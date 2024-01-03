@@ -39,6 +39,13 @@ const VendorsTable = ({
       });
   }
 
+  const getTagColor = (status) => {
+    if (status === "Pending-approval" || status === "Reviewed") return "yellow";
+    else if (status === "pending-approval") return "yellow";
+    else if (status === "approved") return "green";
+    else if (status === "rejected" || status =='declined') return "red";
+  };
+
   const columns = [
     {
       title: "Company Name",
@@ -57,7 +64,7 @@ const VendorsTable = ({
             {/* <div>
               <UserOutlined className="text-xs" />
             </div> */}
-            <div>{record?.vendor?.companyName}</div>
+            <div className="capitalize text-[14px]">{record?.vendor?.companyName.toLowerCase()}</div>
           </div>
         </>
       ),
@@ -72,7 +79,7 @@ const VendorsTable = ({
             {/* <div>
               <UserOutlined className="text-xs" />
             </div> */}
-            <div>{record?.vendor?.tin}</div>
+            <div className="text-[14px] text-[#8392AB]">{record?.vendor?.tin}</div>
           </div>
         </>
       ),
@@ -87,7 +94,7 @@ const VendorsTable = ({
             {/* <div>
               <UserOutlined className="text-xs" />
             </div> */}
-            <div>{record?.vendor?.email}</div>
+            <div className="text-[14px] text-[#8392AB]">{record?.vendor?.email}</div>
           </div>
         </>
       ),
@@ -102,7 +109,7 @@ const VendorsTable = ({
             {/* <div>
               <UserOutlined className="text-xs" />
             </div> */}
-            <div>{record?.vendor?.telephone}</div>
+            <div className="text-[14px] text-[#8392AB]">{record?.vendor?.telephone}</div>
           </div>
         </>
       ),
@@ -113,22 +120,29 @@ const VendorsTable = ({
       sorter: (a, b) => a.vendor?.status > b.vendor?.status,
       render: (_, record) => (
         <>
-          {record?.vendor?.status === "pending-approval" && (
-            <Badge color="yellow" text={record?.vendor?.status} />
-          )}
-
-          {record?.vendor?.status === "approved" && (
-            <Badge color="green" text={record?.vendor?.status} />
-          )}
-
-          {record?.vendor?.status === "declined" && (
-            <Badge color="red" text={record?.vendor?.status} />
-          )}
-
-          {record?.vendor?.status === "rejected" && (
-            <Badge color="red" text={record?.vendor?.status} />
-          )}
+          <div className={`rounded`}>
+            <span className={`bg-${getTagColor(record?.vendor?.status)}-500/20 text-${getTagColor(record?.vendor?.status)}-500 text-[10px]`}>
+              {record?.vendor?.status}
+            </span>
+          </div>
         </>
+        // <>
+        //   {record?.vendor?.status === "pending-approval" && (
+        //     <Badge color="yellow" text={record?.vendor?.status} />
+        //   )}
+
+        //   {record?.vendor?.status === "approved" && (
+        //     <Badge color="green" text={record?.vendor?.status} />
+        //   )}
+
+        //   {record?.vendor?.status === "declined" && (
+        //     <Badge color="red" text={record?.vendor?.status} />
+        //   )}
+
+        //   {record?.vendor?.status === "rejected" && (
+        //     <Badge color="red" text={record?.vendor?.status} />
+        //   )}
+        // </>
       ),
     },
     {

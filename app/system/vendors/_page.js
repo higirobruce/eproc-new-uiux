@@ -50,7 +50,6 @@ import {
 } from "@ant-design/icons";
 import moment from "moment";
 import { motion } from "framer-motion";
-import { FiSearch } from 'react-icons/fi'
 
 export default function Vendors() {
   let user = JSON.parse(localStorage.getItem("user"));
@@ -411,8 +410,8 @@ export default function Vendors() {
     <>
       {contextHolder}
       {
-        <div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 h-screen mt-6 pb-10">
-          {/* <Row className="flex flex-col custom-sticky space-y-2 bg-white px-10 py-3 shadow">
+        <div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-1 h-full">
+          <Row className="flex flex-col custom-sticky space-y-2 bg-white px-10 py-3 shadow">
             <div className="flex flex-row justify-between items-center">
               <div className="text-xl font-semibold">Vendors List</div>
             </div>
@@ -458,7 +457,7 @@ export default function Vendors() {
                 onClick={() => refresh()}
               ></Button>
             </Row>
-          </Row> */}
+          </Row>
 
           {/* <Row className="flex flex-row justify-between items-center">
             <div className="flex flex-row items-start space-x-5 w-1/4">
@@ -477,67 +476,8 @@ export default function Vendors() {
               <Button type="text" icon={<SettingOutlined />}></Button>
             </Row>
           </Row> */}
-          <div className="flex items-center justify-between mr-6">
-            <div />
-            <div className="flex items-center gap-5">
-              <Select
-                // mode="tags"
-                className="text-[9px] w-32 rounded-sm"
-                placeholder="Select status"
-                onChange={(value) => setSearchStatus(value)}
-                value={searchStatus}
-                options={[
-                  { value: "all", label: "All" },
-                  {
-                    value: "pending-approval",
-                    label: "Pending approval",
-                  },
-                  {
-                    value: "approved",
-                    label: "Approved",
-                  },
-                  {
-                    value: "rejected",
-                    label: "Rejected",
-                  },
-                ]}
-              />
-              <Button
-                type="text"
-                className="bg-white h-8 text-[#0063CF]"
-                icon={<ReloadOutlined />}
-                onClick={() => refresh()}
-              ></Button>
-            </div>
-          </div>
-          <div className="mr-6 bg-white rounded-lg h-[calc(100vh-160px)] mb-10 px-5 pb-2">
-            <div className="flex justify-between items-center mb-5">
-              <h4 className="text-[19px] text-[#344767]">Vendors List</h4>
-              <div className="flex items-center rounded-lg bg-[#F5F7FA] p-1.5">
-                <FiSearch size={18} className="text-[#E4E4E4] ml-2" />
-                <Input
-                  onChange={(e) => {
-                    setSearchText(e?.target?.value);
-                  }}
-                  placeholder="Search vendors"
-                  className="border-0 [#8392AB] bg-transparent text-[12px] hover:border-none hover:outline-none"
-                />
-                <div></div>
-              </div>
-            </div>
 
-            <VendorsTable
-              dataSet={tempDataset}
-              handleApproveUser={approveUser}
-              handleDeclineUser={declineUser}
-              updatingId={updatingId}
-              handleBanUser={banVendor}
-              handleActivateUser={activateVendor}
-              handleSetRow={setRowData}
-            />
-          </div>
-
-          {/* <Suspense
+          <Suspense
             fallback={
               <div className="flex items-center justify-center flex-1 h-screen">
                 <Spin
@@ -552,7 +492,6 @@ export default function Vendors() {
               </div>
             }
           >
-          
             <Row className="flex flex-row space-x-5 mx-10 pt-5">
               <motion.div
                 className="w-full"
@@ -578,8 +517,9 @@ export default function Vendors() {
                   />
                 </Col>
               </motion.div>
+              {/* <Col flex={1}><OverviewWindow/></Col> */}
             </Row>
-          </Suspense> */}
+          </Suspense>
           <div class="absolute -bottom-20 right-10 opacity-10">
             <Image src="/icons/blue icon.png" width={110} height={100} />
           </div>

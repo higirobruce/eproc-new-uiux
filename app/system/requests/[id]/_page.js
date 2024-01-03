@@ -550,10 +550,10 @@ export default function page({ params }) {
         type: "tween",
         ease: "circOut",
       }}
-      className="flex flex-col mr-5 transition-opacity ease-in-out duration-1000 py-5 flex-1 space-y-3 h-screen"
+      className="flex flex-col mx-10 transition-opacity ease-in-out duration-1000 py-5 flex-1 space-y-3 h-full"
     >
       {contextHolder}
-      {/* <div className="flex flex-row justify-between items-center">
+      <div className="flex flex-row justify-between items-center">
         <div className="flex flex-row space-x-10 items-center">
           <div>
             <Button
@@ -619,7 +619,7 @@ export default function page({ params }) {
               onChange={(e) => setEditRequest(e)}
             />
           )}
-      </div> */}
+      </div>
       {rowData && (
         <RequestDetails
           handleUpdateStatus={updateStatus}

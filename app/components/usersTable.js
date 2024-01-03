@@ -41,6 +41,13 @@ const UsersTable = ({
     setData(dataSet);
   }, [dataSet]);
 
+  const getTagColor = (status) => {
+    if (status === "pending-approval") return "yellow";
+    else if (status === "approved") return "green";
+    else if (status === "rejected") return "red";
+  };
+
+
   const columns = [
     {
       title: "Email",
@@ -56,7 +63,7 @@ const UsersTable = ({
               // handleSetRow(record)
             }}
           >
-            <div>{record?.email}</div>
+            <div className="capitalize text-[14px]">{record?.email}</div>
           </div>
         </>
       ),
@@ -65,24 +72,45 @@ const UsersTable = ({
       title: "First Name",
       dataIndex: "firstName",
       sorter: (a, b) => a.firstName.localeCompare(b.firstName),
+      render: (_, record) => (
+        <>
+          <div className="space-x-1 flex flex-row items-center">
+            {/* <div>
+              <UserOutlined className="text-xs" />
+            </div> */}
+            <div className="text-[14px] text-[#8392AB]">{record?.firstName}</div>
+          </div>
+        </>
+      ),
     },
     {
       title: "Last Name",
       dataIndex: "lastName",
       sorter: (a, b) => a.lastName.localeCompare(b.lastName),
+      render: (_, record) => (
+        <>
+          <div className="space-x-1 flex flex-row items-center">
+            {/* <div>
+              <UserOutlined className="text-xs" />
+            </div> */}
+            <div className="text-[14px] text-[#8392AB]">{record?.lastName}</div>
+          </div>
+        </>
+      ),
     },
     {
       title: "Department",
       dataIndex: "department",
       sorter: (a, b) =>
         a.department?.description.localeCompare(b.department?.description),
-      render: (_, record) => <>{record?.department?.description}</>,
+      render: (_, record) => <div className=" capitalize text-[14px] text-[#8392AB]">{record?.department?.description.toLowerCase()}</div>,
     },
 
     {
       title: "Phone",
       dataIndex: "telephone",
       sorter: (a, b) => a.telephone > b.telephone,
+      render: (_, record) => <div className="text-[14px] text-[#8392AB]">{record?.telephone}</div>
     },
     {
       title: "Status",
@@ -90,18 +118,13 @@ const UsersTable = ({
       sorter: (a, b) => a.telephone > b.telephone,
       render: (_, record) => (
         <>
-          {record.status === "pending-approval" && (
-            <Badge color="yellow" text={record.status} />
-          )}
-
-          {record.status === "approved" && (
-            <Badge color="green" text={record.status} />
-          )}
-
-          {record.status === "rejected" && (
-            <Badge color="red" text={record.status} />
-          )}
+          <div className={`rounded`}>
+            <span className={`bg-${getTagColor(record?.status)}-500/20 text-${getTagColor(record?.status)}-500 text-[13px]`}>
+              {record?.status}
+            </span>
+          </div>
         </>
+        
       ),
     },
     {

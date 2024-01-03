@@ -5,6 +5,7 @@ import moment from "moment";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { v4 } from "uuid";
 import UploadTORs from "./uploadTORs";
+import { FaPlus } from "react-icons/fa6";
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
@@ -76,7 +77,7 @@ const EditableCell = ({
       >
         {dataIndex == "quantity" || dataIndex == "estimatedUnitCost" ? (
           <InputNumber
-            className="w-full"
+            className="w-full h-10"
             ref={inputRef}
             onPressEnter={save}
             placeholder={dataIndex === "title" ? "enter title" : "eg. 1000000"}
@@ -84,6 +85,7 @@ const EditableCell = ({
           />
         ) : (
           <Input
+            className="w-full h-10"
             ref={inputRef}
             onPressEnter={save}
             placeholder={dataIndex === "title" ? "enter title" : "eg. 1000000"}
@@ -127,13 +129,13 @@ const ItemsTable = ({
     {
       title: "Item title",
       dataIndex: "title",
-      width:'40%',
+      width:'25%',
       editable: true,
     },
     {
       title: "Quantity",
       dataIndex: "quantity",
-      // width: "15%",
+      width: "15%",
       editable: true,
     },
     {
@@ -157,6 +159,8 @@ const ItemsTable = ({
         return (
           <Select
             defaultValue={record.currency}
+            size="large"
+            className="w-full"
             onChange={(value) => (record.currency = value)}
             options={[
               {
@@ -278,16 +282,7 @@ const ItemsTable = ({
   });
 
   return (
-    <div>
-      <Button
-        onClick={handleAdd}
-        type="primary"
-        style={{
-          marginBottom: 16,
-        }}
-      >
-        Add a row
-      </Button>
+    <div className="item-requests flex flex-col gap-2">
       <Table
         components={components}
         rowClassName={() => "editable-row"}
@@ -296,6 +291,13 @@ const ItemsTable = ({
         columns={columns}
         size="small"
       />
+        <Button
+          onClick={handleAdd}
+          className="flex self-start items-center gap-1 border-0 bg-[#EAF1FC] text-[#0065DD]"
+        >
+          <FaPlus />
+          Row
+        </Button>
     </div>
   );
 };

@@ -19,8 +19,6 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { encode } from "base-64";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { MdFileCopy, MdAttachFile, MdOutlineAllInbox } from "react-icons/md";
-import { FiUsers } from "react-icons/fi";
 
 export default function page() {
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -230,88 +228,150 @@ export default function page() {
   return (
     <>
       {contextHolder}
-
       {dataLoaded ? (
-        <div className="mt-10">
-          <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4 mr-6 my-5">
-            <div className="bg-white rounded p-5">
-              <div className="flex items-center gap-7">
-                <div className="w-16 h-16 flex justify-center items-center rounded-full bg-[#E9EAF5]">
-                  <MdOutlineAllInbox size={22} className="text-[#506A73]" />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{
+            opacity: dataLoaded ? 1 : 0,
+          }}
+          transition={{
+            duration: 0.3,
+            type: "tween",
+            ease: "circOut",
+          }}
+          className="flex flex-col flex-1 space-y-10 h-full pb-10"
+        >
+          <div className="grid md:grid-cols-5 gap-4 p-5">
+            <div
+              className="cursor-pointer"
+              onClick={() => router.push("/system/requests")}
+            >
+              <CountCard
+                title="Requests"
+                count={requests?.length}
+                icon={<DocumentIcon className="h-5 w-5" />}
+                color="blue-400"
+              />
+            </div>
+
+            <div
+              className="cursor-pointer"
+              onClick={() => router.push("/system/tenders")}
+            >
+              <CountCard
+                title="Tenders"
+                count={tenders?.length}
+                icon={<DocumentCheckIcon className="h-5 w-5" />}
+                color="blue-400"
+              />
+            </div>
+
+            <div
+              className="cursor-pointer"
+              onClick={() => router.push("/system/contracts")}
+            >
+              <CountCard
+                title="Contracts"
+                count={contracts?.length}
+                icon={<DocumentTextIcon className="h-5 w-5" />}
+                color="blue-400"
+              />
+            </div>
+
+            <div
+              className="cursor-pointer"
+              onClick={() => router.push("/system/purchase-orders")}
+            >
+              <CountCard
+                title="Purchase Orders"
+                count={purchaseOrders?.length}
+                icon={<DocumentDuplicateIcon className="h-5 w-5" />}
+                color="blue-400"
+              />
+            </div>
+
+            <div
+              className="cursor-pointer"
+              onClick={() => router.push("/system/vendors")}
+            >
+              <CountCard
+                title="Vendors"
+                count={vendors?.length}
+                icon={<UsersIcon className="h-5 w-5" />}
+                color="blue-400"
+              />
+            </div>
+          </div>
+          <div className="grid md:grid-cols-5 gap-4 m-5 p-5 bg-white rounded-md shadow-md">
+            <div className="col-span-5 text-xl font-semibold">Requests</div>
+            <RequestStats />
+            <RequestsByDep />
+            <div className="col-span-2">
+              <RequestsByStatus />
+            </div>
+            <div className="flex flex-col space-y-2">
+              <div className="text-xs font-bold">
+                Breakdown by Budgeted vs Unbudgeted
+              </div>
+              <div className="flex flex-row justify-between items-center pt-5">
+                <div className="flex flex-row space-x-2 items-center">
+                  <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+                  <div className="text-sm text-gray-600">Budgeted</div>
                 </div>
-                <div className="-mt-3">
-                  <h4 className="text-[#070F44] font-semibold mb-1">23</h4>
-                  <small className="text-[#455A6A] text-[11px]">
-                    Total Requests
-                  </small>
+                <div className="text-xs text-gray-600">{budgeted || 0}%</div>
+              </div>
+              <Divider></Divider>
+              <div className="flex flex-row justify-between items-center">
+                <div className="flex flex-row space-x-2 items-center">
+                  <div className="h-2 w-2 bg-red-400 rounded-full"></div>
+                  <div className="text-sm text-gray-600">Unbudgeted</div>
                 </div>
+
+                <div className="text-xs text-gray-600">{unbudgeted || 0}%</div>
               </div>
             </div>
-            <div className="bg-white rounded p-5">
-              <div className="flex items-center gap-7">
-                <div className="w-16 h-16 flex justify-center items-center rounded-full bg-[#E9EAF5]">
-                  <MdFileCopy size={22} className="text-[#506A73]" />
+            {/* <TendersStats />
+            <TendersByDep/> */}
+          </div>
+
+          <div className="grid md:grid-cols-5 gap-4 m-5 p-5 bg-white rounded-md shadow-md">
+            <div className="col-span-5 text-xl font-semibold">Tenders</div>
+
+            <TendersStats />
+            <TendersByDep />
+            <div className="flex flex-col space-y-2">
+              <div className="text-xs font-bold">Breakdown by Status</div>
+              <div className="flex flex-row justify-between items-center pt-5">
+                <div className="flex flex-row space-x-2 items-center">
+                  <div className="h-2 w-2 bg-yellow-500 rounded-full"></div>
+                  <div className="text-sm text-gray-600">Open</div>
                 </div>
-                <div className="-mt-3">
-                  <h4 className="text-[#070F44] font-semibold mb-1">34</h4>
-                  <small className="text-[#455A6A] text-[11px]">
-                    Total Tenders
-                  </small>
+                <div className="text-xs text-gray-600">{openTenders || 0}%</div>
+              </div>
+              <Divider></Divider>
+              <div className="flex flex-row justify-between items-center">
+                <div className="flex flex-row space-x-2 items-center">
+                  <div className="h-2 w-2 bg-green-400 rounded-full"></div>
+                  <div className="text-sm text-gray-600">Closed</div>
+                </div>
+                <div className="text-xs text-gray-600">
+                  {closedTenders || 0}%
                 </div>
               </div>
-            </div>
-            <div className="bg-white rounded p-5">
-              <div className="flex items-center gap-7">
-                <div className="w-16 h-16 flex justify-center items-center rounded-full bg-[#F4F5D4]">
-                  <MdAttachFile size={22} className="text-[#506A73]" />
-                </div>
-                <div className="-mt-3">
-                  <h4 className="text-[#070F44] font-semibold mb-1">34</h4>
-                  <small className="text-[#455A6A] text-[11px]">
-                    Total Contracts
-                  </small>
-                </div>
-              </div>
-            </div>
-            <div className="bg-white rounded p-5">
-              <div className="flex items-center gap-7">
-                <div className="w-16 h-16 flex justify-center items-center rounded-full bg-[#D4F5F3]">
-                  <FiUsers size={22} className="text-[#506A73]" />
-                </div>
-                <div className="-mt-3">
-                  <h4 className="text-[#070F44] font-semibold mb-1">6+</h4>
-                  <small className="text-[#455A6A] text-[11px]">
-                    Total Vendors
-                  </small>
+
+              <div className="pt-5">
+                <div className="text-xs font-bold">
+                  {" "}
+                  {avgBids || 0} bid(s) submitted per Tender on Average
                 </div>
               </div>
             </div>
           </div>
-          <div className="grid lg:grid-cols-3 gap-4 mr-6 my-5">
-            <div className="bg-white rounded-lg px-5 h-96">
-              <h6>Requests by Category</h6>
-            </div>
-            <div className="bg-white rounded-lg px-5 h-96">
-              <h6>Requests by Department</h6>
-            </div>
-            <div className="flex flex-col gap-5">
-              <div className="bg-white rounded-lg px-5 h-full">
-                <h6>Requests by Status</h6>
-              </div>
-              <div className="bg-white rounded-lg px-5 h-full">
-                <h6>Budgeted vs Unbudgeted Breakdown</h6>
-              </div>
-            </div>
-          </div>
-          <div className="grid lg:grid-cols-2 gap-4 mr-6 my-5">
-            <div className="bg-white rounded-lg px-5 h-96">
-              <h6>Tenders by Category</h6>
-            </div>
-            <div className="bg-white rounded-lg px-5 h-96">
-              <h6>Tenders by Department</h6>
-            </div>
-          </div>
-        </div>
+
+          {/* <div class="absolute opacity-10 top-0 z-20">
+              <Image src="/icons/blue icon.png" width={962} height={900} />
+            </div> */}
+        </motion.div>
       ) : (
         <div className="flex items-center justify-center flex-1 h-screen">
           <Spin
@@ -326,5 +386,6 @@ export default function page() {
         </div>
       )}
     </>
+    
   );
 }

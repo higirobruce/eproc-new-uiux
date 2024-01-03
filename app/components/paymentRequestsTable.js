@@ -223,7 +223,7 @@ const PaymentRequestsTable = ({
                 <div>
                   <FileTextOutlined className="text-xs" />
                 </div>
-                <div>{record?.purchaseOrder?.number}</div>
+                <div className="capitalize text-[12px]">{record?.purchaseOrder?.number}</div>
               </div>
             ) : (
               <div className="text-xs self-end">N/A</div>
@@ -242,7 +242,7 @@ const PaymentRequestsTable = ({
       render: (_, record) => (
         <>
           <div className={record?.number === selectedRow ? "font-bold" : ""}>
-            <Typography.Text style={{ width: 150 }} ellipsis={true}>
+            <Typography.Text style={{ width: 150 }} className="capitalize text-[12px] text-[#8392AB]" ellipsis={true}>
               {record?.title}
             </Typography.Text>
           </div>
@@ -256,7 +256,7 @@ const PaymentRequestsTable = ({
         a?.createdBy?.firstName?.localeCompare(b?.createdBy?.firstName),
       render: (_, record) => (
         <>
-          <Typography.Text>
+          <Typography.Text className="capitalize text-[12px] text-[#8392AB]">
             {record?.createdBy?.userType !== "VENDOR"
               ? record?.createdBy?.firstName
               : record?.createdBy?.companyName}
@@ -272,7 +272,7 @@ const PaymentRequestsTable = ({
       render: (_, record) => (
         <>
           <Row className="felx flex-row items-center justify-between">
-            <Typography.Text>
+            <Typography.Text className="capitalize text-[12px] text-[#8392AB]">
               {record?.amount?.toLocaleString()} {record?.currency}
             </Typography.Text>
           </Row>
@@ -292,16 +292,21 @@ const PaymentRequestsTable = ({
         ),
       render: (_, record) => (
         <>
-          <Badge
-            color={getTagColor(
-              getHighLevelStatus(
+          <div className={`rounded`}>
+            <span className={`bg-${getTagColor(
+                getHighLevelStatus(
+                  record?.status.charAt(0).toUpperCase() + record?.status.slice(1)
+                )
+              )}-500/20 text-${getTagColor(
+                getHighLevelStatus(
+                  record?.status.charAt(0).toUpperCase() + record?.status.slice(1)
+                )
+              )}-500 text-[13px]`}>
+              {getHighLevelStatus(
                 record?.status.charAt(0).toUpperCase() + record?.status.slice(1)
-              )
-            )}
-            text={getHighLevelStatus(
-              record?.status.charAt(0).toUpperCase() + record?.status.slice(1)
-            )}
-          />
+              )}
+            </span>
+          </div>
         </>
       ),
     },
@@ -341,6 +346,7 @@ const PaymentRequestsTable = ({
                 <Link
                   href={`${url}/file/paymentRequests/${doc}`}
                   target="_blank"
+                  className="capitalize text-[12px] text-[#8392AB]"
                 >
                   {truncatedFileName}
                 </Link>

@@ -49,7 +49,7 @@ const TendersTable = ({
                   <div>
                     <FileProtectOutlined />
                   </div>
-                  <div>{record?.number}</div>
+                  <div className="capitalize text-[14px]">{record?.number}</div>
                 </div>
               </>
             ),
@@ -71,7 +71,7 @@ const TendersTable = ({
                   <div>
                     <FileDoneOutlined />
                   </div>
-                  <div>{record?.purchaseRequest?.number}</div>
+                  <div className="capitalize text-[14px]">{record?.purchaseRequest?.number}</div>
                 </div>
               </>
             ),
@@ -82,8 +82,8 @@ const TendersTable = ({
             sorter: (a, b) => b > a,
             render: (_, record) => (
               <>
-                <Typography.Text>
-                  {record?.purchaseRequest?.title}
+                <Typography.Text className="capitalize text-[#8392AB] text-[14px]">
+                  {record?.purchaseRequest?.title.toLowerCase()}
                 </Typography.Text>
               </>
             ),
@@ -94,8 +94,8 @@ const TendersTable = ({
             sorter: (a, b) => b > a,
             render: (_, record) => (
               <>
-                <Typography.Text>
-                  {record?.createdBy?.department?.description}
+                <Typography.Text className="capitalize text-[#8392AB] text-[14px]">
+                  {record?.createdBy?.department?.description.toLowerCase()}
                 </Typography.Text>
               </>
             ),
@@ -107,8 +107,8 @@ const TendersTable = ({
             sorter: (a, b) => b > a,
             render: (_, record) => (
               <>
-                <Typography.Text>
-                  {record?.purchaseRequest?.serviceCategory}
+                <Typography.Text className="capitalize text-[#8392AB] text-[14px]">
+                  {record?.purchaseRequest?.serviceCategory.toLowerCase()}
                 </Typography.Text>
               </>
             ),
@@ -124,7 +124,7 @@ const TendersTable = ({
             render: (_, record) => (
               <>
                 <Row className="felx flex-row items-center justify-between">
-                  <Typography.Text>
+                  <Typography.Text className="capitalize text-[#8392AB] text-[14px]">
                     {moment(record?.submissionDeadLine).format("YYYY-MMM-DD")}{" "}
                   </Typography.Text>
                   {/* <Typography.Text>
@@ -148,13 +148,11 @@ const TendersTable = ({
             sorter: (a, b) => b > a,
             render: (_, record) => (
               <>
-                {moment().isBefore(moment(record?.submissionDeadLine)) && (
-                  <Badge color="yellow" text="Open" />
-                )}
-
-                {moment().isAfter(moment(record?.submissionDeadLine)) && (
-                  <Badge color="green" text="Closed" />
-                )}
+                <div className={`bg-${moment().isBefore(moment(record?.submissionDeadLine)) ? 'yellow' : moment().isAfter(moment(record?.submissionDeadLine)) && 'green'}-500/15 rounded`}>
+                  <span className={`text-${moment().isBefore(moment(record?.submissionDeadLine)) ? 'yellow' : moment().isAfter(moment(record?.submissionDeadLine)) && 'green'}-500 text-[13px]`}>
+                    {moment().isBefore(moment(record?.submissionDeadLine)) ? 'Open' : moment().isAfter(moment(record?.submissionDeadLine)) && 'Closed'}
+                  </span>
+                </div>
               </>
             ),
           },
@@ -208,7 +206,7 @@ const TendersTable = ({
                   <div>
                     <FileProtectOutlined />
                   </div>
-                  <div>{record?.number}</div>
+                  <div className="capitalize text-[14px]">{record?.number}</div>
                 </div>
               </>
             ),
@@ -218,7 +216,7 @@ const TendersTable = ({
             key: "title",
             render: (_, record) => (
               <>
-                <Typography.Text>
+                <Typography.Text className="capitalize text-[14px]">
                   {record?.purchaseRequest?.title}
                 </Typography.Text>
               </>
@@ -230,8 +228,8 @@ const TendersTable = ({
             key: "category",
             render: (_, record) => (
               <>
-                <Typography.Text>
-                  {record?.purchaseRequest?.serviceCategory}
+                <Typography.Text className="capitalize text-[14px]">
+                  {record?.purchaseRequest?.serviceCategory.toLowerCase()}
                 </Typography.Text>
               </>
             ),
@@ -242,8 +240,8 @@ const TendersTable = ({
             key: "submissionDeadLine",
             render: (_, record) => (
               <>
-                <Row className="felx flex-row items-center justify-between">
-                  <Typography.Text>
+                <Row className="flex flex-row items-center justify-between">
+                  <Typography.Text className="capitalize text-[14px]">
                     {moment(record?.submissionDeadLine).format("YYYY-MMM-DD")}{" "}
                   </Typography.Text>
                   {/* <Typography.Text>
@@ -265,15 +263,11 @@ const TendersTable = ({
             title: "Status",
             key: "action",
             render: (_, record) => (
-              <>
-                {moment().isBefore(moment(record?.submissionDeadLine)) && (
-                  <Badge color="yellow" text="Open" />
-                )}
-
-                {moment().isAfter(moment(record?.submissionDeadLine)) && (
-                  <Badge color="green" text="Closed" />
-                )}
-              </>
+              <div className={`bg-${moment().isBefore(moment(record?.submissionDeadLine)) ? 'yellow' : moment().isAfter(moment(record?.submissionDeadLine)) && 'green'}-500/15 rounded`}>
+                <span className={`text-${moment().isBefore(moment(record?.submissionDeadLine)) ? 'yellow' : moment().isAfter(moment(record?.submissionDeadLine)) && 'green'}-500 text-[13px]`}>
+                  {moment().isBefore(moment(record?.submissionDeadLine)) ? 'Open' : moment().isAfter(moment(record?.submissionDeadLine)) && 'Closed'}
+                </span>
+              </div>
             ),
           },
           // {
