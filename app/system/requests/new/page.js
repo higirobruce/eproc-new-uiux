@@ -507,7 +507,6 @@ export default function NewRequest() {
               files={files}
               setFiles={_setFiles}
             />
-            {console.log('Values ', values)}
           </Form>
         </div>
         <div className="flex justify-end gap-5 xl:-mt-7 md:-mt-5 -mt-3">
