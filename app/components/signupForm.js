@@ -23,11 +23,15 @@ import {
   Tooltip,
 } from "antd";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import UploadRDCerts from "./uploadRDBCerts";
 import { v4 } from "uuid";
 import UploadVatCerts from "./uploadVatCerts";
 import { decode as base64_decode, encode as base64_encode } from "base-64";
+import Login from "@/public/login.svg";
+import LoginForm from "./loginForm";
+import Link from "next/link";
+import Logo from '@/public/Logo.png';
 
 const { Option } = Select;
 
@@ -1507,6 +1511,8 @@ const SignupForm = () => {
   const [vatSelected, setVatSelected] = useState(false);
   const [password, setPassword] = useState("");
   const regexPatternSpecialCh = "[!@#$%^&*()\\-_=+[\\]{};:'\"\\\\|,.<>/?]";
+  const searchParams = useSearchParams();
+  console.log(searchParams.get("goTo"));
 
   const onFinish = (values) => {
     setSubmitting(true);
@@ -1694,463 +1700,904 @@ const SignupForm = () => {
   }));
 
   return (
-    <div className="flex h-screen">
+    // <div className="flex h-screen">
+    //   {contextHolder}
+    //   {loaded ? (
+    //     <div className="flex bg-slate-50 py-5 my-10 px-10 rounded-lg shadow-lg overflow-y-auto">
+    //       <Form
+    //         {...formItemLayout}
+    //         form={form}
+    //         name="register"
+    //         onFinish={onFinish}
+    //         initialValues={{
+    //           residence: ["zhejiang", "hangzhou", "xihu"],
+    //           firstName: "",
+    //           prefix: "+250",
+    //           email: "",
+    //         }}
+    //         scrollToFirstError
+    //       >
+    //         <div>
+    //           {submitting ? (
+    //             <Spin indicator={antIcon} />
+    //           ) : (
+    //             <div className="flex flex-row text-sm items-center">
+    //               <div>Already have an account?</div>
+    //               <Button type="link" onClick={() => router.push("/auth")}>
+    //                 Login
+    //               </Button>
+    //             </div>
+    //           )}
+    //         </div>
+    //         <Row className="flex flex-row space-x-5 items-center justify-between">
+    //           <div>
+    //             <Typography.Title level={2}>Create an account</Typography.Title>
+    //           </div>
+
+    //           <Image
+    //             alt=""
+    //             className="pt-3"
+    //             src="/favicon.png"
+    //             width={38}
+    //             height={40}
+    //           />
+    //         </Row>
+    //         {/* <Form.Item
+    //           name="type"
+    //           label="Account type"
+    //           rules={[
+    //             { required: true, message: "Please select account type!" },
+    //           ]}
+    //         >
+    //           <Select
+    //             placeholder="select account type"
+    //             onChange={(value) => setType(value)}
+    //           >
+    //             <Option value="VENDOR">Vendor</Option>
+    //             <Option value="DPT-USER">Department User</Option>
+    //           </Select>
+    //         </Form.Item> */}
+
+    //         {type === "VENDOR" && (
+    //           <>
+    //             <div className="grid md:grid-cols-2 gap-x-10">
+    //               {/* General Information */}
+    //               <div>
+    //                 <Typography.Title className="" level={4}>
+    //                   General Information
+    //                 </Typography.Title>
+    //                 <div className="">
+    //                   {/* Grid 1 */}
+    //                   <div className="grid grid-cols-2 gap-x-5 -my-1">
+    //                     <div>
+    //                       <div className="flex flex-row spacex-3">
+    //                         Company Name<div className="text-red-500">*</div>
+    //                       </div>
+
+    //                       <Form.Item
+    //                         name="companyName"
+    //                         // label="Company name"
+    //                         rules={[
+    //                           {
+    //                             required: true,
+    //                             message: "Input required",
+    //                           },
+    //                         ]}
+    //                       >
+    //                         <Input />
+    //                       </Form.Item>
+    //                     </div>
+
+    //                     <div>
+    //                       <div className="flex flex-row spacex-3">
+    //                         TIN<div className="text-red-500">*</div>
+    //                         <div>
+    //                           <Tooltip
+    //                             placement="top"
+    //                             title="For foreign business, please provide your base country incorporation or registration ID."
+    //                             arrow={false}
+    //                           >
+    //                             <QuestionCircleOutlined />
+    //                           </Tooltip>
+    //                         </div>
+    //                       </div>
+    //                       <Form.Item
+    //                         name="tin"
+    //                         // label="TIN"
+    //                         rules={[
+    //                           // { len: 10, message: "TIN should be 10 charachers" },
+    //                           {
+    //                             type: "integer",
+    //                             message: "Input required",
+    //                           },
+    //                           { required: true, message: "Input required" },
+    //                         ]}
+    //                       >
+    //                         <InputNumber style={{ width: "100%" }} />
+    //                       </Form.Item>
+    //                     </div>
+    //                   </div>
+
+    //                   <div className="grid grid-cols-2 gap-x-5 -my-1">
+    //                     <div>
+    //                       <div className="flex flex-row spacex-3">
+    //                         Contact person Names
+    //                         <div className="text-red-500">*</div>
+    //                       </div>
+    //                       <Form.Item
+    //                         name="contactPersonNames"
+    //                         // label="Contact Person's Names"
+    //                         rules={[
+    //                           {
+    //                             required: true,
+    //                             message: "Input required",
+    //                           },
+    //                         ]}
+    //                       >
+    //                         <Input />
+    //                       </Form.Item>
+    //                     </div>
+    //                     <div>
+    //                       <div className="flex flex-row spacex-3">
+    //                         Contact Person Title
+    //                         <div className="text-red-500">*</div>
+    //                       </div>
+    //                       <Form.Item
+    //                         name="title"
+    //                         rules={[
+    //                           {
+    //                             required: true,
+    //                             message: "Input required",
+    //                           },
+    //                         ]}
+    //                       >
+    //                         <Input />
+    //                       </Form.Item>
+    //                     </div>
+    //                   </div>
+
+    //                   <div className="grid grid-cols-2 gap-x-5 -my-1">
+    //                     <div>
+    //                     <div className="flex flex-row spacex-3">
+    //                         Email<div className="text-red-500">*</div>
+    //                       </div>
+    //                       <Form.Item
+    //                         name="email"
+    //                         // label="E-mail"
+    //                         rules={[
+    //                           {
+    //                             type: "email",
+    //                             message: "The input is not valid E-mail!",
+    //                           },
+    //                           {
+    //                             required: true,
+    //                             message: "Input required",
+    //                           },
+    //                         ]}
+    //                       >
+    //                         <Input />
+    //                       </Form.Item>
+    //                     </div>
+    //                     <div>
+    //                       <div>Website</div>
+    //                       <Form.Item name="website">
+    //                         <AutoComplete
+    //                           options={websiteOptions}
+    //                           onChange={onWebsiteChange}
+    //                           placeholder="website"
+    //                         >
+    //                           <Input />
+    //                         </AutoComplete>
+    //                       </Form.Item>
+    //                     </div>
+    //                   </div>
+
+    //                   <div className="grid grid-cols-2 gap-x-5 -my-1">
+    //                     <div>
+    //                       <div className="flex flex-row spacex-3">
+    //                         Password<div className="text-red-500">*</div>
+    //                       </div>
+    //                       <Form.Item
+    //                         name="password"
+    //                         // label="Password"
+    //                         rules={[
+    //                           {
+    //                             required: true,
+    //                             message: "Input required",
+    //                           },
+    //                           {
+    //                             pattern: new RegExp("([0-9]\\d*)+"),
+    //                             message: "Please input at least one digit",
+    //                           },
+    //                           {
+    //                             pattern: new RegExp("([a-zA-Z]\\s*)+"),
+    //                             message:
+    //                               "Password should have both small and capital letters",
+    //                           },
+    //                           {
+    //                             pattern: new RegExp(regexPatternSpecialCh, "g"),
+    //                             message:
+    //                               "Password should have a special character",
+    //                           },
+    //                           {
+    //                             pattern: new RegExp("(.{8,})"),
+    //                             message:
+    //                               "Password should have atleast 8 characters",
+    //                           },
+    //                         ]}
+    //                         hasFeedback
+    //                       >
+    //                         <Input.Password onChange={(v) => setPassword(v)} />
+    //                       </Form.Item>
+    //                     </div>
+    //                     <div>
+    //                       <div className="flex flex-row spacex-3">
+    //                         Confirm password
+    //                         <div className="text-red-500">*</div>
+    //                       </div>
+    //                       <Form.Item
+    //                         name="confirm"
+    //                         // label="Confirm Password"
+    //                         dependencies={["password"]}
+    //                         hasFeedback
+    //                         rules={[
+    //                           {
+    //                             required: true,
+    //                             message: "Input required",
+    //                           },
+    //                           ({ getFieldValue }) => ({
+    //                             validator(_, value) {
+    //                               if (
+    //                                 !value ||
+    //                                 getFieldValue("password") === value
+    //                               ) {
+    //                                 return Promise.resolve();
+    //                               }
+    //                               return Promise.reject(
+    //                                 new Error(
+    //                                   "The two passwords that you entered do not match!"
+    //                                 )
+    //                               );
+    //                             },
+    //                           }),
+    //                         ]}
+    //                       >
+    //                         <Input.Password />
+    //                       </Form.Item>
+    //                     </div>
+    //                   </div>
+
+    //                   <div className="grid grid-cols-2 gap-x-5 -my-1">
+    //                     <div>
+    //                       <div className="flex flex-row spacex-3">
+    //                         Phone number <div className="text-red-500">*</div>
+    //                       </div>
+    //                       <Form.Item
+    //                         name="phone"
+    //                         rules={[
+    //                           {
+    //                             required: true,
+    //                             message: "Input required",
+    //                           },
+    //                         ]}
+    //                       >
+    //                         <Input addonBefore={prefixSelector} />
+    //                       </Form.Item>
+    //                     </div>
+    //                     <div>
+    //                       <div className="flex flex-row spacex-3">
+    //                         Area(s) of expertise
+    //                         <div className="text-red-500">*</div>
+    //                       </div>
+    //                       <Form.Item
+    //                         name="services"
+    //                         rules={[
+    //                           {
+    //                             required: true,
+    //                             message: "Input required",
+    //                           },
+    //                         ]}
+    //                       >
+    //                         <Select
+    //                           mode="multiple"
+    //                           allowClear
+    //                           // style={{width:'100%'}}
+    //                           placeholder="Please select"
+    //                         >
+    //                           {servCategories?.map((s) => {
+    //                             return (
+    //                               <Option key={s._id} value={s.description}>
+    //                                 {s.description}
+    //                               </Option>
+    //                             );
+    //                           })}
+    //                         </Select>
+    //                       </Form.Item>
+    //                     </div>
+    //                   </div>
+
+    //                   <div className="grid grid-cols-2 gap-x-5 -my-1">
+    //                     <div>
+    //                       <div>Experience (in Years)</div>
+    //                       <Form.Item
+    //                         name="experience"
+    //                         rules={[
+    //                           {
+    //                             type: "integer",
+    //                             message: "The input is not valid Number",
+    //                           },
+    //                         ]}
+    //                       >
+    //                         <InputNumber style={{ width: "100%" }} />
+    //                       </Form.Item>
+    //                     </div>
+    //                   </div>
+    //                 </div>
+    //               </div>
+
+    //               {/* Address information */}
+    //               <div>
+    //                 <Typography.Title className="" level={4}>
+    //                   Address Information
+    //                 </Typography.Title>
+
+    //                 <div>
+    //                   {/* Grid 1 */}
+    //                   <div className="grid grid-cols-2 gap-x-5">
+    //                     <div>
+    //                       <div>Hq Address</div>
+    //                       <Form.Item name="hqAddress">
+    //                         <Input />
+    //                       </Form.Item>
+    //                     </div>
+
+    //                     <div>
+    //                       <div>Country</div>
+    //                       <Form.Item name="country">
+    //                         <Input />
+    //                       </Form.Item>
+    //                     </div>
+    //                   </div>
+    //                 </div>
+
+    //                 <Typography.Title className="" level={4}>
+    //                   Uploads
+    //                 </Typography.Title>
+
+    //                 <div className="grid md:grid-cols-2 gap-x-5">
+    //                   <div>
+    //                     <div className="flex flex-row space-x-1">
+    //                       <div>Incorporation document</div>
+    //                       <div>
+    //                         <Tooltip
+    //                           placement="top"
+    //                           title="Please attach your incorporation document. For businesses registered in Rwanda, please provide your RDB certificate."
+    //                           arrow={false}
+    //                         >
+    //                           <QuestionCircleOutlined />
+    //                         </Tooltip>
+    //                       </div>
+    //                     </div>
+
+    //                     <Form.Item
+    //                       name="rdbRegistraction"
+    //                       rules={[
+    //                         // {
+    //                         //   validator: (_, value) =>
+    //                         //     rdbSelected
+    //                         //       ? Promise.resolve()
+    //                         //       : Promise.reject(
+    //                         //           new Error(
+    //                         //             "Please attach your incorporation document"
+    //                         //           )
+    //                         //         ),
+    //                         // },
+    //                       ]}
+    //                     >
+    //                       <UploadRDCerts
+    //                         uuid={rdbCertId}
+    //                         setSelected={setRDBSelected}
+    //                         setId={setRdbCertId}
+    //                         iconOnly={false}
+    //                         setStatus={()=>{}}
+    //                       />
+    //                     </Form.Item>
+    //                   </div>
+    //                   <div>
+    //                     <div>VAT Certificate</div>
+    //                     <Form.Item name="vatCertificate">
+    //                       <UploadVatCerts
+    //                         uuid={vatCertId}
+    //                         setId={setVatCertId}
+    //                         setSelected={setVatSelected}
+    //                         setStatus={()=>{}}
+
+    //                       />
+    //                     </Form.Item>
+    //                   </div>
+    //                   <div></div>
+    //                 </div>
+    //               </div>
+    //             </div>
+
+    //             {/* <Form.Item
+    //               name="agreement"
+    //               valuePropName="checked"
+    //               rules={[
+    //                 {
+    //                   validator: (_, value) =>
+    //                     value
+    //                       ? Promise.resolve()
+    //                       : Promise.reject(
+    //                           new Error("Should accept agreement")
+    //                         ),
+    //                 },
+    //               ]}
+    //               {...tailFormItemLayout}
+    //             >
+    //               <Checkbox>
+    //                 I have read the <a href="">agreement</a>
+    //               </Checkbox>
+    //             </Form.Item> */}
+
+    //             <Form.Item className="pb-5" {...tailFormItemLayout}>
+    //               {submitting ? (
+    //                 <Spin indicator={antIcon} />
+    //               ) : (
+    //                 <Button type="default" htmlType="submit">
+    //                   Register
+    //                 </Button>
+    //               )}
+    //             </Form.Item>
+    //           </>
+    //         )}
+    //       </Form>
+    //     </div>
+    //   ) : (
+    //     <Skeleton />
+    //   )}
+    // </div>
+    <main className="overflow-hidden h-screen mb-10">
       {contextHolder}
-      {loaded ? (
-        <div className="flex bg-slate-50 py-5 my-10 px-10 rounded-lg shadow-lg overflow-y-auto">
-          <Form
-            {...formItemLayout}
-            form={form}
-            name="register"
-            onFinish={onFinish}
-            initialValues={{
-              residence: ["zhejiang", "hangzhou", "xihu"],
-              firstName: "",
-              prefix: "+250",
-              email: "",
-            }}
-            scrollToFirstError
-          >
-            <div>
-              {submitting ? (
-                <Spin indicator={antIcon} />
-              ) : (
-                <div className="flex flex-row text-sm items-center">
-                  <div>Already have an account?</div>
-                  <Button type="link" onClick={() => router.push("/auth")}>
-                    Login
-                  </Button>
-                </div>
-              )}
-            </div>
-            <Row className="flex flex-row space-x-5 items-center justify-between">
-              <div>
-                <Typography.Title level={2}>Create an account</Typography.Title>
-              </div>
-
-              <Image
-                alt=""
-                className="pt-3"
-                src="/favicon.png"
-                width={38}
-                height={40}
-              />
-            </Row>
-            {/* <Form.Item
-              name="type"
-              label="Account type"
-              rules={[
-                { required: true, message: "Please select account type!" },
-              ]}
-            >
-              <Select
-                placeholder="select account type"
-                onChange={(value) => setType(value)}
-              >
-                <Option value="VENDOR">Vendor</Option>
-                <Option value="DPT-USER">Department User</Option>
-              </Select>
-            </Form.Item> */}
-
-            {type === "VENDOR" && (
-              <>
-                <div className="grid md:grid-cols-2 gap-x-10">
-                  {/* General Information */}
-                  <div>
-                    <Typography.Title className="" level={4}>
-                      General Information
-                    </Typography.Title>
-                    <div className="">
-                      {/* Grid 1 */}
-                      <div className="grid grid-cols-2 gap-5">
-                        <div>
-                          <div className="flex flex-row spacex-3">
-                            Company Name<div className="text-red-500">*</div>
-                          </div>
-
-                          <Form.Item
-                            name="companyName"
-                            // label="Company name"
-                            rules={[
-                              {
-                                required: true,
-                                message: "Input required",
-                              },
-                            ]}
-                          >
-                            <Input />
-                          </Form.Item>
-                        </div>
-
-                        <div>
-                          <div className="flex flex-row spacex-3">
-                            TIN<div className="text-red-500">*</div>
-                            <div>
-                              <Tooltip
-                                placement="top"
-                                title="For foreign business, please provide your base country incorporation or registration ID."
-                                arrow={false}
-                              >
-                                <QuestionCircleOutlined />
-                              </Tooltip>
-                            </div>
-                          </div>
-                          <Form.Item
-                            name="tin"
-                            // label="TIN"
-                            rules={[
-                              // { len: 10, message: "TIN should be 10 charachers" },
-                              {
-                                type: "integer",
-                                message: "Input required",
-                              },
-                              { required: true, message: "Input required" },
-                            ]}
-                          >
-                            <InputNumber style={{ width: "100%" }} />
-                          </Form.Item>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-5">
-                        <div>
-                          <div className="flex flex-row spacex-3">
-                            Contact person Names
-                            <div className="text-red-500">*</div>
-                          </div>
-                          <Form.Item
-                            name="contactPersonNames"
-                            // label="Contact Person's Names"
-                            rules={[
-                              {
-                                required: true,
-                                message: "Input required",
-                              },
-                            ]}
-                          >
-                            <Input />
-                          </Form.Item>
-                        </div>
-                        <div>
-                          <div className="flex flex-row spacex-3">
-                            Contact Person Title
-                            <div className="text-red-500">*</div>
-                          </div>
-                          <Form.Item
-                            name="title"
-                            rules={[
-                              {
-                                required: true,
-                                message: "Input required",
-                              },
-                            ]}
-                          >
-                            <Input />
-                          </Form.Item>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-5">
-                        <div>
-                        <div className="flex flex-row spacex-3">
-                            Email<div className="text-red-500">*</div>
-                          </div>
-                          <Form.Item
-                            name="email"
-                            // label="E-mail"
-                            rules={[
-                              {
-                                type: "email",
-                                message: "The input is not valid E-mail!",
-                              },
-                              {
-                                required: true,
-                                message: "Input required",
-                              },
-                            ]}
-                          >
-                            <Input />
-                          </Form.Item>
-                        </div>
-                        <div>
-                          <div>Website</div>
-                          <Form.Item name="website">
-                            <AutoComplete
-                              options={websiteOptions}
-                              onChange={onWebsiteChange}
-                              placeholder="website"
-                            >
-                              <Input />
-                            </AutoComplete>
-                          </Form.Item>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-5">
-                        <div>
-                          <div className="flex flex-row spacex-3">
-                            Password<div className="text-red-500">*</div>
-                          </div>
-                          <Form.Item
-                            name="password"
-                            // label="Password"
-                            rules={[
-                              {
-                                required: true,
-                                message: "Input required",
-                              },
-                              {
-                                pattern: new RegExp("([0-9]\\d*)+"),
-                                message: "Please input at least one digit",
-                              },
-                              {
-                                pattern: new RegExp("([a-zA-Z]\\s*)+"),
-                                message:
-                                  "Password should have both small and capital letters",
-                              },
-                              {
-                                pattern: new RegExp(regexPatternSpecialCh, "g"),
-                                message:
-                                  "Password should have a special character",
-                              },
-                              {
-                                pattern: new RegExp("(.{8,})"),
-                                message:
-                                  "Password should have atleast 8 characters",
-                              },
-                            ]}
-                            hasFeedback
-                          >
-                            <Input.Password onChange={(v) => setPassword(v)} />
-                          </Form.Item>
-                        </div>
-                        <div>
-                          <div className="flex flex-row spacex-3">
-                            Confirm password
-                            <div className="text-red-500">*</div>
-                          </div>
-                          <Form.Item
-                            name="confirm"
-                            // label="Confirm Password"
-                            dependencies={["password"]}
-                            hasFeedback
-                            rules={[
-                              {
-                                required: true,
-                                message: "Input required",
-                              },
-                              ({ getFieldValue }) => ({
-                                validator(_, value) {
-                                  if (
-                                    !value ||
-                                    getFieldValue("password") === value
-                                  ) {
-                                    return Promise.resolve();
-                                  }
-                                  return Promise.reject(
-                                    new Error(
-                                      "The two passwords that you entered do not match!"
-                                    )
-                                  );
-                                },
-                              }),
-                            ]}
-                          >
-                            <Input.Password />
-                          </Form.Item>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-5">
-                        <div>
-                          <div className="flex flex-row spacex-3">
-                            Phone number <div className="text-red-500">*</div>
-                          </div>
-                          <Form.Item
-                            name="phone"
-                            rules={[
-                              {
-                                required: true,
-                                message: "Input required",
-                              },
-                            ]}
-                          >
-                            <Input addonBefore={prefixSelector} />
-                          </Form.Item>
-                        </div>
-                        <div>
-                          <div className="flex flex-row spacex-3">
-                            Area(s) of expertise
-                            <div className="text-red-500">*</div>
-                          </div>
-                          <Form.Item
-                            name="services"
-                            rules={[
-                              {
-                                required: true,
-                                message: "Input required",
-                              },
-                            ]}
-                          >
-                            <Select
-                              mode="multiple"
-                              allowClear
-                              // style={{width:'100%'}}
-                              placeholder="Please select"
-                            >
-                              {servCategories?.map((s) => {
-                                return (
-                                  <Option key={s._id} value={s.description}>
-                                    {s.description}
-                                  </Option>
-                                );
-                              })}
-                            </Select>
-                          </Form.Item>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-5">
-                        <div>
-                          <div>Experience (in Years)</div>
-                          <Form.Item
-                            name="experience"
-                            rules={[
-                              {
-                                type: "integer",
-                                message: "The input is not valid Number",
-                              },
-                            ]}
-                          >
-                            <InputNumber style={{ width: "100%" }} />
-                          </Form.Item>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Address information */}
-                  <div>
-                    <Typography.Title className="" level={4}>
-                      Address Information
-                    </Typography.Title>
-
-                    <div>
-                      {/* Grid 1 */}
-                      <div className="grid grid-cols-2 gap-x-5">
-                        <div>
-                          <div>Hq Address</div>
-                          <Form.Item name="hqAddress">
-                            <Input />
-                          </Form.Item>
-                        </div>
-
-                        <div>
-                          <div>Country</div>
-                          <Form.Item name="country">
-                            <Input />
-                          </Form.Item>
-                        </div>
-                      </div>
-                    </div>
-
-                    <Typography.Title className="" level={4}>
-                      Uploads
-                    </Typography.Title>
-
-                    <div className="grid md:grid-cols-2 gap-x-5">
-                      <div>
-                        <div className="flex flex-row space-x-1">
-                          <div>Incorporation document</div>
-                          <div>
-                            <Tooltip
-                              placement="top"
-                              title="Please attach your incorporation document. For businesses registered in Rwanda, please provide your RDB certificate."
-                              arrow={false}
-                            >
-                              <QuestionCircleOutlined />
-                            </Tooltip>
-                          </div>
-                        </div>
-                        
-                        <Form.Item
-                          name="rdbRegistraction"
-                          rules={[
-                            // {
-                            //   validator: (_, value) =>
-                            //     rdbSelected
-                            //       ? Promise.resolve()
-                            //       : Promise.reject(
-                            //           new Error(
-                            //             "Please attach your incorporation document"
-                            //           )
-                            //         ),
-                            // },
-                          ]}
-                        >
-                          <UploadRDCerts
-                            uuid={rdbCertId}
-                            setSelected={setRDBSelected}
-                            setId={setRdbCertId}
-                            iconOnly={false}
-                            setStatus={()=>{}}
-                          />
-                        </Form.Item>
-                      </div>
-                      <div>
-                        <div>VAT Certificate</div>
-                        <Form.Item name="vatCertificate">
-                          <UploadVatCerts
-                            uuid={vatCertId}
-                            setId={setVatCertId}
-                            setSelected={setVatSelected}
-                            setStatus={()=>{}}
-                            
-                          />
-                        </Form.Item>
-                      </div>
-                      <div></div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* <Form.Item
-                  name="agreement"
-                  valuePropName="checked"
-                  rules={[
-                    {
-                      validator: (_, value) =>
-                        value
-                          ? Promise.resolve()
-                          : Promise.reject(
-                              new Error("Should accept agreement")
-                            ),
-                    },
-                  ]}
-                  {...tailFormItemLayout}
-                >
-                  <Checkbox>
-                    I have read the <a href="">agreement</a>
-                  </Checkbox>
-                </Form.Item> */}
-
-                <Form.Item className="pb-5" {...tailFormItemLayout}>
-                  {submitting ? (
-                    <Spin indicator={antIcon} />
-                  ) : (
-                    <Button type="default" htmlType="submit">
-                      Register
-                    </Button>
-                  )}
-                </Form.Item>
-              </>
-            )}
-          </Form>
+      <div className="grid xl:grid-cols-2 items-start px-10 pt-5 h-[calc(100%-80px)] gap-x-10">
+        <div className="hidden bg-[#0065DD] w-[calc(100%-45px)] h-[calc(100vh-25px)] rounded-lg text-center xl:flex flex-col justify-center items-center">
+          <Image src={Login} className="w-[calc(100%-350px)] h-auto" />
+          <h1 className="text-white text-[36px] mb-0 font-bold">
+            Procurement made Easy
+          </h1>
+          <p className="text-white">
+            <small className="text-[17px] leading-8">
+              A tool that aims to simplify the procurement process for suppliers{" "}
+              <br /> looking to work with Irembo.
+            </small>
+          </p>
         </div>
-      ) : (
-        <Skeleton />
-      )}
-    </div>
+        <div className="px-10 py-5 flex flex-col h-[calc(100%-25px)]">
+          <div className="flex justify-between items-center mb-3">
+            <small className="text-[#455A64]">
+              Already have an account?{" "}
+              <Link
+                href="/auth"
+                className="no-underline text-[14px] text-[#0065DD]"
+              >
+                Login
+              </Link>
+            </small>
+            <Image src={Logo} alt="" className="w-[110px] h-auto" />
+          </div>
+          <div className="flex flex-col">
+            <Form
+              {...formItemLayout}
+              form={form}
+              name="register"
+              onFinish={onFinish}
+              initialValues={{
+                residence: ["zhejiang", "hangzhou", "xihu"],
+                firstName: "",
+                prefix: "+250",
+                email: "",
+              }}
+              scrollToFirstError
+              className="flex flex-col h-[calc(100vh-80px)] justify-between"
+            >
+              <div>
+                <h3 className="text-[#455A64]">General Company Information</h3>
+                <div className="grid lg:grid-cols-2 items-center gap-x-5 -my-1">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-[#6A757B]">Company Name</label>
+                      <div className="text-red-500">*</div>
+                    </div>
+
+                    <Form.Item
+                      name="companyName"
+                      // label="Company name"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Input required",
+                        },
+                      ]}
+                    >
+                      <Input
+                        placeholder="Type Company Name"
+                        className="h-10 mt-1"
+                      />
+                    </Form.Item>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-[#6A757B]">TIN</label>
+                      <div className="text-red-500">*</div>
+                      <div>
+                        <Tooltip
+                          placement="top"
+                          title="For foreign business, please provide your base country incorporation or registration ID."
+                          arrow={false}
+                        >
+                          <QuestionCircleOutlined />
+                        </Tooltip>
+                      </div>
+                    </div>
+                    <Form.Item
+                      name="tin"
+                      // label="TIN"
+                      rules={[
+                        // { len: 10, message: "TIN should be 10 charachers" },
+                        {
+                          type: "integer",
+                          message: "Input required",
+                        },
+                        { required: true, message: "Input required" },
+                      ]}
+                    >
+                      <InputNumber Placeholder="Type TIN" className="h-10 mt-1 w-full" />
+                    </Form.Item>
+                  </div>
+                </div>
+                <div className="grid lg:grid-cols-2 items-center gap-x-5 -my-1">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-[#6A757B]">HQ Adress</label>
+                    </div>
+
+                    <Form.Item
+                      name="hqAddress"
+                    >
+                      <Input
+                        placeholder="Type full address"
+                        className="h-10 mt-1 w-full"
+                      />
+                    </Form.Item>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-[#6A757B]">Country</label>
+                    </div>
+
+                    <Form.Item
+                      name="country"
+                    >
+                      <Input
+                        placeholder="Type country"
+                        className="h-10 mt-1 w-full"
+                      />
+                    </Form.Item>
+                  </div>
+                  
+                </div>
+                
+                <div className="grid lg:grid-cols-2 items-center gap-x-5 -my-1">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-[#6A757B]">Area(s) of expertise</label>
+                      <div className="text-red-500">*</div>
+                    </div>
+
+                    <Form.Item
+                      name="services"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Input required",
+                        },
+                      ]}
+                    >
+                      <Select
+                        mode="multiple"
+                        size="large"
+                        allowClear
+                        // style={{width:'100%'}}
+                        placeholder="Please select"
+                        className="mt-1"
+                      >
+                        {servCategories?.map((s) => {
+                          return (
+                            <Option key={s._id} value={s.description}>
+                              {s.description}
+                            </Option>
+                          );
+                        })}
+                      </Select>
+                    </Form.Item>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-[#6A757B]">Website</label>
+                      <div className="text-red-500">*</div>
+                    </div>
+
+                    <Form.Item name="website">
+                      <AutoComplete
+                        options={websiteOptions}
+                        onChange={onWebsiteChange}
+                      >
+                        <Input className="h-10 mt-1 w-full" placeholder="Type in your Website" />
+                      </AutoComplete>
+                    </Form.Item>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-x-5">
+                  <div>
+                    <label className="text-[#6A757B]">Experience (in Years)</label>
+                    <Form.Item
+                      name="experience"
+                      rules={[
+                        {
+                          type: "integer",
+                          message: "The input is not valid Number",
+                        },
+                      ]}
+                    >
+                      <InputNumber className="mt-1 h-10 w-full" />
+                    </Form.Item>
+                  </div>
+                </div>
+                <h3 className="text-[#455A64] -mt-1">Supporting Documents</h3>
+                <div className="grid lg:grid-cols-2 items-center gap-x-5 -my-1">
+                  <div>
+                    <div className="flex gap-2">
+                      <label className="text-[#6A757B] mb-3">Incorporation document</label>
+                      <div>
+                        <Tooltip
+                          placement="top"
+                          title="Please attach your incorporation document. For businesses registered in Rwanda, please provide your RDB certificate."
+                          arrow={false}
+                        >
+                          <QuestionCircleOutlined />
+                        </Tooltip>
+                      </div>
+                    </div>
+
+                    <Form.Item
+                      name="rdbRegistraction"
+                      rules={[
+                        // {
+                        //   validator: (_, value) =>
+                        //     rdbSelected
+                        //       ? Promise.resolve()
+                        //       : Promise.reject(
+                        //           new Error(
+                        //             "Please attach your incorporation document"
+                        //           )
+                        //         ),
+                        // },
+                      ]}
+                    >
+                      <UploadRDCerts
+                        uuid={rdbCertId}
+                        setSelected={setRDBSelected}
+                        setId={setRdbCertId}
+                        iconOnly={false}
+                        setStatus={()=>{}}
+                      />
+                    </Form.Item>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-[#6A757B] mb-3">VAT Certificate</label>
+                    </div>
+
+                    <Form.Item name="vatCertificate">
+                      <UploadVatCerts
+                        uuid={vatCertId}
+                        setId={setVatCertId}
+                        setSelected={setVatSelected}
+                        setStatus={()=>{}}
+
+                      />
+                    </Form.Item>
+                  </div>
+                </div> 
+                <h3 className="text-[#455A64] mt-1">Account Information</h3>
+                <div className="grid lg:grid-cols-2 items-center gap-x-5 -my-1">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-[#6A757B]">Contact person Names</label>
+                      <div className="text-red-500">*</div>
+                    </div>
+
+                    <Form.Item
+                      name="contactPersonNames"
+                      // label="Contact Person's Names"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Input required",
+                        },
+                      ]}
+                    >
+                      <Input
+                        placeholder="Type Contact Person"
+                        className="h-10 mt-1 w-full"
+                      />
+                    </Form.Item>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-[#6A757B]">Contact Person Title</label>
+                      <div className="text-red-500">*</div>
+                    </div>
+
+                    <Form.Item
+                      name="title"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Input required",
+                        },
+                      ]}
+                    >
+                      <Input
+                        placeholder="E.g: Mrs, Mr, Mss"
+                        className="h-10 mt-1 w-full"
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+                <div className="grid lg:grid-cols-2 items-center gap-x-5 -my-1">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-[#6A757B]">Email</label>
+                      <div className="text-red-500">*</div>
+                    </div>
+
+                    <Form.Item
+                      name="email"
+                      // label="E-mail"
+                      rules={[
+                        {
+                          type: "email",
+                          message: "The input is not valid E-mail!",
+                        },
+                        {
+                          required: true,
+                          message: "Input required",
+                        },
+                      ]}
+                    >
+                      <Input
+                        placeholder="Type Email"
+                        className="h-10 mt-1 w-full"
+                      />
+                    </Form.Item>
+                  </div>
+                  <div>
+                    <div className="flex flex-row spacex-3">
+                      <label className="text-[#6A757B] text-12px">
+                        Phone number
+                      </label>
+                      <div className="text-red-500">*</div>
+                    </div>
+                    <Form.Item
+                      name="phone"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Input required",
+                        },
+                      ]}
+                    >
+                      <Input className="mt-1 w-full" addonBefore={prefixSelector} />
+                    </Form.Item>
+                  </div>
+                </div>
+                <div className="grid lg:grid-cols-2 items-center gap-x-5 -my-1">
+                  <div>
+                      <div className="flex flex-row spacex-3">
+                        <label className="text-[#6A757B] text-12px">
+                        Password
+                        </label>
+                        <div className="text-red-500">*</div>
+                      </div>
+                      <Form.Item
+                        name="password"
+                        // label="Password"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Input required",
+                          },
+                          {
+                            pattern: new RegExp("([0-9]\\d*)+"),
+                            message: "Please input at least one digit",
+                          },
+                          {
+                            pattern: new RegExp("([a-zA-Z]\\s*)+"),
+                            message:
+                              "Password should have both small and capital letters",
+                          },
+                          {
+                            pattern: new RegExp(regexPatternSpecialCh, "g"),
+                            message:
+                              "Password should have a special character",
+                          },
+                          {
+                            pattern: new RegExp("(.{8,})"),
+                            message:
+                              "Password should have atleast 8 characters",
+                          },
+                        ]}
+                        hasFeedback
+                      >
+                        <Input.Password placeholder="* * * * * * * *"
+                        className="h-10 mt-1 w-full" onChange={(v) => setPassword(v)} />
+                      </Form.Item>
+                    </div>
+                  <div>
+                    <div className="flex flex-row spacex-3">
+                      <label className="text-[#6A757B] text-12px">
+                        Confirm password
+                      </label>
+                      <div className="text-red-500">*</div>
+                    </div>
+                    <Form.Item
+                      name="confirm"
+                      // label="Confirm Password"
+                      dependencies={["password"]}
+                      hasFeedback
+                      rules={[
+                        {
+                          required: true,
+                          message: "Input required",
+                        },
+                        ({ getFieldValue }) => ({
+                          validator(_, value) {
+                            if (
+                              !value ||
+                              getFieldValue("password") === value
+                            ) {
+                              return Promise.resolve();
+                            }
+                            return Promise.reject(
+                              new Error(
+                                "The two passwords that you entered do not match!"
+                              )
+                            );
+                          },
+                        }),
+                      ]}
+                    >
+                      <Input.Password placeholder="* * * * * * * *"
+                        className="h-10 mt-1 w-full" />
+                    </Form.Item>
+                  </div>
+                </div>
+              </div>
+              <Form.Item className="flex justify-end" {...tailFormItemLayout}>
+                {submitting ? (
+                  <Spin indicator={antIcon} />
+                ) : (
+                  <Button className="bg-[#0065DD] border-none px-10 h-10 text-white" type="default" htmlType="submit">
+                    Register
+                  </Button>
+                )}
+              </Form.Item>
+            </Form>
+          </div>
+        </div>
+      </div>
+    </main>
   );
 };
 

@@ -1,11 +1,12 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   DatePicker,
   Empty,
   Form,
   Popconfirm,
+  Radio,
   Spin,
   Steps,
   Tabs,
@@ -26,13 +27,11 @@ import {
   Tooltip,
   Timeline,
   Progress,
-  Radio,
   Switch,
 } from "antd";
 import {
   CheckOutlined,
   DislikeOutlined,
-  LikeOutlined,
   FileDoneOutlined,
   FileProtectOutlined,
   LoadingOutlined,
@@ -77,12 +76,6 @@ import UploadReqAttach from "./uploadReqAttach";
 // import MyPdfViewer from "./pdfViewer";
 import _ from "lodash";
 import Link from "next/link";
-import { RiArrowDropDownLine } from "react-icons/ri";
-import { FiShoppingBag } from "react-icons/fi";
-import { IoMdCheckboxOutline } from "react-icons/io";
-import { MdFileCopy, MdAttachFile } from "react-icons/md";
-import { BiPurchaseTagAlt } from "react-icons/bi";
-import { TbTruckDelivery } from "react-icons/tb";
 
 let modules = {
   toolbar: [
@@ -211,23 +204,21 @@ function buildTenderForm(
       <div className="items-center">
         <Typography.Title level={5}>Create Tender</Typography.Title>
         <Form.Item
-          className="mb-2"
           name="tenderDocUrl"
           label={
-            <div className="flex flex-col justify-start items-start">
-              Upload Tender Documents
-              <i className="text-xxs">(expected in PDF format)</i>
+            <div>
+              Upload Tender Documents{" "}
+              <i className="text-xs">(expected in PDF format)</i>
             </div>
           }
         >
+          <UploadTenderDoc
+            uuid={docId}
+            setTendeDocSelected={setTendeDocSelected}
+            updateTender={() => {}}
+          />
         </Form.Item>
-        <UploadTenderDoc
-          uuid={docId}
-          setTendeDocSelected={setTendeDocSelected}
-          updateTender={() => {}}
-        />
         <Form.Item
-          className="my-2"
           name="deadLine"
           label="Indicate Bid Submission Deadline"
           rules={[
@@ -237,18 +228,17 @@ function buildTenderForm(
             },
           ]}
         >
+          <DatePicker
+            format="YYYY-MM-DD HH:mm"
+            showTime
+            showNow={false}
+            disabledDate={(current) => current.isBefore(moment())}
+            onChange={(v, str) => {
+              // console.log(moment(str).toISOString());
+              setDeadLine(moment(str).toISOString());
+            }}
+          />
         </Form.Item>
-        <DatePicker
-          format="YYYY-MM-DD HH:mm"
-          showTime
-          showNow={false}
-          disabledDate={(current) => current.isBefore(moment())}
-          onChange={(v, str) => {
-            // console.log(moment(str).toISOString());
-            setDeadLine(moment(str).toISOString());
-          }}
-          className="w-full"
-        />
       </div>
       <div className="flex flex-row space-x-1 mt-5 items-center">
         <Form.Item>
@@ -260,7 +250,6 @@ function buildTenderForm(
             disabled={
               !user?.permissions?.canCreateTenders || !tenderDocSelected
             }
-            className="mt-4"
           >
             Publish Tender
           </Button>
@@ -289,7 +278,7 @@ function buildPOForm(
         >
           <Select
             allowClear
-            style={{ width: "100%" }}
+            style={{ width: "300px" }}
             placeholder="search by vendor name, contract #"
             showSearch
             onChange={(value, option) => {
@@ -368,7 +357,6 @@ const RequestDetails = ({
   files,
   setFileList,
   setFiles,
-  handleUpload
 }) => {
   const [form] = Form.useForm();
   const [size, setSize] = useState("small");
@@ -428,8 +416,6 @@ const RequestDetails = ({
   const [deliveredQties, setDeliveredQties] = useState([]);
   const [tenderDocSelected, setTendeDocSelected] = useState(false);
   const [attachSelected, setAttachSelected] = useState(false);
-  const [activeIndex, setActiveIndex] = useState("");
-  const contentHeight = useRef();
 
   const showPopconfirm = () => {
     setOpen(true);
@@ -968,8 +954,11 @@ const RequestDetails = ({
         <Divider></Divider>
         <div className="grid md:grid-cols-2">
           <div>
+            <div className="ml-3 text-lg font-semibold">
+              Request Approval Queue
+            </div>
             {/* Approval flow */}
-            <div className="mx-3">
+            <div className="mx-3 mt-5 ">
               <Steps
                 direction="vertical"
                 current={currentCode}
@@ -1004,11 +993,11 @@ const RequestDetails = ({
                     ),
                     description: currentCode == 0 && (
                       <div className="flex flex-col">
-                        <div className="text-[#8392AB] mb-4">
+                        <div>
                           Kindly check if the request is relevant and take
                           action accordingly.
                         </div>
-                        <div className="flex flex-row space-x-3">
+                        <div className="flex flex-row space-x-5">
                           <div>
                             <Popconfirm
                               title="Are you sure?"
@@ -1028,7 +1017,6 @@ const RequestDetails = ({
                               onCancel={() => setOpenApprove(false)}
                             >
                               <Button
-                                icon={<LikeOutlined />}
                                 disabled={
                                   !user?.permissions?.canApproveAsHod ||
                                   user?._id !== data?.level1Approver?._id ||
@@ -1036,7 +1024,7 @@ const RequestDetails = ({
                                 }
                                 onClick={() => setOpenApprove(true)}
                                 type="primary"
-                                className="pb-4 pt-1.5 border-none"
+                                size="small"
                               >
                                 Approve
                               </Button>
@@ -1076,9 +1064,9 @@ const RequestDetails = ({
                                   currentCode > 0
                                 }
                                 danger
+                                size="small"
                                 type="primary"
                                 onClick={showPopconfirm}
-                                className="pb-4 pt-1.5 border-none"
                               >
                                 Reject
                               </Button>
@@ -1116,11 +1104,11 @@ const RequestDetails = ({
                     ),
                     description: currentCode === 1 && (
                       <div className="flex flex-col">
-                        <div className="text-[#8392AB] mb-4">
+                        <div>
                           Kindly check if the request is relevant and take
                           action accordingly.
                         </div>
-                        <div className="flex flex-row space-x-3">
+                        <div className="flex flex-row space-x-5">
                           <div>
                             <Popconfirm
                               title="Are you sure?"
@@ -1140,7 +1128,6 @@ const RequestDetails = ({
                               onCancel={() => setOpenApprove(false)}
                             >
                               <Button
-                                icon={<LikeOutlined />}
                                 disabled={
                                   !user?.permissions?.canApproveAsHof ||
                                   currentCode > 1 ||
@@ -1148,7 +1135,7 @@ const RequestDetails = ({
                                 }
                                 onClick={() => setOpenApprove(true)}
                                 type="primary"
-                                className="pb-4 pt-1.5 border-none"
+                                size="small"
                               >
                                 Approve
                               </Button>
@@ -1181,7 +1168,6 @@ const RequestDetails = ({
                               }
                             >
                               <Button
-                                icon={<DislikeOutlined />}
                                 disabled={
                                   !user?.permissions?.canApproveAsHof ||
                                   currentCode > 1 ||
@@ -1189,7 +1175,7 @@ const RequestDetails = ({
                                 }
                                 type="primary"
                                 danger
-                                className="pb-4 pt-1.5 border-none"
+                                size="small"
                                 onClick={showPopconfirm}
                               >
                                 Reject
@@ -1231,7 +1217,7 @@ const RequestDetails = ({
                     ),
                     description: currentCode === 2 && (
                       <div className="flex flex-col">
-                        <div className="text-[#8392AB] mb-4">
+                        <div>
                           Kindly check if the request is relevant and take
                           action accordingly.
                         </div>
@@ -1255,7 +1241,6 @@ const RequestDetails = ({
                               onCancel={() => setOpenApprove(false)}
                             >
                               <Button
-                                icon={<LikeOutlined />}
                                 disabled={
                                   !user?.permissions?.canApproveAsPM ||
                                   currentCode > 3 ||
@@ -1263,7 +1248,7 @@ const RequestDetails = ({
                                 }
                                 onClick={() => setOpenApprove(true)}
                                 type="primary"
-                                className="pb-4 pt-1.5 border-none"
+                                size="small"
                               >
                                 Approve
                               </Button>
@@ -1296,7 +1281,6 @@ const RequestDetails = ({
                               onCancel={handleCancel}
                             >
                               <Button
-                                icon={<DislikeOutlined />}
                                 disabled={
                                   !user?.permissions?.canApproveAsPM ||
                                   currentCode > 3 ||
@@ -1304,7 +1288,7 @@ const RequestDetails = ({
                                 }
                                 type="primary"
                                 danger
-                                className="pb-4 pt-1.5 border-none"
+                                size="small"
                                 onClick={showPopconfirm}
                               >
                                 Reject
@@ -1322,6 +1306,207 @@ const RequestDetails = ({
                 ]}
               />
             </div>
+          </div>
+          <div>
+            {/* Sourcing Method */}
+            {currentCode !== 3 && (
+              <div className="mb-5">
+                <div className="ml-3 text-lg font-bold">Sourcing Method</div>
+                <div className="ml-3">
+                  {(data?.sourcingMethod && (
+                    <Tag>{data?.sourcingMethod}</Tag>
+                  )) ||
+                    "No sourcing method selected at the moment."}
+                </div>
+              </div>
+            )}
+            {currentCode === 3 &&
+              (user?.permissions?.canCreateTenders ||
+                user?.permissions?.canCreatePurchaseOrders ||
+                user?.permissions?.canCreateContracts) && (
+                <>
+                  <Form form={form}>
+                    <div className="text-lg font-semibold">
+                      Sourcing Method Selection
+                    </div>
+                    <div className="mt-5 items-center">
+                      <div>Please select a sourcing method</div>
+                      <Form.Item name="refDoc">
+                        <Select
+                          onChange={(value) => setRefDoc(value)}
+                          style={{ width: "50%" }}
+                          defaultValue={false}
+                          options={[
+                            {
+                              value: "From Existing Contract",
+                              label: "Sourcing from Existing Contract",
+                            },
+
+                            {
+                              value: "Direct Contracting",
+                              label: "Direct contracting",
+                            },
+                            {
+                              value: "Tendering",
+                              label: "Tendering",
+                            },
+                          ]}
+                        />
+                      </Form.Item>
+                    </div>
+
+                    {refDoc === "Tendering" &&
+                      buildTenderForm(
+                        setDeadLine,
+                        user,
+                        docId,
+                        submitTenderData,
+                        setTendeDocSelected,
+                        tenderDocSelected
+                      )}
+
+                    {refDoc === "From Existing Contract" &&
+                      buildPOForm(
+                        setSelectedContract,
+                        contracts,
+                        user,
+                        submitPOData,
+                        setVendor,
+                        selectedContract,
+                        documentFullySigned
+                      )}
+
+                    {refDoc === "Direct Contracting" && (
+                      <div>
+                        <div className="items-center">
+                          <div>Select registered vendor</div>
+                          <Form.Item name="vendor">
+                            <Select
+                              onChange={(value, option) => {
+                                setVendor(option?.payload);
+                              }}
+                              style={{ width: "50%" }}
+                              showSearch
+                              filterSort={(optionA, optionB) =>
+                                (optionA?.label ?? "")
+                                  .toLowerCase()
+                                  .localeCompare(
+                                    (optionB?.label ?? "").toLowerCase()
+                                  )
+                              }
+                              filterOption={(inputValue, option) =>
+                                option?.label
+                                  .toLowerCase()
+                                  .includes(inputValue.toLowerCase())
+                              }
+                              options={vendors
+                                ?.filter(
+                                  (v) => v?.vendor?.status === "approved"
+                                )
+                                ?.map((v) => {
+                                  return {
+                                    value: v?.vendor?._id,
+                                    label: v?.vendor?.companyName,
+                                    payload: v?.vendor,
+                                  };
+                                })}
+                            />
+                          </Form.Item>
+                        </div>
+                        <div className="items-center">
+                          <div>
+                            Upload reference document{" "}
+                            <i className="text-xs">(expected in PDF format)</i>
+                          </div>
+                          <Form.Item name="vendor">
+                            <UploadReqAttach
+                              uuid={reqAttachId}
+                              setAttachSelected={setAttachSelected}
+                            />
+                          </Form.Item>
+                        </div>
+                        <div>
+                          <div className="flex flex-row items-center space-x-5">
+                            <div className="flex flex-row space-x-1 items-center">
+                              <Form.Item>
+                                <Button
+                                  icon={<FileDoneOutlined />}
+                                  type="primary"
+                                  htmlType="submit"
+                                  onClick={submitContractData}
+                                  disabled={
+                                    !user?.permissions?.canCreateContracts ||
+                                    !vendor ||
+                                    !attachSelected
+                                  }
+                                >
+                                  Create Contract
+                                </Button>
+                              </Form.Item>
+                            </div>
+
+                            <div className="flex flex-row space-x-1 items-center">
+                              <Form.Item>
+                                <Button
+                                  icon={<FileDoneOutlined />}
+                                  type="primary"
+                                  htmlType="submit"
+                                  onClick={submitPOData}
+                                  disabled={
+                                    !user?.permissions
+                                      ?.canCreatePurchaseOrders ||
+                                    !vendor ||
+                                    !attachSelected
+                                  }
+                                >
+                                  Create PO
+                                </Button>
+                              </Form.Item>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </Form>
+                </>
+              )}
+
+            {tender && data?.sourcingMethod === "Tendering" && (
+              <div className="ml-3">
+                <Typography.Text type="secondary">
+                  Tender reference:{" "}
+                  <Link href={`/system/tenders/${tender?._id}`}>
+                    {tender?.number}
+                  </Link>
+                </Typography.Text>
+              </div>
+            )}
+
+            {contract &&
+              (data?.sourcingMethod === "Direct Contracting" ||
+                data?.sourcingMethod === "From Existing Contract") && (
+                <div className="ml-3">
+                  <Typography.Text type="secondary">
+                    Contract reference:{" "}
+                    <Link href={`/system/contracts/${contract?._id}`}>
+                      {contract?.number}
+                    </Link>
+                  </Typography.Text>
+                </div>
+              )}
+
+            {po &&
+              (data?.sourcingMethod === "Direct Contracting" ||
+                data?.sourcingMethod === "From Existing Contract") && (
+                <div className="ml-3">
+                  <Typography.Text type="secondary">
+                    PO reference:{" "}
+                    <Link href={`/system/purchase-orders/${po?._id}`}>
+                      {po?.number}
+                    </Link>
+                  </Typography.Text>
+                </div>
+              )}
           </div>
         </div>
       </>
@@ -2489,722 +2674,692 @@ const RequestDetails = ({
     setFilePaths(newFileList);
   }
 
-  const handleItemClick = (value) => {
-    console.log("CLicked ");
-    setActiveIndex((prevIndex) => (prevIndex === value ? "" : value));
-  };
-
-  function updateRequest(_files) {
-    setLoadingRowData(true);
-    let newStatus =
-      rowData?.status == "withdrawn" || rowData?.status == "declined"
-        ? "pending"
-        : rowData?.status;
-
-    rowData.status = newStatus;
-
-    let reqItems = [...rowData.items];
-    reqItems?.map((v, index) => {
-      if (_files?.length > index) {
-        if (_files[index]?.every((item) => typeof item === "string")) {
-          v.paths = _files[index];
-          return v;
-        } else {
-          // console.log("Uploooooodiiing", _files[index]);
-          // messageApi.error("Something went wrong! Please try again.");\
-          v.paths = null;
-          return v;
-        }
-      } else {
-        v.paths = null;
-        return v;
-      }
-    });
-
-    console.log("Haaaaaa", reqItems);
-    // rowData.items = reqItems;
-
-    fetch(`${url}/requests/${rowData?._id}`, {
-      method: "PUT",
-      headers: {
-        Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
-        token: token,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        updates: rowData,
-      }),
-    })
-      .then((res) => getResultFromServer(res))
-      .then((res) => {
-        // setFileList([])
-        // setFiles([])
-        loadData();
-        setLoadingRowData(false);
-      })
-      .catch((err) => {
-        setLoadingRowData(false);
-        messageApi.open({
-          type: "error",
-          content: "Something happened! Please try again.",
-        });
-      })
-      .finally(() => {
-        setEditRequest(false);
-      });
-  }
-
   return (
-    <div className="request-details grid md:grid-cols-5 gap-4 items-start h-screen overflow-y-auto">
+    <div className="grid md:grid-cols-5 gap-1">
       {contextHolder}
-      <div className="md:col-span-4">
-        <div className="flex flex-col ring-1 ring-gray-200 pl-5 pr-8 rounded-lg bg-white mb-4 border-0">
-          {data && (
-            <div>
-              <div className="flex items-center justify-between ml-3 mb-2">
-                <h4>Request Details</h4>
-                <Tag
-                  color={
-                    data?.status === "declined" ||
-                    data?.status === "withdrawn"
-                      ? "red"
-                      : data?.status === "approved" ||
-                        data?.status === "approved (pm)"
-                      ? "geekblue"
-                      : "orange"
-                  }
+      <div className="md:col-span-4 flex flex-col ring-1 ring-gray-200 p-3 rounded shadow-md bg-white  overflow-y-scroll">
+        <div>
+          <Tabs defaultActiveKey="1" type="card" size={size}>
+            <Tabs.TabPane tab="Overview" key="1">
+              {data ? (
+                <Spin
+                  spinning={data ? false : true}
+                  indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />}
                 >
-                  {data?.status === "declined" ||
-                  data?.status === "approved" ||
-                  data?.status === "approved (pm)" ||
-                  data?.status === "withdrawn"
-                    ? data?.status
-                    : "pending"}
-                </Tag>
-              </div>
-              <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-5 ml-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <label className="text-[#6A757B]">Request Title</label>
-                    <div className="text-red-500">*</div>
-                  </div>
-                  <Form.Item name="requestTitle">
-                    <Input defaultValue={data.title} className="h-11 mt-3" />
-                  </Form.Item>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <label className="text-[#6A757B]">Request Number</label>
-                    <div className="text-red-500">*</div>
-                  </div>
-                  <p className="pt-1 text-[17px]">
-                    <small>{data.number}</small>
-                  </p>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <label className="text-[#6A757B]">Initiator</label>
-                    <div className="text-red-500">*</div>
-                  </div>
-                  <p className="pt-1 text-[17px]">
-                    <small>
-                      {data?.createdBy?.firstName +
-                        " " +
-                        data?.createdBy?.lastName}
-                    </small>
-                  </p>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <label className="text-[#6A757B]">Department</label>
-                    <div className="text-red-500">*</div>
-                  </div>
-                  <p className="pt-1 text-[17px]">
-                    <small>{data?.createdBy?.department?.description}</small>
-                  </p>
-                </div>
-              </div>
-              <div className="grid lg:grid-cols-3 gap-5 ml-3">
-                <div>
-                  <label className="text-[#6A757B]">Service category:</label>
-                  <Select
-                    // mode="multiple"
-                    // allowClear
-                    className="mt-3 w-full"
-                    size="large"
-                    defaultValue={data?.serviceCategory}
-                    placeholder="Please select"
-                    onChange={(value) => {
-                      let r = { ...data };
-                      r.serviceCategory = value;
-                      handleUpdateRequest(r);
-                    }}
-                  >
-                    {servCategories?.map((s) => {
-                      return (
-                        <Select.Option key={s._id} value={s.description}>
-                          {s.description}
-                        </Select.Option>
-                      );
-                    })}
-                  </Select>
-                </div>
-                <div className="flex flex-col col-span-2">
-                  <label className="text-[#6A757B]">Description:</label>
-                  <Form.Item
-                    name="description"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Description is required",
-                      },
-                    ]}
-                  >
-                    <Input.TextArea
-                      defaultValue={data.description}
-                      className="w-full mt-3"
-                      // onChange={(e) => setDescription(e.target.value)}
-                      placeholder="Briefly describe your request"
-                      showCount
-                      maxLength={100}
-                      rows={4}
-                    />
-                  </Form.Item>
-                </div>
-              </div>
-              <div className="grid lg:grid-cols-3 md:grid-cols-3 gap-5 ml-3">
-                <div>
-                  <label className="text-[#6A757B]">Request Budgeted?</label>
-                  <div>
-                    <Form.Item
-                      name="budgeted"
-                      valuePropName="checked"
-                      // wrapperCol={{ offset: 8, span: 16 }}
-                    >
-                      <Radio.Group
-                        onChange={({target}) => {
-                          let r = { ...data };
-                          r.budgeted = target.value;
-                          handleUpdateRequest(r);
-                        }}
-                        className="mt-3"
-                        defaultValue={data.budgeted}
-                      >
-                        <Radio value={true} className="mr-3">
-                          <span className="ml-2 text-[18px]">Yes</span>
-                        </Radio>
-                        <Radio value={false} className="mx-3">
-                          <span className="ml-2 text-[18px]">No</span>
-                        </Radio>
-                      </Radio.Group>
-                    </Form.Item>
-                  </div>
-                </div>
-                {console.log('Budgeted Line ', data)}
-                {data.budgeted && <div>
-                  <label className="text-[#6A757B]">Budgeted Line:</label>
-                  <div className="text-xs text-gray-400">
-                    <Select
-                      // defaultValue={budgetLine}
-                      className="mt-3 w-full"
-                      size="large"
-                      placeholder="Select service category"
-                      showSearch
-                      defaultValue={data?.budgetLine?._id}
-                      onChange={(value, option) => {
-                        let r = { ...data };
-                        r.budgetLine = value;
-                        handleUpdateRequest(r);
-                      }}
-                      // filterSort={(optionA, optionB) =>
-                      //   (optionA?.label ?? "")
-                      //     .toLowerCase()
-                      //     .localeCompare(
-                      //       (optionB?.label ?? "").toLowerCase()
-                      //     )
-                      // }
-                      filterOption={(inputValue, option) => {
-                        return option.label
-                          .toLowerCase()
-                          .includes(inputValue.toLowerCase());
-                      }}
-                      options={budgetLines.map((s) => {
-                        return {
-                          label: s.description.toUpperCase(),
-                          options: s.budgetlines.map((sub) => {
-                            return {
-                              label: sub.description,
-                              value: sub._id,
-                              title: sub.description,
-                            };
-                          }),
-                        };
-                      })}
-                    ></Select>
-                  </div>
-                </div>}
-                <div>
-                  <label className="text-[#6A757B]">Budgeted Date:</label>
-                  <Form.Item
-                    name="dueDate"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Due date is required",
-                      },
-                    ]}
-                  >
-                    <DatePicker
-                      className="mt-3 h-10 w-full"
-                      defaultValue={dayjs(data?.dueDate)}
-                      disabledDate={(current) =>
-                        current.isBefore(dayjs().subtract(1, "day"))
-                      }
-                      // value={moment(data?.dueDate)}
-                      onChange={(v, dstr) => {
-                        let _d = data;
-                        _d.dueDate = dstr;
-                        handleUpdateRequest(_d);
-                      }}
-                    />
-                  </Form.Item>
-                </div>
-              </div>
-              <div className="edit-requests my-10 pt-5 border-2 border-[#732083]">
-                <ItemsTable
-                  setDataSource={(v) => {
-                    setValues(v);
-                    let r = { ...data };
-                    r.items = v;
-                    handleUpdateRequest(r);
-                  }}
-                  dataSource={values}
-                  fileList={fileList}
-                  setFileList={_setFileList}
-                  files={files}
-                  setFiles={_setFiles}
-                  editingRequest={true}
-                />
-              </div>
-              <div className="flex justify-end gap-5 mb-5">
-                <Popconfirm
-                  title="Are you sure?"
-                  open={openWithdraw}
-                  icon={
-                    <QuestionCircleOutlined
-                      style={{ color: "red" }}
-                    />
-                  }
-                  onConfirm={() => {
-                    changeStatus(5);
-                    setOpenWithdraw(false);
-                  }}
-                  // okButtonProps={{
-                  //   loading: confirmRejectLoading,
-                  // }}
-                  onCancel={() => setOpenWithdraw(false)}
-                >
-                  <Button
-                    type="primary"
-                    danger
-                    onClick={() => setOpenWithdraw(true)}
-                    className="rounded-lg px-8 pt-3 pb-8 bg-[#F5365C] border-none"
-                  >
-                    Withdraw request
-                  </Button>
-                </Popconfirm>
-                <button className="bg-[#0065DD] rounded-lg px-8 py-3 border-none cursor-pointer" onClick={handleUpload}>
-                  <small className="py-5 text-[15px] text-white">Update</small>
-                </button>
-              </div>
-            </div>
-          )}
-          {createPOMOdal()}
-          {previewAttachmentModal()}
-          {createContractMOdal()}
-        </div>
-
-        <div className="md:col-span-4 flex pb-8 flex-col ring-1 ring-gray-200 px-3 rounded-lg bg-white mb-24">
-          <h4 className="mb-1 text-[17px]">Request Process</h4>
-          <div className="-my-3.5">
-            <button
-              className={`cursor-pointer w-full pr-5 flex justify-between items-center bg-transparent border-none ${
-                activeIndex == "delivery" ? "active" : ""
-              }`}
-              onClick={() => handleItemClick("request")}
-            >
-              <div className="flex flex-col items-start justify-start gap-4">
-                <h6 className="text-[#344767] text-[15px] -mb-1">
-                  Request Approval Process
-                </h6>
-                <span className="text-[#8392AB]">
-                  Proceed with approving the above request by adding your stamp
-                  mark where needed
-                </span>
-              </div>
-              <RiArrowDropDownLine
-                className={`text-[36px] text-[#344767] arrow ${
-                  activeIndex == "request" ? "active" : ""
-                }`}
-              />
-            </button>
-            <div
-              ref={contentHeight}
-              className="answer-container"
-              style={
-                activeIndex == "request"
-                  ? { display: 'block'}
-                  : { display: "none"}
-              }
-            >
-              <div>
-              {
-                // data?.status !== "approved" &&
-                //   data?.status !== "po created" &&
-                //   data?.status !== "declined" &&
-                currentCode !== 5 &&
-                  buildApprovalFlow(
-                    currentCode,
-                    changeStatus,
-                    submitTenderData,
-                    setDeadLine,
-                    open,
-                    handleOk,
-                    setReason,
-                    confirmRejectLoading,
-                    handleCancel,
-                    showPopconfirm,
-                    data?.approvalDate,
-                    refDoc,
-                    setRefDoc,
-                    contracts,
-                    submitPOData,
-                    setSelectedContract,
-                    data,
-                    submitContractData,
-                    setTendeDocSelected,
-                    form
-                  )
-                }
-              </div>
-            </div>
-          </div>
-          <div className="my-0">
-            <button
-              className={`w-full pr-5 flex justify-between items-center bg-transparent cursor-pointer border-none ${
-                activeIndex == "delivery" ? "active" : ""
-              }`}
-              onClick={() => handleItemClick("delivery")}
-            >
-              <div className="flex flex-col items-start justify-start gap-4">
-                <h6 className="text-[#344767] text-[15px] -mb-1">
-                  Delivery Tracking
-                </h6>
-                <span className="text-[#8392AB]">
-                  Proceed with approving the above request by adding your stamp
-                  mark where needed
-                </span>
-              </div>
-              <RiArrowDropDownLine
-                className={`text-[36px] text-[#344767] arrow ${
-                  activeIndex == "delivery" ? "active" : ""
-                }`}
-              />
-            </button>
-          </div>
-        </div>
-      </div>
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col rounded bg-white px-5 shadow">
-          <Typography.Title level={5} className="pb-4">Workflow tracker</Typography.Title>
-          <Timeline
-            // mode="alternate"
-            items={[
-              {
-                children: (
-                  <div className="flex flex-col mb-1">
-                    <h6 className="m-0 py-0.5 px-0 text-[12px] text-[#344767]">Purchase Requisition</h6>
-                    <small className="text-[#A3AEB4]">You can perfom sourcing action here.</small>
-                  </div>
-                ),
-                color: data?.status !== "declined" ? "blue" : "red",
-                dot: data?.status !== "declined" && (
-                  <FiShoppingBag className=" text-[#01AF65]" />
-                ),
-              },
-              {
-                children: (
-                  <div className="flex flex-col mb-1">
-                    <h6 className="m-0 py-0.5 px-0 text-[12px] text-[#344767]">Request Approval</h6>
-                    <small className="text-[#A3AEB4]">You can perfom sourcing action here.</small>
-                  </div>
-                ),
-                color:
-                  data?.status === "approved (pm)" ||
-                  data?.status === "approved" ||
-                  tender
-                    ? "blue"
-                    : "gray",
-                dot: (data?.status === "approved (pm)" ||
-                  tender ||
-                  data?.status === "approved") && (
-                  <IoMdCheckboxOutline className=" text-[#01AF65]" />
-                ),
-              },
-              {
-                children: (
-                  <div className="flex flex-col mb-1">
-                    <h6 className="m-0 py-0.5 px-0 text-[12px] text-[#344767]">Tendering</h6>
-                    <small className="text-[#A3AEB4]">You can perfom sourcing action here.</small>
-                  </div>
-                ),
-                color: tender ? "blue" : "gray",
-                dot: tender && (
-                  <MdFileCopy className=" text-[#01AF65]" />
-                ),
-              },
-              {
-                color: contract ? "blue" : "gray",
-                children: (
-                  <div className="flex flex-col mb-1">
-                    <h6 className="m-0 py-0.5 px-0 text-[12px] text-[#344767]">Contracting</h6>
-                    <small className="text-[#A3AEB4]">You can perfom sourcing action here.</small>
-                  </div>
-                ),
-                dot: contract && (
-                  <MdAttachFile className=" text-[#01AF65]" />
-                ),
-              },
-              {
-                children: (
-                  <div className="flex flex-col mb-1">
-                    <h6 className="m-0 py-0.5 px-0 text-[12px] text-[#344767]">Purchase Order</h6>
-                    <small className="text-[#A3AEB4]">You can perfom sourcing action here.</small>
-                  </div>
-                ),
-                color: po ? "blue" : "gray",
-                dot: po && <BiPurchaseTagAlt className=" text-[#01AF65]" />,
-              },
-              {
-                children: (
-                  <div className="flex flex-col mb-1">
-                    <h6 className="m-0 py-0.5 px-0 text-[12px] text-[#344767]">Delivery</h6>
-                    <small className="text-[#A3AEB4]">You can perfom sourcing action here.</small>
-                  </div>
-                ),
-                color: progress >= 100 ? "blue" : "gray",
-                dot: po && progress >= 100 && (
-                  <TbTruckDelivery className=" text-[#01AF65]" />
-                ),
-              },
-            ]}
-          />
-        </div>
-        <div className="bg-white rounded px-4 pt-2 shadow">
-          <div className="pt-3">
-            {/* Sourcing Method */}
-            {currentCode !== 3 && (
-              <div className="mb-5">
-                <div className="text-[16px] font-bold">Sourcing Method</div>
-                <div className="mt-4 text-[14px] line text-[#A3AEB4] leading-6">
-                  {(data?.sourcingMethod && (
-                    <Tag>{data?.sourcingMethod}</Tag>
-                  )) ||
-                    "No sourcing method selected at the moment."}
-                </div>
-              </div>
-            )}
-            {currentCode === 3 &&
-              (user?.permissions?.canCreateTenders ||
-                user?.permissions?.canCreatePurchaseOrders ||
-                user?.permissions?.canCreateContracts) && (
-                <>
-                  <Form form={form}>
-                    <div className="text-[16px] font-bold">
-                      Sourcing Method Selection
-                    </div>
-                    <div className="mt-5 items-center">
-                      <div className="mb-2">Please select a sourcing method</div>
-                      <Form.Item name="refDoc">
-                        <Select
-                          onChange={(value) => setRefDoc(value)}
-                          style={{ width: "100%" }}
-                          defaultValue={false}
-                          options={[
-                            {
-                              value: "From Existing Contract",
-                              label: "Sourcing from Existing Contract",
-                            },
-
-                            {
-                              value: "Direct Contracting",
-                              label: "Direct contracting",
-                            },
-                            {
-                              value: "Tendering",
-                              label: "Tendering",
-                            },
-                          ]}
-                        />
-                      </Form.Item>
-                    </div>
-
-                    {refDoc === "Tendering" &&
-                      buildTenderForm(
-                        setDeadLine,
-                        user,
-                        docId,
-                        submitTenderData,
-                        setTendeDocSelected,
-                        tenderDocSelected
-                      )}
-
-                    {refDoc === "From Existing Contract" &&
-                      buildPOForm(
-                        setSelectedContract,
-                        contracts,
-                        user,
-                        submitPOData,
-                        setVendor,
-                        selectedContract,
-                        documentFullySigned
-                      )}
-
-                    {refDoc === "Direct Contracting" && (
-                      <div>
-                        <div className="items-center">
-                          <div className="mb-2">Select registered vendor</div>
-                          <Form.Item name="vendor">
-                            <Select
-                              onChange={(value, option) => {
-                                setVendor(option?.payload);
+                  <div className="flex flex-col space-y-5">
+                    {/* TItle */}
+                    <div className="flex flex-row justify-between items-center">
+                      <div className="ml-3 text-lg font-bold">
+                        Request Details
+                      </div>
+                      <div className="space-x-3 ">
+                        {!data?.status?.includes("approved") &&
+                          data?.status !== "declined" &&
+                          data?.status !== "withdrawn" &&
+                          user?._id == data?.createdBy?._id && (
+                            <Popconfirm
+                              title="Are you sure?"
+                              open={openWithdraw}
+                              icon={
+                                <QuestionCircleOutlined
+                                  style={{ color: "red" }}
+                                />
+                              }
+                              onConfirm={() => {
+                                changeStatus(5);
+                                setOpenWithdraw(false);
                               }}
-                              style={{ width: "100%" }}
-                              showSearch
-                              filterSort={(optionA, optionB) =>
-                                (optionA?.label ?? "")
-                                  .toLowerCase()
-                                  .localeCompare(
-                                    (optionB?.label ?? "").toLowerCase()
-                                  )
-                              }
-                              filterOption={(inputValue, option) =>
-                                option?.label
-                                  .toLowerCase()
-                                  .includes(inputValue.toLowerCase())
-                              }
-                              options={vendors
-                                ?.filter(
-                                  (v) => v?.vendor?.status === "approved"
-                                )
-                                ?.map((v) => {
-                                  return {
-                                    value: v?.vendor?._id,
-                                    label: v?.vendor?.companyName,
-                                    payload: v?.vendor,
-                                  };
-                                })}
-                            />
-                          </Form.Item>
-                        </div>
-                        <div className="items-center">
-                          <div>
-                            Upload reference document{" "}
-                            <i className="text-xs">(expected in PDF format)</i>
+                              // okButtonProps={{
+                              //   loading: confirmRejectLoading,
+                              // }}
+                              onCancel={() => setOpenWithdraw(false)}
+                            >
+                              <Button
+                                type="primary"
+                                danger
+                                onClick={() => setOpenWithdraw(true)}
+                              >
+                                Withdraw this request
+                              </Button>
+                            </Popconfirm>
+                          )}
+                        <Tag
+                          color={
+                            data?.status === "declined" ||
+                            data?.status === "withdrawn"
+                              ? "red"
+                              : data?.status === "approved" ||
+                                data?.status === "approved (pm)"
+                              ? "geekblue"
+                              : "orange"
+                          }
+                        >
+                          {data?.status === "declined" ||
+                          data?.status === "approved" ||
+                          data?.status === "approved (pm)" ||
+                          data?.status === "withdrawn"
+                            ? data?.status
+                            : "pending"}
+                        </Tag>
+                      </div>
+                      {/* <div className="">
+                        <Tag color={data?.budgeted ? "green" : "blue"}>
+                          <Tooltip title={data?.budgetLine} showArrow={false}>
+                            {data?.budgeted ? "budgeted" : "not budgeted"}
+                          </Tooltip>
+                        </Tag>
+                      </div>
+                      <div className="">
+                        <Tag>
+                          Requested by{" "}
+                          {data?.createdBy?.firstName +
+                            " " +
+                            data?.createdBy?.lastName}
+                        </Tag>
+                      </div> */}
+                    </div>
+                    <div className="flex flex-row justify-between items-start">
+                      <div className="grid md:grid-cols-4 gap-5 w-full">
+                        {/* Request number */}
+                        <div className="flex flex-col space-y-1 items-start">
+                          <div className="text-xs ml-3 text-gray-400">
+                            Request Number:
                           </div>
-                          <Form.Item name="vendor">
-                            <UploadReqAttach
-                              uuid={reqAttachId}
-                              setAttachSelected={setAttachSelected}
-                            />
-                          </Form.Item>
+                          <div className="text-sm font-semibold ml-3 text-gray-600">
+                            {data?.number}
+                          </div>
                         </div>
-                        <div>
-                          <div className="flex flex-row items-center space-x-1">
-                            <div className="flex flex-row space-x-1 items-center">
-                              <Form.Item>
-                                <Button
-                                  icon={<FileDoneOutlined />}
-                                  type="primary"
-                                  htmlType="submit"
-                                  onClick={submitContractData}
-                                  disabled={
-                                    !user?.permissions?.canCreateContracts ||
-                                    !vendor ||
-                                    !attachSelected
+
+                        {/* Initiator */}
+                        <div className="flex flex-col space-y-1 items-start">
+                          <div className="text-xs ml-3 text-gray-400">
+                            Initiator:
+                          </div>
+                          <div className="text-sm font-semibold ml-3 text-gray-600">
+                            {data?.createdBy?.firstName +
+                              " " +
+                              data?.createdBy?.lastName}
+                          </div>
+                        </div>
+
+                        {/* Department */}
+                        <div className="flex flex-col space-y-1 items-start">
+                          <div className="text-xs ml-3 text-gray-400">
+                            Department:
+                          </div>
+                          <div className="text-sm font-semibold ml-3 text-gray-600">
+                            {data?.createdBy?.department?.description}
+                          </div>
+                        </div>
+
+                        {/* Due date */}
+                        <div className="flex flex-col space-y-1 items-start">
+                          <div className="text-xs ml-3 text-gray-400">
+                            Due date:
+                          </div>
+                          {!edit && (
+                            <div className="text-sm font-semibold ml-3 text-gray-600">
+                              {moment(data?.dueDate).format("YYYY-MMM-DD")}
+                            </div>
+                          )}
+                          {edit && (
+                            <div className="text-sm font-semibold ml-3 text-gray-600">
+                              <Form.Item
+                                name="dueDate"
+                                rules={[
+                                  {
+                                    required: true,
+                                    message: "Due date is required",
+                                  },
+                                ]}
+                              >
+                                <DatePicker
+                                  style={{ width: "100%" }}
+                                  defaultValue={dayjs(data?.dueDate)}
+                                  disabledDate={(current) =>
+                                    current.isBefore(dayjs().subtract(1, "day"))
                                   }
-                                  className="space-x-0 pt-1 pb-3 gap-2 px-2 mx-1"
-                                >
-                                  Create Contract
-                                </Button>
+                                  // value={moment(data?.dueDate)}
+                                  onChange={(v, dstr) => {
+                                    let _d = data;
+                                    _d.dueDate = dstr;
+                                    handleUpdateRequest(_d);
+                                  }}
+                                />
                               </Form.Item>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Service Category */}
+                        <div className="flex flex-col space-y-1 items-start">
+                          <div className="text-xs ml-3 text-gray-400">
+                            Service category:
+                          </div>
+                          {!edit && (
+                            <div className="text-sm font-semibold ml-3 text-gray-600">
+                              {data?.serviceCategory}
+                            </div>
+                          )}
+
+                          {edit && (
+                            <Select
+                              // mode="multiple"
+                              // allowClear
+                              className="ml-3"
+                              defaultValue={data?.serviceCategory}
+                              style={{ width: "100%" }}
+                              placeholder="Please select"
+                              onChange={(value) => {
+                                let r = { ...data };
+                                r.serviceCategory = value;
+                                handleUpdateRequest(r);
+                              }}
+                            >
+                              {servCategories?.map((s) => {
+                                return (
+                                  <Select.Option
+                                    key={s._id}
+                                    value={s.description}
+                                  >
+                                    {s.description}
+                                  </Select.Option>
+                                );
+                              })}
+                            </Select>
+                          )}
+                        </div>
+
+                        {/* Budgeted */}
+                        <div className="flex flex-col space-y-1 items-start">
+                          <div className="text-xs ml-3 text-gray-400">
+                            Budgeted:
+                          </div>
+                          {!edit && (
+                            <div className="text-sm font-semibold ml-3 text-gray-600">
+                              {data?.budgeted ? "Yes" : "No"}
+                            </div>
+                          )}
+                          {edit && (
+                            <div className="text-xs ml-3 text-gray-400">
+                              <Select
+                                // mode="multiple"
+                                // allowClear
+                                defaultValue={data?.budgeted ? "Yes" : "No"}
+                                // style={{ width: "100%" }}
+                                placeholder="Please select"
+                                onChange={(value) => {
+                                  let r = { ...data };
+                                  r.budgeted = value;
+                                  if (value == "No") r.budgetLine = null;
+                                  handleUpdateRequest(r);
+                                }}
+                                options={[
+                                  { value: true, label: "Yes" },
+                                  { value: false, label: "No" },
+                                ]}
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Budget Line */}
+                        <div className="flex flex-col space-y-1 items-start">
+                          <div className="text-xs ml-3 text-gray-400">
+                            Budget Line:
+                          </div>
+                          {!edit && (
+                            <div className="text-sm font-semibold ml-3 text-gray-600">
+                              {data?.budgetLine?.description}
+                            </div>
+                          )}
+
+                          {edit && data.budgeted && (
+                            // <Select
+                            //   // mode="multiple"
+                            //   // allowClear
+                            //   className="ml-3"
+                            //   defaultValue={data?.budgetLine}
+                            //   style={{ width: "100%" }}
+                            //   placeholder="Please select"
+                            //   onChange={(value) => {
+                            //     let r = { ...data };
+                            //     r.budgetLine = value;
+                            //     handleUpdateRequest(r);
+                            //   }}
+                            // >
+                            //   {servCategories?.map((s) => {
+                            //     return (
+                            //       <Select.Option
+                            //         key={s._id}
+                            //         value={s.description}
+                            //       >
+                            //         {s.description}
+                            //       </Select.Option>
+                            //     );
+                            //   })}
+                            // </Select>
+
+                            <Select
+                              // defaultValue={budgetLine}
+                              className="ml-3"
+                              placeholder="Select service category"
+                              showSearch
+                              defaultValue={data?.budgetLine?._id}
+                              onChange={(value, option) => {
+                                let r = { ...data };
+                                r.budgetLine = value;
+                                handleUpdateRequest(r);
+                              }}
+                              // filterSort={(optionA, optionB) =>
+                              //   (optionA?.label ?? "")
+                              //     .toLowerCase()
+                              //     .localeCompare(
+                              //       (optionB?.label ?? "").toLowerCase()
+                              //     )
+                              // }
+                              filterOption={(inputValue, option) => {
+                                return option.label
+                                  .toLowerCase()
+                                  .includes(inputValue.toLowerCase());
+                              }}
+                              options={budgetLines.map((s) => {
+                                return {
+                                  label: s.description.toUpperCase(),
+                                  options: s.budgetlines.map((sub) => {
+                                    return {
+                                      label: sub.description,
+                                      value: sub._id,
+                                      title: sub.description,
+                                    };
+                                  }),
+                                };
+                              })}
+                            ></Select>
+                          )}
+                        </div>
+
+                        {/* Description */}
+                        <div className="flex flex-col space-y-1 items-start">
+                          <div className="text-xs ml-3 text-gray-400">
+                            Description:
+                          </div>
+                          {!edit && (
+                            <div className="text-sm font-semibold ml-3 text-gray-600">
+                              {data?.description}
+                            </div>
+                          )}
+                          {edit && (
+                            <div className="text-xs ml-3 text-gray-400">
+                              <Typography.Text
+                                editable={
+                                  edit && {
+                                    text: data?.description,
+                                    onChange: (e) => {
+                                      let req = { ...data };
+                                      req.description = e;
+                                      handleUpdateRequest(req);
+                                    },
+                                  }
+                                }
+                              >
+                                {data?.description}
+                              </Typography.Text>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Items table */}
+                    <div className="p-5">
+                      {!edit && (
+                        <Table
+                          size="small"
+                          dataSource={data?.items}
+                          columns={columns}
+                          rowClassName={() => "editable-row"}
+                          bordered
+                          pagination={false}
+                        />
+                      )}
+
+                      {edit && (
+                        <ItemsTable
+                          setDataSource={(v) => {
+                            setValues(v);
+                            let r = { ...data };
+                            r.items = v;
+                            handleUpdateRequest(r);
+                          }}
+                          dataSource={values}
+                          fileList={fileList}
+                          setFileList={_setFileList}
+                          files={files}
+                          setFiles={_setFiles}
+                          editingRequest={true}
+                        />
+                      )}
+                    </div>
+
+                    {
+                      // data?.status !== "approved" &&
+                      //   data?.status !== "po created" &&
+                      //   data?.status !== "declined" &&
+                      currentCode !== 5 &&
+                        buildApprovalFlow(
+                          currentCode,
+                          changeStatus,
+                          submitTenderData,
+                          setDeadLine,
+                          open,
+                          handleOk,
+                          setReason,
+                          confirmRejectLoading,
+                          handleCancel,
+                          showPopconfirm,
+                          data?.approvalDate,
+                          refDoc,
+                          setRefDoc,
+                          contracts,
+                          submitPOData,
+                          setSelectedContract,
+                          data,
+                          submitContractData,
+                          setTendeDocSelected,
+                          form
+                        )
+                    }
+
+                    {/* {po?.status === "started" && (
+                      <div className="ml-5 w-1/3">
+                        <div>Delivery progress</div>
+                        <Progress
+                          percent={_.round(po?.deliveryProgress, 1) || 0}
+                          size="small"
+                          status="active"
+                        />
+                      </div>
+                    )} */}
+
+                    {/* {po?.status === "started" &&
+                      po?.deliveryProgress < 100 &&
+                      user?._id === data?.createdBy?._id &&
+                      po?.items?.map((i, index) => {
+                        return (
+                          <div key={i.key} className="m-5">
+                            <div>
+                              Delivery for {i.title}{" "}
+                              <Tag>{i?.deliveredQty} delivered</Tag>
                             </div>
 
-                            <div className="flex flex-row space-x-1 items-center">
-                              <Form.Item>
-                                <Button
-                                  icon={<FileDoneOutlined />}
-                                  type="primary"
-                                  htmlType="submit"
-                                  onClick={submitPOData}
-                                  disabled={
-                                    !user?.permissions
-                                      ?.canCreatePurchaseOrders ||
-                                    !vendor ||
-                                    !attachSelected
-                                  }
-                                  className="space-x-0 pt-1 pb-3 gap-2 px-2 mx-1"
-                                >
-                                  Create PO
-                                </Button>
-                              </Form.Item>
-                            </div>
+                            {buildConfirmDeliveryForm(
+                              po,
+                              handleGetProgress,
+                              handleUpdateProgress,
+                              progress,
+                              index
+                            )}
                           </div>
+                        );
+                      })} */}
+
+                    {currentCode !== 5 && (
+                      <>
+                        <div className="ml-3 ">
+                          <div className="text-lg font-bold">
+                            Delivery progress
+                          </div>
+                          {console.log("Data ", data)}
+                          <Button
+                            type="primary"
+                            disabled={
+                              !documentFullySigned(po) ||
+                              po?.status == "started" ||
+                              !po?.status ||
+                              user._id !== data?.createdBy?._id
+                            }
+                            size="small"
+                            loading={startingDelivery}
+                            icon={<PlaySquareOutlined />}
+                            onClick={() => handleStartDelivery(po)}
+                          >
+                            Delivery has started
+                          </Button>
+                        </div>
+
+                        {data?.items?.map((i, index) => {
+                          let deliveredQty =
+                            po?.items[index]?.deliveredQty || 0;
+                          return (
+                            <div key={i.key} className="m-5">
+                              <div>
+                                {i.title}: {deliveredQty || 0} delivered out of{" "}
+                                {i?.quantity}
+                              </div>
+
+                              {deliveredQty < parseInt(i?.quantity) &&
+                                buildConfirmDeliveryForm(
+                                  po,
+                                  handleGetProgress,
+                                  handleUpdateProgress,
+                                  progress,
+                                  index,
+                                  i?.quantity
+                                )}
+                            </div>
+                          );
+                        })}
+
+                        <div className="ml-3 w-1/3">
+                          {/* <div>Delivery progress</div> */}
+                          <Progress
+                            percent={_.round(po?.deliveryProgress, 1) || 0}
+                            size="small"
+                            status="active"
+                          />
+                        </div>
+
+                        {/* {data?.status === "approved" &&
+                      (tender || po) &&
+                      buildWorkflow(currentStep, tender, po)} */}
+
+                        {po &&
+                          _.round(po?.deliveryProgress, 1) >= 100 &&
+                          !po.rate && (
+                            <div className="justify-center items-center w-full flex flex-col space-y-3">
+                              <Divider></Divider>
+                              <Typography.Title level={5}>
+                                Supplier & Delivery Rate
+                              </Typography.Title>
+                              <Rate
+                                // allowHalf
+                                disabled={user?._id !== data?.createdBy?._id}
+                                defaultValue={po?.rate || rate}
+                                tooltips={[
+                                  "Very bad",
+                                  "Bad",
+                                  "Good",
+                                  "Very good",
+                                  "Excellent",
+                                ]}
+                                onChange={(value) => setRate(value)}
+                                // onChange={(value) => handleRateDelivery(po, value)}
+                              />
+
+                              <Typography.Title level={5}>
+                                Give a comment on your rating
+                              </Typography.Title>
+                              <Input.TextArea
+                                className="w-1/3"
+                                value={comment}
+                                onChange={(v) => setComment(v.target.value)}
+                              />
+
+                              <div>
+                                <Button
+                                  type="primary"
+                                  onClick={() =>
+                                    handleRateDelivery(po, rate, comment)
+                                  }
+                                >
+                                  Submit my rate and review
+                                </Button>
+                              </div>
+                            </div>
+                          )}
+
+                        {po &&
+                          _.round(po?.deliveryProgress, 1) >= 100 &&
+                          po.rate && (
+                            <div className="w-full flex flex-col space-y-3">
+                              <Divider></Divider>
+                              <Typography.Title level={5}>
+                                Supplier & Delivery Rate
+                              </Typography.Title>
+                              <Rate
+                                // allowHalf
+                                disabled={true}
+                                defaultValue={po?.rate || rate}
+                                tooltips={[
+                                  "Very bad",
+                                  "Bad",
+                                  "Good",
+                                  "Very good",
+                                  "Excellent",
+                                ]}
+                              />
+
+                              <div className="flex flex-row">
+                                <Typography.Text>
+                                  {data?.createdBy?.firstName}{" "}
+                                  {data?.createdBy?.lastName} commented:
+                                </Typography.Text>
+                                <Typography.Text code>
+                                  {po.rateComment}
+                                </Typography.Text>
+                              </div>
+                            </div>
+                          )}
+
+                        {/* {po && po.deliveryProgress >= 100 && po.rate && (
+                      <div className="justify-center items-center w-full flex flex-col space-y-3">
+                        <Divider></Divider>
+                        <Typography.Title level={5}>
+                          Supplier & Delivery Rate
+                        </Typography.Title>
+                        <Rate
+                          // allowHalf
+                          disabled
+                          defaultValue={po?.rate}
+                          tooltips={[
+                            "Very bad",
+                            "Bad",
+                            "Good",
+                            "Very good",
+                            "Excellent",
+                          ]}
+                          // onChange={(value) => setRate(value)}
+                          // onChange={(value) => handleRateDelivery(po, value)}
+                        />
+
+                        <Typography.Text level={5}>
+                          {po?.comment}
+                        </Typography.Text>
+                      </div>
+                    )} */}
+                      </>
+                    )}
+
+                    {data?.status === "declined" && (
+                      <div className="flex flex-col mt-5 space-y-1">
+                        <div className="text-xs font-semibold ml-3  text-gray-500">
+                          The request was declined by {data?.declinedBy}. Below
+                          is the reason/comment.
+                        </div>
+                        <div className="text-sm ml-3 text-gray-600">
+                          <Alert
+                            message={data?.reasonForRejection}
+                            type="error"
+                          />
                         </div>
                       </div>
                     )}
-                  </Form>
-                </>
-              )}
 
-            {tender && data?.sourcingMethod === "Tendering" && (
-              <div className="ml-3">
-                <Typography.Text type="secondary">
-                  Tender reference:{" "}
-                  <Link href={`/system/tenders/${tender?._id}`}>
-                    {tender?.number}
-                  </Link>
-                </Typography.Text>
-              </div>
-            )}
-
-            {contract &&
-              (data?.sourcingMethod === "Direct Contracting" ||
-                data?.sourcingMethod === "From Existing Contract") && (
-                <div className="ml-3">
-                  <Typography.Text type="secondary">
-                    Contract reference:{" "}
-                    <Link href={`/system/contracts/${contract?._id}`}>
-                      {contract?.number}
-                    </Link>
-                  </Typography.Text>
-                </div>
+                    {data?.status === "withdrawn" && (
+                      <div className="flex flex-col mt-5 space-y-1">
+                        <div className="text-xs font-semibold ml-3  text-red-500">
+                          The request was witdrawn
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </Spin>
+              ) : (
+                <Empty />
               )}
-
-            {po &&
-              (data?.sourcingMethod === "Direct Contracting" ||
-                data?.sourcingMethod === "From Existing Contract") && (
-                <div className="ml-3">
-                  <Typography.Text type="secondary">
-                    PO reference:{" "}
-                    <Link href={`/system/purchase-orders/${po?._id}`}>
-                      {po?.number}
-                    </Link>
-                  </Typography.Text>
-                </div>
-              )}
-          </div>
+            </Tabs.TabPane>
+            {/* <Tabs.TabPane tab="New Task" key="2"></Tabs.TabPane> */}
+          </Tabs>
         </div>
+        {createPOMOdal()}
+        {previewAttachmentModal()}
+        {createContractMOdal()}
+      </div>
+      <div className="flex flex-col rounded space-y-5 bg-white px-4 pt-2 shadow ">
+        <Typography.Title level={5}>Workflow tracker</Typography.Title>
+        <Timeline
+          // mode="alternate"
+          items={[
+            {
+              children: <div className="">Purchase Requisition</div>,
+              color: data?.status !== "declined" ? "blue" : "red",
+              dot: data?.status !== "declined" && (
+                <CheckCircleOutlined className=" text-green-500" />
+              ),
+            },
+            {
+              children: <div className="">Request approval</div>,
+              color:
+                data?.status === "approved (pm)" ||
+                data?.status === "approved" ||
+                tender
+                  ? "blue"
+                  : "gray",
+              dot: (data?.status === "approved (pm)" ||
+                tender ||
+                data?.status === "approved") && (
+                <CheckCircleOutlined className=" text-green-500" />
+              ),
+            },
+            {
+              children: `Tendering`,
+              color: tender ? "blue" : "gray",
+              dot: tender && (
+                <CheckCircleOutlined className=" text-green-500" />
+              ),
+            },
+            {
+              color: contract ? "blue" : "gray",
+              children: "Contracting",
+              dot: contract && (
+                <CheckCircleOutlined className=" text-green-500" />
+              ),
+            },
+            {
+              children: "Purchase Order",
+              color: po ? "blue" : "gray",
+              dot: po && <CheckCircleOutlined className=" text-green-500" />,
+            },
+            {
+              children: "Delivery",
+              color: progress >= 100 ? "blue" : "gray",
+              dot: po && progress >= 100 && (
+                <CheckCircleOutlined className=" text-green-500" />
+              ),
+            },
+          ]}
+        />
       </div>
     </div>
   );
