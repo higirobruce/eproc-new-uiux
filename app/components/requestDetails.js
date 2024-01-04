@@ -2589,7 +2589,7 @@ const RequestDetails = ({
                     <div className="text-red-500">*</div>
                   </div>
                   <Form.Item name="requestTitle">
-                    <Input defaultValue={data.title} className="h-11 mt-3" />
+                    <Input defaultValue={data.title} className="h-11 mt-3" disabled={data?.status === "approved" || data?.status === "approved (pm)"} />
                   </Form.Item>
                 </div>
                 <div>
@@ -2639,6 +2639,7 @@ const RequestDetails = ({
                       r.serviceCategory = value;
                       handleUpdateRequest(r);
                     }}
+                    disabled={data?.status === "approved" || data?.status === "approved (pm)"}
                   >
                     {servCategories?.map((s) => {
                       return (
@@ -2662,12 +2663,13 @@ const RequestDetails = ({
                   >
                     <Input.TextArea
                       defaultValue={data.description}
-                      className="w-full mt-3"
+                      className={`w-full mt-3 text-red-500`}
                       // onChange={(e) => setDescription(e.target.value)}
                       placeholder="Briefly describe your request"
                       showCount
                       maxLength={100}
                       rows={4}
+                      disabled={data?.status === "approved" || data?.status === "approved (pm)"}
                     />
                   </Form.Item>
                 </div>
@@ -2689,6 +2691,7 @@ const RequestDetails = ({
                         }}
                         className="mt-3"
                         defaultValue={data.budgeted}
+                        disabled={data?.status === "approved" || data?.status === "approved (pm)"}
                       >
                         <Radio value={true} className="mr-3">
                           <span className="ml-2 text-[18px]">Yes</span>
@@ -2700,9 +2703,9 @@ const RequestDetails = ({
                     </Form.Item>
                   </div>
                 </div>
-                {console.log('Budgeted Line ', data)}
                 {data.budgeted && <div>
                   <label className="text-[#6A757B]">Budgeted Line:</label>
+                  {console.log('Data ', data)}
                   <div className="text-xs text-gray-400">
                     <Select
                       // defaultValue={budgetLine}
@@ -2711,6 +2714,7 @@ const RequestDetails = ({
                       placeholder="Select service category"
                       showSearch
                       defaultValue={data?.budgetLine?._id}
+                      disabled={data?.status === "approved" || data?.status === "approved (pm)"}
                       onChange={(value, option) => {
                         let r = { ...data };
                         r.budgetLine = value;
@@ -2755,7 +2759,7 @@ const RequestDetails = ({
                     ]}
                   >
                     <DatePicker
-                      className="mt-3 h-10 w-full"
+                      className="mt-3 h-11 w-full"
                       defaultValue={dayjs(data?.dueDate)}
                       disabledDate={(current) =>
                         current.isBefore(dayjs().subtract(1, "day"))
@@ -2766,6 +2770,7 @@ const RequestDetails = ({
                         _d.dueDate = dstr;
                         handleUpdateRequest(_d);
                       }}
+                      disabled={data?.status === "approved" || data?.status === "approved (pm)"}
                     />
                   </Form.Item>
                 </div>
@@ -2784,9 +2789,10 @@ const RequestDetails = ({
                   files={files}
                   setFiles={_setFiles}
                   editingRequest={true}
+                  status={data?.status}
                 />
               </div>
-              <div className="flex justify-end gap-5 mb-5">
+              {(data?.status !== "approved" && data?.status !== "approved (pm)") && <div className="flex justify-end gap-5 mb-5">
                 <Popconfirm
                   title="Are you sure?"
                   open={openWithdraw}
@@ -2808,15 +2814,15 @@ const RequestDetails = ({
                     type="primary"
                     danger
                     onClick={() => setOpenWithdraw(true)}
-                    className="rounded-lg px-8 pt-3 pb-8 bg-[#F5365C] border-none"
+                    className="rounded-lg px-8 pt-2 pb-9 bg-[#F5365C] border-none"
                   >
                     Withdraw request
                   </Button>
                 </Popconfirm>
-                <button className="bg-[#0065DD] rounded-lg px-8 py-3 border-none cursor-pointer" onClick={handleUpload}>
+                <button className="bg-[#0065DD] rounded-lg px-8 py-2 border-none cursor-pointer" onClick={handleUpload}>
                   <small className="py-5 text-[15px] text-white">Update</small>
                 </button>
-              </div>
+              </div>}
             </div>
           )}
           {createPOMOdal()}

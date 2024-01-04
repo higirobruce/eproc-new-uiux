@@ -946,8 +946,8 @@ export default function UserRequests() {
           </Row> */}
           <div className="flex items-center justify-between mr-6">
             <Button
-              className="bg-white h-9 px-5 text-[11px] font-semibold rounded text-[#0063CF]"
-              icon={<PlusOutlined />}
+              className="bg-white h-9 px-5 text-[13px] font-semibold rounded text-[#0063CF]"
+              icon={<PlusOutlined className="font-[15px]" />}
               onClick={() => {
                 form.resetFields();
 
@@ -958,25 +958,25 @@ export default function UserRequests() {
             </Button>
             <div className="flex items-center gap-5">
               <Select
-                  // mode="tags"
-                  className="text-[9px] w-32 rounded-sm"
-                  placeholder="Select status"
-                  onChange={(value) => setSearchStatus(value)}
-                  value={searchStatus}
-                  options={[
-                    // { value: "mine", label: "My requests" },
-                    { value: "all", label: "Filters" },
-                    { value: "pending", label: "Pending approval" },
-                    {
-                      value: "approved",
-                      label: "Approved",
-                    },
-                    {
-                      value: "declined",
-                      label: "Declined",
-                    },
-                  ]}
-                />
+                // mode="tags"
+                className="text-[14px] text-[#2c6ad6] w-48 rounded-sm"
+                placeholder="Select status"
+                onChange={(value) => setSearchStatus(value)}
+                value={searchStatus}
+                options={[
+                  // { value: "mine", label: "My requests" },
+                  { value: "all", label: "All Requests" },
+                  { value: "pending", label: "Pending approval" },
+                  {
+                    value: "approved",
+                    label: "Approved",
+                  },
+                  {
+                    value: "declined",
+                    label: "Declined",
+                  },
+                ]}
+              />
               <Button
                 type="text"
                 className="bg-white h-8 text-[#0063CF]"
@@ -987,27 +987,55 @@ export default function UserRequests() {
 
           </div>
           {/* <RequestStats totalRequests={dataset?.length}/> */}
-          <div className="mr-6 bg-white h-[calc(100vh-165px)] rounded-lg mb-10 px-5 pb-2">
+          <div className="request mr-6 bg-white h-[calc(100vh-165px)] rounded-lg mb-10 px-5 overflow-y-auto">
             <div className="flex justify-between items-center mb-5">
               <h4 className="text-[19px] text-[#344767]">Purchase Request</h4>
-              <div className="flex items-center rounded-lg bg-[#F5F7FA] p-1.5">
-                <FiSearch size={18} className="text-[#E4E4E4] ml-2" />
-                <Input
-                  placeholder="Search by request #, Initiator"
-                  className="border-0 text-[#8392AB] bg-transparent text-[12px] hover:bg-transparent hover:border-none hover:outline-none"
-                  onChange={(e) => {
-                    setSearchText(e?.target?.value);
-                  }}
-                />
-                {/* <Input.Search
-                  style={{ width: "300px" }}
-                  autoFocus
-                  onChange={(e) => {
-                    setSearchText(e?.target?.value);
-                  }}
-                  placeholder="Search by request#, initiator"
-                /> */}
-                <div></div>
+              <div className="flex items-center gap-5">
+                {(currentUser?.permissions?.canApproveAsHod ||
+                  currentUser?.permissions?.canApproveAsHof ||
+                  currentUser?.permissions?.canApproveAsPM) && (
+                  <div className="flex items-center space-x-5">
+                    <div className="flex flex-row items-center space-x-1">
+                      <div className="text-[13px] text-[#344767]">Awaiting my approval</div>
+                      <Checkbox
+                        checked={myPendingRequest}
+                        disabled={onlyMine}
+                        onChange={(e) => {
+                          getMyPendingRequest(e.target.checked);
+                        }}
+                      />
+                    </div>
+                    <div className="flex flex-row items-center space-x-1">
+                      <div className="text-[13px] text-[#344767]">My requests</div>
+                      <Checkbox
+                        checked={onlyMine}
+                        disabled={myPendingRequest}
+                        onChange={(e) => {
+                          setOnlyMine(e.target.checked);
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+                <div className="flex items-center rounded-lg bg-[#F5F7FA] p-1.5">
+                  <FiSearch size={18} className="text-[#E4E4E4] ml-2" />
+                  <Input
+                    placeholder="Search by request #, Initiator"
+                    className="border-0 text-[#8392AB] bg-transparent text-[12px] hover:bg-transparent hover:border-none hover:outline-none"
+                    onChange={(e) => {
+                      setSearchText(e?.target?.value);
+                    }}
+                  />
+                  {/* <Input.Search
+                    style={{ width: "300px" }}
+                    autoFocus
+                    onChange={(e) => {
+                      setSearchText(e?.target?.value);
+                    }}
+                    placeholder="Search by request#, initiator"
+                  /> */}
+                  <div></div>
+                </div>
               </div>
             </div>
             <UsersRequestsTable

@@ -104,7 +104,7 @@ const LoginForm = ({ goTo }) => {
                   `${
                     res.user?.userType === "VENDOR"
                       ? "/system/tenders"
-                      : "/system/dashboard"
+                      : "/system/requests"
                   }`
                 );
             setSubmitting(false);
