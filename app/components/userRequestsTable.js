@@ -17,6 +17,7 @@ import {
 import moment from "moment/moment";
 import Highlighter from "react-highlight-words";
 import { useRouter } from "next/navigation";
+import { IoMdCheckmarkCircleOutline, IoMdCloseCircleOutline } from "react-icons/io";
 
 const UsersRequestsTable = ({
   dataSet,
@@ -167,7 +168,7 @@ const UsersRequestsTable = ({
   };
 
   const getTagColor = (status) => {
-    if (status === "Pending HOD") return "yellow";
+    if (status === "Pending HOD") return "orange";
     else if (status === "Approved") return "green";
     else if (status === "Approved (fd)" || status === "Pending PROC") return "cyan";
     else if (status === "Approved (pm)" || status === "Pending PROC") return "geekblue";
@@ -196,7 +197,7 @@ const UsersRequestsTable = ({
             <div>
               <FileTextOutlined className="text-xs" />
             </div>
-            <div>{record?.number}</div>
+            <div className="capitalize text-[11px] text-[#1677FF]">{record?.number}</div>
           </div>
         </>
       ),
@@ -210,7 +211,7 @@ const UsersRequestsTable = ({
       render: (_, record) => (
         <>
           <div className={record?.number === selectedRow ? "font-bold" : ""}>
-            <Typography.Text style={{ width: 150 }} ellipsis={true}>
+            <Typography.Text style={{ width: 150 }} className="capitalize text-[14px] text-[#8392AB]" ellipsis={true}>
               {record?.title}
             </Typography.Text>
           </div>
@@ -225,7 +226,7 @@ const UsersRequestsTable = ({
         b?.createdBy?.department?.description,
       render: (_, record) => (
         <>
-          <Typography.Text>{record?.createdBy?.firstName}</Typography.Text>
+          <Typography.Text className="capitalize text-[14px] text-[#8392AB]">{record?.createdBy?.firstName.toLowerCase()}</Typography.Text>
         </>
       ),
     },
@@ -237,8 +238,8 @@ const UsersRequestsTable = ({
         b?.createdBy?.department?.description,
       render: (_, record) => (
         <>
-          <Typography.Text>
-            {record?.createdBy?.department?.description}
+          <Typography.Text className="capitalize text-[14px] text-[#8392AB]">
+            {record?.createdBy?.department?.description.toLowerCase()}
           </Typography.Text>
         </>
       ),
@@ -249,7 +250,7 @@ const UsersRequestsTable = ({
       sorter: (a, b) => a?.serviceCategory > b?.serviceCategory,
       render: (_, record) => (
         <>
-          <Typography.Text>{record?.serviceCategory}</Typography.Text>
+          <Typography.Text className="capitalize text-[14px] text-[#8392AB]">{record?.serviceCategory?.toLowerCase()}</Typography.Text>
         </>
       ),
     },
@@ -260,8 +261,8 @@ const UsersRequestsTable = ({
       sorter: (a, b) => a?.budgeted > b?.budgeted,
       render: (_, record) => (
         <>
-          {record.budgeted && <Typography.Text>Yes</Typography.Text>}
-          {!record.budgeted && <Typography.Text>No</Typography.Text>}
+          {record.budgeted && <IoMdCheckmarkCircleOutline size={18} className="text-[#01AF65]" />}
+          {!record.budgeted && <IoMdCloseCircleOutline size={18} className="text-[#F5365C]" />}
         </>
       ),
     },
@@ -272,7 +273,7 @@ const UsersRequestsTable = ({
       render: (_, record) => (
         <>
           <Row className="felx flex-row items-center justify-between">
-            <Typography.Text>
+            <Typography.Text className="text-[14px] text-[#8392AB]">
               {moment(record?.dueDate).fromNow()}{" "}
             </Typography.Text>
           </Row>
@@ -286,7 +287,22 @@ const UsersRequestsTable = ({
       sorter: (a, b) => a?.status > b?.status,
       render: (_, record) => (
         <>
-          <Badge
+        <div className={`bg-${getTagColor(
+              getHighLevelStatus(
+                record?.status.charAt(0).toUpperCase() + record?.status.slice(1)
+              )
+            )}-500/10 rounded`}>
+          <span className={`text-${getTagColor(
+              getHighLevelStatus(
+                record?.status.charAt(0).toUpperCase() + record?.status.slice(1)
+              )
+            )}-500 text-[13px]`}>
+            {getHighLevelStatus(
+              record?.status.charAt(0).toUpperCase() + record?.status.slice(1)
+            )}
+          </span>
+        </div>
+          {/* <Badge
             color={getTagColor(
               getHighLevelStatus(
                 record?.status.charAt(0).toUpperCase() + record?.status.slice(1)
@@ -295,7 +311,7 @@ const UsersRequestsTable = ({
             text={getHighLevelStatus(
               record?.status.charAt(0).toUpperCase() + record?.status.slice(1)
             )}
-          />
+          /> */}
         </>
       ),
     },
@@ -335,15 +351,17 @@ const UsersRequestsTable = ({
 
   return (
     <Form form={form} component={false}>
-      <Table
-        size="small"
-        dataSource={data}
-        columns={columns}
-        className="shadow-lg rounded-md"
-        // pagination={{
-        //   pageSize: 20,
-        // }}
-      />
+      <div className="request-table">
+        <Table
+          size="small"
+          dataSource={data}
+          columns={columns}
+          className="shadow-lg rounded-md"
+          // pagination={{
+          //   pageSize: 20,
+          // }}
+        />
+      </div>
     </Form>
   );
 };

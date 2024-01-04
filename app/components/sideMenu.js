@@ -16,6 +16,7 @@ import { Menu } from "antd";
 import {useRouter, usePathname} from "next/navigation";
 import { useRouter as nextRouter } from "next/router";
 import Image from "next/image";
+import Link from 'next/link'
 
 const SideMenu = ({ setScreen, screen, user }) => {
   let pathName = usePathname();
@@ -40,7 +41,7 @@ const SideMenu = ({ setScreen, screen, user }) => {
         _items.push({
           label: "Dashboard",
           key: "system/dashboard",
-          icon: <PieChartOutlined />,
+          icon: <PieChartOutlined size={28} className={`text-[${current == `system/dashboard` ? `#1677FF` : `#95A1B3`}]`} />,
         });
       }
 
@@ -48,7 +49,7 @@ const SideMenu = ({ setScreen, screen, user }) => {
         _items.push({
           label: "Purchase Requests",
           key: "system/requests",
-          icon: <SolutionOutlined />,
+          icon: <SolutionOutlined size={28} className={`text-[${current == `system/requests` ? `#1677FF` : `#95A1B3`}]`} />,
         });
       }
 
@@ -56,7 +57,7 @@ const SideMenu = ({ setScreen, screen, user }) => {
         _items.push({
           label: "Tenders",
           key: "system/tenders",
-          icon: <MessageOutlined />,
+          icon: <MessageOutlined size={28} className={`text-[${current == `system/tenders` ? `#1677FF` : `#95A1B3`}]`} />,
         });
       }
 
@@ -64,7 +65,7 @@ const SideMenu = ({ setScreen, screen, user }) => {
         _items.push({
           label: "Contracts",
           key: "system/contracts",
-          icon: <FileDoneOutlined />,
+          icon: <FileDoneOutlined size={28} className={`text-[${current == `system/contracts` ? `#1677FF` : `#95A1B3`}]`} />,
         });
       }
 
@@ -72,14 +73,14 @@ const SideMenu = ({ setScreen, screen, user }) => {
         _items.push({
           label: "Purchase Orders",
           key: "system/purchase-orders",
-          icon: <OrderedListOutlined />,
+          icon: <OrderedListOutlined size={28} className={`text-[${current == `system/purchase-orders` ? `#1677FF` : `#95A1B3`}]`} />,
         });
       }
 
       _items.push({
         label: "Payment requests",
         key: "system/payment-requests",
-        icon: <DollarOutlined />,
+        icon: <DollarOutlined size={28} className={`text-[${current == `system/payment-requests` ? `#1677FF` : `#95A1B3`}]`} />,
       });
 
       if (user?.permissions?.canViewPurchaseOrders) {
@@ -90,7 +91,7 @@ const SideMenu = ({ setScreen, screen, user }) => {
         _items.push({
           label: "Vendors",
           key: "system/vendors",
-          icon: <UsergroupAddOutlined />,
+          icon: <UsergroupAddOutlined size={28} className={`text-[${current == `system/vendors` ? `#1677FF` : `#95A1B3`}]`} />,
         });
       }
       
@@ -103,7 +104,7 @@ const SideMenu = ({ setScreen, screen, user }) => {
         _items.push({
           label: "Internal Users",
           key: "system/users",
-          icon: <UserOutlined />,
+          icon: <UserOutlined size={28} className={`text-[${current == `system/dashboard` ? `#1677FF` : `#95A1B3`}]`} />,
         },)
       }
 
@@ -160,16 +161,31 @@ const SideMenu = ({ setScreen, screen, user }) => {
     setCurrent(e.key);
   };
 
+  if(!user) return;
+
   return (
-    <Menu
-      onClick={onClick}
-      className="h-full"
-      style={{top: '63px',width: '100%',position: 'fixed'
-      }}
-      selectedKeys={[current]}
-      mode="vertical"
-      items={items}
-    />
+    <div className="flex flex-col gap-10">
+      {items?.map((item) => {
+        return  (item.label && item.label != 'Internal Users') && (
+          <Link href={item.key} className="no-underline flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              {item.icon}
+              {/* <PieChartOutlined size={28} className="text-[#1677FF]" /> */}
+              <span className={`text-[18px] ${current == item.key ? `text-[#1677FF]` : `text-[#95A1B3]`}`}>{item.label}</span>
+            </div>
+            <div className={`w-1 h-6 rounded ${current == item.key ? `bg-[#1677FF]` : `bg-transparent`}`}></div>
+          </Link>
+      )})}
+    </div>
+    // <Menu
+    //   onClick={onClick}
+    //   className="h-full"
+    //   style={{top: '63px',width: '100%',position: 'fixed'
+    //   }}
+    //   selectedKeys={[current]}
+    //   mode="vertical"
+    //   items={items}
+    // />
   );
 };
 

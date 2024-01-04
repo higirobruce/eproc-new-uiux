@@ -24,7 +24,7 @@ export default function PublicPortal() {
         <link rel="icon" href="/favicon.png" />
       </Head>
 
-      <main className="bg-white flex flex-col h-screen">
+      <main className="overflow-hidden bg-white flex flex-col h-screen">
         {loaded && (
           <Layout className="bg-white">
             <div className="flex flex-row justify-between items-center p-5">

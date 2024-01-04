@@ -235,7 +235,7 @@ const LoginForm = ({ goTo }) => {
     <div>
       {contextHolder}
       {loaded ? (
-        <div className="flex flex-col bg-gray-50 items-center justify-center rounded shadow-md h-screen md:px-20">
+        <div className="flex flex-col items-center justify-center rounded md:pr-20">
           {!forgotPassword && (
             <>
               <Form
@@ -265,11 +265,8 @@ const LoginForm = ({ goTo }) => {
                 </div>
                 <div className="font-bold text-lg">Irembo Procure</div> */}
                   </div>
-                  <Typography.Title className="" level={3}>
-                    Login
-                  </Typography.Title>
                 </Row>
-
+                <h1 className="mb-10  text-[#0063CF]">Log In</h1>
                 <div>
                   <div>Email</div>
                   <Form.Item
@@ -286,7 +283,7 @@ const LoginForm = ({ goTo }) => {
                       },
                     ]}
                   >
-                    <Input />
+                    <Input placeholder="Your email" className="h-11 my-3" />
                   </Form.Item>
                 </div>
 
@@ -303,7 +300,7 @@ const LoginForm = ({ goTo }) => {
                     ]}
                     hasFeedback
                   >
-                    <Input.Password />
+                    <Input.Password placeholder="* * * * * * * *" className="h-11 my-3" />
                   </Form.Item>
                 </div>
 
@@ -312,25 +309,24 @@ const LoginForm = ({ goTo }) => {
                     <Spin indicator={antIcon} />
                   ) : (
                     <div className="flex flex-row items-center justify-between">
-                      <Button type="default" htmlType="submit">
-                        Login
-                      </Button>
-
                       <Button
                         type="link"
                         onClick={() => setForgotPassword(true)}
                       >
-                        Forgot password?
+                        Forgot Password?
                       </Button>
+                      <Button htmlType="submit" className="bg-[#0065DD] pt-1 px-10 text-white h-10 font-semibold">
+                        Log in
+                      </Button>
+
                     </div>
                   )}
                 </Form.Item>
               </Form>
 
-              <div className="flex flex-row space-x-2 self-start">
-                <Typography.Text level={5}>New User? </Typography.Text>
-                <Typography.Link onClick={() => router.push("/auth/signup")}>
-                  Sign up
+              <div className="flex flex-row space-x-2 self-center mt-10">
+                <Typography.Link className="underline" onClick={() => router.push("/auth/signup")}>
+                  Join as new user ?
                 </Typography.Link>
               </div>
             </>
@@ -365,7 +361,7 @@ const LoginForm = ({ goTo }) => {
                 </Row>
 
                 <div>
-                  <div>Email</div>
+                  <label className="text-[12px] text-[#6A757B]">Email</label>
                   <Form.Item
                     name="email"
                     // label="E-mail"
@@ -380,7 +376,7 @@ const LoginForm = ({ goTo }) => {
                       },
                     ]}
                   >
-                    <Input />
+                    <Input className="h-11 my-3" />
                   </Form.Item>
                 </div>
 

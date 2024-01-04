@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ['latin'] })
 const myFont = localFont({
   src: [
     {
-      path: './fonts/Los Andes - Lota Grotesque Alt 1 Regular.otf',
+      path: './fonts/RobotoFlex-Regular.ttf',
       weight: '300',
       style: 'normal',
     },
@@ -44,7 +44,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${myFont.className}`} suppressHydrationWarning={true}>
+      <body className={`${myFont.className} overflow-hidden`} suppressHydrationWarning={true}>
         {children}
         </body>
     </html>

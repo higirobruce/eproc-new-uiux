@@ -55,7 +55,6 @@ import {
 import PermissionsTable from "../../components/permissionsTable";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { FiSearch } from 'react-icons/fi'
 
 export default function Users() {
   let user = JSON.parse(localStorage.getItem("user"));
@@ -663,7 +662,7 @@ export default function Users() {
       {contextHolder}
       {buildCreateUserScreen()}
       {dataLoaded ? (
-        <div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 h-screen mt-6 pb-10">
+        <div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-1 h-full">
           {/* <Row className="flex flex-row justify-between items-center">
             <Typography.Title level={4}>Users</Typography.Title>
             <Row className="flex flex-row space-x-5 items-center">
@@ -689,70 +688,84 @@ export default function Users() {
              
             </Row>
           </Row> */}
-          <div className="flex items-center justify-between mr-6">
-            <Button
-              className="bg-white h-9 px-5 text-[11px] font-semibold rounded text-[#0063CF]"
-              icon={<PlusOutlined />}
-              onClick={() => {
-                () => setOpenCreateUser(true)
-              }}
-            >
-              New user
-            </Button>
-            <div className="flex items-center gap-5">
-              <Select
-                // mode="tags"
-                className="text-[9px] w-32 rounded-sm"
-                placeholder="Select status"
-                onChange={(value) => setSearchStatus(value)}
-                value={searchStatus}
-                options={[
-                  { value: "all", label: "All" },
-                  // {
-                  //   value: "pending-approval",
-                  //   label: "Pending approval",
-                  // },
-                  {
-                    value: "approved",
-                    label: "Approved",
-                  },
-                  {
-                    value: "rejected",
-                    label: "Rejected",
-                  },
-                ]}
-              />
-              <Button
-                type="text"
-                className="bg-white h-8 text-[#0063CF]"
-                icon={<ReloadOutlined />}
-                onClick={() => refresh()}
-              ></Button>
+          <Row className="flex flex-col custom-sticky space-y-2 bg-white px-10 py-3 shadow">
+            <div className="flex flex-row justify-between items-center">
+              <div className="text-xl font-semibold">Internal Users List</div>
             </div>
-          </div>
-          <div className="mr-6 bg-white rounded-lg h-[calc(100vh-160px)] mb-10 px-5 pb-2">
-            <div className="flex justify-between items-center mb-5">
-              <h4 className="text-[19px] text-[#344767]">Internal Users List</h4>
-              <div className="flex items-center rounded-lg bg-[#F5F7FA] p-1.5">
-                <FiSearch size={18} className="text-[#E4E4E4] ml-2" />
-                <Input
+
+            <Row className="flex flex-row space-x-5 items-center justify-between">
+              <div className="flex-1">
+                <Select
+                  // mode="tags"
+                  style={{ width: "300px" }}
+                  placeholder="Select status"
+                  onChange={(value) => setSearchStatus(value)}
+                  value={searchStatus}
+                  options={[
+                    { value: "all", label: "All" },
+                    // {
+                    //   value: "pending-approval",
+                    //   label: "Pending approval",
+                    // },
+                    {
+                      value: "approved",
+                      label: "Approved",
+                    },
+                    {
+                      value: "rejected",
+                      label: "Rejected",
+                    },
+                  ]}
+                />
+              </div>
+              <div className="">
+                <Input.Search
+                  autoFocus
+                  style={{ width: "300px" }}
                   onChange={(e) => {
                     setSearchText(e?.target?.value);
                   }}
-                  placeholder="Search Email, Names"
-                  className="border-0 text-[#8392AB] bg-transparent text-[12px] hover:border-none hover:outline-none"
+                  placeholder="Search email, names"
                 />
-                <div></div>
               </div>
-            </div>
-            <UsersTable
-              dataSet={tempDataset}
-              handleApproveUser={approveUser}
-              handleDeclineUser={declineUser}
-              updatingId={updatingId}
-              handleSetRow={setRow}
-            />
-          </div>
+              <Button
+                type="text"
+                icon={<ReloadOutlined />}
+                onClick={() => refresh()}
+              ></Button>
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => setOpenCreateUser(true)}
+              >
+                New user
+              </Button>
+            </Row>
+          </Row>
+          <Row className="flex flex-row space-x-5 mx-10 pt-5">
+            <motion.div
+              className="w-full"
+              initial={{ opacity: 0 }}
+              animate={{
+                opacity: tempDataset && tempDataset?.length >= 1 ? 1 : 0,
+              }}
+              transition={{
+                duration: 0.3,
+                type: "tween",
+                ease: "circOut",
+              }}
+            >
+              <Col flex={4}>
+                <UsersTable
+                  dataSet={tempDataset}
+                  handleApproveUser={approveUser}
+                  handleDeclineUser={declineUser}
+                  updatingId={updatingId}
+                  handleSetRow={setRow}
+                />
+              </Col>
+            </motion.div>
+          </Row>
 
           <div class="absolute -bottom-28 right-10 opacity-10">
             <Image src="/icons/blue icon.png" width={110} height={100} />
