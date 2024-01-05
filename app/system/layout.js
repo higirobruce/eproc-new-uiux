@@ -169,7 +169,7 @@ export default function SystemLayout({ children }) {
               <div className="flex items-center gap-3 ml-3">
                 <small className="text-[14px] font-medium text-white">
                   Hi,{" "}
-                  {user.userType === "VENDOR"
+                  {user?.userType === "VENDOR"
                     ? user?.contactPersonNames
                     : user?.firstName}
                 </small>
