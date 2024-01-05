@@ -18,8 +18,8 @@ import UserImage from "@/public/favicon.png";
 import { Dropdown } from "antd";
 import Logo from "@/public/Logo.png";
 
-
 export default function SystemLayout({ children }) {
+  let user = JSON.parse(localStorage.getItem("user"));
   let [screen, setScreen] = useState("");
   let [loggedInUser, setLoggedInUser] = useState(null);
   let [loggingOut, setLoggingOut] = useState(false);
@@ -32,16 +32,12 @@ export default function SystemLayout({ children }) {
       key: "1",
       icon: <PencilSquareIcon className="w-4 h-4 text-gray-600" />,
       label: (
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-  
-        >
+        <a rel="noopener noreferrer" href="/system/profile">
           Edit Profile
         </a>
       ),
     },
-  
+
     {
       key: "4",
       danger: true,
@@ -50,7 +46,7 @@ export default function SystemLayout({ children }) {
         <a
           target="_blank"
           rel="noopener noreferrer"
-          onClick={() => setLoggingOut(true)}
+          onClick={() => {localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.pathname = '/'}}
         >
           Log Out
         </a>
@@ -149,12 +145,12 @@ export default function SystemLayout({ children }) {
               </div>
             </div>
             <div className="mb-10 mr-7">
-              <button className="flex items-center bg-[#F2F4FD] w-[calc(100%-15px)] px-5 py-4 cursor-pointer rounded-lg border-0 gap-3">
+              <a href="/system/users" className="flex items-center bg-[#F2F4FD] w-[calc(100%-30px)] px-5 py-4 cursor-pointer rounded-lg border-0 gap-3 no-underline">
                 <UserGroupIcon className="w-5 h-5 text-[#1677FF]" />
                 <small className="font-semibold text-[14.5px] text-[#1677FF]">
                   User Management
                 </small>
-              </button>
+              </a>
             </div>
           </div>
         </div>
@@ -171,10 +167,13 @@ export default function SystemLayout({ children }) {
                 <div className="w-2.5 h-2.5 -ml-2 rounded-full bg-[#FFD275]" />
               </div> */}
               <div className="flex items-center gap-3 ml-3">
-                <small className="text-[13px] font-semibold text-white">
-                  Eric Lee
+                <small className="text-[14px] font-medium text-white">
+                  Hi,{" "}
+                  {user.userType === "VENDOR"
+                    ? user?.contactPersonNames
+                    : user?.firstName}
                 </small>
-                <Image src={UserImage} className="w-8 h-8 rounded-full" />
+                {/* <Image src={UserImage} className="w-8 h-8 rounded-full" /> */}
                 <Dropdown
                   menu={{
                     items,

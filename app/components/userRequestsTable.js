@@ -168,7 +168,7 @@ const UsersRequestsTable = ({
   };
 
   const getTagColor = (status) => {
-    if (status === "Pending HOD") return "orange";
+    if (status === "Pending HOD") return "yellow";
     else if (status === "Approved") return "green";
     else if (status === "Approved (fd)" || status === "Pending PROC") return "cyan";
     else if (status === "Approved (pm)" || status === "Pending PROC") return "geekblue";
@@ -197,7 +197,7 @@ const UsersRequestsTable = ({
             <div>
               <FileTextOutlined className="text-xs" />
             </div>
-            <div className="capitalize text-[11px] text-[#1677FF]">{record?.number}</div>
+            <div className="capitalize text-[14px] text-[#1677FF]">{record?.number}</div>
           </div>
         </>
       ),
@@ -250,7 +250,7 @@ const UsersRequestsTable = ({
       sorter: (a, b) => a?.serviceCategory > b?.serviceCategory,
       render: (_, record) => (
         <>
-          <Typography.Text className="capitalize text-[14px] text-[#8392AB]">{record?.serviceCategory?.toLowerCase()}</Typography.Text>
+          <Typography.Text className="text-[14px] text-[#8392AB]">{record?.serviceCategory}</Typography.Text>
         </>
       ),
     },

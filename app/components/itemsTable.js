@@ -1,6 +1,15 @@
 "use client";
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import { Button, Form, Input, InputNumber, Popconfirm, Select, Table, Tooltip } from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  InputNumber,
+  Popconfirm,
+  Select,
+  Table,
+  Tooltip,
+} from "antd";
 import moment from "moment";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { v4 } from "uuid";
@@ -30,6 +39,7 @@ const EditableCell = ({
   dataIndex,
   record,
   handleSave,
+  status,
   ...restProps
 }) => {
   const [editing, setEditing] = useState(true);
@@ -82,6 +92,7 @@ const EditableCell = ({
             onPressEnter={save}
             placeholder={dataIndex === "title" ? "enter title" : "eg. 1000000"}
             onBlur={save}
+            disabled={status === "approved" || status === "approved (pm)"}
           />
         ) : (
           <Input
@@ -90,6 +101,7 @@ const EditableCell = ({
             onPressEnter={save}
             placeholder={dataIndex === "title" ? "enter title" : "eg. 1000000"}
             onBlur={save}
+            disabled={status === "approved" || status === "approved (pm)"}
           />
         )}
       </Form.Item>
@@ -116,6 +128,7 @@ const ItemsTable = ({
   files,
   setFiles,
   editingRequest,
+  status,
 }) => {
   const [count, setCount] = useState(dataSource?.length + 1);
   const [rowForm] = Form.useForm();
@@ -129,7 +142,7 @@ const ItemsTable = ({
     {
       title: "Item title",
       dataIndex: "title",
-      width:'25%',
+      width: "25%",
       editable: true,
     },
     {
@@ -159,6 +172,7 @@ const ItemsTable = ({
         return (
           <Select
             defaultValue={record.currency}
+            disabled={status === "approved" || status === "approved (pm)"}
             size="large"
             className="w-full"
             onChange={(value) => (record.currency = value)}
@@ -204,7 +218,7 @@ const ItemsTable = ({
       dataIndex: "attachements",
       width: "20%",
       render: (_, record, index) => {
-        return dataSource?.length >= 1 ? (
+        return (dataSource?.length >= 1 && (status != "approved" && status != "approved (pm)")) ? (
           <UploadTORs
             uuid={record?.key - 1}
             setFileList={setFileList}
@@ -213,7 +227,7 @@ const ItemsTable = ({
             setFiles={setFiles}
             itemFiles={files[index]}
             disabled={editingRequest}
-            setStatus={()=>{}}
+            setStatus={() => {}}
             iconOnly={false}
           />
         ) : null;
@@ -223,7 +237,7 @@ const ItemsTable = ({
       title: "Action",
       dataIndex: "operation",
       render: (_, record) =>
-        dataSource?.length >= 1 ? (
+        (dataSource?.length >= 1 && (status != "approved" && status != "approved (pm)")) ? (
           <Popconfirm
             title="Are you sure?"
             onConfirm={() => handleDelete(record.key)}
@@ -277,6 +291,7 @@ const ItemsTable = ({
         dataIndex: col.dataIndex,
         title: col.title,
         handleSave,
+        status
       }),
     };
   });
@@ -292,15 +307,19 @@ const ItemsTable = ({
           columns={columns}
           size="small"
           pagination={false}
+          status={status}
         />
       </div>
-      <Button
-        onClick={handleAdd}
-        className="flex self-start items-center gap-1 border-0 bg-[#EAF1FC] text-[#0065DD] mt-3"
-      >
-        <FaPlus />
-        Row
-      </Button>
+      {(status !== "approved" &&
+        status !== "approved (pm)") && (
+          <Button
+            onClick={handleAdd}
+            className="flex self-start items-center gap-1 border-0 bg-[#EAF1FC] text-[#0065DD] mt-3"
+          >
+            <FaPlus />
+            Row
+          </Button>
+        )}
     </>
   );
 };
