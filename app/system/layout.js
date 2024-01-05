@@ -19,7 +19,7 @@ import { Dropdown } from "antd";
 import Logo from "@/public/Logo.png";
 
 export default function SystemLayout({ children }) {
-  let user = JSON.parse(localStorage.getItem("user"));
+  let user = JSON.parse(localStorage?.getItem("user"));
   let [screen, setScreen] = useState("");
   let [loggedInUser, setLoggedInUser] = useState(null);
   let [loggingOut, setLoggingOut] = useState(false);
@@ -138,10 +138,10 @@ export default function SystemLayout({ children }) {
                 <Image src={Logo} alt="" className="w-full h-auto" />
               </div>
               <div className="mt-20">
-                <SideMenu
+                {loggedInUser&&<SideMenu
                   user={JSON.parse(loggedInUser)}
                   className="h-screen fixed top-0"
-                />
+                />}
               </div>
             </div>
             <div className="mb-10 mr-7">
