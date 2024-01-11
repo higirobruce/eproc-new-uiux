@@ -63,7 +63,7 @@ const UsersTable = ({
               // handleSetRow(record)
             }}
           >
-            <div className="capitalize text-[14px]">{record?.email}</div>
+            <div className="text-[14px]">{record?.email}</div>
           </div>
         </>
       ),

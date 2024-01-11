@@ -199,3 +199,7 @@ body {
 .ant-select-item {
   color: #344767 !important;
 }
+
+.permission .ant-switch.ant-switch-checked {
+  background-color: #1db954 !important;
+}
