@@ -46,7 +46,11 @@ export default function SystemLayout({ children }) {
         <a
           target="_blank"
           rel="noopener noreferrer"
-          onClick={() => {localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.pathname = '/'}}
+          onClick={() => {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            window.location.pathname = "/";
+          }}
         >
           Log Out
         </a>
@@ -138,14 +142,19 @@ export default function SystemLayout({ children }) {
                 <Image src={Logo} alt="" className="w-full h-auto" />
               </div>
               <div className="mt-20">
-                {loggedInUser&&<SideMenu
-                  user={JSON.parse(loggedInUser)}
-                  className="h-screen fixed top-0"
-                />}
+                {loggedInUser && (
+                  <SideMenu
+                    user={JSON.parse(loggedInUser)}
+                    className="h-screen fixed top-0"
+                  />
+                )}
               </div>
             </div>
             <div className="mb-10 mr-7">
-              <a href="/system/users" className="flex items-center bg-[#F2F4FD] w-[calc(100%-30px)] px-5 py-4 cursor-pointer rounded-lg border-0 gap-3 no-underline">
+              <a
+                href="/system/users"
+                className="flex items-center bg-[#F2F4FD] w-[calc(100%-30px)] px-5 py-4 cursor-pointer rounded-lg border-0 gap-3 no-underline"
+              >
                 <UserGroupIcon className="w-5 h-5 text-[#1677FF]" />
                 <small className="font-semibold text-[14.5px] text-[#1677FF]">
                   User Management

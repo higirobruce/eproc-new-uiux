@@ -46,6 +46,7 @@ import {
   DocumentMagnifyingGlassIcon,
   LockClosedIcon,
   UserGroupIcon,
+  LightBulbIcon,
 } from "@heroicons/react/24/outline";
 import UploadPaymentReq from "@/app/components/uploadPaymentReq";
 import UpdatePaymentReqDoc from "@/app/components/updatePaymentReqDoc";
@@ -74,6 +75,61 @@ async function getPaymentRequestDetails(id, router) {
         `/auth?goTo=/system/payment-requests/${id}&sessionExpired=true`
       );
     }
+    return null;
+    // throw new Error("Failed to fetch data");
+  }
+
+  return res.json();
+}
+
+async function getPoPaymentProgress(id, router) {
+  let token = localStorage.getItem("token");
+
+  if (id) {
+    const res = await fetch(`${url}/purchaseOrders/paymentProgress/${id}`, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      if (res.status === 401) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        router.push("/auth");
+      }
+      // This will activate the closest `error.js` Error Boundary
+      return null;
+      // throw new Error("Failed to fetch data");
+    }
+
+    return res.json();
+  } else {
+    return null;
+  }
+}
+
+async function getPoPaidRequests(id, router) {
+  let token = localStorage.getItem("token");
+  const res = await fetch(`${url}/purchaseOrders/paymentsDone/${id}`, {
+    method: "GET",
+    headers: {
+      Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+      token: token,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    if (res.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      router.push("/auth");
+    }
+    // This will activate the closest `error.js` Error Boundary
     return null;
     // throw new Error("Failed to fetch data");
   }
@@ -125,6 +181,28 @@ async function getAccounts() {
   return res.json();
 }
 
+async function getDistributionRules() {
+  let token = localStorage.getItem("token");
+  const res = await fetch(`${url}/b1/distributionRules`, {
+    method: "GET",
+    headers: {
+      Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+
+      token: token,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    // This will activate the closest `error.js` Error Boundary
+
+    return null;
+    // throw new Error("Failed to fetch data");
+  }
+
+  return res.json();
+}
+
 async function getBudgetLines() {}
 
 async function getFile(path) {
@@ -155,9 +233,10 @@ export default function PaymentRequest({ params }) {
   let [paymentRequest, setPaymentRequest] = useState(null);
   let router = useRouter();
   let [form] = Form.useForm();
+  let [paymentForm] = Form.useForm();
   let [title, setTitle] = useState("");
   let [description, setDescription] = useState("");
-  let [amount, setAmout] = useState(null);
+  let [amount, setAmount] = useState(null);
   let [docId, setDocId] = useState(null);
   let [files, setFiles] = useState([]);
   let [filesProof, setFilesProof] = useState([]);
@@ -165,6 +244,8 @@ export default function PaymentRequest({ params }) {
   let [level1Approvers, setLevel1Approvers] = useState([]);
   let [level1Approver, setLevel1Approver] = useState(null);
   let [currency, setCurrency] = useState("RWF");
+  let [overrideAmount, setOverrideAmount] = useState(false);
+  let [amountOverride, setAmountOverride] = useState(0);
 
   let [editRequest, setEditRequest] = useState(false);
 
@@ -185,9 +266,18 @@ export default function PaymentRequest({ params }) {
   let [accounts, setAccounts] = useState([]);
   let [debitAccount, setDebitAccount] = useState(null);
   let [creditAccount, setCreditAccount] = useState(null);
+  let [distributionRules, setDistributionRules] = useState([]);
+  let [distributionRuleCr, setDistributionRuleCr] = useState(null);
+  let [distributionRuleDb, setDistributionRuleDb] = useState(null);
+
+  let [po, setPo] = useState(null);
+  let [poVal, setPoVal] = useState(0);
+  let [totalPaymentVal, setTotalPaymentVal] = useState(0);
+  let [totalPaid, setTotalPaid] = useState(0);
 
   useEffect(() => {
     getPaymentRequestDetails(params.id, router).then((res) => {
+      if (res?.status == "reviewed") res.status = "pending-approval";
       setPaymentRequest(res);
       let _files = [...files];
 
@@ -195,9 +285,9 @@ export default function PaymentRequest({ params }) {
 
       _paymentRequest?.docIds?.map(async (doc, i) => {
         let uid = `rc-upload-${moment().milliseconds()}-${i}`;
-        let _url = `${url}/file/paymentRequests/${doc}`;
+        let _url = `${url}/file/paymentRequests/${encodeURI(doc)}`;
         let status = "done";
-        let name = `Invoice ${i + 1}.pdf`;
+        let name = `${doc}`;
 
         let response = await fetch(_url);
         let data = await response.blob();
@@ -215,10 +305,19 @@ export default function PaymentRequest({ params }) {
           setFiles(_files);
         });
       });
+      setPo(res?.purchaseOrder);
 
+      res?.purchaseOrder?._id &&
+        getPoPaidRequests(res?.purchaseOrder?._id, router).then((res) => {
+          // setPoVal(res?.poVal);
+          setTotalPaid(res?.totalPaymentVal);
+        });
+
+      setAmount(res?.amount)
       let statusCode = getRequestStatusCode(res?.status);
       setCurrentCode(statusCode);
       setBudgeted(res?.budgeted);
+      setCurrency(_paymentRequest?.currency);
     });
 
     const getBase64 = (file) =>
@@ -247,6 +346,10 @@ export default function PaymentRequest({ params }) {
     getAccounts().then((res) => {
       setAccounts(res?.value);
     });
+
+    getDistributionRules().then((res) => {
+      setDistributionRules(res?.value);
+    });
     fetch(`${url}/budgetLines`, {
       method: "GET",
       headers: {
@@ -268,13 +371,21 @@ export default function PaymentRequest({ params }) {
   }, [params]);
 
   useEffect(() => {
+    po &&
+      getPoPaymentProgress(po?._id, router).then((res) => {
+        setPoVal(res?.poVal);
+        setTotalPaymentVal(res?.totalPaymentVal);
+      });
+  }, [po]);
+
+  useEffect(() => {
     console.log(files);
   }, [files]);
 
   function getPoTotalVal() {
     let t = 0;
     let tax = 0;
-    paymentRequest?.items?.map((i) => {
+    po?.items?.map((i) => {
       t = t + i?.quantity * i?.estimatedUnitCost;
       if (i.taxGroup === "I1")
         tax = tax + (i?.quantity * i?.estimatedUnitCost * 18) / 100;
@@ -380,7 +491,7 @@ export default function PaymentRequest({ params }) {
   function getRequestStatus(code) {
     // if (code === 0) return "verified";
     if (code === 0) return "pending-review";
-    else if (code === 1 || code === 0) return "reviewed";
+    else if (code === 1) return "pending-approval";
     else if (code === 2) return "approved (hod)";
     else if (code === 3) return "approved";
     else if (code === 4) return "paid";
@@ -391,8 +502,8 @@ export default function PaymentRequest({ params }) {
 
   function getRequestStatusCode(status) {
     // if (status === "verified") return 0;
-    if (status === "pending-review") return 1;
-    else if (status === "reviewed") return 1;
+    if (status === "pending-review") return 0;
+    else if (status === "pending-approval") return 1;
     else if (status === "approved (hod)") return 2;
     else if (status === "approved") return 3;
     else if (status === "paid") return 4;
@@ -407,7 +518,7 @@ export default function PaymentRequest({ params }) {
   }
 
   function sendReview() {
-    paymentRequest.approver = level1Approver;
+    paymentRequest.approver = level1Approver || paymentRequest?.approver?._id;
     paymentRequest.reviewedBy = user?._id;
     paymentRequest.reviewedAt = moment();
     paymentRequest.status = "reviewed";
@@ -425,12 +536,15 @@ export default function PaymentRequest({ params }) {
     })
       .then((res) => getResultFromServer(res))
       .then((res) => {
+        setShowAddApproverForm(false);
+        setOpen(false);
         refresh();
       });
   }
 
   function updateRequest(docIds) {
     // docIds[0] = null;
+    paymentRequest.amount = amount;
     if (
       !docIds.includes(null) &&
       !docIds.includes(undefined) &&
@@ -446,7 +560,7 @@ export default function PaymentRequest({ params }) {
       paymentRequest.hof_approvalDate = null;
       paymentRequest.rejectionDate = null;
       paymentRequest.reasonForRejection = null;
-      paymentRequest.approver = null;
+      // paymentRequest.approver = null;
       paymentRequest.reviewedAt = null;
       paymentRequest.reviewedBy = null;
     }
@@ -539,30 +653,53 @@ export default function PaymentRequest({ params }) {
   }
 
   function sendProofForRequest(docIds) {
-    paymentRequest.status = "paid";
-    paymentRequest.paymentProofDocs = docIds;
-    paymentRequest.journalEntry = {
-      Memo: paymentRequest?.title,
-      ReferenceDate: moment(),
-      JournalEntryLines: [
-        {
-          AccountCode: debitAccount,
-          Debit: paymentRequest?.amount,
-          // FCCurrency: paymentRequest?.currency,
-          LineMemo: paymentRequest?.title,
-        },
-        {
-          AccountCode: creditAccount,
-          Credit: paymentRequest?.amount,
-          // FCCurrency: paymentRequest?.currency,
-          LineMemo: paymentRequest?.title,
-        },
-      ],
-    };
+    let _amount = overrideAmount ? amountOverride : paymentRequest?.amount;
+    let _currency = overrideAmount ? "RWF" : paymentRequest?.currency;
+
+    if (paymentRequest?.category === "internal")
+      paymentRequest.journalEntry = {
+        Memo: paymentRequest?.title,
+        ReferenceDate: moment(),
+        JournalEntryLines: [
+          {
+            AccountCode: debitAccount,
+
+            // FCCurrency: paymentRequest?.currency,
+            LineMemo: paymentRequest?.title,
+            CostingCode: distributionRuleDb,
+            ...(_currency !== "RWF" && {
+              FCCurrency: _currency,
+              FCDebit: _amount,
+            }),
+            ...(_currency == "RWF" && {
+              Debit: _amount,
+            }),
+          },
+          {
+            AccountCode: creditAccount,
+
+            // FCCurrency: _currency,
+            LineMemo: paymentRequest?.title,
+            CostingCode: distributionRuleCr,
+            ...(_currency !== "RWF" && {
+              FCCurrency: _currency,
+              FCCredit: _amount,
+            }),
+            ...(_currency == "RWF" && {
+              Credit: _amount,
+            }),
+          },
+        ],
+      };
+
+    let updates = { ...paymentRequest };
+
+    updates.status = "paid";
+    updates.paymentProofDocs = docIds;
     fetch(`${url}/paymentRequests/${paymentRequest?._id}`, {
       method: "PUT",
       body: JSON.stringify({
-        updates: paymentRequest,
+        updates,
       }),
       headers: {
         Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
@@ -572,22 +709,104 @@ export default function PaymentRequest({ params }) {
     })
       .then((res) => getResultFromServer(res))
       .then((res) => {
+        console.log("Resseseses", res);
         if (res?.error) {
-          message.error(res?.message);
+          // paymentRequest.status = "approved";
+          message.error(res?.message, 10);
         } else {
+          paymentRequest.paymentProofDocs = docIds;
           refresh();
         }
+      })
+      .catch((err) => {
+        message.error(err);
       });
   }
 
   function refresh() {
-    getPaymentRequestDetails(params.id).then((res) => {
+    getPaymentRequestDetails(params.id, router).then((res) => {
+      if (res?.status == "reviewed") res.status = "pending-approval";
       setPaymentRequest(res);
+      let _files = [];
+
+      let _paymentRequest = res;
+
+      _paymentRequest?.docIds?.map(async (doc, i) => {
+        let uid = `rc-upload-${moment().milliseconds()}-${i}`;
+        let _url = `${url}/file/paymentRequests/${encodeURI(doc)}`;
+        let status = "done";
+        let name = `${doc}`;
+
+        let response = await fetch(_url);
+        let data = await response.blob();
+        getBase64(data).then((res) => {
+          let newFile = new File([data], name, {
+            uid,
+            url: _url,
+            status,
+            name,
+            // type:'pdf'
+          });
+          _files.push(newFile);
+          setFiles(_files);
+        });
+      });
+      setAmount(res?.amount)
+      setPo(res?.purchaseOrder);
       let statusCode = getRequestStatusCode(res?.status);
       setCurrentCode(statusCode);
-      setShowAddApproverForm(false);
-      setLevel1Approver(null);
+      setBudgeted(res?.budgeted);
+      setCurrency(_paymentRequest?.currency);
     });
+
+    const getBase64 = (file) =>
+      new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+      });
+
+    getApprovers()
+      .then((res) => {
+        let approversList = res?.filter((a) => a?._id !== user?._id);
+        setLevel1Approvers(res);
+        let hod = approversList?.filter(
+          (a) => a?.department?._id === user?.department
+        );
+      })
+      .catch((err) => {
+        messageApi.open({
+          type: "error",
+          content: "Something happened! Please try again.",
+        });
+      });
+
+    getAccounts().then((res) => {
+      setAccounts(res?.value);
+    });
+
+    getDistributionRules().then((res) => {
+      setDistributionRules(res?.value);
+    });
+    fetch(`${url}/budgetLines`, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setBudgetLines(res);
+      })
+      .catch((err) => {
+        messageApi.open({
+          type: "error",
+          content: "Connection Error!",
+        });
+      });
   }
 
   function getResultFromServer(res) {
@@ -640,11 +859,11 @@ export default function PaymentRequest({ params }) {
           (paymentRequest?.status == "pending-review" ||
             paymentRequest?.status == "declined" ||
             paymentRequest?.status == "withdrawn" ||
-            paymentRequest?.status.includes("pending-approval"))) ||
+            paymentRequest?.status?.includes("pending-approval"))) ||
           ((paymentRequest?.approver?._id === user?._id ||
             user?.permissions?.canApproveAsHof) &&
-            (paymentRequest?.status.includes("pending-review") ||
-              paymentRequest?.status.includes("pending-approval")))) && (
+            (paymentRequest?.status?.includes("pending-review") ||
+              paymentRequest?.status?.includes("pending-approval")))) && (
           <Switch
             checked={editRequest}
             checkedChildren={<EditOutlined />}
@@ -658,7 +877,9 @@ export default function PaymentRequest({ params }) {
         <div className="md:col-span-4 flex flex-col ring-1 ring-gray-200 p-5 rounded shadow-md bg-white overflow-y-scroll space-y-5">
           {/* Overview */}
           <div className="flex flex-row items-center justify-between">
-            <Typography.Title level={4}>Overview</Typography.Title>
+            <Typography.Title level={4} onClick={refresh}>
+              Overview
+            </Typography.Title>
 
             <div className="space-x-3 ">
               {!paymentRequest?.status?.includes("approved") &&
@@ -695,12 +916,13 @@ export default function PaymentRequest({ params }) {
               color={
                 paymentRequest?.status == "pending-review"
                   ? "yellow"
-                  : paymentRequest?.status.includes("approved (")
+                  : paymentRequest?.status?.includes("approved (")
                   ? "orange"
                   : paymentRequest?.status == "approved" ||
                     paymentRequest?.status == "paid"
                   ? "green"
-                  : paymentRequest?.status == "reviewed"
+                  : paymentRequest?.status == "reviewed" ||
+                    paymentRequest?.status == "pending-approval"
                   ? "yellow"
                   : "red"
               }
@@ -708,7 +930,12 @@ export default function PaymentRequest({ params }) {
               {paymentRequest?.status}
             </Tag>
           </div>
-          <Form form={form}>
+          <Form
+            form={form}
+            initialValues={{
+              currency: currency,
+            }}
+          >
             <div className="grid md:grid-cols-4 sm:grid-cols-1 gap-6">
               {/* Request Title */}
               <div className="flex flex-col space-y-2">
@@ -813,18 +1040,61 @@ export default function PaymentRequest({ params }) {
                             required: true,
                             message: "Amount is required",
                           },
+                          {
+                            validator(rule, value) {
+                              return new Promise((resolve, reject) => {
+                                if (
+                                  ((poVal > -1 &&
+                                    value >
+                                      getPoTotalVal()?.grossTotal -
+                                        totalPaymentVal +
+                                        paymentRequest?.amount) ||
+                                    (poVal == -1 &&
+                                      value > getPoTotalVal()?.grossTotal)) &&
+                                  paymentRequest?.category === "external"
+                                ) {
+                                  reject(
+                                    "Requested amount should not exceed the PO Value!"
+                                  );
+                                } else {
+                                  resolve();
+                                }
+                              });
+                            },
+                          },
                         ]}
                         initialValue={paymentRequest.amount}
                       >
                         <InputNumber
                           style={{ width: "100%" }}
                           addonBefore={
-                            <Form.Item noStyle name="currency">
+                            <Form.Item
+                              noStyle
+                              name="currencyEd"
+                              initialValue={currency}
+                              rules={[
+                                {
+                                  validator(rule, value) {
+                                    return new Promise((resolve, reject) => {
+                                      if (
+                                        value !== currency &&
+                                        paymentRequest?.category === "external"
+                                      ) {
+                                        reject(
+                                          "The currency can not differ from the PO currency!"
+                                        );
+                                      } else {
+                                        resolve();
+                                      }
+                                    });
+                                  },
+                                },
+                              ]}
+                            >
                               <Select
                                 onChange={(value) =>
                                   (paymentRequest.currency = value)
                                 }
-                                defaultValue={paymentRequest.currency}
                                 value={paymentRequest.currency}
                                 options={[
                                   {
@@ -849,7 +1119,8 @@ export default function PaymentRequest({ params }) {
                           // defaultValue={paymentRequest.amount}
                           value={paymentRequest.amount}
                           onChange={(e) => {
-                            paymentRequest.amount = e;
+                            setAmount(e);
+                            // paymentRequest.amount = e;
                           }}
                         />
                       </Form.Item>
@@ -875,7 +1146,9 @@ export default function PaymentRequest({ params }) {
                           <Tooltip title={doc}>
                             <Typography.Text ellipsis>
                               <Link
-                                href={`${url}/file/paymentRequests/${doc}`}
+                                href={`${url}/file/paymentRequests/${encodeURI(
+                                  doc
+                                )}`}
                                 target="_blank"
                               >
                                 <div className="text-xs">
@@ -889,7 +1162,7 @@ export default function PaymentRequest({ params }) {
                           </Tooltip>
 
                           {/* <Link
-                            href={`${url}/file/paymentRequests/${doc}`}
+                            href={`${url}/file/paymentRequests/${encodeURI(doc)}`}
                             target="_blank"
                           >
                             <div className="text-xs">
@@ -924,125 +1197,130 @@ export default function PaymentRequest({ params }) {
               </div>
 
               {/* Budgeted */}
-              <div className="flex flex-col space-y-1 items-start">
-                <div className="text-xs text-gray-400">Budgeted:</div>
-                {!editRequest && (
-                  <div className="text-sm font-semibold text-gray-600">
-                    {paymentRequest?.budgeted ? "Yes" : "No"}
-                  </div>
-                )}
-                {editRequest && (
-                  <div className="text-xs text-gray-400">
-                    <Form.Item name="budgeted">
-                      <Select
-                        // mode="multiple"
-                        // allowClear
-                        defaultValue={paymentRequest?.budgeted ? "Yes" : "No"}
-                        value={paymentRequest?.budgeted ? "Yes" : "No"}
-                        // style={{ width: "100%" }}
-                        placeholder="Please select"
-                        disabled={paymentRequest?.category === "external"}
-                        onChange={(value) => {
-                          paymentRequest.budgeted = value;
-                          if (value === false) paymentRequest.budgetLine = null;
-                          setBudgeted(value);
-                          // handleUpdateRequest(r);
-                        }}
-                        options={[
-                          { value: true, label: "Yes" },
-                          { value: false, label: "No" },
-                        ]}
-                      />
-                    </Form.Item>
-                  </div>
-                )}
-              </div>
+              {user?.userType !== "VENDOR" && (
+                <div className="flex flex-col space-y-1 items-start">
+                  <div className="text-xs text-gray-400">Budgeted:</div>
+                  {!editRequest && (
+                    <div className="text-sm font-semibold text-gray-600">
+                      {paymentRequest?.budgeted ? "Yes" : "No"}
+                    </div>
+                  )}
+                  {editRequest && (
+                    <div className="text-xs text-gray-400">
+                      <Form.Item name="budgeted">
+                        <Select
+                          // mode="multiple"
+                          // allowClear
+                          defaultValue={paymentRequest?.budgeted ? "Yes" : "No"}
+                          value={paymentRequest?.budgeted ? "Yes" : "No"}
+                          // style={{ width: "100%" }}
+                          placeholder="Please select"
+                          // disabled={paymentRequest?.category === "external"}
+                          onChange={(value) => {
+                            paymentRequest.budgeted = value;
+                            if (value === false)
+                              paymentRequest.budgetLine = null;
+                            setBudgeted(value);
+                            // handleUpdateRequest(r);
+                          }}
+                          options={[
+                            { value: true, label: "Yes" },
+                            { value: false, label: "No" },
+                          ]}
+                        />
+                      </Form.Item>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Budget Line */}
-              <div className="flex flex-col space-y-1 items-start">
-                <div className="text-xs text-gray-400">Budget Line:</div>
-                {!editRequest && (
-                  <div className="text-sm font-semibold text-gray-600">
-                    {paymentRequest?.budgetLine?.description}
-                  </div>
-                )}
+              {user?.userType !== "VENDOR" && (
+                <div className="flex flex-col space-y-1 items-start">
+                  <div className="text-xs text-gray-400">Budget Line:</div>
+                  {!editRequest && (
+                    <div className="text-sm font-semibold text-gray-600">
+                      {paymentRequest?.budgetLine?.description}
+                    </div>
+                  )}
 
-                {editRequest && budgeted && (
-                  // <Select
-                  //   // mode="multiple"
-                  //   // allowClear
-                  //   className="ml-3"
-                  //   defaultValue={data?.budgetLine}
-                  //   style={{ width: "100%" }}
-                  //   placeholder="Please select"
-                  //   onChange={(value) => {
-                  //     let r = { ...data };
-                  //     r.budgetLine = value;
-                  //     handleUpdateRequest(r);
-                  //   }}
-                  // >
-                  //   {servCategories?.map((s) => {
-                  //     return (
-                  //       <Select.Option
-                  //         key={s._id}
-                  //         value={s.description}
-                  //       >
-                  //         {s.description}
-                  //       </Select.Option>
-                  //     );
-                  //   })}
-                  // </Select>
+                  {editRequest && budgeted && (
+                    // <Select
+                    //   // mode="multiple"
+                    //   // allowClear
+                    //   className="ml-3"
+                    //   defaultValue={data?.budgetLine}
+                    //   style={{ width: "100%" }}
+                    //   placeholder="Please select"
+                    //   onChange={(value) => {
+                    //     let r = { ...data };
+                    //     r.budgetLine = value;
+                    //     handleUpdateRequest(r);
+                    //   }}
+                    // >
+                    //   {servCategories?.map((s) => {
+                    //     return (
+                    //       <Select.Option
+                    //         key={s._id}
+                    //         value={s.description}
+                    //       >
+                    //         {s.description}
+                    //       </Select.Option>
+                    //     );
+                    //   })}
+                    // </Select>
 
-                  <Form.Item
-                    name="budgetLine"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Budget Line is required",
-                      },
-                    ]}
-                    initialValue={paymentRequest?.budgetLine?._id}
-                  >
-                    <Select
-                      // defaultValue={budgetLine}
+                    <Form.Item
+                      name="budgetLine"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Budget Line is required",
+                        },
+                      ]}
+                      initialValue={paymentRequest?.budgetLine?._id}
+                    >
+                      <Select
+                        // defaultValue={budgetLine}
 
-                      // className="ml-3"
-                      placeholder="Select service category"
-                      showSearch
-                      // defaultValue={paymentRequest?.budgetLine?._id}
-                      value={paymentRequest?.budgetLine?._id}
-                      onChange={(value, option) => {
-                        paymentRequest.budgetLine = value;
-                      }}
-                      disabled={paymentRequest?.category === "external"}
-                      // filterSort={(optionA, optionB) =>
-                      //   (optionA?.label ?? "")
-                      //     .toLowerCase()
-                      //     .localeCompare(
-                      //       (optionB?.label ?? "").toLowerCase()
-                      //     )
-                      // }
-                      filterOption={(inputValue, option) => {
-                        return option.label
-                          .toLowerCase()
-                          .includes(inputValue.toLowerCase());
-                      }}
-                      options={budgetLines.map((s) => {
-                        return {
-                          label: s.description.toUpperCase(),
-                          options: s.budgetlines.map((sub) => {
-                            return {
-                              label: sub.description,
-                              value: sub._id,
-                              title: sub.description,
-                            };
-                          }),
-                        };
-                      })}
-                    ></Select>
-                  </Form.Item>
-                )}
-              </div>
+                        // className="ml-3"
+                        placeholder="Select service category"
+                        showSearch
+                        // defaultValue={paymentRequest?.budgetLine?._id}
+                        value={paymentRequest?.budgetLine?._id}
+                        onChange={(value, option) => {
+                          paymentRequest.budgetLine = value;
+                        }}
+                        // disabled={paymentRequest?.category === "external"}
+                        // filterSort={(optionA, optionB) =>
+                        //   (optionA?.label ?? "")
+                        //     .toLowerCase()
+                        //     .localeCompare(
+                        //       (optionB?.label ?? "").toLowerCase()
+                        //     )
+                        // }
+                        filterOption={(inputValue, option) => {
+                          return option.label
+                            .toLowerCase()
+                            .includes(inputValue.toLowerCase());
+                        }}
+                        options={budgetLines.map((s) => {
+                          return {
+                            label: s.description.toUpperCase(),
+                            options: s.budgetlines.map((sub) => {
+                              return {
+                                label: sub.description,
+                                value: sub._id,
+                                title: sub.description,
+                              };
+                            }),
+                          };
+                        })}
+                      ></Select>
+                    </Form.Item>
+                  )}
+                </div>
+              )}
 
               {editRequest && (
                 <div>
@@ -1051,13 +1329,14 @@ export default function PaymentRequest({ params }) {
                     icon={<SaveOutlined />}
                     type="primary"
                     onClick={async () => {
-                      await form.validateFields();
-                      if (files?.length < 1) {
-                        messageApi.error("Please attach atleast one file!");
-                      } else {
-                        setEditRequest(false);
-                        handleUpload("update");
-                      }
+                      form.validateFields().then(() => {
+                        if (files?.length < 1) {
+                          messageApi.error("Please attach atleast one file!");
+                        } else {
+                          setEditRequest(false);
+                          handleUpload("update");
+                        }
+                      });
                     }}
                   >
                     Update
@@ -1067,6 +1346,60 @@ export default function PaymentRequest({ params }) {
             </div>
           </Form>
 
+          {paymentRequest?.category === "external" && editRequest && (
+            <div className="bg-gray-50 py-3 px-10  my-5 rounded">
+              <div className="flex flex-row items-center text-blue-500">
+                <LightBulbIcon className="h-8 w-8" />
+                <div>
+                  <Typography.Title level={5}>Hints</Typography.Title>
+                </div>
+              </div>
+
+              <div className="flex flex-col space-y-3 w-1/2 mt-5">
+                <Typography.Text>
+                  <div className="text-gray-700 grid grid-cols-2">
+                    <div>Related PO {po?.number} (Total Value): </div>
+                    <div className="font-semibold">
+                      {po?.items[0]?.currency +
+                        " " +
+                        getPoTotalVal().grossTotal?.toLocaleString()}
+                    </div>
+                  </div>
+                </Typography.Text>
+
+                <Typography.Text>
+                  <div className="text-gray-700 grid grid-cols-2">
+                    <div>Paid Requests' Value: </div>
+                    <div className="font-semibold">
+                      {po?.items[0]?.currency +
+                        " " +
+                        totalPaid?.toLocaleString()}
+                    </div>
+                  </div>
+                </Typography.Text>
+
+                <Typography.Text>
+                  <div className="text-gray-700 grid grid-cols-2">
+                    <div>Linked Payment Requests' Value: </div>
+                    <div
+                      className={`font-semibold
+                  
+                      ${
+                        amount > getPoTotalVal().grossTotal - totalPaymentVal + paymentRequest?.amount &&
+                        "text-red-500"
+                      }
+                  `}
+                    >
+                      {po?.items[0]?.currency +
+                        " " +
+                        (totalPaymentVal + amount - paymentRequest?.amount)?.toLocaleString()}
+                    </div>
+                  </div>
+                </Typography.Text>
+              </div>
+            </div>
+          )}
+
           {paymentRequest?.status == "withdrawn" && (
             <div className="text-sm text-red-600 p-3 bg-red-50 rounded-md flex flex-col justify-center items-center">
               <LockClosedIcon className="h-10 w-10 text-red-400" />
@@ -1074,14 +1407,18 @@ export default function PaymentRequest({ params }) {
             </div>
           )}
 
-          {/* Approval flow */}
           {paymentRequest?.status !== "withdrawn" && (
             <>
-              <div>
-                <Typography.Title level={4}>Request Approval</Typography.Title>
-              </div>
+              {/* Approval flow */}
+              {user?.userType !== "VENDOR" && (
+                <div>
+                  <Typography.Title level={4}>
+                    Request Approval
+                  </Typography.Title>
+                </div>
+              )}
 
-              {paymentRequest?.approver && (
+              {paymentRequest?.approver && user?.userType !== "VENDOR" && (
                 <div className="mx-3 mt-5 ">
                   <Steps
                     direction="vertical"
@@ -1379,7 +1716,8 @@ export default function PaymentRequest({ params }) {
                   {showAddApproverForm ? "" : "No approver selected yet"}
                 </div> */}
                     {!showAddApproverForm &&
-                      user?.permissions?.canEditPaymentRequests && (
+                      user?.permissions?.canEditPaymentRequests &&
+                      !user?.approver && (
                         <div className="flex flex-row items-center space-x-1">
                           <Button
                             type="primary"
@@ -1407,7 +1745,9 @@ export default function PaymentRequest({ params }) {
                   </div>
                 )}
 
-              {showAddApproverForm && (
+              {(showAddApproverForm ||
+                (paymentRequest?.approver &&
+                  paymentRequest?.status == "pending-review")) && (
                 <div className="w-1/3">
                   <Form layout="vertical">
                     <Form.Item
@@ -1422,6 +1762,7 @@ export default function PaymentRequest({ params }) {
                     >
                       <Select
                         // defaultValue={defaultApprover}
+                        defaultValue={paymentRequest?.approver?._id}
                         placeholder="Select Approver"
                         showSearch
                         onChange={(value) => {
@@ -1445,7 +1786,9 @@ export default function PaymentRequest({ params }) {
                       <Button
                         onClick={sendReview}
                         type="primary"
-                        disabled={!level1Approver}
+                        disabled={
+                          !level1Approver && !paymentRequest?.approver?._id
+                        }
                       >
                         Submit
                       </Button>
@@ -1455,95 +1798,325 @@ export default function PaymentRequest({ params }) {
               )}
 
               {/* Payment process */}
-              <div className="flex flex-row justify-between items-center">
-                <Typography.Title level={4}>Payment process</Typography.Title>
-                <div>
-                  {paymentRequest?.status == "approved" && (
-                    <Tag color="orange">payment is due</Tag>
-                  )}
+              {
+                <div className="flex flex-row justify-between items-center">
+                  <Typography.Title level={4}>Payment process</Typography.Title>
+                  <div>
+                    {paymentRequest?.status == "approved" && (
+                      <Tag color="orange">payment is due</Tag>
+                    )}
+                  </div>
                 </div>
-              </div>
+              }
 
               {paymentRequest?.status === "approved" &&
-                user?.permissions.canApproveAsHof && (
+                user?.permissions.canApproveAsHof &&
+                paymentRequest?.category === "internal" && (
+                  <>
+                    <Form form={paymentForm}>
+                      <UploadOtherFiles
+                        files={filesProof}
+                        setFiles={setFilesProof}
+                        label="Select Payment proof"
+                      />
+
+                      <div className="grid lg:grid-cols-2 gap-6 divide-x">
+                        {/* <div className="flex flex-col">
+                        <div>DistributionRule</div>
+                        <Form.Item
+                          // label="Select level 1 approver"
+                          name="distributionRule"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Can not be empty!",
+                            },
+                          ]}
+                        >
+                          <Select
+                            // defaultValue={defaultApprover}
+                            placeholder="Select rule"
+                            showSearch
+                            onChange={(value) => {
+                              // setLevel1Approver(value);
+                              setDistributionRule(value);
+                            }}
+                            filterOption={(input, option) =>
+                              (option?.label ?? "")
+                                .toLowerCase()
+                                .includes(input.toLowerCase())
+                            }
+                            options={distributionRules?.map((l) => {
+                              return {
+                                label: l?.FactorDescription,
+                                value: l?.FactorCode,
+                              };
+                            })}
+                          ></Select>
+                        </Form.Item>
+                      </div> */}
+                        <Form.Item
+                          label="Distribution Rule - Debit Acc"
+                          name="currency"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Can not be empty!",
+                            },
+                          ]}
+                        >
+                          <Select
+                            // style={{ marginLeft: 8, maxWidth: 200 }}
+                            showSearch
+                            onChange={(value) => {
+                              // setLevel1Approver(value);
+                              setDistributionRuleDb(value);
+                              setDistributionRuleCr(value);
+                            }}
+                            placeholder="Distribution rule"
+                            filterOption={(input, option) =>
+                              (option?.label ?? "")
+                                .toLowerCase()
+                                .includes(input.toLowerCase())
+                            }
+                            options={distributionRules?.map((l) => {
+                              return {
+                                label: l?.FactorDescription,
+                                value: l?.FactorCode,
+                              };
+                            })}
+                          ></Select>
+                        </Form.Item>
+
+                        <div>
+                          <Form.Item
+                            label="Debit Account"
+                            name="accountToDebit"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Can not be empty!",
+                              },
+                            ]}
+                          >
+                            <Select
+                              // defaultValue={defaultApprover}
+                              // style={{ marginLeft: 8, maxWidth: 250 }}
+                              // style={{ marginLeft: 8 }}
+                              placeholder="Account to debit"
+                              showSearch
+                              onChange={(value) => {
+                                // setLevel1Approver(value);
+                                setDebitAccount(value);
+                              }}
+                              filterOption={(input, option) =>
+                                (option?.label ?? "")
+                                  .toLowerCase()
+                                  .includes(input.toLowerCase())
+                              }
+                              options={accounts?.map((l) => {
+                                return {
+                                  label: l?.Name,
+                                  value: l?.Code,
+                                };
+                              })}
+                            ></Select>
+                          </Form.Item>
+                          <Form.Item
+                            label="Credit Account"
+                            name="accountToCredit"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Can not be empty!",
+                              },
+                            ]}
+                          >
+                            <Select
+                              // style={{ marginLeft: 8, maxWidth: 250 }}
+                              // defaultValue={defaultApprover}
+                              // style={{ marginLeft: 8 }}
+                              placeholder="Account to Credit"
+                              showSearch
+                              onChange={(value) => {
+                                // setLevel1Approver(value);
+                                setCreditAccount(value);
+                              }}
+                              filterOption={(input, option) =>
+                                (option?.label ?? "")
+                                  .toLowerCase()
+                                  .includes(input.toLowerCase())
+                              }
+                              options={accounts?.map((l) => {
+                                return {
+                                  label: l?.Name,
+                                  value: l?.Code,
+                                };
+                              })}
+                            ></Select>
+                          </Form.Item>
+                        </div>
+                        {/* <div className="flex flex-row items-center"></div> */}
+
+                        {/*<div className="flex flex-row items-center">
+                         <Form.Item
+                          label="Distribution Rule - Credit Acc"
+                          name="currency"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Can not be empty!",
+                            },
+                          ]}
+                        >
+                          <Select
+                            // style={{ marginLeft: 8, maxWidth: 200 }}
+                            showSearch
+                            placeholder="Distribution rule"
+                            onChange={(value) => {
+                              // setLevel1Approver(value);
+                              setDistributionRuleCr(value);
+                            }}
+                            filterOption={(input, option) =>
+                              (option?.label ?? "")
+                                .toLowerCase()
+                                .includes(input.toLowerCase())
+                            }
+                            options={distributionRules?.map((l) => {
+                              return {
+                                label: l?.FactorDescription,
+                                value: l?.FactorCode,
+                              };
+                            })}
+                          ></Select>
+                        </Form.Item> 
+                      </div>*/}
+
+                        <div className="mr-10 space-y-2 flex flex-col">
+                          {/* <InputNumber
+                    size="small"
+                    name="title"
+                    className="text-xs w-full"
+                    placeholder={paymentRequest?.amount}
+                    onChange={(e) => {
+                      paymentRequest.amount = e;
+                    }}
+                  /> */}
+                          <div className="flex flex-row space-x-2 items-center">
+                            <Switch
+                              onChange={setOverrideAmount}
+                              checked={overrideAmount}
+                              disabled={paymentRequest?.currency === "RWF"}
+                            />
+                            <div>Override Amount</div>
+                          </div>
+                          {overrideAmount && (
+                            <div>
+                              <Form.Item>
+                                <Form.Item
+                                  label="Override RWF Amount"
+                                  name="overrideAmount"
+                                  noStyle
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "Amount is required",
+                                    },
+                                    {
+                                      validator(rule, value) {
+                                        return new Promise(
+                                          (resolve, reject) => {
+                                            if (value <= 0) {
+                                              reject(
+                                                "The amount should exceed Zero"
+                                              );
+                                            } else {
+                                              resolve();
+                                            }
+                                          }
+                                        );
+                                      },
+                                    },
+                                  ]}
+                                  initialValue={0}
+                                >
+                                  <InputNumber
+                                    label="Override RWF Amount"
+                                    style={{ width: "100%" }}
+                                    addonBefore={
+                                      <Form.Item
+                                        noStyle
+                                        // name="currency"
+                                      >
+                                        <Select
+                                          disabled={true}
+                                          defaultValue="RWF"
+                                          value="RWF"
+                                          options={[
+                                            {
+                                              value: "RWF",
+                                              label: "RWF",
+                                              key: "RWF",
+                                            },
+                                            // {
+                                            //   value: "USD",
+                                            //   label: "USD",
+                                            //   key: "USD",
+                                            // },
+                                            // {
+                                            //   value: "EUR",
+                                            //   label: "EUR",
+                                            //   key: "EUR",
+                                            // },
+                                          ]}
+                                        ></Select>
+                                      </Form.Item>
+                                    }
+                                    // defaultValue={paymentRequest.amount}
+                                    value={amountOverride}
+                                    onChange={setAmountOverride}
+                                  />
+                                </Form.Item>
+                              </Form.Item>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="mt-10">
+                        <Button
+                          loading={saving}
+                          onClick={() =>
+                            paymentForm.validateFields().then(() => {
+                              handleUpload("paymentProof");
+                            })
+                          }
+                          type="primary"
+                          disabled={
+                            !filesProof ||
+                            filesProof.length == 0 ||
+                            !debitAccount ||
+                            !creditAccount ||
+                            !distributionRuleCr ||
+                            !distributionRuleDb
+                          }
+                        >
+                          Submit
+                        </Button>
+                      </div>
+                    </Form>
+                  </>
+                )}
+
+              {paymentRequest?.status === "approved" &&
+                user?.permissions.canApproveAsHof &&
+                paymentRequest?.category === "external" && (
                   <>
                     <UploadOtherFiles
                       files={filesProof}
                       setFiles={setFilesProof}
                       label="Select Payment proof"
                     />
-
-                    <div className="grid grid-cols-2 gap-6">
-                      <div className="flex flex-col">
-                        <div>Account to Debit</div>
-                        <Form.Item
-                          // label="Select level 1 approver"
-                          name="accountToDebit"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Can not be empty!",
-                            },
-                          ]}
-                        >
-                          <Select
-                            // defaultValue={defaultApprover}
-                            placeholder="Account to debit"
-                            showSearch
-                            onChange={(value) => {
-                              // setLevel1Approver(value);
-                              setDebitAccount(value);
-                            }}
-                            filterOption={(input, option) =>
-                              (option?.label ?? "")
-                                .toLowerCase()
-                                .includes(input.toLowerCase())
-                            }
-                            options={accounts?.map((l) => {
-                              return {
-                                label: l?.Name,
-                                value: l?.Code,
-                              };
-                            })}
-                          ></Select>
-                        </Form.Item>
-                      </div>
-
-                      <div className="flex flex-col">
-                        <div>Account to Credit</div>
-                        <Form.Item
-                          // label="Select level 1 approver"
-                          name="accountToCredit"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Can not be empty!",
-                            },
-                          ]}
-                        >
-                          <Select
-                            // defaultValue={defaultApprover}
-                            placeholder="Account to Credit"
-                            showSearch
-                            onChange={(value) => {
-                              // setLevel1Approver(value);
-                              setCreditAccount(value);
-                            }}
-                            filterOption={(input, option) =>
-                              (option?.label ?? "")
-                                .toLowerCase()
-                                .includes(input.toLowerCase())
-                            }
-                            options={accounts?.map((l) => {
-                              return {
-                                label: l?.Name,
-                                value: l?.Code,
-                              };
-                            })}
-                          ></Select>
-                        </Form.Item>
-                      </div>
-                    </div>
 
                     <div>
                       <Button
@@ -1557,6 +2130,7 @@ export default function PaymentRequest({ params }) {
                     </div>
                   </>
                 )}
+
               {paymentRequest?.status !== "approved" &&
                 paymentRequest?.status !== "paid" && (
                   <div className="text-sm text-gray-600 p-3 bg-gray-50 rounded-md flex flex-col justify-center items-center">
@@ -1574,16 +2148,6 @@ export default function PaymentRequest({ params }) {
                     <div className="text-xs text-gray-400">
                       Attached Payment proof(s)
                     </div>
-
-                    {paymentRequest?.journalEntry && (
-                      <div>
-                        <Tag color="">
-                          SAP Journal Entry: {paymentRequest?.journalEntry}
-                        </Tag>
-                      </div>
-                    )}
-
-                    
                   </div>
 
                   <div className="grid grid-cols-2 gap-y-2">
@@ -1599,7 +2163,9 @@ export default function PaymentRequest({ params }) {
                           <Tooltip title={doc}>
                             <Typography.Text ellipsis>
                               <Link
-                                href={`${url}/file/paymentRequests/${doc}`}
+                                href={`${url}/file/paymentRequests/${encodeURI(
+                                  doc
+                                )}`}
                                 target="_blank"
                               >
                                 <div className="text-xs">
@@ -1626,6 +2192,54 @@ export default function PaymentRequest({ params }) {
                   </div>
                 </div>
               )}
+
+              {paymentRequest?.journalEntry &&
+                !paymentRequest?.journalEntry?.Memo && (
+                  <div>
+                    <Tag color="">
+                      SAP Journal Entry: {paymentRequest?.journalEntry}
+                    </Tag>
+                    {paymentRequest?.category == "internal" && (
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="flex flex-col space-y-2">
+                          <div className="mt-2">
+                            {/* <div className="text-xs text-gray-400">
+                              Debit: 10090189 - Legal
+                            </div> */}
+
+                            <Tag color="blue">
+                              Debit:{" "}
+                              {
+                                paymentRequest?.journalEntryLines[0]
+                                  ?.AccountCode
+                              }{" "}
+                              -{" "}
+                              {
+                                paymentRequest?.journalEntryLines[0]
+                                  ?.CostingCode
+                              }
+                            </Tag>
+                          </div>
+
+                          <div>
+                            <Tag color="orange">
+                              Credit:{" "}
+                              {
+                                paymentRequest?.journalEntryLines[1]
+                                  ?.AccountCode
+                              }{" "}
+                              -{" "}
+                              {
+                                paymentRequest?.journalEntryLines[1]
+                                  ?.CostingCode
+                              }
+                            </Tag>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
             </>
           )}
         </div>
@@ -1639,7 +2253,7 @@ export default function PaymentRequest({ params }) {
                 color: paymentRequest?.status !== "declined" ? "blue" : "red",
                 dot:
                   paymentRequest?.status == "reviewed" ||
-                  paymentRequest?.status.includes("approved") ||
+                  paymentRequest?.status?.includes("approved") ||
                   paymentRequest?.status == "paid" ? (
                     <CheckCircleOutlined className=" text-green-500" />
                   ) : paymentRequest?.status == "declined" ? (
@@ -1661,7 +2275,7 @@ export default function PaymentRequest({ params }) {
                     <CheckCircleOutlined className=" text-green-500" />
                   )) ||
                   ((paymentRequest?.status == "reviewed" ||
-                    paymentRequest?.status.includes("approved (")) && (
+                    paymentRequest?.status?.includes("approved (")) && (
                     <LoadingOutlined className=" text-blue-500" />
                   )),
               },

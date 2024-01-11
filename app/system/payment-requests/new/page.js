@@ -170,6 +170,7 @@ export default function NewPaymentRequest() {
         approver: level1Approver,
         // purchaseOrder: params?.poId,
         docIds: _fileList,
+        status:'pending-approval'
       }),
     })
       .then((res) => {
@@ -480,9 +481,10 @@ export default function NewPaymentRequest() {
               icon={<SaveOutlined />}
               type="primary"
               onClick={() => {
-                form.validateFields();
-                setSubmitting(true);
-                handleUpload();
+                form.validateFields().then(() => {
+                  setSubmitting(true);
+                  handleUpload();
+                });
               }}
               disabled={submitting}
             >

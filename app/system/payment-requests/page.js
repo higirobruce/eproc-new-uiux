@@ -35,7 +35,6 @@ import { useRouter } from "next/navigation";
 import { encode } from "base-64";
 import { motion } from "framer-motion";
 import PaymentRequestsTable from "@/app/components/paymentRequestsTable";
-import { FiSearch } from "react-icons/fi";
 
 export default function UserRequests() {
   let router = useRouter();
@@ -187,8 +186,7 @@ export default function UserRequests() {
           ? item.status == "approved (hod)"
           : user?.permissions?.canApproveAsHod
           ? user._id == item?.approver?._id &&
-            (item?.status == "pending-review" ||
-              item?.status == "reviewed")
+            (item?.status == "pending-review" || item?.status == "reviewed")
           : true
       );
 
@@ -216,8 +214,8 @@ export default function UserRequests() {
     <>
       {contextHolder}
       {dataLoaded && !submitting ? (
-        <motion.div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-5 h-screen mt-6 pb-10">
-          {/* <Row className="flex flex-col custom-sticky bg-white px-10 py-3 shadow space-y-2">
+        <motion.div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-10 h-full">
+          <Row className="flex flex-col custom-sticky bg-white px-10 py-3 shadow space-y-2">
             <div className="flex flex-row items-center justify-between">
               <div className="text-xl font-semibold">Payment Requests</div>
 
@@ -237,17 +235,19 @@ export default function UserRequests() {
                       />
                     </div>
                   )}
-                <div className="flex flex-row items-center space-x-1">
-                  <div>My requests</div>
-                  {
-                    <Checkbox
-                      checked={onlyMine}
-                      onChange={(e) => {
-                        setOnlyMine(e.target.checked);
-                      }}
-                    />
-                  }
-                </div>
+                {user?.userType !== "VENDOR" && (
+                  <div className="flex flex-row items-center space-x-1">
+                    <div>My requests</div>
+                    {
+                      <Checkbox
+                        checked={onlyMine}
+                        onChange={(e) => {
+                          setOnlyMine(e.target.checked);
+                        }}
+                      />
+                    }
+                  </div>
+                )}
               </div>
             </div>
             <Row className="flex flex-row justify-between items-center space-x-4">
@@ -308,66 +308,20 @@ export default function UserRequests() {
                 </Button>
               )}
             </Row>
-          </Row> */}
-          <div className="flex items-center justify-between mr-6">
-            {user?.userType !== "VENDOR" && (
-              <Button
-                className="bg-white h-9 px-5 text-[11px] font-semibold rounded text-[#0063CF]"
-                icon={<PlusOutlined />}
-                onClick={() => {
-                  setSubmitting(true);
-                  router.push("/system/payment-requests/new");
-                }}
-              >
-                New Payment request
-              </Button>
-            )}
-            <div className="flex items-center gap-5">
-              <Select
-                // mode="tags"
-                className="text-[9px] w-32 rounded-sm"
-                placeholder="Select status"
-                onChange={(value) => setSearchStatus(value)}
-                value={searchStatus}
-                options={[
-                  // { value: "mine", label: "My requests" },
-                  { value: "all", label: "Filters" },
-                  { value: "pending", label: "Pending approval" },
-                  {
-                    value: "approved",
-                    label: "Approved",
-                  },
-                  {
-                    value: "declined",
-                    label: "Declined",
-                  },
-                ]}
-              />
-              <Button
-                type="text"
-                className="bg-white h-8 text-[#0063CF]"
-                icon={<ReloadOutlined />}
-                onClick={() => refresh()}
-              ></Button>
-            </div>
-
-          </div>
+          </Row>
           {/* <RequestStats totalRequests={dataset?.length}/> */}
-          <div className="payment-request  mr-6 bg-white rounded-lg h-[calc(100vh-161px)] mb-10 px-5 pb-2">
-            <div className="flex justify-between items-center mb-5">
-              <h4 className="text-[19px] text-[#344767]">Payment Request</h4>
-              <div className="flex items-center rounded-lg bg-[#F5F7FA] p-1.5">
-                <FiSearch size={18} className="text-[#E4E4E4] ml-2" />
-                <Input
-                  onChange={(e) => {
-                    setSearchText(e?.target?.value);
-                  }}
-                  placeholder="Search by request#, po#, initiator"
-                  className="border-0 text-[#8392AB] bg-transparent text-[12px] hover:border-none hover:outline-none"
-                />
-                <div></div>
-              </div>
-            </div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{
+              opacity: tempDataset ? 1 : 0,
+            }}
+            transition={{
+              duration: 0.2,
+              type: "tween",
+              ease: "circOut",
+            }}
+            className="mx-10"
+          >
             <PaymentRequestsTable
               // handleSetRow={handleSetRow}
               dataSet={tempDataset}
@@ -376,10 +330,11 @@ export default function UserRequests() {
               // handleDeclineRequest={declineRequest}
               updatingId={updatingId}
             />
-          </div>
-          {/* <div class="absolute -bottom-32 right-10 opacity-10">
+          </motion.div>
+
+          <div class="absolute -bottom-32 right-10 opacity-10">
             <Image src="/icons/blue icon.png" width={110} height={100} />
-          </div> */}
+          </div>
         </motion.div>
       ) : (
         <div className="flex items-center justify-center flex-1 h-screen">
