@@ -1,7 +1,6 @@
 "use client";
 import {
   DollarOutlined,
-  FileTextOutlined,
   LoadingOutlined,
   PlaySquareOutlined,
   PrinterOutlined,
@@ -28,7 +27,7 @@ import {
   Col,
 } from "antd";
 import Image from "next/image";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import parse from "html-react-parser";
 import * as _ from "lodash";
 import moment from "moment-timezone";
@@ -38,14 +37,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { encode } from "base-64";
 import { useRouter } from "next/navigation";
-import { FiSearch } from "react-icons/fi";
-import { RiArrowDropDownLine } from "react-icons/ri";
-import { FaLink } from "react-icons/fa6";
-import { IoLink } from "react-icons/io5";
-import { LuUser, LuHash } from "react-icons/lu";
-import { BiEnvelope } from "react-icons/bi";
-import { IoCheckmarkOutline } from "react-icons/io5";
-import { RiForbidLine } from "react-icons/ri";
 // import MyPdfViewer from "../common/pdfViewer";
 
 export default function PurchaseOrders() {
@@ -64,8 +55,6 @@ export default function PurchaseOrders() {
   let [startingDelivery, setStartingDelivery] = useState(false);
   let [readyToSign, setReadyToSign] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
-  const [activeIndex, setActiveIndex] = useState("");
-  const contentHeight = useRef();
   const items = [
     {
       key: "1",
@@ -231,10 +220,11 @@ export default function PurchaseOrders() {
           message.error("Purchase order is fully paid!");
       })
       .catch((err) => {
-        console.log(err);
+        console.log(err)
         setSubmitting(false);
       })
-      .finally((err) => {});
+      .finally((err) => {
+      });
   }
 
   function getPOs() {}
@@ -677,10 +667,6 @@ export default function PurchaseOrders() {
     // );
   }
 
-  const handleItemClick = (value) => {
-    setActiveIndex((prevIndex) => (prevIndex === value ? "" : value));
-  };
-
   function getResultFromServer(res) {
     if (res.status === 401) {
       localStorage.removeItem("token");
@@ -711,11 +697,11 @@ export default function PurchaseOrders() {
   return (
     <>
       {dataLoaded && !submitting ? (
-        <div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-screen pb-10">
+        <div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-1 h-full">
           {viewPOMOdal()}
 
           {previewAttachmentModal()}
-          {/* <Row className="flex flex-col custom-sticky space-y-2 bg-white px-10 py-3 shadow">
+          <Row className="flex flex-col custom-sticky space-y-2 bg-white px-10 py-3 shadow">
             <div className="flex flex-row justify-between items-center">
               <div className="text-xl font-semibold">Purchase Orders List</div>
             </div>
@@ -761,21 +747,20 @@ export default function PurchaseOrders() {
                 onClick={() => refresh()}
               ></Button>
             </Row>
-          </Row> */}
-
-          <div className="flex items-center justify-between mr-6">
-            <div />
-            <div className="flex items-center gap-5">
+          </Row>
+          {/* <div className="flex flex-col items-start space-y-2 ml-3">
+            <div className="text-xl font-semibold">Purchase Orders</div>
+            <div className="flex-1">
               <Select
                 // mode="tags"
-                className="text-[14px] text-[#2c6ad6] w-48 rounded-sm"
+                style={{ width: "300px" }}
                 placeholder="Select status"
                 onChange={(value) => setSearchStatus(value)}
                 value={searchStatus}
                 options={[
                   { value: "all", label: "All" },
                   {
-                    value: "pending-signature",
+                    value: "pending",
                     label: "Pending Signature",
                   },
                   {
@@ -788,254 +773,136 @@ export default function PurchaseOrders() {
                   },
                 ]}
               />
-              <Button
-                type="text"
-                className="bg-white h-8 text-[#0063CF]"
-                icon={<ReloadOutlined />}
-                onClick={() => refresh()}
-              ></Button>
             </div>
-          </div>
+          </div> */}
 
           {(getData()?.length < 1 || !getData()) && <Empty />}
 
           {getData() && getData()?.length >= 1 && (
-            <div className="request mr-6 bg-white h-[calc(100vh-150px)] rounded-lg mb-10 px-5 overflow-y-auto">
-              <div className="flex justify-between items-center mb-5">
-                <h4 className="text-[19px] text-[#344767]">
-                  Purchase Orders List
-                </h4>
-                <div className="flex items-center gap-5">
-                  <div className="flex items-center rounded-lg bg-[#F5F7FA] p-1.5">
-                    <FiSearch size={18} className="text-[#E4E4E4] ml-2" />
-                    <Input
-                      className="border-0 text-[#8392AB] bg-transparent text-[12px] hover:bg-transparent hover:border-none hover:outline-none"
-                      onChange={(e) => {
-                        setSearchText(e?.target?.value);
-                      }}
-                      placeholder="Search by po#, vendor name"
-                    />
-                    {/* <Input.Search
-                      style={{ width: "300px" }}
-                      autoFocus
-                      onChange={(e) => {
-                        setSearchText(e?.target?.value);
-                      }}
-                      placeholder="Search by request#, initiator"
-                    /> */}
-                    <div></div>
-                  </div>
-                </div>
-              </div>
-              {getData()?.data?.map((po, key) => {
-                let t = 0;
-                return (
-                  <div className="my-5">
-                    <button
-                      className={`cursor-pointer w-full pr-5 pt-3 -pb-4 flex justify-evenly items-center border-b-0 border-[#f5f2f2] border-t border-x-0 ${
-                        activeIndex == key ? "bg-[#F1F3FF]" : "bg-transparent"
-                      }`}
-                      onClick={() => handleItemClick(key)}
-                    >
-                      <div className="flex flex-1 items-center justify-between gap-4 my-3">
-                        <button
-                          disabled={
-                            user?.userType === "VENDOR" &&
-                            !documentFullySignedInternally(po)
-                          }
-                          onClick={() => {
-                            setPO(po);
-                            setOpenViewPO(true);
-                          }}
-                          className="font-semibold cursor-pointer space-x-1 flex flex-row items-center text-blue-500 hover:underline border-none bg-transparent"
-                        >
-                          <div>
-                            <FileTextOutlined className="text-xs" />
+            <Row className="flex flex-col mx-10">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{
+                  opacity: getData() && getData()?.length >= 1 ? 1 : 0,
+                }}
+                transition={{
+                  duration: 0.3,
+                  type: "tween",
+                  ease: "circOut",
+                }}
+              >
+                <Col flex={user?.userType !== "VENDOR" ? 7 : 5}>
+                  {getData()?.data?.map((po) => {
+                    let t = 0;
+                    return (
+                      <div
+                        key={po?.number}
+                        className={`grid ${
+                          user?.userType !== "VENDOR"
+                            ? `lg:grid-cols-6`
+                            : `lg:grid-cols-3`
+                        } sm:grid-col-1 md:grid-cols-3 gap-1 ring-1 ring-gray-200 bg-white rounded px-5 py-3 shadow hover:shadow-md m-3`}
+                      >
+                        <div className="flex flex-col space-y-1">
+                          <div className="text-xs text-gray-600">
+                            Purchase Order
                           </div>
-                          <div className="capitalize text-[14px] text-[#1677FF]">
-                            {po?.number}
+                          <div className="font-semibold flex flex-row space-x-2">
+                            <div>{po?.number}</div>
+                            {(user?.userType !== "VENDOR" ||
+                              (documentFullySignedInternally(po) &&
+                                user?.userType === "VENDOR")) && (
+                              <Link href={`/system/purchase-orders/${po?._id}`}>
+                                <PrinterOutlined />
+                              </Link>
+                            )}
                           </div>
-                        </button>
+                          <div className="text-gray-600">
+                            {po?.tender?.purchaseRequest?.description ||
+                              po?.request?.description}
+                          </div>
+                          {(po?.tender?.purchaseRequest?.number ||
+                            po?.request?.number) &&
+                            user?.userType !== "VENDOR" && (
+                              <div className="text-gray-600">
+                                <Link
+                                  onClick={() => setSubmitting(true)}
+                                  alt=""
+                                  href={`/system/requests/${
+                                    po?.tender?.purchaseRequest?._id ||
+                                    po?.request?._id
+                                  }`}
+                                >
+                                  Req Number:{" "}
+                                  {po?.tender?.purchaseRequest?.number ||
+                                    po?.request?.number}
+                                </Link>
+                              </div>
+                            )}
+
+                          {po?.reqAttachmentDocId && (
+                            <Link
+                              target="_blank"
+                              href={`${url}/file/reqAttachments/${po?.reqAttachmentDocId}.pdf`}
+                            >
+                              <Typography.Link className="flex flex-row items-center space-x-1">
+                                <div>Reference doc</div>{" "}
+                                <PaperClipIcon className="h-4 w-4" />
+                              </Typography.Link>
+                            </Link>
+                          )}
+                        </div>
+
                         {user?.userType !== "VENDOR" && (
-                          <div className="flex flex-col items-start gap-2">
-                            <small className="text-[10px] text-[#353531]">
-                              Vendor
-                            </small>
-                            <p className="text-[#344767] font-medium text-[13px] py-0 my-0">
-                              {po?.vendor?.companyName}
-                            </p>
+                          <div className="flex flex-col space-y-2">
+                            <div className="text-xs text-gray-600">
+                              SAP B1 reference(s)
+                            </div>
+                            <div className="text-gray-600">
+                              {po?.referenceDocs?.map((ref, i) => {
+                                return <Tag key={i}>{ref}</Tag>;
+                              })}
+                            </div>
                           </div>
                         )}
-                        <div className="flex flex-col items-start gap-2">
-                          <small className="text-[10px] text-[#353531]">
-                            Total Value
-                          </small>
-                          <p className="text-[#344767] font-medium text-[13px] py-0 my-0">
+
+                        {user?.userType !== "VENDOR" && (
+                          <div className="flex flex-col space-y-1">
+                            <div className="text-xs text-gray-600">Vendor</div>
+                            <div className="font-semibold">
+                              {po?.vendor?.companyName}
+                            </div>
+                            <div className=" text-gray-500">
+                              TIN: {po?.vendor?.tin}
+                            </div>
+                            <div className=" text-gray-500">
+                              email: {po?.vendor?.companyEmail}
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex flex-col space-y-1">
+                          <div className="text-xs text-gray-600">
+                            Total value
+                          </div>
+                          <div className="font-semibold">
                             {po?.items?.map((i) => {
                               let lTot = i?.quantity * i?.estimatedUnitCost;
                               t = t + lTot;
                             })}{" "}
                             {t.toLocaleString()} {po?.items[0]?.currency}
-                          </p>
-                        </div>
-                        <div className="flex flex-col items-start gap-2">
-                          <small className="text-[10px] text-[#353531]">
-                            Created At
-                          </small>
-                          <p className="text-[#344767] font-medium text-[13px] py-0 my-0">
-                            03 - Mar - 2023
-                          </p>
-                        </div>
-                        {documentFullySigned(po) && (
-                          <div>
-                            <div className="bg-[#D2FBD0] rounded-xl text-[#0D4A26] text-[12px] font-medium px-3 py-1">
-                              Signed
-                            </div>
                           </div>
-                        )}
+                        </div>
 
-                        {!documentFullySigned(po) && (
-                          <div>
-                            <div className="bg-[#F9BB01] rounded-xl text-[#FFF] text-[12px] font-medium px-3 py-1">
-                              {po?.status || "Pending-signature"}
-                            </div>
-                          </div>
-                        )}
-
-                        <button
-                          className="bg-[#1677FF] border-none px-3 py-2 rounded-lg text-[11px] font-semibold text-white"
-                          onClick={() => createPaymentRequest(po)}
-                        >
-                          Request Payment
-                        </button>
-                      </div>
-                      <RiArrowDropDownLine
-                        className={`text-[36px] text-[#344767] arrow ml-10 ${
-                          activeIndex == key ? "active" : ""
-                        }`}
-                      />
-                    </button>
-                    <div
-                      ref={contentHeight}
-                      className="answer-container mt-3 -mb-[21px] px-8 rounded-lg"
-                      style={
-                        activeIndex == key
-                          ? { display: "flex", flexDirection: 'column', borderWidth: 2, borderStyle: 'solid', borderColor: '#F1F3FF', background: '#FDFEFF' }
-                          : { display: "none" }
-                      }
-                    >
-                      <div className="py-5 flex justify-between">
-                        <div className="flex flex-col gap-5">
-                          <small className="text-[12px] text-[#353531]">
-                            Related Links
-                          </small>
-                          {(po?.tender?.purchaseRequest?.number ||
-                            po?.request?.number) &&
-                            user?.userType !== "VENDOR" && (
-                              <Link
-                                onClick={() => setSubmitting(true)}
-                                alt=""
-                                href={`/system/requests/${
-                                  po?.tender?.purchaseRequest?._id ||
-                                  po?.request?._id
-                                }`}
-                                className="text-[13px] flex items-center gap-3 no-underline text-[#1677FF]"
-                              >
-                                <FaLink />
-                                Reference Docs
-                              </Link>
-                            )}
-                          {po?.reqAttachmentDocId && (
-                            <Link
-                              href={`${url}/file/reqAttachments/${po?.reqAttachmentDocId}.pdf`}
-                              className="text-[13px] flex items-center gap-3 no-underline text-[#1677FF]"
-                            >
-                              <IoLink />
-                              Check request
-                            </Link>
-                          )}
-                        </div>
-                        <div className="flex flex-col gap-5">
-                          <small className="text-[12px] text-[#353531]">
-                            Vendor Details
-                          </small>
-                          <div className="flex flex-col gap-3">
-                            <div className="flex items-center gap-3">
-                              <LuUser className="text-[#8392AB]" />
-                              {/* {po?.vendor?.companyName} */}
-                              <small className="text-[#455A64] text-[13px] font-medium">
-                                {po?.vendor?.companyName || "-"}
-                              </small>
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <LuHash className="text-[#8392AB]" />
-                              {/* {po?.vendor?.tin} */}
-                              <small className="text-[#455A64] text-[13px] font-medium">
-                                {po?.vendor?.tin || "-"}
-                              </small>
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <BiEnvelope className="text-[#8392AB]" />
-                              {/* {po?.vendor?.companyEmail} */}
-                              <small className="text-[#455A64] text-[13px] font-medium">
-                                {po?.vendor?.companyEmail || "-"}
-                              </small>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex flex-col gap-5">
-                          <small className="text-[12px] text-[#353531]">
-                            Signatories
-                          </small>
-                          {/* {user?.userType !== "VENDOR" && (
-                            <div className="flex flex-col space-y-3 text-gray-600">
-                              {po?.signatories?.map((s) => {
-                                return (
-                                  <div
-                                    key={s?.email}
-                                    className="flex flex-row items-center space-x-2"
-                                  >
-                                    <div>
-                                      {s?.signed ? (
-                                        <Tooltip
-                                          placement="top"
-                                          title={`signed: ${moment(
-                                            s?.signedAt
-                                          ).format("DD MMM YYYY")} at ${moment(
-                                            s?.signedAt
-                                          )
-                                            .tz("Africa/Kigali")
-                                            .format("h:mm a z")}`}
-                                        >
-                                          <span>
-                                            <LockClosedIcon className="h-5 text-green-500" />
-                                          </span>
-                                        </Tooltip>
-                                      ) : (
-                                        <Tooltip title="Signature still pending">
-                                          <span>
-                                            <LockOpenIcon className="h-5 text-yellow-500" />
-                                          </span>
-                                        </Tooltip>
-                                      )}
-                                    </div>
-                                    <div className="flex flex-col text-gray-600">
-                                      <div>{s?.onBehalfOf}</div>
-                                      <div>{s?.names}</div>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          )} */}
-                          {user?.userType !== "VENDOR" && (
-                            <div className="flex flex-col gap-3">
-                              {po?.signatories?.map((s) => {
-                                return (
-                                  <div
-                                    key={s?.email}
-                                    className="flex items-center gap-3"
-                                  >
+                        {user?.userType !== "VENDOR" && (
+                          <div className="flex flex-col space-y-3 text-gray-600">
+                            {po?.signatories?.map((s) => {
+                              return (
+                                <div
+                                  key={s?.email}
+                                  className="flex flex-row items-center space-x-2"
+                                >
+                                  <div>
                                     {s?.signed ? (
                                       <Tooltip
                                         placement="top"
@@ -1047,54 +914,135 @@ export default function PurchaseOrders() {
                                           .tz("Africa/Kigali")
                                           .format("h:mm a z")}`}
                                       >
-                                        <IoCheckmarkOutline className="text-[#00CE82]" />
+                                        <span>
+                                          <LockClosedIcon className="h-5 text-green-500" />
+                                        </span>
                                       </Tooltip>
                                     ) : (
                                       <Tooltip title="Signature still pending">
                                         <span>
-                                          <RiForbidLine className="text-[#F5365C]" />
+                                          <LockOpenIcon className="h-5 text-yellow-500" />
                                         </span>
                                       </Tooltip>
                                     )}
-                                    <small className="text-[#455A64] text-[13px] font-semibold">
-                                      {s?.names}
-                                    </small>
-                                    <div className="bg-[#F1F3FF] py-1 px-3 rounded-xl text-[11px] font-medium text-[#353531]">
-                                      {s?.title}
-                                    </div>
                                   </div>
-                                );
-                              })}
-                              
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex flex-col gap-5">
-                          <small className="text-[12px] text-[#353531]">
-                            SAP B1 References
-                          </small>
-                          <div className="text-gray-600">
-                            {po?.referenceDocs?.map((ref, i) => {
-                              return <Tag key={i}>{ref}</Tag>;
+                                  <div className="flex flex-col text-gray-600">
+                                    <div>{s?.onBehalfOf}</div>
+                                    <div>{s?.names}</div>
+                                  </div>
+                                </div>
+                              );
                             })}
                           </div>
-                        </div>
-                        <div className="flex flex-col gap-5">
-                          <small className="text-[12px] text-[#353531]">
-                            Delivery Status
-                          </small>
-                          <Progress
-                            percent={_.round(po?.deliveryProgress, 1)}
-                            size="small"
-                            status="active"
-                          />
+                        )}
+
+                        <div className="flex flex-col space-y-1 items-start justify-center">
+                          {/* <Dropdown.Button
+                          disabled={
+                            user?.userType === "VENDOR" &&
+                            !documentFullySignedInternally(po)
+                          }
+                          menu={{ items, onClick: onMenuClick }}
+                          onOpenChange={() => {
+                            setPO(po);
+                          }}
+                        >
+                          Actions
+                        </Dropdown.Button> */}
+
+                          {(user?.userType !== "VENDOR" ||
+                            (user?.userType === "VENDOR" &&
+                              documentFullySignedInternally(po))) && (
+                            <div className="w-full">
+                              <Button
+                                disabled={
+                                  user?.userType === "VENDOR" &&
+                                  !documentFullySignedInternally(po)
+                                }
+                                onClick={() => {
+                                  setPO(po);
+                                  setOpenViewPO(true);
+                                }}
+                              >
+                                View PO
+                              </Button>
+                            </div>
+                          )}
+
+                          {documentFullySigned(po) && (
+                            <div>
+                              <Tag color="green">Signed</Tag>
+                            </div>
+                          )}
+
+                          {!documentFullySigned(po) && (
+                            <div>
+                              <Tag color="gold">
+                                {po?.status || "pending-signature"}
+                              </Tag>
+                            </div>
+                          )}
+
+                          <div className="flex flex-col space-y-1 justify-center">
+                            {/* <div className="text-xs text-gray-400">Delivery</div> */}
+
+                            {po?.status !== "started" &&
+                              po?.status !== "stopped" && (
+                                <Button
+                                  type="primary"
+                                  disabled={!documentFullySigned(po)}
+                                  size="small"
+                                  loading={po.status === "starting"}
+                                  // icon={<PlaySquareOutlined />}
+                                  onClick={() => handleStartDelivery(po)}
+                                >
+                                  Delivery start
+                                </Button>
+                              )}
+
+                            <div className="text-xs text-gray-600">
+                              Delivery progress
+                            </div>
+                            <div>
+                              <Progress
+                                percent={_.round(po?.deliveryProgress, 1)}
+                                size="small"
+                                status="active"
+                              />
+                            </div>
+
+                            {/* Payment request */}
+                            {
+                              // _.round(po?.deliveryProgress,1) >= 100 &&
+                              <div>
+                                <Button
+                                  type="default"
+                                  // disabled={!documentFullySigned(po)}
+                                  size="small"
+                                  // loading={submitting}
+                                  icon={<DollarOutlined />}
+                                  onClick={() => createPaymentRequest(po)}
+                                >
+                                  Payment
+                                </Button>
+                              </div>
+                            }
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                    );
+                  })}
+
+                  {/* <div class="absolute -bottom-0 right-10 opacity-10">
+                    <Image
+                      src="/icons/blue icon.png"
+                      width={110}
+                      height={100}
+                    />
+                  </div> */}
+                </Col>
+              </motion.div>
+            </Row>
           )}
         </div>
       ) : (
