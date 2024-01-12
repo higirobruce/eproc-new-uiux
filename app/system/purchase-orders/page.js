@@ -987,47 +987,6 @@ export default function PurchaseOrders() {
                           <small className="text-[12px] text-[#353531]">
                             Signatories
                           </small>
-                          {/* {user?.userType !== "VENDOR" && (
-                            <div className="flex flex-col space-y-3 text-gray-600">
-                              {po?.signatories?.map((s) => {
-                                return (
-                                  <div
-                                    key={s?.email}
-                                    className="flex flex-row items-center space-x-2"
-                                  >
-                                    <div>
-                                      {s?.signed ? (
-                                        <Tooltip
-                                          placement="top"
-                                          title={`signed: ${moment(
-                                            s?.signedAt
-                                          ).format("DD MMM YYYY")} at ${moment(
-                                            s?.signedAt
-                                          )
-                                            .tz("Africa/Kigali")
-                                            .format("h:mm a z")}`}
-                                        >
-                                          <span>
-                                            <LockClosedIcon className="h-5 text-green-500" />
-                                          </span>
-                                        </Tooltip>
-                                      ) : (
-                                        <Tooltip title="Signature still pending">
-                                          <span>
-                                            <LockOpenIcon className="h-5 text-yellow-500" />
-                                          </span>
-                                        </Tooltip>
-                                      )}
-                                    </div>
-                                    <div className="flex flex-col text-gray-600">
-                                      <div>{s?.onBehalfOf}</div>
-                                      <div>{s?.names}</div>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          )} */}
                           {user?.userType !== "VENDOR" && (
                             <div className="flex flex-col gap-3">
                               {po?.signatories?.map((s) => {

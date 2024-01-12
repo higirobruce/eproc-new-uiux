@@ -30,9 +30,6 @@ import PermissionsTable from "../../../components/permissionsTable";
 import { useRouter } from "next/navigation";
 import { encode } from "base-64";
 import { motion } from "framer-motion";
-import { LuUser } from "react-icons/lu";
-import { PiBagSimpleBold } from "react-icons/pi";
-import { MdOutlineAlternateEmail, MdPhoneAndroid } from "react-icons/md";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
@@ -487,12 +484,21 @@ export default function page({ params }) {
   }
 
   return (
-    <div
-      className="payment-request flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-screen pb-1 mb-32 overflow-y-auto"
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{
+        opacity: row ? 1 : 0,
+      }}
+      transition={{
+        duration: 0.3,
+        type: "tween",
+        ease: "circOut",
+      }}
+      className="flex flex-col  transition-opacity ease-in-out duration-1000 px-10 py-5 flex-1 space-y-3 overflow-x-scroll"
     >
       {contextHolder}
       <div className="flex flex-col space-y-5">
-        {/* <div className="flex flex-row justify-between">
+        <div className="flex flex-row justify-between">
           <div className="flex flex-row items-center space-x-2">
             <div>
               <Button
@@ -532,44 +538,149 @@ export default function page({ params }) {
               />
             </div>
           )}
-        </div> */}
+        </div>
 
-        <div className="grid md:grid-cols-3 gap-5 mb-16">
+        <div className="grid md:grid-cols-3 gap-5">
           {/* Data */}
           <div className="flex flex-col space-y-5">
-            <div className="bg-white rounded-lg shadow px-5 pb-7">
-              <h5 className="text-[17px] text-[#263238]">General Information</h5>
-              <div className="flex flex-col gap-y-4">
-                <small className="text-[13px] text-[#ADB6BF]">ABOUT</small>
-                <div className="flex items-center gap-x-5 my-2">
-                  <LuUser  className="text-[#ADB6BF]" />
-                  <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">{row?.firstName} {row?.lastName}</h6>
-                </div>
-                <div className="flex items-center gap-x-5 my-2">
-                  <PiBagSimpleBold  className="text-[#ADB6BF]" />
-                  <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">{row?.department?.description}</h6>
-                </div>
-                <div className="flex items-center gap-x-5">
-                  
-                  {/* <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">{row?.firstName} {row?.lastName}</h6> */}
-                </div>
+            <div className="bg-white ring-1 ring-gray-100 rounded shadow p-5">
+              <div className="text-xl font-semibold mb-5 flex flex-row justify-between items-center">
+                <div>General Information</div>
               </div>
-              <div className="flex flex-col gap-y-4 mt-5">
-                <small className="text-[13px] text-[#ADB6BF]">CONTACT</small>
-                <div className="flex items-center gap-x-5 my-2">
-                  <MdOutlineAlternateEmail  className="text-[#ADB6BF]" />
-                  <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">{row?.email}</h6>
+              <div className="flex flex-col space-y-2">
+                <div className="flex flex-row items-center space-x-10">
+                  <UserIcon className="text-gray-400 h-4 w-4" />
+                  <div className="text-sm flex flex-row items-center space-x-2">
+                    {!editUser && (
+                      <div>
+                        {row?.firstName} {row?.lastName}
+                      </div>
+                    )}
+
+                    {editUser && (
+                      <div className="flex flex-row items-center">
+                        <Typography.Text
+                          editable={
+                            editUser && {
+                              onChange: (e) => {
+                                let r = { ...row };
+                                r.firstName = e;
+                                setRow(r);
+                              },
+                              text: row?.firstName,
+                            }
+                          }
+                        >
+                          {row?.firstName}
+                        </Typography.Text>
+
+                        <Typography.Text
+                          editable={
+                            editUser && {
+                              onChange: (e) => {
+                                let r = { ...row };
+                                r.lastName = e;
+                                setRow(r);
+                              },
+                              text: row?.lastName,
+                            }
+                          }
+                        >
+                          {row?.lastName}
+                        </Typography.Text>
+                      </div>
+                    )}
+
+                    {/* {!editUser &&  <div>
+                        <Tag color="cyan">
+                          Position: {row?.title ? row?.title : row?.number}
+                        </Tag>
+                      </div>} */}
+                  </div>
                 </div>
-                <div className="flex items-center gap-x-5 my-2">
-                <MdPhoneAndroid className="text-[#ADB6BF]" />
-                  <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">{row?.telephone}</h6>
+                <div className="flex flex-row items-center space-x-10">
+                  <EnvelopeIcon className="h-4 w-4 text-gray-400" />
+                  {!editUser && <div className="text-sm ">{row?.email} </div>}
+                  {editUser && (
+                    <Typography.Text
+                      editable={
+                        editUser && {
+                          onChange: (e) => {
+                            let r = { ...row };
+                            r.email = e;
+                            setRow(r);
+                          },
+                          text: row?.email,
+                        }
+                      }
+                    >
+                      {row?.email}
+                    </Typography.Text>
+                  )}
                 </div>
-                
+
+                <div className="flex flex-row items-center space-x-10">
+                  <PhoneOutlined className="text-gray-400" />
+                  {!editUser && (
+                    <div className="text-sm ">{row?.telephone} </div>
+                  )}
+                  {editUser && (
+                    <Typography.Text
+                      editable={
+                        editUser && {
+                          onChange: (e) => {
+                            let r = { ...row };
+                            r.telephone = e;
+                            setRow(r);
+                          },
+                          text: row?.telephone,
+                        }
+                      }
+                    >
+                      {row?.telephone}
+                    </Typography.Text>
+                  )}
+                </div>
+                <div className="flex flex-row items-center space-x-10">
+                  <UsersIcon className="h-4 w-4 text-gray-400" />
+                  {!editUser && (
+                    <div className="text-sm ">
+                      <Typography.Link>
+                        {row?.department?.description}{" "}
+                      </Typography.Link>
+                    </div>
+                  )}
+
+                  {editUser && (
+                    <Select
+                      // mode="multiple"
+                      // allowClear
+                      style={{ width: "100%" }}
+                      defaultValue={row?.department?._id}
+                      placeholder="Please select"
+                      onChange={(value) => {
+                        let newDep = dpts?.filter((d) => d?._id === value);
+
+                        let r = { ...row };
+                        r.department = newDep[0];
+                        setRow(r);
+                      }}
+                    >
+                      {dpts?.map((dpt) => {
+                        return (
+                          <Select.Option key={dpt._id} value={dpt._id}>
+                            {dpt.description}
+                          </Select.Option>
+                        );
+                      })}
+                    </Select>
+                  )}
+                </div>
               </div>
             </div>
 
             {/* Reset password */}
-            {/* {user?.permissions?.canEditUsers && (
+            {user?.permissions?.canEditUsers && (
               <div className="bg-white ring-1 ring-gray-100 rounded shadow p-5">
                 <div className="text-xl font-semibold mb-5 flex flex-row justify-between items-center">
                   <div>Reset password</div>
@@ -595,127 +706,173 @@ export default function page({ params }) {
                   </Form.Item>
                 </Form>
               </div>
-            )} */}
+            )}
           </div>
 
           {/* Transactions */}
-          <div className="col-span-2 flex flex-col space-y-5 p-5">
-            <PermissionsTable
-              canApproveRequests={row?.permissions?.canApproveRequests}
-              canCreateRequests={row?.permissions?.canCreateRequests}
-              canEditRequests={row?.permissions?.canEditRequests}
-              canViewRequests={row?.permissions?.canViewRequests}
-              canApprovePaymentRequests={row?.permissions?.canApprovePaymentRequests}
-              canCreatePaymentRequests={row?.permissions?.canCreatePaymentRequests}
-              canEditPaymentRequests={row?.permissions?.canEditPaymentRequests}
-              canViewPaymentRequests={row?.permissions?.canViewPaymentRequests}
-              canApproveTenders={row?.permissions?.canApproveTenders}
-              canCreateTenders={row?.permissions?.canCreateTenders}
-              canEditTenders={row?.permissions?.canEditTenders}
-              canViewTenders={row?.permissions?.canViewTenders}
-              canApproveBids={row?.permissions?.canApproveBids}
-              canCreateBids={row?.permissions?.canCreateBids}
-              canEditBids={row?.permissions?.canEditBids}
-              canViewBids={row?.permissions?.canViewBids}
-              canApproveContracts={row?.permissions?.canApproveContracts}
-              canCreateContracts={row?.permissions?.canCreateContracts}
-              canEditContracts={row?.permissions?.canEditContracts}
-              canViewContracts={row?.permissions?.canViewContracts}
-              canApprovePurchaseOrders={
-                row?.permissions?.canApprovePurchaseOrders
-              }
-              canCreatePurchaseOrders={
-                row?.permissions?.canCreatePurchaseOrders
-              }
-              canEditPurchaseOrders={
-                row?.permissions?.canEditPurchaseOrders
-              }
-              canViewPurchaseOrders={
-                row?.permissions?.canViewPurchaseOrders
-              }
-              canApproveVendors={row?.permissions?.canApproveVendors}
-              canCreateVendors={row?.permissions?.canCreateVendors}
-              canEditVendors={row?.permissions?.canEditVendors}
-              canViewVendors={row?.permissions?.canViewVendors}
-              canApproveUsers={row?.permissions?.canApproveUsers}
-              canCreateUsers={row?.permissions?.canCreateUsers}
-              canEditUsers={row?.permissions?.canEditUsers}
-              canViewUsers={row?.permissions?.canViewUsers}
-              canApproveDashboard={row?.permissions?.canApproveDashboard}
-              canCreateDashboard={row?.permissions?.canCreateDashboard}
-              canEditDashboard={row?.permissions?.canEditDashboard}
-              canViewDashboard={row?.permissions?.canViewDashboard}
-              handleSetCanView={setCanView}
-              handleSetCanCreated={setCanCreated}
-              handleSetCanEdit={setCanEdit}
-              handleSetCanApprove={setCanApprove}
+          <div className="col-span-2 flex flex-col space-y-5 bg-white ring-1 ring-gray-100 rounded shadow p-10 ">
+            <Segmented
+              block
+              size="large"
+              options={[
+                {
+                  label: "Permissions",
+                  value: "Permissions",
+                  icon: <BarsOutlined />,
+                },
+                {
+                  label: "Requests History",
+                  value: "Requests History",
+                  icon: <FieldTimeOutlined />,
+                },
+              ]}
+              onChange={setSegment}
             />
-            <div className="bg-white rounded-3xl px-5 pb-10">
-              <div className="text-md font-semibold my-5 flex flex-row justify-between items-center">
-                <div>Approval permissions</div>
-              </div>
-              {row && (
-                <Form className="w-full">
-                  <Form.Item
-                    name="canApproveAsHod"
-                  >
-                    <div className="flex w-full items-center justify-between">
-                      <div>
-                        <h6 className="text-[13px] text-[#707C95] my-2">Can approve as a Head of department</h6>
-                        <small className="text-[12px] text-[#95A1B3]">Perfom more action on request on this user</small>
-                      </div>
-                      <div className="permission">
-                        <Switch checked={row?.permissions?.canApproveAsHod} onChange={(checked) => {setCanApproveAsHod(checked)}} />
-                      </div>
-                      
-                    </div>
-                  </Form.Item>
-                  <Form.Item
-                    name="canApproveAsHof"
-                  >
-                    <div className="flex w-full items-center justify-between">
-                      <div>
-                        <h6 className="text-[13px] text-[#707C95] my-2">Can approve as a Head of finance</h6>
-                        <small className="text-[12px] text-[#95A1B3]">Perfom more action on request on this user</small>
-                      </div>
-                      <div className="permission">
-                        <Switch checked={row?.permissions?.canApproveAsHof} onChange={(checked) => {setCanApproveAsHof(checked)}} />
-                      </div>
-                    </div>
-                  </Form.Item>
-                  <Form.Item
-                    name="canApproveAsPM"
-                  >
-                    <div className="flex w-full items-center justify-between">
-                      <div>
-                        <h6 className="text-[13px] text-[#707C95] my-2">Can approve as a Procurement manager</h6>
-                        <small className="text-[12px] text-[#95A1B3]">Perfom more action on request on this user</small>
-                      </div>
-                      <div className="permission">
-                        <Switch checked={row?.permissions?.canApproveAsPM} onChange={(checked) => {setCanApproveAsPM(checked)}} />
-                      </div>
-                    </div>
-                  </Form.Item>
+            {segment === "Permissions" && (
+              <div className="p-3 overflow-y-scroll h-[560px]">
+                <div className="text-md font-semibold mb-5 flex flex-row justify-between items-center">
+                  <div>Module access permissions</div>
+                </div>
+                {row && (
+                  <PermissionsTable
+                    canApproveRequests={row?.permissions?.canApproveRequests}
+                    canCreateRequests={row?.permissions?.canCreateRequests}
+                    canEditRequests={row?.permissions?.canEditRequests}
+                    canViewRequests={row?.permissions?.canViewRequests}
+                    canApprovePaymentRequests={row?.permissions?.canApprovePaymentRequests}
+                    canCreatePaymentRequests={row?.permissions?.canCreatePaymentRequests}
+                    canEditPaymentRequests={row?.permissions?.canEditPaymentRequests}
+                    canViewPaymentRequests={row?.permissions?.canViewPaymentRequests}
+                    canApproveTenders={row?.permissions?.canApproveTenders}
+                    canCreateTenders={row?.permissions?.canCreateTenders}
+                    canEditTenders={row?.permissions?.canEditTenders}
+                    canViewTenders={row?.permissions?.canViewTenders}
+                    canApproveBids={row?.permissions?.canApproveBids}
+                    canCreateBids={row?.permissions?.canCreateBids}
+                    canEditBids={row?.permissions?.canEditBids}
+                    canViewBids={row?.permissions?.canViewBids}
+                    canApproveContracts={row?.permissions?.canApproveContracts}
+                    canCreateContracts={row?.permissions?.canCreateContracts}
+                    canEditContracts={row?.permissions?.canEditContracts}
+                    canViewContracts={row?.permissions?.canViewContracts}
+                    canApprovePurchaseOrders={
+                      row?.permissions?.canApprovePurchaseOrders
+                    }
+                    canCreatePurchaseOrders={
+                      row?.permissions?.canCreatePurchaseOrders
+                    }
+                    canEditPurchaseOrders={
+                      row?.permissions?.canEditPurchaseOrders
+                    }
+                    canViewPurchaseOrders={
+                      row?.permissions?.canViewPurchaseOrders
+                    }
+                    canApproveVendors={row?.permissions?.canApproveVendors}
+                    canCreateVendors={row?.permissions?.canCreateVendors}
+                    canEditVendors={row?.permissions?.canEditVendors}
+                    canViewVendors={row?.permissions?.canViewVendors}
+                    canApproveUsers={row?.permissions?.canApproveUsers}
+                    canCreateUsers={row?.permissions?.canCreateUsers}
+                    canEditUsers={row?.permissions?.canEditUsers}
+                    canViewUsers={row?.permissions?.canViewUsers}
+                    canApproveDashboard={row?.permissions?.canApproveDashboard}
+                    canCreateDashboard={row?.permissions?.canCreateDashboard}
+                    canEditDashboard={row?.permissions?.canEditDashboard}
+                    canViewDashboard={row?.permissions?.canViewDashboard}
+                    handleSetCanView={setCanView}
+                    handleSetCanCreated={setCanCreated}
+                    handleSetCanEdit={setCanEdit}
+                    handleSetCanApprove={setCanApprove}
+                  />
+                )}
 
-                  <Form.Item
-                    name="canApproveAsLegal"
-                  >
-                    <div className="permission flex w-full items-center justify-between">
+                <div className="text-md font-semibold my-5 flex flex-row justify-between items-center">
+                  <div>Approval permissions</div>
+                </div>
+                {row && (
+                  <Form>
+                    <Form.Item
+                      name="canApproveAsHod"
+                      label="Can approve as a Head of department"
+                    >
+                      <Checkbox
+                        defaultChecked={row?.permissions?.canApproveAsHod}
+                        onChange={(e) => setCanApproveAsHod(e.target.checked)}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      name="canApproveAsHof"
+                      label="Can approve as a Head of finance"
+                    >
+                      <Checkbox
+                        defaultChecked={row?.permissions?.canApproveAsHof}
+                        onChange={(e) => setCanApproveAsHof(e.target.checked)}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      name="canApproveAsPM"
+                      label="Can approve as a Procurement manager"
+                    >
+                      <Checkbox
+                        defaultChecked={row?.permissions?.canApproveAsPM}
+                        onChange={(e) => setCanApproveAsPM(e.target.checked)}
+                      />
+                    </Form.Item>
+
+                    <Form.Item
+                      name="canApproveAsLegal"
+                      label="Can approve as a Legal officer"
+                    >
+                      <Checkbox
+                        defaultChecked={row?.permissions?.canApproveAsLegal}
+                        onChange={(e) => setCanApproveAsLegal(e.target.checked)}
+                      />
+                    </Form.Item>
+                  </Form>
+                )}
+              </div>
+            )}
+            {segment === "Requests History" && (
+              <div className="p-3 overflow-y-scroll h-[560px]">
+                {usersRequests?.map((request) => {
+                  return (
+                    <div
+                      key={request?._id}
+                      className="grid grid-cols-3 ring-1 ring-gray-200 rounded my-3 p-3 text-gray-700"
+                    >
                       <div>
-                        <h6 className="text-[13px] text-[#707C95] my-2">Can approve as a Legal officer</h6>
-                        <small className="text-[12px] text-[#95A1B3]">Perfom more action on request on this user</small>
+                        <div className="text-gray-500 font-semibold mb-2">
+                          Request #
+                        </div>
+                        <div className="flex-row  flex items-center">
+                          <div>
+                            <FileTextOutlined className="h-4 w-4" />
+                          </div>{" "}
+                          <div>{request?.number}</div>
+                        </div>
                       </div>
-                      <div className="permission">
-                        <Switch checked={row?.permissions?.canApproveAsLegal} onChange={(checked) => {setCanApproveAsLegal(checked)}} />
+                      <div>
+                        <div className="text-gray-500 font-semibold mb-2">
+                          Title
+                        </div>
+                        <div>{request?.title}</div>
+                      </div>
+                      <div>
+                        <div className="text-gray-500 font-semibold mb-2">
+                          Status
+                        </div>
+                        <div>
+                          <Tag color="gold">{request.status}</Tag>
+                        </div>
                       </div>
                     </div>
-                  </Form.Item>
-                </Form>
-              )}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
