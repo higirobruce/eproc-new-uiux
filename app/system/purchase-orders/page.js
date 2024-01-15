@@ -903,7 +903,7 @@ export default function PurchaseOrders() {
                         )}
 
                         <button
-                          className="bg-[#1677FF] border-none px-3 py-2 rounded-lg text-[11px] font-semibold text-white"
+                          className="bg-[#1677FF] border-none px-3 py-2 rounded-lg text-[11px] font-semibold text-white cursor-pointer"
                           onClick={() => createPaymentRequest(po)}
                         >
                           Request Payment

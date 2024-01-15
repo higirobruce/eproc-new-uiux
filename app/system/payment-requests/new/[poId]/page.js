@@ -19,6 +19,10 @@ import { ArrowLeftOutlined, SaveOutlined } from "@ant-design/icons";
 import UploadPaymentReq from "@/app/components/uploadPaymentReq";
 import { resolve } from "styled-jsx/css";
 import { reject } from "lodash";
+import { MdAccountBalance } from "react-icons/md";
+import { FaMobileAlt } from "react-icons/fa";
+import Link from 'next/link';
+
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
@@ -113,6 +117,12 @@ export default function NewPaymentRequest({ params }) {
   let [poVal, setPoVal] = useState(0);
   let [totalPaymentVal, setTotalPaymentVal] = useState(0);
   let [totalPaid, setTotalPaid] = useState(0);
+  const [bankPay, setBankPay] = useState(true);
+  let [bankName, setBankName] = useState("");
+  let [accountName, setAccountName] = useState("");
+  let [accountNumber, setAccountNumber] = useState("");
+  let [phoneName, setPhoneName] = useState("");
+  let [phoneNumber, setPhoneNumber] = useState("");
 
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -243,9 +253,9 @@ export default function NewPaymentRequest({ params }) {
         type: "tween",
         ease: "circOut",
       }}
-      className="flex flex-col mx-10 transition-opacity ease-in-out duration-1000 py-5 flex-1 space-y-3 h-full"
+      className="flex flex-col transition-opacity ease-in-out duration-1000 py-5 flex-1 space-y-3 mt-6 h-screen pb-10"
     >
-      <div className="flex flex-row justify-between items-center">
+      {/* <div className="flex flex-row justify-between items-center">
         {contextHolder}
         <div className="flex flex-row space-x-10 items-center">
           <div>
@@ -263,120 +273,118 @@ export default function NewPaymentRequest({ params }) {
             New Payment Request for PO {po?.number}
           </div>
         </div>
-      </div>
+      </div> */}
+      <div className="request mr-6 bg-white h-[calc(100vh-165px)] rounded-lg mb-10 px-5 overflow-y-auto py-2 flex flex-col justify-between pb-8 md:mr-5">
+        <div className="flex flex-col">
+          <div className="flex items-start gap-x-5">
+            <h4 className="text-[21px] text-[#344767] mb-3">
+              New Payment Request
+            </h4>
+            <sup className="bg-[#F1F3FF] px-3 py-1 rounded-full mt-2 text-[#1677FF] font-semibold">
+              EXTERNAL
+            </sup>
+          </div>
+          <small className="text-[13.5px] text-[#8392AB]">
+            Please fill the form and submit the form below to create your
+            payment request
+          </small>
+        </div>
+        <div className="grid lg:grid-cols-3 gap-x-10 mt-5 items-start justify-start h-full">
+          <div className="lg:col-span-2">
+            <h5 className="text-[18px] text-[#344767] ml-3 mb-4">
+              Request Details
+            </h5>
 
-      <div className="grid md:grid-cols-5 gap-1">
-        <div className="md:col-span-4 flex flex-col ring-1 ring-gray-200 p-3 rounded shadow-md bg-white  overflow-y-scroll">
-          <Form
-            className="mt-5"
-            // layout="horizontal"
-            form={form}
-            initialValues={{
-              currency: currency,
-            }}
-            // onFinish={handleUpload}
-          >
-            <div className="grid md:grid-cols-3 gap-10">
-              {/* Form grid 1 */}
-              <div>
-                {/* Title */}
-                <div>
-                  <div> Request title</div>
-                  <div>
-                    <Form.Item
-                      name="title"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Request title is required",
-                        },
-                      ]}
-                    >
-                      <Input
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        placeholder="How would you name your request?"
-                      />
-                    </Form.Item>
-                  </div>
-                </div>
-
-                {/* Description */}
-                <div>
-                  <div>Comment/additional note</div>
-                  <div>
-                    <Form.Item
-                      name="description"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Request description is required",
-                        },
-                      ]}
-                    >
-                      <Input.TextArea
-                        value={description}
-                        onChange={(e) => {
-                          setDescription(e.target.value);
-                        }}
-                        placeholder="Describe your request"
-                      />
-                    </Form.Item>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                {/* Amount */}
-                <div className="flex flex-col">
-                  <div>{`Amount due`}</div>
-
-                  <Form.Item>
-                    <Form.Item
-                      name="amount"
-                      noStyle
-                      rules={[
-                        {
-                          required: true,
-                          message: "Amount is required",
-                        },
-                        {
-                          validator(rule, value) {
-                            return new Promise((resolve, reject) => {
-                              if (
-                                (poVal > -1 &&
-                                  value >
-                                    getPoTotalVal()?.grossTotal -
-                                      totalPaymentVal -
-                                      value) ||
-                                (poVal == -1 &&
-                                  value > getPoTotalVal()?.grossTotal)
-                              ) {
-                                reject(
-                                  "Requested amount should not exceed the PO Value!"
-                                );
-                              } else {
-                                resolve();
-                              }
-                            });
-                          },
-                        },
-                      ]}
-                    >
-                      <InputNumber
-                        style={{ width: "100%" }}
-                        addonBefore={
+            <div className="gap-1 grid-cols-1">
+              <div className="flex flex-col p-3">
+                <Form
+                  // layout="horizontal"
+                  form={form}
+                  initialValues={{
+                    currency: currency,
+                  }}
+                  // onFinish={handleUpload}
+                >
+                  <div className="grid md:grid-cols-2 gap-x-10">
+                    {/* Form grid 1 */}
+                    <div>
+                      {/* Title */}
+                      <div>
+                        <div className="text-[14px] text-[#344767] mb-2"> Request title</div>
+                        <div>
                           <Form.Item
-                            noStyle
-                            name="currencyP"
+                            name="title"
                             rules={[
+                              {
+                                required: true,
+                                message: "Request title is required",
+                              },
+                            ]}
+                          >
+                            <Input
+                              value={title}
+                              className="h-11"
+                              onChange={(e) => setTitle(e.target.value)}
+                              placeholder="How would you name your request?"
+                            />
+                          </Form.Item>
+                        </div>
+                      </div>
+
+                      {/* Description */}
+                      <div>
+                        <div className="text-[14px] text-[#344767] mb-2">Comment/additional note</div>
+                        <div>
+                          <Form.Item
+                            name="description"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Request description is required",
+                              },
+                            ]}
+                          >
+                            <Input.TextArea
+                              value={description}
+                              rows={5}
+                              onChange={(e) => {
+                                setDescription(e.target.value);
+                              }}
+                              placeholder="Describe your request"
+                            />
+                          </Form.Item>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      {/* Amount */}
+                      <div className="flex flex-col">
+                        <div className="text-[14px] text-[#344767] mb-2">{`Amount due`}</div>
+
+                        <Form.Item>
+                          <Form.Item
+                            name="amount"
+                            noStyle
+                            rules={[
+                              {
+                                required: true,
+                                message: "Amount is required",
+                              },
                               {
                                 validator(rule, value) {
                                   return new Promise((resolve, reject) => {
-                                    value = currency;
-                                    if (value !== po?.items[0]?.currency) {
+                                    if (
+                                      (poVal > -1 &&
+                                        value >
+                                          getPoTotalVal()?.grossTotal -
+                                            totalPaymentVal -
+                                            value) ||
+                                      (poVal == -1 &&
+                                        value > getPoTotalVal()?.grossTotal)
+                                    ) {
                                       reject(
-                                        "The currency can not differ from the PO currency!"
+                                        "Requested amount should not exceed the PO Value!"
                                       );
                                     } else {
                                       resolve();
@@ -386,141 +394,334 @@ export default function NewPaymentRequest({ params }) {
                               },
                             ]}
                           >
-                            {currency && (
-                              <Select
-                                onChange={(value) => setCurrency(value)}
-                                defaultValue={currency}
-                                value={currency}
-                                options={[
-                                  {
-                                    value: "RWF",
-                                    label: "RWF",
-                                    key: "RWF",
-                                  },
-                                  {
-                                    value: "USD",
-                                    label: "USD",
-                                    key: "USD",
-                                  },
-                                  {
-                                    value: "EUR",
-                                    label: "EUR",
-                                    key: "EUR",
-                                  },
-                                ]}
-                              ></Select>
-                            )}
+                            <InputNumber
+                              style={{ width: "100%" }}
+                              className="h-11"
+                              addonBefore={
+                                <Form.Item
+                                  noStyle
+                                  name="currencyP"
+                                  rules={[
+                                    {
+                                      validator(rule, value) {
+                                        return new Promise(
+                                          (resolve, reject) => {
+                                            value = currency;
+                                            if (
+                                              value !== po?.items[0]?.currency
+                                            ) {
+                                              reject(
+                                                "The currency can not differ from the PO currency!"
+                                              );
+                                            } else {
+                                              resolve();
+                                            }
+                                          }
+                                        );
+                                      },
+                                    },
+                                  ]}
+                                >
+                                  {currency && (
+                                    <Select
+                                      onChange={(value) => setCurrency(value)}
+                                      defaultValue={currency}
+                                      value={currency}
+                                      size="large"
+                                      options={[
+                                        {
+                                          value: "RWF",
+                                          label: "RWF",
+                                          key: "RWF",
+                                        },
+                                        {
+                                          value: "USD",
+                                          label: "USD",
+                                          key: "USD",
+                                        },
+                                        {
+                                          value: "EUR",
+                                          label: "EUR",
+                                          key: "EUR",
+                                        },
+                                      ]}
+                                    ></Select>
+                                  )}
+                                </Form.Item>
+                              }
+                              value={amount}
+                              onChange={(e) => setAmout(e)}
+                            />
                           </Form.Item>
-                        }
-                        value={amount}
-                        onChange={(e) => setAmout(e)}
-                      />
-                    </Form.Item>
-                  </Form.Item>
-                </div>
-                <div>
-                  <div>Invoice attachement(s)</div>
-                  <UploadPaymentReq files={files} setFiles={setFiles} />
-                </div>
-              </div>
-
-              {/* Form grid 3 */}
-              {user?.userType !== "VENDOR" && (
-                <div>
-                  {/* Budgeted */}
-                  <div>
-                    <div>Budgeted?</div>
-                    <div className="font-semibold">
-                      {po?.request?.budgeted ? "Yes" : "No"}
-                    </div>
-                  </div>
-
-                  {/* Budget Lines */}
-                  {po?.request?.budgetLine && (
-                    // <Form.Item label="Budget Line" name="budgetLine">
-                    //   <Input
-                    //     onChange={(e) => {
-                    //       setBudgetLine(e.target.value);
-                    //     }}
-                    //     placeholder=""
-                    //   />
-                    // </Form.Item>
-
-                    <div className="mt-10">
-                      <div>Budget Line</div>
-                      <div className="font-semibold">
-                        {po?.request?.budgetLine?.description}
+                        </Form.Item>
+                      </div>
+                      <div>
+                        <div className="text-[14px] text-[#344767] mb-2">Invoice attachement(s)</div>
+                        <UploadPaymentReq files={files} setFiles={setFiles} />
                       </div>
                     </div>
-                  )}
+
+                    {/* Form grid 3 */}
+                    {user?.userType !== "VENDOR" && (
+                      <div>
+                        {/* Budgeted */}
+                        <div>
+                          <div className="text-[14px] text-[#344767] mb-2">Budgeted?</div>
+                          <div className="font-semibold">
+                            {po?.request?.budgeted ? "Yes" : "No"}
+                          </div>
+                        </div>
+
+                        {/* Budget Lines */}
+                        {po?.request?.budgetLine && (
+                          // <Form.Item label="Budget Line" name="budgetLine">
+                          //   <Input
+                          //     onChange={(e) => {
+                          //       setBudgetLine(e.target.value);
+                          //     }}
+                          //     placeholder=""
+                          //   />
+                          // </Form.Item>
+
+                          <div className="mt-10">
+                            <div className="text-[14px] text-[#344767] mb-2">Budget Line</div>
+                            <div className="font-semibold">
+                              {po?.request?.budgetLine?.description}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </Form>
+
+                <div className="bg-[#F1F3FF] pb-5 px-10  my-5 rounded">
+                  <div className="flex flex-row space-x-2 items-center text-[#FFD275]">
+                    <LightBulbIcon className="h-7 w-7" />
+                    <h5 className="text-[18px] text-[#FFD275]">Hints</h5>
+                  </div>
+
+                  <div className="flex flex-col space-y-6 my-5">
+                    
+                    <div className="w-full flex justify-between text-gray-700">
+                      <div>Related PO {po?.number} (Total Value): </div>
+                      <div className="font-semibold text-[13px]">
+                        {po?.items[0]?.currency +
+                          " " +
+                          getPoTotalVal().grossTotal?.toLocaleString()}
+                      </div>
+                    </div>
+
+                    <div className="w-full flex justify-between text-gray-700">
+                      <div>Paid Requests' Value: </div>
+                      <div className="font-semibold text-[13px]">
+                        {po?.items[0]?.currency +
+                          " " +
+                          totalPaid?.toLocaleString()}
+                      </div>
+                    </div>
+
+                    <div className="w-full flex justify-between text-gray-700">
+                      <div>Linked Payment Requests' Value: </div>
+                      <div
+                        className={`font-semibold text-[13px]
+                      
+                          ${
+                            amount >
+                              getPoTotalVal().grossTotal - totalPaymentVal &&
+                            "text-red-500"
+                          }
+                      `}
+                      >
+                        {po?.items[0]?.currency +
+                          " " +
+                          (totalPaymentVal + amount)?.toLocaleString()}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
-
-            <Button
-              icon={<SaveOutlined />}
-              type="primary"
-              onClick={() => {
-                form.validateFields().then(() => {
-                  setSubmitting(true);
-                  handleUpload();
-                });
-              }}
-              disabled={submitting}
-            >
-              Save
-            </Button>
-          </Form>
-
-          <div className="bg-gray-50 py-3 px-10  my-5 rounded">
-            <div className="flex flex-row items-center text-blue-500">
-              <LightBulbIcon className="h-8 w-8" />
-              <div>
-                <Typography.Title level={5}>Hints</Typography.Title>
               </div>
             </div>
-
-            <div className="flex flex-col space-y-3 w-1/2 mt-5">
-              <Typography.Text>
-                <div className="text-gray-700 grid grid-cols-2">
-                  <div>Related PO {po?.number} (Total Value): </div>
-                  <div className="font-semibold">
-                    {po?.items[0]?.currency +
-                      " " +
-                      getPoTotalVal().grossTotal?.toLocaleString()}
-                  </div>
-                </div>
-              </Typography.Text>
-
-              <Typography.Text>
-                <div className="text-gray-700 grid grid-cols-2">
-                  <div>Paid Requests' Value: </div>
-                  <div className="font-semibold">
-                    {po?.items[0]?.currency + " " + totalPaid?.toLocaleString()}
-                  </div>
-                </div>
-              </Typography.Text>
-
-              <Typography.Text>
-                <div className="text-gray-700 grid grid-cols-2">
-                  <div>Linked Payment Requests' Value: </div>
-                  <div
-                    className={`font-semibold
-                  
-                      ${
-                        amount > getPoTotalVal().grossTotal - totalPaymentVal &&
-                        "text-red-500"
-                      }
-                  `}
+          </div>
+          <div>
+            <div className="mr-5 lg:col-span-1 bg-[#EFF4F8] pb-8 pt-3 px-10">
+              <h5 className="text-[18px] text-[#344767] mb-7">Payment Details</h5>
+              <div className="flex items-center">
+                <Form.Item
+                  name="bankPay"
+                  valuePropName="checked"
+                  // wrapperCol={{ offset: 8, span: 16 }}
+                >
+                  <Radio.Group
+                    onChange={(e) => {
+                      setBankPay(e.target.value);
+                      if (e.target.value === false) setBudgetLine(null);
+                    }}
+                    value={bankPay}
+                    className="my-2"
                   >
-                    {po?.items[0]?.currency +
-                      " " +
-                      (totalPaymentVal + amount)?.toLocaleString()}
+                    <div className="flex gap-x-10">
+                      <div className="my-1 border-t-2 border-x-2 border-[#BFC5C5]">
+                        <Radio value={true} className="flex gap-x-1 items-center">
+                          <MdAccountBalance /> &nbsp;<span>Bank Info</span>
+                        </Radio>
+                      </div>
+                      <div className="my-1 border-2 border-[#BFC5C5]">
+                        <Radio
+                          value={false}
+                          className="flex gap-x-1 items-center"
+                        >
+                          <FaMobileAlt /> &nbsp;<span>Mobile Pay</span>
+                        </Radio>
+                      </div>
+                    </div>
+                  </Radio.Group>
+                </Form.Item>
+              </div>
+              {bankPay ? (
+                <>
+                  <div>
+                    <div className="text-[14px] text-[#344767] mb-2">
+                      Bank Name
+                    </div>
+                    <div>
+                      <Form.Item
+                        name="bankName"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Request Bank name is required",
+                          },
+                        ]}
+                      >
+                        <Input
+                          value={bankName}
+                          className="h-11"
+                          onChange={(e) => setBankName(e.target.value)}
+                          placeholder="Type in Bank Name"
+                        />
+                      </Form.Item>
+                    </div>
                   </div>
-                </div>
-              </Typography.Text>
+                  <div>
+                    <div className="text-[14px] text-[#344767] mb-2">
+                      Account Name
+                    </div>
+                    <div>
+                      <Form.Item
+                        name="accountName"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Request account name is required",
+                          },
+                        ]}
+                      >
+                        <Input
+                          value={accountName}
+                          className="h-11"
+                          onChange={(e) => setAccountName(e.target.value)}
+                          placeholder="Type in User account name"
+                        />
+                      </Form.Item>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-[14px] text-[#344767] mb-2">
+                      Account Number
+                    </div>
+                    <div>
+                      <Form.Item
+                        name="accountNumber"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Request account number is required",
+                          },
+                        ]}
+                      >
+                        <Input
+                          value={accountNumber}
+                          className="h-11"
+                          onChange={(e) => setAccountNumber(e.target.value)}
+                          placeholder="Type in User account number"
+                        />
+                      </Form.Item>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div>
+                    <div className="text-[14px] text-[#344767] mb-2">
+                      Phone Name
+                    </div>
+                    <div>
+                      <Form.Item
+                        name="phoneName"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Request Phone name is required",
+                          },
+                        ]}
+                      >
+                        <Input
+                          value={phoneName}
+                          className="h-11"
+                          onChange={(e) => setPhoneName(e.target.value)}
+                          placeholder="Type in Phone name"
+                        />
+                      </Form.Item>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-[14px] text-[#344767] mb-2">
+                      Phone Number
+                    </div>
+                    <div>
+                      <Form.Item
+                        name="phoneNumber"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Request Phone number required",
+                          },
+                        ]}
+                      >
+                        <Input
+                          value={phoneNumber}
+                          className="h-11"
+                          onChange={(e) => setPhoneNumber(e.target.value)}
+                          placeholder="Type in phone number"
+                        />
+                      </Form.Item>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+            <h5 className="text-[16px] text-[#344767] pt-5">Related Document</h5>
+            <div className="flex items-center gap-x-2">
+              <small className="text-[134x] text-[#344767]">Purchase Order:</small>
+              <Link className="text-[#1677FF] text-[14px]" href={'/system/purchase-orders/' + po?.number}>{po?.number}</Link>
             </div>
           </div>
+        </div>
+        <div className="flex w-full justify-end items-end self-end">
+          <button
+            onClick={() => {
+              form.validateFields().then(() => {
+                setSubmitting(true);
+                handleUpload();
+              });
+            }}
+            disabled={submitting}
+            className="flex item-center border-none text-[16px] text-white gap-x-4 bg-[#0065DD] rounded-lg py-3 px-6"
+          >
+            <SaveOutlined className="font-[19px]" />
+            Save
+          </button>
         </div>
       </div>
     </motion.div>

@@ -167,22 +167,34 @@ const SideMenu = ({ setScreen, screen, user }) => {
         {
           label: "Tenders",
           key: "system/tenders",
-          icon: <MessageOutlined />,
+          icon: <MessageOutlined size={28}
+          className={`text-[${
+            current == `system/tenders` ? `#1677FF` : `#95A1B3`
+          }]`} />,
         },
         {
           label: "My Contracts",
           key: "system/contracts",
-          icon: <FileDoneOutlined />,
+          icon: <FileDoneOutlined size={28}
+          className={`text-[${
+            current == `system/contracts` ? `#1677FF` : `#95A1B3`
+          }]`} />,
         },
         {
           label: "My Purchase Orders",
           key: "system/purchase-orders",
-          icon: <OrderedListOutlined />,
+          icon: <OrderedListOutlined size={28}
+          className={`text-[${
+            current == `system/purchase-orders` ? `#1677FF` : `#95A1B3`
+          }]`} />,
         },
         {
           label: "My Payment requests",
           key: "system/payment-requests",
-          icon: <DollarOutlined />,
+          icon: <DollarOutlined size={28}
+          className={`text-[${
+            current == `system/payment-requests` ? `#1677FF` : `#95A1B3`
+          }]`} />,
         },
         // {
         //   key: "logout",
