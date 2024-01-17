@@ -437,22 +437,19 @@ export default function page({ params }) {
               <div className="flex items-center gap-x-5 my-2">
                 <LuUser className="text-[#ADB6BF]" />
                 <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
-                  {/* {row?.firstName} {row?.lastName} */}
-                  AZ_MANAGER
+                  {row?.firstName} {row?.lastName}
                 </h6>
               </div>
               <div className="flex items-center gap-x-5 my-2">
                 <MdOutlineAlternateEmail className="text-[#ADB6BF]" />
                 <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
-                  {/* {row?.department?.description} */}
-                  AZ_TECH
+                  {row?.department?.description}
                 </h6>
               </div>
               <div className="flex items-center gap-x-5 my-2">
                 <FaFirefoxBrowser className="text-[#ADB6BF]" />
                 <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
-                  {/* {row?.telephone} */}
-                  www.shapeherd.rw
+                  {row?.telephone}
                 </h6>
               </div>
             </div>
@@ -461,15 +458,13 @@ export default function page({ params }) {
               <div className="flex items-center gap-x-5 my-2">
                 <MdOutlineAlternateEmail className="text-[#ADB6BF]" />
                 <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
-                  ericnziza+AZ_TECH@gmail.com
-                  {/* {row?.email} */}
+                  {row?.email}
                 </h6>
               </div>
               <div className="flex items-center gap-x-5 my-2">
                 <MdPhoneAndroid className="text-[#ADB6BF]" />
                 <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
-                  {/* {row?.telephone} */}
-                  +191919191919
+                  {row?.telephone}
                 </h6>
               </div>
             </div>
