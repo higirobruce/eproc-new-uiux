@@ -316,15 +316,15 @@ const PaymentRequestsTable = ({
       align: "center",
       sorter: (a, b) =>
         getHighLevelStatus(
-          a?.category?.charAt(0).toUpperCase() + a?.category.slice(1)
+          a?.category?.charAt(0).toUpperCase() + a?.category?.slice(1)
         ).localeCompare(
           getHighLevelStatus(
-            b?.category?.charAt(0).toUpperCase() + b?.category.slice(1)
+            b?.category?.charAt(0).toUpperCase() + b?.category?.slice(1)
           )
         ),
       render: (_, record) => (
         <Tag color={`${record?.category === "internal" ? "blue" : "magenta"}`}>
-          {record?.category?.charAt(0).toUpperCase() + record?.category.slice(1)}
+          {record?.category?.charAt(0).toUpperCase() + record?.category?.slice(1)}
         </Tag>
       ),
     },
