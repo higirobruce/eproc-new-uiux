@@ -1,6 +1,7 @@
 'use client'
 import { Checkbox, Table } from "antd";
 import { Switch } from 'antd';
+import { usePathname } from 'next/navigation'
 
 function PermissionsTable({
   canViewRequests,
@@ -45,6 +46,7 @@ function PermissionsTable({
   handleSetCanApprove,
   canNotEdit,
 }) {
+  const pathname = usePathname();
   const columns = [
     {
       title: "Module",
@@ -200,8 +202,8 @@ function PermissionsTable({
   
   return (
     <div className="flex flex-col gap-5">
-      <h5 className="text-[25px] text-[#FFF] my-0">Overview</h5>
-      <div className="bg-white rounded-3xl px-5 pb-10">
+      {pathname != '/system/profile' && <h5 className="text-[25px] text-[#FFF] my-0">Overview</h5>}
+      <div className={`bg-white ${pathname != '/system/profile' ? 'rounded-3xl' : 'rounded-lg'} px-5 pb-10`}>
         <h6 className="mb-3 pb-0 text-[15px] text-[#263238]">Module access permissions</h6>
         <small className="text-[#95A1B3] text-[14px]">Choose how you want permissions granted to any specific internal user with this permission settings</small>
         <div className="grid grid-cols-2 md:pr-10 border-b-2 border-x-0 border-t-0 border-red-500">

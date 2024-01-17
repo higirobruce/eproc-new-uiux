@@ -47,11 +47,6 @@ import { useRouter } from "next/navigation";
 import UploadRDCerts from "@/app/components/uploadRDBCerts";
 import UploadVatCerts from "@/app/components/uploadVatCerts";
 import { v4 } from "uuid";
-import { LuUser } from "react-icons/lu";
-import {
-  MdOutlineAlternateEmail,
-  MdPhoneAndroid
-} from "react-icons/md";
 
 export default function page() {
   let router = useRouter();
@@ -88,7 +83,6 @@ export default function page() {
   const [rdbSelected, setRDBSelected] = useState(false);
   const [vatSelected, setVatSelected] = useState(false);
   const [fileUploadStatus, setFileUploadStatus] = useState("");
-  const [tab, setTab] = useState(0);
 
   const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -156,265 +150,299 @@ export default function page() {
 
   function buildUser() {
     return (
-      <div className="payment-request flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-screen pb-1 mb-32 overflow-y-auto">
+      <div className="flex flex-col  transition-opacity ease-in-out duration-1000 px-10 py-5 flex-1 space-y-3 h-full overflow-x-scroll">
         {contextHolder}
-          <div className="grid md:grid-cols-3 gap-5 mb-16">
+        <div className="flex flex-col space-y-5">
+          <div className="grid md:grid-cols-3 gap-5">
+            {/* Data */}
             <div className="flex flex-col space-y-5">
-              <div className="bg-white rounded-lg shadow px-5 pb-7">
-                <h5 className="text-[17px] text-[#263238]">General Information</h5>
-                <div className="flex flex-col gap-y-4">
-                  <small className="text-[13px] text-[#ADB6BF]">ABOUT</small>
-                  <div className="flex items-center gap-x-5 my-2">
-                    <LuUser className="text-[#ADB6BF]" />
-                    <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
-                      {user?.firstName} {user?.lastName}
-                    </h6>
-                    <Tag color="cyan">
-                      {user?.title ? user?.title : user?.number}
-                    </Tag>
+              {/* General Infromation */}
+              <div className="bg-white ring-1 ring-gray-100 rounded shadow p-5">
+                <div className="text-xl font-semibold mb-5 flex flex-row justify-between items-center">
+                  <div>General Information</div>
+                </div>
+                <div className="flex flex-col space-y-2">
+                  <div className="flex flex-row items-center space-x-10">
+                    <UserIcon className="text-gray-400 h-4 w-4" />
+                    <div className="text-sm flex flex-row items-center space-x-2">
+                      <div>
+                        {user?.firstName} {user?.lastName}
+                      </div>{" "}
+                      <div>
+                        <Tag color="cyan">
+                          {user?.title ? user?.title : user?.number}
+                        </Tag>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-x-5 my-2">
-                    <MdOutlineAlternateEmail className="text-[#ADB6BF]" />
-                    <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
-                      {user?.email}
-                    </h6>
+                  <div className="flex flex-row items-center space-x-10">
+                    <EnvelopeIcon className="h-4 w-4 text-gray-400" />
+                    <div className="text-sm ">{user?.email} </div>
                   </div>
-                  <div className="flex items-center gap-x-5 my-2">
-                    <MdPhoneAndroid className="text-[#ADB6BF]" />
-                    <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
-                      {user?.telephone}
-                    </h6>
+
+                  <div className="flex flex-row items-center space-x-10">
+                    <PhoneOutlined className="text-gray-400" />
+                    <div className="text-sm ">{user?.telephone} </div>
                   </div>
-                  <div className="flex items-center gap-x-5 my-2">
-                    <MdOutlineAlternateEmail className="text-[#ADB6BF]" />
-                    <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
-                      {user?.department?.description}
-                    </h6>
+                  <div className="flex flex-row items-center space-x-10">
+                    <UsersIcon className="h-4 w-4 text-gray-400" />
+                    <div className="text-sm ">
+                      <Typography.Link>
+                        {user?.department?.description}{" "}
+                      </Typography.Link>
+                    </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Reset password */}
+              <div className="bg-white ring-1 ring-gray-100 rounded shadow p-5">
+                <div className="text-xl font-semibold mb-5 flex flex-row justify-between items-center">
+                  <div>Reset password</div>
+                </div>
+                <Form
+                  // {...formItemLayout}
+                  form={form}
+                  name="register"
+                  onFinish={onFinish}
+                  scrollToFirstError
+                  style={{ width: "100%" }}
+                >
+                  <div>
+                    <div>Current password</div>
+                    <Form.Item
+                      name="currentPassword"
+                      // label="Password"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please input your current password!",
+                        },
+                      ]}
+                      hasFeedback
+                    >
+                      <Input.Password />
+                    </Form.Item>
+                  </div>
+
+                  <div>
+                    <div>New password</div>
+                    <Form.Item
+                      name="newPassword"
+                      // label="Password"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please input your new password!",
+                        },
+                        {
+                          pattern: new RegExp("([0-9]\\d*)+"),
+                          message: "Please input at least one digit",
+                        },
+                        {
+                          pattern: new RegExp("([a-zA-Z]\\s*)+"),
+                          message:
+                            "Password should have both small and capital letters",
+                        },
+                        {
+                          pattern: new RegExp(regexPatternSpecialCh, "g"),
+                          message: "Password should have a special character",
+                        },
+                        {
+                          pattern: new RegExp("(.{8,})"),
+                          message: "Password should have atleast 8 characters",
+                        },
+                      ]}
+                      hasFeedback
+                    >
+                      <Input.Password />
+                    </Form.Item>
+                  </div>
+
+                  <div>
+                    <div>Confirm new password</div>
+                    <Form.Item
+                      name="confirmPassword"
+                      // label="Password"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please confirm your password!",
+                        },
+                        ({ getFieldValue }) => ({
+                          validator(_, value) {
+                            if (
+                              !value ||
+                              getFieldValue("newPassword") === value
+                            ) {
+                              return Promise.resolve();
+                            }
+                            return Promise.reject(
+                              new Error(
+                                "The two passwords that you entered do not match!"
+                              )
+                            );
+                          },
+                        }),
+                      ]}
+                      hasFeedback
+                    >
+                      <Input.Password />
+                    </Form.Item>
+                  </div>
+
+                  <Form.Item>
+                    {submitting ? (
+                      <Spin indicator={antIcon} />
+                    ) : (
+                      <div className="flex flex-row items-center justify-between">
+                        <Button type="primary" danger htmlType="submit">
+                          Update my password
+                        </Button>
+                      </div>
+                    )}
+                  </Form.Item>
+                </Form>
               </div>
             </div>
-            {/* Data */}
-            
+
             {/* Transactions */}
             {user?.userType !== "VENDOR" && (
-              <div className="col-span-2 flex flex-col space-y-5 px-5">
-                <div className="bg-white py-3 px-3 rounded my-1">
-                <div className="flex items-center gap-x-14 px-7 bg-[#F5F5F5]">
-                  <button
-                    className={`bg-transparent py-3 my-3 ${
-                      tab == 0
-                        ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238]`
-                        : `border-none text-[#8392AB]`
-                    } text-[14px] cursor-pointer`}
-                    onClick={() => setTab(0)}
-                  >
-                    Account Info
-                  </button>
-                  {/* <button
-                    className={`bg-transparent py-3 my-3 ${
-                      tab == 1
-                        ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238]`
-                        : `border-none text-[#8392AB]`
-                    } text-[14px] cursor-pointer`}
-                    onClick={() => setTab(1)}
-                  >
-                    Activities
-                  </button> */}
-                  <button
-                    className={`bg-transparent py-3 my-3 ${
-                      tab == 2
-                        ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238]`
-                        : `border-none text-[#8392AB]`
-                    } text-[14px] cursor-pointer`}
-                    onClick={() => setTab(2)}
-                  >
-                    Reset Password
-                  </button>
-                </div>
-              </div>
-              {tab == 0 ? (
-                <>
-                  <PermissionsTable
-                    canApproveRequests={user?.permissions?.canApproveRequests}
-                    canCreateRequests={user?.permissions?.canCreateRequests}
-                    canEditRequests={user?.permissions?.canEditRequests}
-                    canViewRequests={user?.permissions?.canViewRequests}
-                    canApprovePaymentRequests={
-                      user?.permissions?.canApprovePaymentRequests
-                    }
-                    canCreatePaymentRequests={
-                      user?.permissions?.canCreatePaymentRequests
-                    }
-                    canEditPaymentRequests={
-                      user?.permissions?.canEditPaymentRequests
-                    }
-                    canViewPaymentRequests={
-                      user?.permissions?.canViewPaymentRequests
-                    }
-                    canApproveTenders={user?.permissions?.canApproveTenders}
-                    canCreateTenders={user?.permissions?.canCreateTenders}
-                    canEditTenders={user?.permissions?.canEditTenders}
-                    canViewTenders={user?.permissions?.canViewTenders}
-                    canApproveBids={user?.permissions?.canApproveBids}
-                    canCreateBids={user?.permissions?.canCreateBids}
-                    canEditBids={user?.permissions?.canEditBids}
-                    canViewBids={user?.permissions?.canViewBids}
-                    canApproveContracts={
-                      user?.permissions?.canApproveContracts
-                    }
-                    canCreateContracts={user?.permissions?.canCreateContracts}
-                    canEditContracts={user?.permissions?.canEditContracts}
-                    canViewContracts={user?.permissions?.canViewContracts}
-                    canApprovePurchaseOrders={
-                      user?.permissions?.canApprovePurchaseOrders
-                    }
-                    canCreatePurchaseOrders={
-                      user?.permissions?.canCreatePurchaseOrders
-                    }
-                    canEditPurchaseOrders={
-                      user?.permissions?.canEditPurchaseOrders
-                    }
-                    canViewPurchaseOrders={
-                      user?.permissions?.canViewPurchaseOrders
-                    }
-                    canApproveVendors={user?.permissions?.canApproveVendors}
-                    canCreateVendors={user?.permissions?.canCreateVendors}
-                    canEditVendors={user?.permissions?.canEditVendors}
-                    canViewVendors={user?.permissions?.canViewVendors}
-                    canApproveUsers={user?.permissions?.canApproveUsers}
-                    canCreateUsers={user?.permissions?.canCreateUsers}
-                    canEditUsers={user?.permissions?.canEditUsers}
-                    canViewUsers={user?.permissions?.canViewUsers}
-                    canApproveDashboard={
-                      user?.permissions?.canApproveDashboard
-                    }
-                    canCreateDashboard={user?.permissions?.canCreateDashboard}
-                    canEditDashboard={user?.permissions?.canEditDashboard}
-                    canViewDashboard={user?.permissions?.canViewDashboard}
-                    handleSetCanView={() => {}}
-                    handleSetCanCreated={() => {}}
-                    handleSetCanEdit={() => {}}
-                    handleSetCanApprove={() => {}}
-                    canNotEdit={true}
-                  />
-                </>
-              ) : (
-                <>
-                  <div className="flex flex-col space-y-5">
-
-                  {/* Reset password */}
-                  <div className="bg-white ring-1 ring-gray-100 rounded shadow p-5">
-                    <div className="text-xl font-semibold mb-5 flex flex-row justify-between items-center">
-                      <div className="pb-3 text-[13px] text-[#344767]">Reset password</div>
+              <div className="col-span-2 flex flex-col space-y-5 bg-white ring-1 ring-gray-100 rounded shadow p-10">
+                <Segmented
+                  block
+                  size="large"
+                  options={[
+                    {
+                      label: "Permissions",
+                      value: "Permissions",
+                      icon: <BarsOutlined />,
+                    },
+                    {
+                      label: "Requests History",
+                      value: "Requests History",
+                      icon: <FieldTimeOutlined />,
+                    },
+                  ]}
+                  onChange={setSegment}
+                />
+                {segment === "Permissions" && (
+                  <div className="flex flex-col space-y-2">
+                    <div className="text-md font-semibold">
+                      Module Access Permissions
                     </div>
-                    <Form
-                      // {...formItemLayout}
-                      form={form}
-                      name="register"
-                      onFinish={onFinish}
-                      scrollToFirstError
-                      style={{ width: "100%" }}
-                    >
-                      <div>
-                        <div className="text-[13px] text-[#344767]">Current password</div>
-                        <Form.Item
-                          name="currentPassword"
-                          // label="Password"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please input your current password!",
-                            },
-                          ]}
-                          hasFeedback
-                        >
-                          <Input.Password placeholder="Current Password" className="h-11 mt-3" />
-                        </Form.Item>
-                      </div>
+                    <PermissionsTable
+                      canApproveRequests={user?.permissions?.canApproveRequests}
+                      canCreateRequests={user?.permissions?.canCreateRequests}
+                      canEditRequests={user?.permissions?.canEditRequests}
+                      canViewRequests={user?.permissions?.canViewRequests}
+                      canApprovePaymentRequests={
+                        user?.permissions?.canApprovePaymentRequests
+                      }
+                      canCreatePaymentRequests={
+                        user?.permissions?.canCreatePaymentRequests
+                      }
+                      canEditPaymentRequests={
+                        user?.permissions?.canEditPaymentRequests
+                      }
+                      canViewPaymentRequests={
+                        user?.permissions?.canViewPaymentRequests
+                      }
+                      canApproveTenders={user?.permissions?.canApproveTenders}
+                      canCreateTenders={user?.permissions?.canCreateTenders}
+                      canEditTenders={user?.permissions?.canEditTenders}
+                      canViewTenders={user?.permissions?.canViewTenders}
+                      canApproveBids={user?.permissions?.canApproveBids}
+                      canCreateBids={user?.permissions?.canCreateBids}
+                      canEditBids={user?.permissions?.canEditBids}
+                      canViewBids={user?.permissions?.canViewBids}
+                      canApproveContracts={
+                        user?.permissions?.canApproveContracts
+                      }
+                      canCreateContracts={user?.permissions?.canCreateContracts}
+                      canEditContracts={user?.permissions?.canEditContracts}
+                      canViewContracts={user?.permissions?.canViewContracts}
+                      canApprovePurchaseOrders={
+                        user?.permissions?.canApprovePurchaseOrders
+                      }
+                      canCreatePurchaseOrders={
+                        user?.permissions?.canCreatePurchaseOrders
+                      }
+                      canEditPurchaseOrders={
+                        user?.permissions?.canEditPurchaseOrders
+                      }
+                      canViewPurchaseOrders={
+                        user?.permissions?.canViewPurchaseOrders
+                      }
+                      canApproveVendors={user?.permissions?.canApproveVendors}
+                      canCreateVendors={user?.permissions?.canCreateVendors}
+                      canEditVendors={user?.permissions?.canEditVendors}
+                      canViewVendors={user?.permissions?.canViewVendors}
+                      canApproveUsers={user?.permissions?.canApproveUsers}
+                      canCreateUsers={user?.permissions?.canCreateUsers}
+                      canEditUsers={user?.permissions?.canEditUsers}
+                      canViewUsers={user?.permissions?.canViewUsers}
+                      canApproveDashboard={
+                        user?.permissions?.canApproveDashboard
+                      }
+                      canCreateDashboard={user?.permissions?.canCreateDashboard}
+                      canEditDashboard={user?.permissions?.canEditDashboard}
+                      canViewDashboard={user?.permissions?.canViewDashboard}
+                      handleSetCanView={() => {}}
+                      handleSetCanCreated={() => {}}
+                      handleSetCanEdit={() => {}}
+                      handleSetCanApprove={() => {}}
+                      canNotEdit={true}
+                    />
 
-                      <div>
-                        <div className="text-[13px] text-[#344767]">New password</div>
-                        <Form.Item
-                          name="newPassword"
-                          // label="Password"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please input your new password!",
-                            },
-                            {
-                              pattern: new RegExp("([0-9]\\d*)+"),
-                              message: "Please input at least one digit",
-                            },
-                            {
-                              pattern: new RegExp("([a-zA-Z]\\s*)+"),
-                              message:
-                                "Password should have both small and capital letters",
-                            },
-                            {
-                              pattern: new RegExp(regexPatternSpecialCh, "g"),
-                              message: "Password should have a special character",
-                            },
-                            {
-                              pattern: new RegExp("(.{8,})"),
-                              message: "Password should have atleast 8 characters",
-                            },
-                          ]}
-                          hasFeedback
-                        >
-                          <Input.Password placeholder="Your New Password" className="h-11 mt-3" />
-                        </Form.Item>
-                      </div>
+                    <div className="text-md font-semibold pt-2">
+                      Approval Permissions
+                    </div>
+                    <Form>
+                      <Form.Item
+                        name="canApproveAsHod"
+                        label="Can approve as a Head of department"
+                      >
+                        <Checkbox
+                          disabled
+                          defaultChecked={user?.permissions?.canApproveAsHod}
+                          onChange={(e) => setCanApproveAsHod(e.target.checked)}
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        name="canApproveAsHof"
+                        label="Can approve as a Head of finance"
+                      >
+                        <Checkbox
+                          disabled
+                          defaultChecked={user?.permissions?.canApproveAsHof}
+                          // onChange={(e) => setCanApproveAsHof(e.target.checked)}
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        name="canApproveAsPM"
+                        label="Can approve as a Procurement manager"
+                      >
+                        <Checkbox
+                          disabled
+                          defaultChecked={user?.permissions?.canApproveAsPM}
+                          // onChange={(e) => setCanApproveAsPM(e.target.checked)}
+                        />
+                      </Form.Item>
 
-                      <div>
-                        <div className="text-[13px] text-[#344767]">Confirm new password</div>
-                        <Form.Item
-                          name="confirmPassword"
-                          // label="Password"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please confirm your password!",
-                            },
-                            ({ getFieldValue }) => ({
-                              validator(_, value) {
-                                if (
-                                  !value ||
-                                  getFieldValue("newPassword") === value
-                                ) {
-                                  return Promise.resolve();
-                                }
-                                return Promise.reject(
-                                  new Error(
-                                    "The two passwords that you entered do not match!"
-                                  )
-                                );
-                              },
-                            }),
-                          ]}
-                          hasFeedback
-                        >
-                          <Input.Password placeholder="Your Confirm Password" className="h-11 mt-3" />
-                        </Form.Item>
-                      </div>
-
-                      <Form.Item>
-                        {submitting ? (
-                          <Spin indicator={antIcon} />
-                        ) : (
-                          <div className="flex flex-row items-center justify-between mt-3">
-                            <Button type="primary" danger htmlType="submit">
-                              Update my password
-                            </Button>
-                          </div>
-                        )}
+                      <Form.Item
+                        name="canApproveAsLegal"
+                        label="Can approve as a Legal officer"
+                      >
+                        <Checkbox
+                          disabled
+                          defaultChecked={user?.permissions?.canApproveAsPM}
+                          // onChange={(e) => setCanApproveAsPM(e.target.checked)}
+                        />
                       </Form.Item>
                     </Form>
                   </div>
-                </div>
-                </>
-              )}
+                )}
 
                 {segment === "Requests History" && (
                   <div className="p-3">
@@ -463,6 +491,7 @@ export default function page() {
               </div>
             )}
           </div>
+        </div>
       </div>
     );
   }
