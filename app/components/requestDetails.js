@@ -2598,7 +2598,7 @@ const RequestDetails = ({
                     <div className="text-red-500">*</div>
                   </div>
                   <p className="pt-1 text-[17px]">
-                    <small>{data.number}</small>
+                    <small>{data?.number}</small>
                   </p>
                 </div>
                 <div>
