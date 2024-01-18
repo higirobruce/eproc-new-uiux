@@ -60,7 +60,7 @@ let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
 
 async function getPaymentRequestDetails(id, router) {
-  let token = localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
 
   const res = await fetch(`${url}/paymentRequests/${id}`, {
     headers: {
@@ -88,7 +88,7 @@ async function getPaymentRequestDetails(id, router) {
 }
 
 async function getPoPaymentProgress(id, router) {
-  let token = localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
 
   if (id) {
     const res = await fetch(`${url}/purchaseOrders/paymentProgress/${id}`, {
@@ -118,7 +118,7 @@ async function getPoPaymentProgress(id, router) {
 }
 
 async function getPoPaidRequests(id, router) {
-  let token = localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
   const res = await fetch(`${url}/purchaseOrders/paymentsDone/${id}`, {
     method: "GET",
     headers: {
@@ -143,7 +143,7 @@ async function getPoPaidRequests(id, router) {
 }
 
 async function getApprovers() {
-  let token = localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
   const res = await fetch(`${url}/users/level1Approvers`, {
     method: "GET",
     headers: {
@@ -165,7 +165,7 @@ async function getApprovers() {
 }
 
 async function getAccounts() {
-  let token = localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
   const res = await fetch(`${url}/b1/accounts`, {
     method: "GET",
     headers: {
@@ -187,7 +187,7 @@ async function getAccounts() {
 }
 
 async function getDistributionRules() {
-  let token = localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
   const res = await fetch(`${url}/b1/distributionRules`, {
     method: "GET",
     headers: {
@@ -211,7 +211,7 @@ async function getDistributionRules() {
 async function getBudgetLines() {}
 
 async function getFile(path) {
-  let token = localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
   const res = await fetch(path, {
     method: "GET",
     headers: {
@@ -233,8 +233,8 @@ async function getFile(path) {
 }
 
 export default function PaymentRequest({ params }) {
-  let user = JSON.parse(localStorage.getItem("user"));
-  let token = localStorage.getItem("token");
+  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
   let [paymentRequest, setPaymentRequest] = useState(null);
   let router = useRouter();
   let [form] = Form.useForm();

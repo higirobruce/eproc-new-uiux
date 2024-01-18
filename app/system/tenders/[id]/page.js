@@ -17,7 +17,7 @@ let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
 
 async function getTenderDetails(id, router) {
-  let token = localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
 
   const res = await fetch(`${url}/tenders/${id}`, {
     headers: {
@@ -45,8 +45,8 @@ async function getTenderDetails(id, router) {
 
 export default function page({ params }) {
   let router = useRouter();
-  let user = JSON.parse(localStorage.getItem("user"));
-  let token = localStorage.getItem("token");
+  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
 
   const [messageApi, contextHolder] = message.useMessage();
 

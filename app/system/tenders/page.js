@@ -31,9 +31,9 @@ import { useRouter } from "next/navigation";
 import { FiSearch } from "react-icons/fi";
 
 export default function Tenders() {
-  let user = JSON.parse(localStorage.getItem("user"));
+  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
   let router = useRouter()
-  let token = localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
   const [dataLoaded, setDataLoaded] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
@@ -188,7 +188,7 @@ export default function Tenders() {
   const save = () => {
     console.log("Received values of form:", values);
     setConfirmLoading(true);
-    let user = JSON.parse(localStorage.getItem("user"));
+    let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
 
     fetch(`${url}/tenders/`, {
       method: "POST",

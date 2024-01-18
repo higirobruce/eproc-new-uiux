@@ -24,7 +24,7 @@ import { FiUsers } from "react-icons/fi";
 
 export default function page() {
   const [dataLoaded, setDataLoaded] = useState(false);
-  let token = localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
   const [requests, setRequests] = useState([]);
   const [tenders, setTenders] = useState([]);
   const [contracts, setContracts] = useState([]);

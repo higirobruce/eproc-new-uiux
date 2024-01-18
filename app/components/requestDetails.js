@@ -380,8 +380,8 @@ const RequestDetails = ({
   const [openWithdraw, setOpenWithdraw] = useState(false);
   let [reason, setReason] = useState("");
   const [messageApi, contextHolder] = message.useMessage();
-  let user = JSON.parse(localStorage.getItem("user"));
-  let token = localStorage.getItem("token");
+  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
@@ -782,7 +782,7 @@ const RequestDetails = ({
   }
 
   function submitTenderData(values) {
-    let user = JSON.parse(localStorage.getItem("user"));
+    let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
     let tData = {
       createdBy: user._id,
       items: data?.items,

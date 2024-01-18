@@ -111,7 +111,7 @@ const TenderDetails = ({
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
-  let token = localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
   const [messageApi, contextHolder] = message.useMessage();
   const [size, setSize] = useState("small");
   const [currentCode, setCurrentCode] = useState(-1);

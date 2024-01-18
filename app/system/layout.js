@@ -19,7 +19,7 @@ import { Dropdown } from "antd";
 import Logo from "@/public/Logo.png";
 
 export default function SystemLayout({ children }) {
-  let user = JSON.parse(localStorage?.getItem("user"));
+  let user = JSON.parse(typeof window !== 'undefined' && localStorage?.getItem("user"));
   let [screen, setScreen] = useState("");
   let [loggedInUser, setLoggedInUser] = useState(null);
   let [loggingOut, setLoggingOut] = useState(false);
@@ -61,7 +61,7 @@ export default function SystemLayout({ children }) {
   let pathName = usePathname();
   useEffect(() => {
     setLoggedInUser(localStorage.getItem("user"));
-    let user = JSON.parse(localStorage.getItem("user"));
+    let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
     setToken(localStorage.getItem("token"));
     if (user?.userType !== "VENDOR") setScreen("dashboard");
     else setScreen("tenders");
@@ -75,6 +75,7 @@ export default function SystemLayout({ children }) {
   useEffect(() => {
     setCurrent(pathName.substring(1));
   }, [pathName]);
+
   return (
     // <main>
     //   {(loggedInUser && token?.length>=1 ) && (
@@ -150,7 +151,7 @@ export default function SystemLayout({ children }) {
                 )}
               </div>
             </div>
-            <div className="mb-10 mr-7">
+            {JSON.parse(loggedInUser)?.userType !== "VENDOR" && <div className="mb-10 mr-7">
               <a
                 href="/system/users"
                 className="flex items-center bg-[#F2F4FD] w-[calc(100%-30px)] px-5 py-4 cursor-pointer rounded-lg border-0 gap-3 no-underline"
@@ -160,7 +161,7 @@ export default function SystemLayout({ children }) {
                   User Management
                 </small>
               </a>
-            </div>
+            </div>}
           </div>
         </div>
         <div className="w-full h-screen">

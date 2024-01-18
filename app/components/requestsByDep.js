@@ -30,7 +30,7 @@ export default function RequestsByDep() {
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
   const [messageApi, contextHolder] = message.useMessage();
-  let token = localStorage.getItem('token')
+  let token = typeof window !== 'undefined' && localStorage.getItem('token')
 
   useEffect(() => {
     fetch(`${url}/requests/countsByDep`, {

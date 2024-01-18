@@ -82,7 +82,7 @@ let formats = [
 export default function Contracts() {
   let router = useRouter();
   let user = JSON.parse(localStorage.getItem("user"));
-  let token = localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
   const [dataLoaded, setDataLoaded] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   let url = process.env.NEXT_PUBLIC_BKEND_URL;

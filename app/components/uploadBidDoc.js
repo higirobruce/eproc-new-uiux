@@ -8,7 +8,7 @@ function UploadBidDoc({ label, uuid, setSelected, iconOnly }) {
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
-  let token = localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
   let [loading, setLoading] = useState(false);
 
   const props = {
