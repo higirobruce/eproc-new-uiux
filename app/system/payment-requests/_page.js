@@ -67,7 +67,7 @@ export default function UserRequests() {
   const [currentUser, setCurrentUser] = useState("");
   const [sourcingMethod, setSourcingMethod] = useState("");
   let [submitting, setSubmitting] = useState(false);
-  let token = localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
 
   useEffect(() => {
     setDataLoaded(false);

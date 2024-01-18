@@ -49,8 +49,8 @@ import { RiForbidLine } from "react-icons/ri";
 // import MyPdfViewer from "../common/pdfViewer";
 
 export default function PurchaseOrders() {
-  let user = JSON.parse(localStorage.getItem("user"));
-  let token = localStorage.getItem("token");
+  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
   let router = useRouter();
   const [dataLoaded, setDataLoaded] = useState(false);
   let url = process.env.NEXT_PUBLIC_BKEND_URL;

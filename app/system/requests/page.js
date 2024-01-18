@@ -46,7 +46,7 @@ export default function UserRequests() {
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
-  let user = JSON.parse(localStorage.getItem("user"));
+  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
   let [dataset, setDataset] = useState([]);
   let [tempDataset, setTempDataset] = useState([]);
   let [updatingId, setUpdatingId] = useState("");
@@ -83,7 +83,7 @@ export default function UserRequests() {
   const [currentUser, setCurrentUser] = useState("");
   const [sourcingMethod, setSourcingMethod] = useState("");
   let [files, setFiles] = useState([]);
-  let token = localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
 
   useEffect(() => {
     // loadRequests()
@@ -289,7 +289,7 @@ export default function UserRequests() {
   const save = (_fileList) => {
     if (values && values[0]) {
       setConfirmLoading(true);
-      let user = JSON.parse(localStorage.getItem("user"));
+      let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
       let _values = [...values];
       _values.map((v, index) => {
         v.paths = _fileList[index];

@@ -18,7 +18,7 @@ let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
 
 async function geRequestDetails(id, router, messageApi) {
-  let token = localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
   const res = await fetch(`${url}/requests/${id}`, {
     headers: {
       Authorization: "Basic " + `${encode(`${apiUsername}:${apiPassword}`)}`,
@@ -63,14 +63,14 @@ export async function fileExists(filepath) {
 export default function page({ params }) {
   let router = useRouter();
   const [messageApi, contextHolder] = message.useMessage();
-  let user = JSON.parse(localStorage.getItem("user"));
+  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
   let [loadingRowData, setLoadingRowData] = useState(false);
   let [confirmRejectLoading, setConfirmRejectLoading] = useState(false);
   let [reload, setReload] = useState(false);
   const [editRequest, setEditRequest] = useState(false);
   const [sourcingMethod, setSourcingMethod] = useState("");
 
-  let token = localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
   let [rowData, setRowData] = useState(null);
   let [filePaths, setFilePaths] = useState([]);
   let [fileList, setFileList] = useState([]);

@@ -28,7 +28,7 @@ let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
 
 async function getPoDetails(id, router) {
-  let token = localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
   const res = await fetch(`${url}/purchaseOrders/${id}`, {
     headers: {
       Authorization: "Basic " + `${encode(`${apiUsername}:${apiPassword}`)}`,
@@ -52,7 +52,7 @@ async function getPoDetails(id, router) {
 }
 
 async function getPoPaymentProgress(id, router) {
-  let token = localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
   const res = await fetch(`${url}/purchaseOrders/paymentProgress/${id}`, {
     method: "GET",
     headers: {
@@ -77,7 +77,7 @@ async function getPoPaymentProgress(id, router) {
 }
 
 async function getPoPaidRequests(id, router) {
-  let token = localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
   const res = await fetch(`${url}/purchaseOrders/paymentsDone/${id}`, {
     method: "GET",
     headers: {
@@ -102,8 +102,8 @@ async function getPoPaidRequests(id, router) {
 }
 
 export default function NewPaymentRequest({ params }) {
-  let user = JSON.parse(localStorage.getItem("user"));
-  let token = localStorage.getItem("token");
+  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
   let [po, setPo] = useState(null);
   let router = useRouter();
   let [form] = Form.useForm();

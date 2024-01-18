@@ -44,7 +44,7 @@ export default function UserRequests() {
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
-  let user = JSON.parse(localStorage.getItem("user"));
+  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
   let [dataset, setDataset] = useState([]);
   let [tempDataset, setTempDataset] = useState([]);
   let [updatingId, setUpdatingId] = useState("");
@@ -68,7 +68,7 @@ export default function UserRequests() {
   const [currentUser, setCurrentUser] = useState("");
   const [sourcingMethod, setSourcingMethod] = useState("");
   let [submitting, setSubmitting] = useState(false);
-  let token = localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
 
   useEffect(() => {
     setDataLoaded(false);
@@ -310,7 +310,7 @@ export default function UserRequests() {
             </Row>
           </Row> */}
           <div className="flex items-center justify-between mr-6">
-            {user?.userType !== "VENDOR" && (
+            {user?.userType !== "VENDOR" ? (
               <Button
                 className="bg-white h-9 px-5 text-[11px] font-semibold rounded text-[#0063CF]"
                 icon={<PlusOutlined />}
@@ -321,7 +321,7 @@ export default function UserRequests() {
               >
                 New Payment request
               </Button>
-            )}
+            ) : <div />}
             <div className="flex items-center gap-5">
               <Select
                 // mode="tags"

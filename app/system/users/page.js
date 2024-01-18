@@ -58,9 +58,9 @@ import { useRouter } from "next/navigation";
 import { FiSearch } from 'react-icons/fi'
 
 export default function Users() {
-  let user = JSON.parse(localStorage.getItem("user"));
+  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
   let router = useRouter()
-  let token = localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
   const [dataLoaded, setDataLoaded] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   let url = process.env.NEXT_PUBLIC_BKEND_URL;

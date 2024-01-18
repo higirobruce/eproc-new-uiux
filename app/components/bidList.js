@@ -61,7 +61,7 @@ const BidList = ({
   let [ContainerHeight, setContainerHeight] = useState(0);
   let [openSelectBid, setOpenSelectBid] = useState(false);
   let [evaluationReportId, setEvaluationRptId] = useState(v4());
-  let token = localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
   let [fileSelected, setFileSelected] = useState(false);
 
   const appendData = () => {

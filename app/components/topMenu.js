@@ -23,7 +23,7 @@ const TopMenu = ({ setScreen, screen, handleLogout }) => {
   useEffect(() => {}, [screen]);
 
   useEffect(() => {
-    let user = JSON.parse(localStorage.getItem("user"));
+    let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
     let _items = [];
     _items = [
       {
