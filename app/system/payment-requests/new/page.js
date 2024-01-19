@@ -519,7 +519,7 @@ export default function NewPaymentRequest() {
                     if (e.target.value === false) setBudgetLine(null);
                   }}
                   value={bankPay}
-                  className="my-10"
+                  className="mb-2 mt-5"
                 >
                   <div className="flex gap-x-10">
                     <div className="my-1 border-t-2 border-x-2 border-[#BFC5C5]">
