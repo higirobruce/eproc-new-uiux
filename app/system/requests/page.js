@@ -996,7 +996,6 @@ export default function UserRequests() {
                   currentUser?.permissions?.canApproveAsPM) && (
                   <div className="flex items-center space-x-5">
                     <div className="flex flex-row items-center space-x-1">
-                      <div className="text-[13px] text-[#344767]">Awaiting my approval</div>
                       <Checkbox
                         checked={myPendingRequest}
                         disabled={onlyMine}
@@ -1004,9 +1003,9 @@ export default function UserRequests() {
                           getMyPendingRequest(e.target.checked);
                         }}
                       />
+                      <div className="text-[13px] text-[#344767]">Awaiting my approval</div>
                     </div>
                     <div className="flex flex-row items-center space-x-1">
-                      <div className="text-[13px] text-[#344767]">My requests</div>
                       <Checkbox
                         checked={onlyMine}
                         disabled={myPendingRequest}
@@ -1014,6 +1013,7 @@ export default function UserRequests() {
                           setOnlyMine(e.target.checked);
                         }}
                       />
+                      <div className="text-[13px] text-[#344767]">My requests</div>
                     </div>
                   </div>
                 )}

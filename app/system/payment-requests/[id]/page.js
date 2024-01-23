@@ -62,7 +62,7 @@ let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
 
 async function getPaymentRequestDetails(id, router) {
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
 
   const res = await fetch(`${url}/paymentRequests/${id}`, {
     headers: {
@@ -90,7 +90,7 @@ async function getPaymentRequestDetails(id, router) {
 }
 
 async function getPoPaymentProgress(id, router) {
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
 
   if (id) {
     const res = await fetch(`${url}/purchaseOrders/paymentProgress/${id}`, {
@@ -120,7 +120,7 @@ async function getPoPaymentProgress(id, router) {
 }
 
 async function getPoPaidRequests(id, router) {
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const res = await fetch(`${url}/purchaseOrders/paymentsDone/${id}`, {
     method: "GET",
     headers: {
@@ -145,7 +145,7 @@ async function getPoPaidRequests(id, router) {
 }
 
 async function getApprovers() {
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const res = await fetch(`${url}/users/level1Approvers`, {
     method: "GET",
     headers: {
@@ -167,7 +167,7 @@ async function getApprovers() {
 }
 
 async function getAccounts() {
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const res = await fetch(`${url}/b1/accounts`, {
     method: "GET",
     headers: {
@@ -189,7 +189,7 @@ async function getAccounts() {
 }
 
 async function getDistributionRules() {
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const res = await fetch(`${url}/b1/distributionRules`, {
     method: "GET",
     headers: {
@@ -213,7 +213,7 @@ async function getDistributionRules() {
 async function getBudgetLines() {}
 
 async function getFile(path) {
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const res = await fetch(path, {
     method: "GET",
     headers: {
@@ -235,8 +235,10 @@ async function getFile(path) {
 }
 
 export default function PaymentRequest({ params }) {
-  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let user = JSON.parse(
+    typeof window !== "undefined" && localStorage.getItem("user")
+  );
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   let [paymentRequest, setPaymentRequest] = useState(null);
   let router = useRouter();
   let [form] = Form.useForm();
@@ -584,7 +586,7 @@ export default function PaymentRequest({ params }) {
       accountName: paymentRequest?.paymentDetails?.accountName || "",
       accountNumber: paymentRequest?.paymentDetails?.accountNumber || "",
       phoneName: paymentRequest?.paymentDetails?.phoneName || "",
-      phoneNumber: paymentRequest?.paymentDetails?.phoneNumber || ""
+      phoneNumber: paymentRequest?.paymentDetails?.phoneNumber || "",
     };
     paymentRequest.status =
       paymentRequest.status == "declined" ||
@@ -847,6 +849,8 @@ export default function PaymentRequest({ params }) {
     setActiveIndex((prevIndex) => (prevIndex === value ? "" : value));
   };
 
+  console.log("Payment Request ", paymentRequest);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -881,6 +885,11 @@ export default function PaymentRequest({ params }) {
 
                   <div className="text-lg font-semibold">
                     Payment request {paymentRequest?.number}
+                    <sup className="bg-[#F1F3FF] px-3 py-1 rounded-full mt-2 ml-3 text-[#1677FF] font-semibold">
+                      {paymentRequest?.category == "internal"
+                        ? "INTERNAL"
+                        : "EXTERNAL"}
+                    </sup>
                   </div>
                 </div>
               </div>
@@ -960,7 +969,7 @@ export default function PaymentRequest({ params }) {
                   </div>
                 </div>
               </div>
-              
+
               <Form
                 form={form}
                 initialValues={{
@@ -971,9 +980,7 @@ export default function PaymentRequest({ params }) {
                   {/* Request Title */}
                   <div className="flex flex-col space-y-2">
                     <div className="mb-3">
-                      <label className="text-xs text-gray-400">
-                        Title
-                      </label>
+                      <label className="text-xs text-gray-400">Title</label>
                     </div>
                     {!editRequest && (
                       <Typography.Text className="text-xs">
@@ -1013,8 +1020,10 @@ export default function PaymentRequest({ params }) {
                   {/* Request Amount due*/}
                   <div className="flex flex-col  space-y-2 ">
                     <div className="mb-3">
-                      <label className="text-xs text-gray-400">Amount due</label>
-                      </div>
+                      <label className="text-xs text-gray-400">
+                        Amount due
+                      </label>
+                    </div>
                     {!editRequest && (
                       <div className="text-xs">
                         {paymentRequest?.amount?.toLocaleString()}{" "}
@@ -1069,7 +1078,7 @@ export default function PaymentRequest({ params }) {
                             initialValue={paymentRequest.amount}
                           >
                             <InputNumber
-                              className="h-10 w-full"
+                              className="h-10 w-full pt-1.5"
                               addonBefore={
                                 <Form.Item
                                   noStyle
@@ -1139,7 +1148,9 @@ export default function PaymentRequest({ params }) {
                   {/* Request Attached Invoice*/}
                   <div className="flex flex-col space-y-2">
                     <div className="mb-3">
-                      <label className="text-xs text-gray-400">Attached Invoice(s)</label>
+                      <label className="text-xs text-gray-400">
+                        Attached Invoice(s)
+                      </label>
                     </div>
                     {!editRequest && (
                       <div className="grid grid-cols-2 gap-y-2">
@@ -1211,8 +1222,8 @@ export default function PaymentRequest({ params }) {
                   {user?.userType !== "VENDOR" && (
                     <div className="flex flex-col space-y-1 items-start">
                       <div className="mb-3">
-                        <label className="text-[14px] text-[#344767]">
-                          Budgeted:
+                        <label className="text-xs text-gray-400">
+                          Budgeted
                         </label>
                       </div>
                       {!editRequest && (
@@ -1228,15 +1239,20 @@ export default function PaymentRequest({ params }) {
                             // wrapperCol={{ offset: 8, span: 16 }}
                           >
                             <Radio.Group
-                              onChange={({target}) => {
+                              onChange={({ target }) => {
                                 paymentRequest.budgeted = target.value;
                                 if (target.value === false)
                                   paymentRequest.budgetLine = null;
                                 setBudgeted(target.value);
                               }}
                               className="mt-3"
-                              defaultValue={paymentRequest?.budgeted ? true : false}
-                              disabled={paymentRequest?.status === "approved" || paymentRequest?.status === "approved (pm)"}
+                              defaultValue={
+                                paymentRequest?.budgeted ? true : false
+                              }
+                              disabled={
+                                paymentRequest?.status === "approved" ||
+                                paymentRequest?.status === "approved (pm)"
+                              }
                             >
                               <Radio value={true} className="mr-3">
                                 <span className="ml-2 text-[18px]">Yes</span>
@@ -1252,9 +1268,15 @@ export default function PaymentRequest({ params }) {
                   )}
 
                   {/* Budget Line */}
-                  {(user?.userType !== "VENDOR" && budgeted) && (
+                  {user?.userType !== "VENDOR" && budgeted && (
                     <div className="flex flex-col space-y-1 items-start">
-                      {editRequest && budgeted && <div className="text-[14px] text-[#344767]">Budget Line:</div>}
+                      {budgeted && (
+                        <div className="mb-3">
+                          <label className="text-xs text-gray-400">
+                            Budget Line
+                          </label>
+                        </div>
+                      )}
                       {!editRequest && (
                         <div className="text-sm font-semibold text-gray-600">
                           {paymentRequest?.budgetLine?.description}
@@ -1379,190 +1401,241 @@ export default function PaymentRequest({ params }) {
                     )}
                   </div>
                 </div>
-                {<div className="edit-requests mb-10 pt-5 border-4 border-[#203783]">
-                  <h5 className="text-[18px] text-[#344767]">Payment Details</h5>
-                  <div className="bg-[#EFF4F8] px-5 rounded-lg">
-                    <div className="flex items-center">
-                      <Form.Item
-                        name="budgeted"
-                        valuePropName="checked"
-                        // wrapperCol={{ offset: 8, span: 16 }}
-                      >
-                        <Radio.Group
-                          onChange={(e) => {
-                            setBankPay(e.target.value);
-                            if (e.target.value === false) setBudgetLine(null);
-                          }}
-                          value={bankPay}
-                          className="mb-2 mt-5"
+                {paymentRequest && (
+                  <div className="edit-requests mb-10 pt-5 border-4 border-[#203783]">
+                    <h5 className="text-[18px] text-[#344767]">
+                      Payment Details
+                    </h5>
+                    <div className="bg-[#EFF4F8] px-5 rounded-lg">
+                      <div className="flex items-center">
+                        <Form.Item
+                          name="budgeted"
+                          valuePropName="checked"
+                          // wrapperCol={{ offset: 8, span: 16 }}
                         >
-                          <div className="flex gap-x-10">
-                            <div className="my-1 border-t-2 border-x-2 border-[#BFC5C5]">
-                              <Radio value={true} className="flex gap-x-1 items-center">
-                                <MdAccountBalance /> &nbsp;<span>Bank Info</span>
-                              </Radio>
+                          <Radio.Group
+                            onChange={(e) => {
+                              setBankPay(e.target.value);
+                              if (e.target.value === false) setBudgetLine(null);
+                            }}
+                            value={bankPay}
+                            className="mb-2 mt-5"
+                          >
+                            <div className="flex gap-x-10">
+                              <div className="my-1 border-t-2 border-x-2 border-[#BFC5C5]">
+                                <Radio
+                                  value={true}
+                                  className="flex gap-x-1 items-center"
+                                >
+                                  <MdAccountBalance /> &nbsp;
+                                  <span>Bank Info</span>
+                                </Radio>
+                              </div>
+                              <div className="my-1 border-2 border-[#BFC5C5]">
+                                <Radio
+                                  value={false}
+                                  className="flex gap-x-1 items-center"
+                                >
+                                  <FaMobileAlt /> &nbsp;<span>Mobile Pay</span>
+                                </Radio>
+                              </div>
                             </div>
-                            <div className="my-1 border-2 border-[#BFC5C5]">
-                              <Radio
-                                value={false}
-                                className="flex gap-x-1 items-center"
-                              >
-                                <FaMobileAlt /> &nbsp;<span>Mobile Pay</span>
-                              </Radio>
-                            </div>
-                          </div>
-                        </Radio.Group>
-                      </Form.Item>
-                    </div>
-                    <div className="grid grid-cols-3 space-x-6">
-                      {bankPay ? (
-                        <>
-                          <div>
-                            <div className="text-[14px] text-[#344767] mb-2">
-                              Bank Name
+                          </Radio.Group>
+                        </Form.Item>
+                      </div>
+                      <div className="grid grid-cols-3 space-x-6">
+                        {bankPay ? (
+                          <>
+                            <div>
+                              <div className="text-[14px] text-[#344767] mb-2">
+                                Bank Name
+                              </div>
+                              <div>
+                                <Form.Item
+                                  name="bankName"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "Request Bank name is required",
+                                    },
+                                  ]}
+                                >
+                                  <Input
+                                    className="h-11"
+                                    onChange={(e) => {
+                                      let _p = { ...paymentRequest };
+                                      _p.paymentDetails.bankName =
+                                        e.target.value;
+                                      setPaymentRequest(_p);
+                                      // setBankName(e.target.value)
+                                    }}
+                                    value={
+                                      paymentRequest?.paymentDetails?.bankName
+                                    }
+                                    defaultValue={
+                                      paymentRequest?.paymentDetails?.bankName
+                                    }
+                                    placeholder="Type in Bank name"
+                                    disabled={!editRequest}
+                                  />
+                                </Form.Item>
+                              </div>
                             </div>
                             <div>
-                              <Form.Item
-                                name="bankName"
-                                rules={[
-                                  {
-                                    required: true,
-                                    message: "Request Bank name is required",
-                                  },
-                                ]}
-                              >
-                                <Input
-                                  value={paymentRequest?.paymentDetails?.bankName}
-                                  className="h-11"
-                                  onChange={(e) => {
-                                    let _p = { ...paymentRequest };
-                                    _p.paymentDetails.bankName = e.target.value;
-                                    setPaymentRequest(_p);
-                                    // setBankName(e.target.value)
-                                  }}
-                                  placeholder="Type in Bank Name"
-                                />
-                              </Form.Item>
-                            </div>
-                          </div>
-                          <div>
-                            <div className="text-[14px] text-[#344767] mb-2">
-                              Account Name
-                            </div>
-                            <div>
-                              <Form.Item
-                                name="accountName"
-                                rules={[
-                                  {
-                                    required: true,
-                                    message: "Request account name is required",
-                                  },
-                                ]}
-                              >
-                                <Input
-                                  value={paymentRequest?.paymentDetails?.accountName}
-                                  className="h-11"
-                                  onChange={(e) => {
-                                    let _p = { ...paymentRequest };
-                                    _p.paymentDetails.accountName = e.target.value;
-                                    setPaymentRequest(_p);
-                                    // setAccountName(e.target.value)
-                                  }}
-                                  placeholder="Type in User account name"
-                                />
-                              </Form.Item>
-                            </div>
-                          </div>
-                          <div>
-                            <div className="text-[14px] text-[#344767] mb-2">
-                              Account Number
+                              <div className="text-[14px] text-[#344767] mb-2">
+                                Account Name
+                              </div>
+                              <div>
+                                <Form.Item
+                                  name="accountName"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message:
+                                        "Request account name is required",
+                                    },
+                                  ]}
+                                >
+                                  <Input
+                                    value={
+                                      paymentRequest?.paymentDetails
+                                        ?.accountName
+                                    }
+                                    defaultValue={
+                                      paymentRequest?.paymentDetails
+                                        ?.accountName
+                                    }
+                                    className="h-11"
+                                    onChange={(e) => {
+                                      let _p = { ...paymentRequest };
+                                      _p.paymentDetails.accountName =
+                                        e.target.value;
+                                      setPaymentRequest(_p);
+                                      // setAccountName(e.target.value)
+                                    }}
+                                    placeholder="Type in User account name"
+                                    disabled={!editRequest}
+                                  />
+                                </Form.Item>
+                              </div>
                             </div>
                             <div>
-                              <Form.Item
-                                name="accountNumber"
-                                rules={[
-                                  {
-                                    required: true,
-                                    message: "Request account number is required",
-                                  },
-                                ]}
-                              >
-                                <Input
-                                  value={paymentRequest?.paymentDetails?.accountNumber}
-                                  className="h-11"
-                                  onChange={(e) => {
-                                    let _p = { ...paymentRequest };
-                                    _p.paymentDetails.accountNumber = e.target.value;
-                                    setPaymentRequest(_p);
-                                    // setAccountNumber(e.target.value)
-                                  }}
-                                  placeholder="Type in User account number"
-                                />
-                              </Form.Item>
+                              <div className="text-[14px] text-[#344767] mb-2">
+                                Account Number
+                              </div>
+                              <div>
+                                <Form.Item
+                                  name="accountNumber"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message:
+                                        "Request account number is required",
+                                    },
+                                  ]}
+                                >
+                                  <Input
+                                    value={
+                                      paymentRequest?.paymentDetails
+                                        ?.accountNumber
+                                    }
+                                    defaultValue={
+                                      paymentRequest?.paymentDetails
+                                        ?.accountNumber
+                                    }
+                                    className="h-11"
+                                    onChange={(e) => {
+                                      let _p = { ...paymentRequest };
+                                      _p.paymentDetails.accountNumber =
+                                        e.target.value;
+                                      setPaymentRequest(_p);
+                                      // setAccountNumber(e.target.value)
+                                    }}
+                                    placeholder="Type in User account number"
+                                    disabled={!editRequest}
+                                  />
+                                </Form.Item>
+                              </div>
                             </div>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <div>
-                            <div className="text-[14px] text-[#344767] mb-2">
-                              Phone Name
+                          </>
+                        ) : (
+                          <>
+                            <div>
+                              <div className="text-[14px] text-[#344767] mb-2">
+                                Phone Name
+                              </div>
+                              <div>
+                                <Form.Item
+                                  name="phoneName"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "Request Phone name is required",
+                                    },
+                                  ]}
+                                >
+                                  <Input
+                                    value={
+                                      paymentRequest?.paymentDetails?.phoneName
+                                    }
+                                    defaultValue={
+                                      paymentRequest?.paymentDetails?.phoneName
+                                    }
+                                    className="h-11"
+                                    onChange={(e) => {
+                                      let _p = { ...paymentRequest };
+                                      _p.paymentDetails.phoneName =
+                                        e.target.value;
+                                      setPaymentRequest(_p);
+                                    }}
+                                    placeholder="Type in Phone name"
+                                    disabled={!editRequest}
+                                  />
+                                </Form.Item>
+                              </div>
                             </div>
                             <div>
-                              <Form.Item
-                                name="phoneName"
-                                rules={[
-                                  {
-                                    required: true,
-                                    message: "Request Phone name is required",
-                                  },
-                                ]}
-                              >
-                                <Input
-                                  value={paymentRequest?.paymentDetails?.phoneName}
-                                  className="h-11"
-                                  onChange={(e) => {
-                                    let _p = { ...paymentRequest };
-                                    _p.paymentDetails.phoneName = e.target.value;
-                                    setPaymentRequest(_p);
-                                  }}
-                                  placeholder="Type in Phone name"
-                                />
-                              </Form.Item>
+                              <div className="text-[14px] text-[#344767] mb-2">
+                                Phone Number
+                              </div>
+                              <div>
+                                <Form.Item
+                                  name="phoneNumber"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "Request Phone number required",
+                                    },
+                                  ]}
+                                >
+                                  <Input
+                                    value={
+                                      paymentRequest?.paymentDetails
+                                        ?.phoneNumber
+                                    }
+                                    defaultValue={
+                                      paymentRequest?.paymentDetails
+                                        ?.phoneNumber
+                                    }
+                                    className="h-11"
+                                    onChange={(e) => {
+                                      let _p = { ...paymentRequest };
+                                      _p.paymentDetails.phoneNumber =
+                                        e.target.value;
+                                      setPaymentRequest(_p);
+                                    }}
+                                    placeholder="Type in phone number"
+                                    disabled={!editRequest}
+                                  />
+                                </Form.Item>
+                              </div>
                             </div>
-                          </div>
-                          <div>
-                            <div className="text-[14px] text-[#344767] mb-2">
-                              Phone Number
-                            </div>
-                            <div>
-                              <Form.Item
-                                name="phoneNumber"
-                                rules={[
-                                  {
-                                    required: true,
-                                    message: "Request Phone number required",
-                                  },
-                                ]}
-                              >
-                                <Input
-                                  value={paymentRequest?.paymentDetails?.phoneNumber}
-                                  className="h-11"
-                                  onChange={(e) => {
-                                    let _p = { ...paymentRequest };
-                                    _p.paymentDetails.phoneNumber = e.target.value;
-                                    setPaymentRequest(_p);
-                                  }}
-                                  placeholder="Type in phone number"
-                                />
-                              </Form.Item>
-                            </div>
-                          </div>
-                        </>
-                      )}
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>}
+                )}
                 <div className="flex justify-end gap-x-5 my-4">
                   {editRequest && (
                     <div>
@@ -1588,7 +1661,6 @@ export default function PaymentRequest({ params }) {
                     </div>
                   )}
                 </div>
-
               </Form>
 
               {paymentRequest?.category === "external" && editRequest && (
@@ -1625,16 +1697,19 @@ export default function PaymentRequest({ params }) {
                     
                         ${
                           amount >
-                            getPoTotalVal().grossTotal - totalPaymentVal +
-                            paymentRequest?.amount &&
-                          "text-red-500"
+                            getPoTotalVal().grossTotal -
+                              totalPaymentVal +
+                              paymentRequest?.amount && "text-red-500"
                         }
                     `}
                     >
                       {po?.items[0]?.currency +
                         " " +
-                        (totalPaymentVal + amount -
-                          paymentRequest?.amount)?.toLocaleString()}
+                        (
+                          totalPaymentVal +
+                          amount -
+                          paymentRequest?.amount
+                        )?.toLocaleString()}
                     </div>
                   </div>
                 </div>
@@ -1670,8 +1745,8 @@ export default function PaymentRequest({ params }) {
                           Request Approval Process
                         </h6>
                         <span className="text-[#8392AB]">
-                          Proceed with approving the above request by adding your stamp
-                          mark where needed
+                          Proceed with approving the above request by adding
+                          your stamp mark where needed
                         </span>
                       </div>
                       <RiArrowDropDownLine
@@ -1685,306 +1760,323 @@ export default function PaymentRequest({ params }) {
                       className="answer-container"
                       style={
                         activeIndex == "request"
-                          ? { display: 'block'}
-                          : { display: "none"}
+                          ? { display: "block" }
+                          : { display: "none" }
                       }
                     >
-                      {paymentRequest?.approver && user?.userType !== "VENDOR" && (
-                        <div className="mx-3 mt-5 ">
-                          <Steps
-                            direction="vertical"
-                            current={currentCode}
-                            items={[
-                              // {
-                              //   title: `Reviewed by ${paymentRequest?.reviewedBy?.firstName} ${paymentRequest?.reviewedBy?.lastName}`,
-                              //   icon: <DocumentMagnifyingGlassIcon className="h-5" />,
-                              //   subTitle: currentCode > 0 && (
-                              //     <div className="flex flex-row items-center space-x-1 text-xs font-semibold">
-                              //       <div>
-                              //         {currentCode > 0 &&
-                              //           paymentRequest?.reviewedAt && (
-                              //             <CheckOutlined className="h-5 w-5 text-green-500" />
-                              //           )}
-                              //       </div>
-                              //       <div>
-                              //         {currentCode > 0 &&
-                              //           paymentRequest?.reviewedAt &&
-                              //           `Reviewed ` +
-                              //             moment(paymentRequest?.reviewedAt).fromNow()}
-                              //       </div>
-                              //     </div>
-                              //   ),
+                      {paymentRequest?.approver &&
+                        user?.userType !== "VENDOR" && (
+                          <div className="mx-3 mt-5 ">
+                            <Steps
+                              direction="vertical"
+                              current={currentCode}
+                              items={[
+                                // {
+                                //   title: `Reviewed by ${paymentRequest?.reviewedBy?.firstName} ${paymentRequest?.reviewedBy?.lastName}`,
+                                //   icon: <DocumentMagnifyingGlassIcon className="h-5" />,
+                                //   subTitle: currentCode > 0 && (
+                                //     <div className="flex flex-row items-center space-x-1 text-xs font-semibold">
+                                //       <div>
+                                //         {currentCode > 0 &&
+                                //           paymentRequest?.reviewedAt && (
+                                //             <CheckOutlined className="h-5 w-5 text-green-500" />
+                                //           )}
+                                //       </div>
+                                //       <div>
+                                //         {currentCode > 0 &&
+                                //           paymentRequest?.reviewedAt &&
+                                //           `Reviewed ` +
+                                //             moment(paymentRequest?.reviewedAt).fromNow()}
+                                //       </div>
+                                //     </div>
+                                //   ),
 
-                              //   disabled:
-                              //     !user?.permissions?.canApproveAsHod ||
-                              //     currentCode > 0,
-                              // },
-                              {
-                                title: `Level 1 (${
-                                  paymentRequest?.approver?.firstName +
-                                  " " +
-                                  paymentRequest?.approver?.lastName
-                                })`,
-                                icon: (
-                                  <ClipboardDocumentCheckIcon className="h-5" />
-                                ),
-                                subTitle: currentCode > 1 && (
-                                  <div className="flex flex-row items-center space-x-1 text-xs font-semibold">
-                                    <div>
-                                      {currentCode === 5 &&
-                                        !paymentRequest?.hod_approvalDate && (
-                                          <CloseOutlined className="h-5 w-5 text-red-500" />
-                                        )}
-                                      {currentCode > 1 &&
-                                        paymentRequest?.hod_approvalDate && (
-                                          <CheckOutlined className="h-5 w-5 text-green-500" />
-                                        )}
-                                    </div>
-                                    <div>
-                                      {currentCode === 5 &&
-                                        !paymentRequest?.hod_approvalDate &&
-                                        `Declined ` +
-                                          moment(
-                                            paymentRequest?.rejectionDate
-                                          ).fromNow()}
-                                      {currentCode > 1 &&
-                                        paymentRequest?.hod_approvalDate &&
-                                        `Approved ` +
-                                          moment(
-                                            paymentRequest?.hod_approvalDate
-                                          ).fromNow()}
-                                    </div>
-                                  </div>
-                                ),
-                                description: currentCode == 1 && (
-                                  <div className="flex flex-col">
-                                    <div className="text-[#8392AB] mb-4">
-                                      Kindly check if the request is relevant and
-                                      take action accordingly.
-                                    </div>
-                                    <div className="flex flex-row space-x-5">
-                                      <div>
-                                        <Popconfirm
-                                          title="Are you sure?"
-                                          open={openApprove}
-                                          icon={
-                                            <QuestionCircleOutlined
-                                              style={{ color: "red" }}
-                                            />
-                                          }
-                                          onConfirm={() => {
-                                            // changeStatus(2);
-                                            approveRequest(getRequestStatus(2));
-                                            setOpenApprove(false);
-                                          }}
-                                          // okButtonProps={{
-                                          //   loading: confirmRejectLoading,
-                                          // }}
-                                          onCancel={() => setOpenApprove(false)}
-                                        >
-                                          <Button
-                                            icon={<LikeOutlined />}
-                                            disabled={
-                                              !user?.permissions?.canApproveAsHod ||
-                                              user?._id !==
-                                                paymentRequest?.approver?._id ||
-                                              currentCode > 1
-                                            }
-                                            onClick={() => setOpenApprove(true)}
-                                            type="primary"
-                                            className="pb-4 pt-1.5 border-none"
-                                          >
-                                            Approve
-                                          </Button>
-                                        </Popconfirm>
-                                      </div>
-                                      <div>
-                                        <Popconfirm
-                                          title="Are you sure?"
-                                          open={open}
-                                          icon={
-                                            <QuestionCircleOutlined
-                                              style={{ color: "red" }}
-                                            />
-                                          }
-                                          onConfirm={() => {
-                                            if (reason?.length >= 3)
-                                              declineRequest();
-                                          }}
-                                          description={
-                                            <>
-                                              <Input
-                                                onChange={(v) =>
-                                                  setReason(v.target.value)
-                                                }
-                                                placeholder="Please insert a reason for the rejection"
-                                              ></Input>
-                                            </>
-                                          }
-                                          okButtonProps={{
-                                            disabled: reason?.length < 3,
-                                            loading: confirmRejectLoading,
-                                          }}
-                                          onCancel={handleCancel}
-                                        >
-                                          <Button
-                                            icon={<DislikeOutlined />}
-                                            disabled={
-                                              !user?.permissions?.canApproveAsHod ||
-                                              user?._id !==
-                                                paymentRequest?.approver?._id ||
-                                              currentCode > 1
-                                            }
-                                            danger
-                                            type="primary"
-                                            className="pb-4 pt-1.5 border-none"
-                                            onClick={showPopconfirm}
-                                          >
-                                            Reject
-                                          </Button>
-                                        </Popconfirm>
-                                      </div>
-                                    </div>
-                                  </div>
-                                ),
-                                disabled:
-                                  !user?.permissions?.canApproveAsHod ||
-                                  currentCode > 1,
-                              },
-                              {
-                                title: "Level 2 (Finance)",
-                                icon: <CreditCardIcon className="h-5" />,
-                                subTitle: currentCode > 2 &&
-                                  paymentRequest?.hod_approvalDate && (
+                                //   disabled:
+                                //     !user?.permissions?.canApproveAsHod ||
+                                //     currentCode > 0,
+                                // },
+                                {
+                                  title: `Level 1 (${
+                                    paymentRequest?.approver?.firstName +
+                                    " " +
+                                    paymentRequest?.approver?.lastName
+                                  })`,
+                                  icon: (
+                                    <ClipboardDocumentCheckIcon className="h-5" />
+                                  ),
+                                  subTitle: currentCode > 1 && (
                                     <div className="flex flex-row items-center space-x-1 text-xs font-semibold">
                                       <div>
                                         {currentCode === 5 &&
-                                          !paymentRequest?.hof_approvalDate && (
+                                          !paymentRequest?.hod_approvalDate && (
                                             <CloseOutlined className="h-5 w-5 text-red-500" />
                                           )}
-                                        {currentCode > 2 &&
-                                          paymentRequest?.hof_approvalDate && (
+                                        {currentCode > 1 &&
+                                          paymentRequest?.hod_approvalDate && (
                                             <CheckOutlined className="h-5 w-5 text-green-500" />
                                           )}
                                       </div>
                                       <div>
                                         {currentCode === 5 &&
-                                          !paymentRequest?.hof_approvalDate &&
+                                          !paymentRequest?.hod_approvalDate &&
                                           `Declined ` +
                                             moment(
                                               paymentRequest?.rejectionDate
                                             ).fromNow()}
-                                        {currentCode > 2 &&
-                                          paymentRequest?.hof_approvalDate &&
+                                        {currentCode > 1 &&
+                                          paymentRequest?.hod_approvalDate &&
                                           `Approved ` +
                                             moment(
-                                              paymentRequest?.hof_approvalDate
+                                              paymentRequest?.hod_approvalDate
                                             ).fromNow()}
                                       </div>
                                     </div>
                                   ),
-                                description: currentCode === 2 && (
-                                  <div className="flex flex-col">
-                                    <div className="text-[#8392AB] mb-4">
-                                      Kindly check if the request is relevant and
-                                      take action accordingly.
-                                    </div>
-                                    <div className="flex flex-row space-x-5">
-                                      <div>
-                                        <Popconfirm
-                                          title="Are you sure?"
-                                          open={openApprove}
-                                          icon={
-                                            <QuestionCircleOutlined
-                                              style={{ color: "red" }}
-                                            />
-                                          }
-                                          onConfirm={() => {
-                                            approveRequest("approved");
-                                            setOpenApprove(false);
-                                          }}
-                                          // okButtonProps={{
-                                          //   loading: confirmRejectLoading,
-                                          // }}
-                                          onCancel={() => setOpenApprove(false)}
-                                        >
-                                          <Button
-                                            icon={<LikeOutlined />}
-                                            disabled={
-                                              !user?.permissions?.canApproveAsHof ||
-                                              currentCode > 2 ||
-                                              currentCode < 0
-                                            }
-                                            onClick={() => setOpenApprove(true)}
-                                            type="primary"
-                                            className="pb-4 pt-1.5 border-none"
-                                          >
-                                            Approve
-                                          </Button>
-                                        </Popconfirm>
+                                  description: currentCode == 1 && (
+                                    <div className="flex flex-col">
+                                      <div className="text-[#8392AB] mb-4">
+                                        Kindly check if the request is relevant
+                                        and take action accordingly.
                                       </div>
-                                      <div>
-                                        <Popconfirm
-                                          title="Are you sure?"
-                                          open={open}
-                                          icon={
-                                            <QuestionCircleOutlined
-                                              style={{ color: "red" }}
-                                            />
-                                          }
-                                          onConfirm={() => {
-                                            if (reason?.length >= 3)
-                                              declineRequest();
-                                          }}
-                                          okButtonProps={{
-                                            disabled: reason?.length < 3,
-                                            loading: confirmRejectLoading,
-                                          }}
-                                          onCancel={handleCancel}
-                                          description={
-                                            <>
-                                              <Input
-                                                onChange={(v) =>
-                                                  setReason(v.target.value)
-                                                }
-                                                placeholder="Reason for rejection"
-                                              ></Input>
-                                            </>
-                                          }
-                                        >
-                                          <Button
-                                            icon={<DislikeOutlined />}
-                                            disabled={
-                                              !user?.permissions?.canApproveAsHof ||
-                                              currentCode > 2 ||
-                                              currentCode < 0
+                                      <div className="flex flex-row space-x-5">
+                                        <div>
+                                          <Popconfirm
+                                            title="Are you sure?"
+                                            open={openApprove}
+                                            icon={
+                                              <QuestionCircleOutlined
+                                                style={{ color: "red" }}
+                                              />
                                             }
-                                            type="primary"
-                                            danger
-                                            className="pb-4 pt-1.5 border-none"
-                                            onClick={showPopconfirm}
+                                            onConfirm={() => {
+                                              // changeStatus(2);
+                                              approveRequest(
+                                                getRequestStatus(2)
+                                              );
+                                              setOpenApprove(false);
+                                            }}
+                                            // okButtonProps={{
+                                            //   loading: confirmRejectLoading,
+                                            // }}
+                                            onCancel={() =>
+                                              setOpenApprove(false)
+                                            }
                                           >
-                                            Reject
-                                          </Button>
-                                        </Popconfirm>
+                                            <Button
+                                              icon={<LikeOutlined />}
+                                              disabled={
+                                                !user?.permissions
+                                                  ?.canApproveAsHod ||
+                                                user?._id !==
+                                                  paymentRequest?.approver
+                                                    ?._id ||
+                                                currentCode > 1
+                                              }
+                                              onClick={() =>
+                                                setOpenApprove(true)
+                                              }
+                                              type="primary"
+                                              className="pb-4 pt-1.5 border-none"
+                                            >
+                                              Approve
+                                            </Button>
+                                          </Popconfirm>
+                                        </div>
+                                        <div>
+                                          <Popconfirm
+                                            title="Are you sure?"
+                                            open={open}
+                                            icon={
+                                              <QuestionCircleOutlined
+                                                style={{ color: "red" }}
+                                              />
+                                            }
+                                            onConfirm={() => {
+                                              if (reason?.length >= 3)
+                                                declineRequest();
+                                            }}
+                                            description={
+                                              <>
+                                                <Input
+                                                  onChange={(v) =>
+                                                    setReason(v.target.value)
+                                                  }
+                                                  placeholder="Please insert a reason for the rejection"
+                                                ></Input>
+                                              </>
+                                            }
+                                            okButtonProps={{
+                                              disabled: reason?.length < 3,
+                                              loading: confirmRejectLoading,
+                                            }}
+                                            onCancel={handleCancel}
+                                          >
+                                            <Button
+                                              icon={<DislikeOutlined />}
+                                              disabled={
+                                                !user?.permissions
+                                                  ?.canApproveAsHod ||
+                                                user?._id !==
+                                                  paymentRequest?.approver
+                                                    ?._id ||
+                                                currentCode > 1
+                                              }
+                                              danger
+                                              type="primary"
+                                              className="pb-4 pt-1.5 border-none"
+                                              onClick={showPopconfirm}
+                                            >
+                                              Reject
+                                            </Button>
+                                          </Popconfirm>
+                                        </div>
                                       </div>
                                     </div>
-                                  </div>
-                                ),
-                                disabled:
-                                  !user?.permissions?.canApproveAsHof ||
-                                  currentCode > 2 ||
-                                  currentCode < 0,
-                              },
-                            ]}
-                          />
-                          {paymentRequest?.reasonForRejection && (
-                            <div className="bg-red-50 p-2 rounded-md">
-                              {paymentRequest?.reasonForRejection}
-                            </div>
-                          )}
-                        </div>
-                      )}
+                                  ),
+                                  disabled:
+                                    !user?.permissions?.canApproveAsHod ||
+                                    currentCode > 1,
+                                },
+                                {
+                                  title: "Level 2 (Finance)",
+                                  icon: <CreditCardIcon className="h-5" />,
+                                  subTitle: currentCode > 2 &&
+                                    paymentRequest?.hod_approvalDate && (
+                                      <div className="flex flex-row items-center space-x-1 text-xs font-semibold">
+                                        <div>
+                                          {currentCode === 5 &&
+                                            !paymentRequest?.hof_approvalDate && (
+                                              <CloseOutlined className="h-5 w-5 text-red-500" />
+                                            )}
+                                          {currentCode > 2 &&
+                                            paymentRequest?.hof_approvalDate && (
+                                              <CheckOutlined className="h-5 w-5 text-green-500" />
+                                            )}
+                                        </div>
+                                        <div>
+                                          {currentCode === 5 &&
+                                            !paymentRequest?.hof_approvalDate &&
+                                            `Declined ` +
+                                              moment(
+                                                paymentRequest?.rejectionDate
+                                              ).fromNow()}
+                                          {currentCode > 2 &&
+                                            paymentRequest?.hof_approvalDate &&
+                                            `Approved ` +
+                                              moment(
+                                                paymentRequest?.hof_approvalDate
+                                              ).fromNow()}
+                                        </div>
+                                      </div>
+                                    ),
+                                  description: currentCode === 2 && (
+                                    <div className="flex flex-col">
+                                      <div className="text-[#8392AB] mb-4">
+                                        Kindly check if the request is relevant
+                                        and take action accordingly.
+                                      </div>
+                                      <div className="flex flex-row space-x-5">
+                                        <div>
+                                          <Popconfirm
+                                            title="Are you sure?"
+                                            open={openApprove}
+                                            icon={
+                                              <QuestionCircleOutlined
+                                                style={{ color: "red" }}
+                                              />
+                                            }
+                                            onConfirm={() => {
+                                              approveRequest("approved");
+                                              setOpenApprove(false);
+                                            }}
+                                            // okButtonProps={{
+                                            //   loading: confirmRejectLoading,
+                                            // }}
+                                            onCancel={() =>
+                                              setOpenApprove(false)
+                                            }
+                                          >
+                                            <Button
+                                              icon={<LikeOutlined />}
+                                              disabled={
+                                                !user?.permissions
+                                                  ?.canApproveAsHof ||
+                                                currentCode > 2 ||
+                                                currentCode < 0
+                                              }
+                                              onClick={() =>
+                                                setOpenApprove(true)
+                                              }
+                                              type="primary"
+                                              className="pb-4 pt-1.5 border-none"
+                                            >
+                                              Approve
+                                            </Button>
+                                          </Popconfirm>
+                                        </div>
+                                        <div>
+                                          <Popconfirm
+                                            title="Are you sure?"
+                                            open={open}
+                                            icon={
+                                              <QuestionCircleOutlined
+                                                style={{ color: "red" }}
+                                              />
+                                            }
+                                            onConfirm={() => {
+                                              if (reason?.length >= 3)
+                                                declineRequest();
+                                            }}
+                                            okButtonProps={{
+                                              disabled: reason?.length < 3,
+                                              loading: confirmRejectLoading,
+                                            }}
+                                            onCancel={handleCancel}
+                                            description={
+                                              <>
+                                                <Input
+                                                  onChange={(v) =>
+                                                    setReason(v.target.value)
+                                                  }
+                                                  placeholder="Reason for rejection"
+                                                ></Input>
+                                              </>
+                                            }
+                                          >
+                                            <Button
+                                              icon={<DislikeOutlined />}
+                                              disabled={
+                                                !user?.permissions
+                                                  ?.canApproveAsHof ||
+                                                currentCode > 2 ||
+                                                currentCode < 0
+                                              }
+                                              type="primary"
+                                              danger
+                                              className="pb-4 pt-1.5 border-none"
+                                              onClick={showPopconfirm}
+                                            >
+                                              Reject
+                                            </Button>
+                                          </Popconfirm>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ),
+                                  disabled:
+                                    !user?.permissions?.canApproveAsHof ||
+                                    currentCode > 2 ||
+                                    currentCode < 0,
+                                },
+                              ]}
+                            />
+                            {paymentRequest?.reasonForRejection && (
+                              <div className="bg-red-50 p-2 rounded-md">
+                                {paymentRequest?.reasonForRejection}
+                              </div>
+                            )}
+                          </div>
+                        )}
                     </div>
                   </div>
 
@@ -2097,47 +2189,47 @@ export default function PaymentRequest({ params }) {
                     paymentRequest?.category === "internal" && (
                       <>
                         <Form form={paymentForm}>
-                          <UploadOtherFiles
-                            files={filesProof}
-                            setFiles={setFilesProof}
-                            label="Select Payment proof"
-                          />
-
-                          <div className="grid lg:grid-cols-2 gap-6 divide-x">
+                          <div className="grid lg:grid-cols-2 items-center mt-5 gap-6 divide-x">
+                            <UploadOtherFiles
+                              files={filesProof}
+                              setFiles={setFilesProof}
+                              label="Select Payment proof"
+                            />
                             {/* <div className="flex flex-col">
-                          <div>DistributionRule</div>
-                          <Form.Item
-                            // label="Select level 1 approver"
-                            name="distributionRule"
-                            rules={[
-                              {
-                                required: true,
-                                message: "Can not be empty!",
-                              },
-                            ]}
-                          >
-                            <Select
-                              // defaultValue={defaultApprover}
-                              placeholder="Select rule"
-                              showSearch
-                              onChange={(value) => {
-                                // setLevel1Approver(value);
-                                setDistributionRule(value);
-                              }}
-                              filterOption={(input, option) =>
-                                (option?.label ?? "")
-                                  .toLowerCase()
-                                  .includes(input.toLowerCase())
-                              }
-                              options={distributionRules?.map((l) => {
-                                return {
-                                  label: l?.FactorDescription,
-                                  value: l?.FactorCode,
-                                };
-                              })}
-                            ></Select>
-                          </Form.Item>
-                        </div> */}
+                                <div>DistributionRule</div>
+                                <Form.Item
+                                  // label="Select level 1 approver"
+                                  name="distributionRule"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "Can not be empty!",
+                                    },
+                                  ]}
+                                >
+                                  <Select
+                                    // defaultValue={defaultApprover}
+                                    placeholder="Select rule"
+                                    showSearch
+                                    onChange={(value) => {
+                                      // setLevel1Approver(value);
+                                      setDistributionRule(value);
+                                    }}
+                                    filterOption={(input, option) =>
+                                      (option?.label ?? "")
+                                        .toLowerCase()
+                                        .includes(input.toLowerCase())
+                                    }
+                                    options={distributionRules?.map((l) => {
+                                      return {
+                                        label: l?.FactorDescription,
+                                        value: l?.FactorCode,
+                                      };
+                                    })}
+                                  ></Select>
+                                </Form.Item>
+                              </div> 
+                            */}
                             <Form.Item
                               label="Distribution Rule - Debit Acc"
                               name="currency"
@@ -2172,76 +2264,6 @@ export default function PaymentRequest({ params }) {
                               ></Select>
                             </Form.Item>
 
-                            <div>
-                              <Form.Item
-                                label="Debit Account"
-                                name="accountToDebit"
-                                rules={[
-                                  {
-                                    required: true,
-                                    message: "Can not be empty!",
-                                  },
-                                ]}
-                              >
-                                <Select
-                                  // defaultValue={defaultApprover}
-                                  // style={{ marginLeft: 8, maxWidth: 250 }}
-                                  // style={{ marginLeft: 8 }}
-                                  placeholder="Account to debit"
-                                  size="large"
-                                  showSearch
-                                  onChange={(value) => {
-                                    // setLevel1Approver(value);
-                                    setDebitAccount(value);
-                                  }}
-                                  filterOption={(input, option) =>
-                                    (option?.label ?? "")
-                                      .toLowerCase()
-                                      .includes(input.toLowerCase())
-                                  }
-                                  options={accounts?.map((l) => {
-                                    return {
-                                      label: l?.Name,
-                                      value: l?.Code,
-                                    };
-                                  })}
-                                ></Select>
-                              </Form.Item>
-                              <Form.Item
-                                label="Credit Account"
-                                name="accountToCredit"
-                                rules={[
-                                  {
-                                    required: true,
-                                    message: "Can not be empty!",
-                                  },
-                                ]}
-                              >
-                                <Select
-                                  // style={{ marginLeft: 8, maxWidth: 250 }}
-                                  // defaultValue={defaultApprover}
-                                  // style={{ marginLeft: 8 }}
-                                  placeholder="Account to Credit"
-                                  showSearch
-                                  size="large"
-                                  onChange={(value) => {
-                                    // setLevel1Approver(value);
-                                    setCreditAccount(value);
-                                  }}
-                                  filterOption={(input, option) =>
-                                    (option?.label ?? "")
-                                      .toLowerCase()
-                                      .includes(input.toLowerCase())
-                                  }
-                                  options={accounts?.map((l) => {
-                                    return {
-                                      label: l?.Name,
-                                      value: l?.Code,
-                                    };
-                                  })}
-                                ></Select>
-                              </Form.Item>
-                            </div>
                             {/* <div className="flex flex-row items-center"></div> */}
 
                             {/*<div className="flex flex-row items-center">
@@ -2280,94 +2302,165 @@ export default function PaymentRequest({ params }) {
 
                             <div className="mr-10 space-y-2 flex flex-col">
                               {/* <InputNumber
-                      size="small"
-                      name="title"
-                      className="text-xs w-full"
-                      placeholder={paymentRequest?.amount}
-                      onChange={(e) => {
-                        paymentRequest.amount = e;
-                      }}
-                    /> */}
-                              <div className="flex flex-row space-x-2 items-center">
-                                <Switch
-                                  onChange={setOverrideAmount}
-                                  checked={overrideAmount}
-                                  disabled={paymentRequest?.currency === "RWF"}
-                                />
-                                <div>Override Amount</div>
-                              </div>
-                              {overrideAmount && (
-                                <div>
-                                  <Form.Item>
-                                    <Form.Item
-                                      label="Override RWF Amount"
-                                      name="overrideAmount"
-                                      noStyle
-                                      rules={[
-                                        {
-                                          required: true,
-                                          message: "Amount is required",
-                                        },
-                                        {
-                                          validator(rule, value) {
-                                            return new Promise(
-                                              (resolve, reject) => {
-                                                if (value <= 0) {
-                                                  reject(
-                                                    "The amount should exceed Zero"
-                                                  );
-                                                } else {
-                                                  resolve();
-                                                }
-                                              }
-                                            );
-                                          },
-                                        },
-                                      ]}
-                                      initialValue={0}
-                                    >
-                                      <InputNumber
-                                        label="Override RWF Amount"
-                                        className="h-11 w-full"
-                                        addonBefore={
-                                          <Form.Item
-                                            noStyle
-                                            // name="currency"
-                                          >
-                                            <Select
-                                              disabled={true}
-                                              defaultValue="RWF"
-                                              value="RWF"
-                                              options={[
-                                                {
-                                                  value: "RWF",
-                                                  label: "RWF",
-                                                  key: "RWF",
-                                                },
-                                                // {
-                                                //   value: "USD",
-                                                //   label: "USD",
-                                                //   key: "USD",
-                                                // },
-                                                // {
-                                                //   value: "EUR",
-                                                //   label: "EUR",
-                                                //   key: "EUR",
-                                                // },
-                                              ]}
-                                            ></Select>
-                                          </Form.Item>
-                                        }
-                                        // defaultValue={paymentRequest.amount}
-                                        value={amountOverride}
-                                        onChange={setAmountOverride}
-                                      />
-                                    </Form.Item>
-                                  </Form.Item>
-                                </div>
-                              )}
+                                size="small"
+                                name="title"
+                                className="text-xs w-full"
+                                placeholder={paymentRequest?.amount}
+                                onChange={(e) => {
+                                  paymentRequest.amount = e;
+                                }}
+                              /> */}
                             </div>
                           </div>
+
+                          <div className="grid lg:grid-cols-2 items-center gap-x-6 mt-2">
+                            <Form.Item
+                              label="Debit Account"
+                              name="accountToDebit"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "Can not be empty!",
+                                },
+                              ]}
+                            >
+                              <Select
+                                // defaultValue={defaultApprover}
+                                // style={{ marginLeft: 8, maxWidth: 250 }}
+                                // style={{ marginLeft: 8 }}
+                                placeholder="Account to debit"
+                                size="large"
+                                showSearch
+                                onChange={(value) => {
+                                  // setLevel1Approver(value);
+                                  setDebitAccount(value);
+                                }}
+                                filterOption={(input, option) =>
+                                  (option?.label ?? "")
+                                    .toLowerCase()
+                                    .includes(input.toLowerCase())
+                                }
+                                options={accounts?.map((l) => {
+                                  return {
+                                    label: l?.Name,
+                                    value: l?.Code,
+                                  };
+                                })}
+                              ></Select>
+                            </Form.Item>
+                            <Form.Item
+                              label="Credit Account"
+                              name="accountToCredit"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "Can not be empty!",
+                                },
+                              ]}
+                            >
+                              <Select
+                                // style={{ marginLeft: 8, maxWidth: 250 }}
+                                // defaultValue={defaultApprover}
+                                // style={{ marginLeft: 8 }}
+                                placeholder="Account to Credit"
+                                showSearch
+                                size="large"
+                                onChange={(value) => {
+                                  // setLevel1Approver(value);
+                                  setCreditAccount(value);
+                                }}
+                                filterOption={(input, option) =>
+                                  (option?.label ?? "")
+                                    .toLowerCase()
+                                    .includes(input.toLowerCase())
+                                }
+                                options={accounts?.map((l) => {
+                                  return {
+                                    label: l?.Name,
+                                    value: l?.Code,
+                                  };
+                                })}
+                              ></Select>
+                            </Form.Item>
+                          </div>
+                          <div className="flex flex-row space-x-2 items-center my-4">
+                            <Switch
+                              onChange={setOverrideAmount}
+                              checked={overrideAmount}
+                              disabled={paymentRequest?.currency === "RWF"}
+                            />
+                            <div>Override Amount</div>
+                          </div>
+                          {overrideAmount && (
+                            <div className="grid md:grid-cols-3">
+                              <Form.Item>
+                                <Form.Item
+                                  label="Override RWF Amount"
+                                  name="overrideAmount"
+                                  noStyle
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "Amount is required",
+                                    },
+                                    {
+                                      validator(rule, value) {
+                                        return new Promise(
+                                          (resolve, reject) => {
+                                            if (value <= 0) {
+                                              reject(
+                                                "The amount should exceed Zero"
+                                              );
+                                            } else {
+                                              resolve();
+                                            }
+                                          }
+                                        );
+                                      },
+                                    },
+                                  ]}
+                                  initialValue={0}
+                                >
+                                  <InputNumber
+                                    label="Override RWF Amount"
+                                    className="h-11 w-full pt-2"
+                                    addonBefore={
+                                      <Form.Item
+                                        noStyle
+                                        // name="currency"
+                                      >
+                                        <Select
+                                          disabled={true}
+                                          defaultValue="RWF"
+                                          value="RWF"
+                                          options={[
+                                            {
+                                              value: "RWF",
+                                              label: "RWF",
+                                              key: "RWF",
+                                            },
+                                            // {
+                                            //   value: "USD",
+                                            //   label: "USD",
+                                            //   key: "USD",
+                                            // },
+                                            // {
+                                            //   value: "EUR",
+                                            //   label: "EUR",
+                                            //   key: "EUR",
+                                            // },
+                                          ]}
+                                        ></Select>
+                                      </Form.Item>
+                                    }
+                                    // defaultValue={paymentRequest.amount}
+                                    value={amountOverride}
+                                    onChange={setAmountOverride}
+                                  />
+                                </Form.Item>
+                              </Form.Item>
+                            </div>
+                          )}
 
                           <div className="mt-10">
                             <Button
@@ -2539,8 +2632,12 @@ export default function PaymentRequest({ params }) {
                 {
                   children: (
                     <div className="flex flex-col mb-1">
-                      <h6 className="m-0 py-0.5 px-0 text-[12px] text-[#344767]">Review</h6>
-                      <small className="text-[#A3AEB4]">You can perfom sourcing action here.</small>
+                      <h6 className="m-0 py-0.5 px-0 text-[12px] text-[#344767]">
+                        Review
+                      </h6>
+                      <small className="text-[#A3AEB4]">
+                        You can perfom sourcing action here.
+                      </small>
                     </div>
                   ),
                   color: paymentRequest?.status !== "declined" ? "blue" : "red",
@@ -2558,8 +2655,12 @@ export default function PaymentRequest({ params }) {
                 {
                   children: (
                     <div className="flex flex-col mb-1">
-                      <h6 className="m-0 py-0.5 px-0 text-[12px] text-[#344767]">Approval</h6>
-                      <small className="text-[#A3AEB4]">You can perfom sourcing action here.</small>
+                      <h6 className="m-0 py-0.5 px-0 text-[12px] text-[#344767]">
+                        Approval
+                      </h6>
+                      <small className="text-[#A3AEB4]">
+                        You can perfom sourcing action here.
+                      </small>
                     </div>
                   ),
                   color:
@@ -2580,8 +2681,12 @@ export default function PaymentRequest({ params }) {
                 {
                   children: (
                     <div className="flex flex-col mb-1">
-                      <h6 className="m-0 py-0.5 px-0 text-[12px] text-[#344767]">Payment</h6>
-                      <small className="text-[#A3AEB4]">You can perfom sourcing action here.</small>
+                      <h6 className="m-0 py-0.5 px-0 text-[12px] text-[#344767]">
+                        Payment
+                      </h6>
+                      <small className="text-[#A3AEB4]">
+                        You can perfom sourcing action here.
+                      </small>
                     </div>
                   ),
                   color: paymentRequest?.status == "paid" ? "blue" : "gray",

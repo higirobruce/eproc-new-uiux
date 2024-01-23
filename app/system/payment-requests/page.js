@@ -331,11 +331,16 @@ export default function UserRequests() {
                 value={searchStatus}
                 options={[
                   // { value: "mine", label: "My requests" },
-                  { value: "all", label: "Filters" },
-                  { value: "pending", label: "Pending approval" },
+                  { value: "all", label: "All requests" },
+                  { value: "pending-approval", label: "Pending approval" },
+                  { value: "pending-review", label: "Pending review" },
                   {
                     value: "approved",
                     label: "Approved",
+                  },
+                  {
+                    value: "paid",
+                    label: "Paid",
                   },
                   {
                     value: "declined",
@@ -356,16 +361,47 @@ export default function UserRequests() {
           <div className="request mr-6 bg-white h-[calc(100vh-161px)] rounded-lg mb-10 px-5 overflow-y-auto">
             <div className="flex justify-between items-center mb-5">
               <h4 className="text-[19px] text-[#344767]">Payment Request</h4>
-              <div className="flex items-center rounded-lg bg-[#F5F7FA] p-1.5">
-                <FiSearch size={18} className="text-[#E4E4E4] ml-2" />
-                <Input
-                  onChange={(e) => {
-                    setSearchText(e?.target?.value);
-                  }}
-                  placeholder="Search by request#, po#, initiator"
-                  className="border-0 text-[#8392AB] bg-transparent text-[12px] hover:border-none hover:outline-none"
-                />
-                <div></div>
+              <div className="flex items-center gap-5">
+                <div className="flex items-center space-x-5">
+                  {user?.userType !== "VENDOR" &&
+                    (currentUser?.permissions?.canApproveAsHod ||
+                      currentUser?.permissions?.canApproveAsHof ||
+                      currentUser?.permissions?.canApproveAsPM) && (
+                      <div className="flex flex-row items-center space-x-1">
+                        <Checkbox
+                          checked={myPendingRequest}
+                          disabled={onlyMine}
+                          onChange={(e) => {
+                            getMyPendingRequest(e.target.checked);
+                          }}
+                        />
+                        <div className="text-[13px] text-[#344767]">Awaiting my approval</div>
+                      </div>
+                    )
+                  }
+                  {user?.userType !== "VENDOR" && (
+                    <div className="flex flex-row items-center space-x-1">
+                      <Checkbox
+                        checked={onlyMine}
+                        onChange={(e) => {
+                          setOnlyMine(e.target.checked);
+                        }}
+                        />
+                        <div className="text-[13px] text-[#344767]">My requests</div>
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center rounded-lg bg-[#F5F7FA] p-1.5">
+                  <FiSearch size={18} className="text-[#E4E4E4] ml-2" />
+                  <Input
+                    onChange={(e) => {
+                      setSearchText(e?.target?.value);
+                    }}
+                    placeholder="Search by request#, po#, initiator"
+                    className="border-0 text-[#8392AB] bg-transparent text-[12px] hover:border-none hover:outline-none"
+                  />
+                  <div></div>
+                </div>
               </div>
             </div>
             <PaymentRequestsTable

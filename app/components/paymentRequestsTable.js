@@ -313,7 +313,6 @@ const PaymentRequestsTable = ({
     {
       title: "Internal/External",
       key: "category",
-      align: "center",
       sorter: (a, b) =>
         getHighLevelStatus(
           a?.category?.charAt(0).toUpperCase() + a?.category?.slice(1)
@@ -323,9 +322,12 @@ const PaymentRequestsTable = ({
           )
         ),
       render: (_, record) => (
-        <Tag color={`${record?.category === "internal" ? "blue" : "magenta"}`}>
-          {record?.category?.charAt(0).toUpperCase() + record?.category?.slice(1)}
-        </Tag>
+        <div className="mt-2 text-left font-semibold text-[11px]">
+          <small className="bg-[#F1F3FF] rounded-3xl text-[#1677FF] px-4 py-1.5">{record?.category == "internal" ? 'INTERNAL' : 'EXTERNAL'}</small>
+        </div>
+        // <Tag color={`${record?.category === "internal" ? "blue" : "magenta"}`}>
+        //   {record?.category?.charAt(0).toUpperCase() + record?.category?.slice(1)}
+        // </Tag>
       ),
     },
 
