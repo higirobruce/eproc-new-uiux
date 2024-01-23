@@ -2490,7 +2490,6 @@ const RequestDetails = ({
   }
 
   const handleItemClick = (value) => {
-    console.log("CLicked ");
     setActiveIndex((prevIndex) => (prevIndex === value ? "" : value));
   };
 
