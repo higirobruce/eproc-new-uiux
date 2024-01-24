@@ -331,34 +331,34 @@ const PaymentRequestsTable = ({
       ),
     },
 
-    {
-      title: "Invoice (s) ",
-      key: "docs",
-      // sorter: (a, b) => a?.status > b?.status,
-      render: (_, record) => (
-        <div className="flex flex-col text-xs">
-          {record?.docIds?.map((doc, index) => {
-            const truncatedFileName =
-              doc?.length >= 11
-                ? `${doc?.slice(0, 7)}... ${doc?.slice(doc?.lastIndexOf("."))}`
-                : doc;
-            return (
-              <Tooltip title={doc}>
-                <Typography.Text ellipsis>
-                <Link
-                  href={`${url}/file/paymentRequests/${doc}`}
-                  target="_blank"
-                  className="capitalize text-[12px] text-[#8392AB]"
-                >
-                  {truncatedFileName}
-                </Link>
-              </Typography.Text>
-              </Tooltip>
-            );
-          })}
-        </div>
-      ),
-    },
+    // {
+    //   title: "Invoice (s) ",
+    //   key: "docs",
+    //   sorter: (a, b) => a?.status > b?.status,
+    //   render: (_, record) => (
+    //     <div className="flex flex-col text-xs">
+    //       {record?.docIds?.map((doc, index) => {
+    //         const truncatedFileName =
+    //           doc?.length >= 11
+    //             ? `${doc?.slice(0, 7)}... ${doc?.slice(doc?.lastIndexOf("."))}`
+    //             : doc;
+    //         return (
+    //           <Tooltip title={doc}>
+    //             <Typography.Text ellipsis>
+    //               <Link
+    //                 href={`${url}/file/paymentRequests/${doc}`}
+    //                 target="_blank"
+    //                 className="capitalize text-[12px] text-[#8392AB]"
+    //               >
+    //                 {truncatedFileName}
+    //               </Link>
+    //             </Typography.Text>
+    //           </Tooltip>
+    //         );
+    //       })}
+    //     </div>
+    //   ),
+    // },
 
     // {
     //   title: "Action",

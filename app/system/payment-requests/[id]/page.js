@@ -849,7 +849,16 @@ export default function PaymentRequest({ params }) {
     setActiveIndex((prevIndex) => (prevIndex === value ? "" : value));
   };
 
-  console.log("Payment Request ", paymentRequest);
+  const conditions =
+    (paymentRequest?.createdBy?._id === user?._id &&
+      (paymentRequest?.status == "pending-review" ||
+        paymentRequest?.status == "declined" ||
+        paymentRequest?.status == "withdrawn" ||
+        paymentRequest?.status?.includes("pending-approval"))) ||
+    ((paymentRequest?.approver?._id === user?._id ||
+      user?.permissions?.canApproveAsHof) &&
+      (paymentRequest?.status?.includes("pending-review") ||
+        paymentRequest?.status?.includes("pending-approval")));
 
   return (
     <motion.div
@@ -871,7 +880,7 @@ export default function PaymentRequest({ params }) {
             <div className="flex flex-row justify-between items-center">
               <div className="flex flex-row justify-between items-center">
                 <div className="flex flex-row space-x-10 items-center">
-                  <div>
+                  {/* <div>
                     <Button
                       icon={<ArrowLeftOutlined />}
                       type="primary"
@@ -881,7 +890,7 @@ export default function PaymentRequest({ params }) {
                     >
                       Back
                     </Button>
-                  </div>
+                  </div> */}
 
                   <div className="text-lg font-semibold">
                     Payment request {paymentRequest?.number}
@@ -893,22 +902,14 @@ export default function PaymentRequest({ params }) {
                   </div>
                 </div>
               </div>
-              {((paymentRequest?.createdBy?._id === user?._id &&
-                (paymentRequest?.status == "pending-review" ||
-                  paymentRequest?.status == "declined" ||
-                  paymentRequest?.status == "withdrawn" ||
-                  paymentRequest?.status?.includes("pending-approval"))) ||
-                ((paymentRequest?.approver?._id === user?._id ||
-                  user?.permissions?.canApproveAsHof) &&
-                  (paymentRequest?.status?.includes("pending-review") ||
-                    paymentRequest?.status?.includes("pending-approval")))) && (
+              {/* {conditions && (
                 <Switch
                   checked={editRequest}
                   checkedChildren={<EditOutlined />}
                   unCheckedChildren={<EyeOutlined />}
                   onChange={(e) => setEditRequest(e)}
                 />
-              )}
+              )} */}
             </div>
             <div className="flex flex-col pl-5 pr-8">
               {/* Overview */}
@@ -937,36 +938,7 @@ export default function PaymentRequest({ params }) {
                       {paymentRequest?.status}
                     </Tag>
                   </div>
-                  <div className="space-x-3 ">
-                    {!paymentRequest?.status?.includes("approved") &&
-                      paymentRequest?.status !== "declined" &&
-                      paymentRequest?.status !== "withdrawn" &&
-                      paymentRequest?.status !== "paid" &&
-                      user?._id == paymentRequest?.createdBy?._id && (
-                        <Popconfirm
-                          title="Are you sure?"
-                          open={openWithdraw}
-                          icon={
-                            <QuestionCircleOutlined style={{ color: "red" }} />
-                          }
-                          onConfirm={() => {
-                            withdrawRequest();
-                          }}
-                          // okButtonProps={{
-                          //   loading: confirmRejectLoading,
-                          // }}
-                          onCancel={() => setOpenWithdraw(false)}
-                        >
-                          <Button
-                            type="primary"
-                            danger
-                            onClick={() => setOpenWithdraw(true)}
-                          >
-                            Withdraw this request
-                          </Button>
-                        </Popconfirm>
-                      )}
-                  </div>
+                  
                 </div>
               </div>
 
@@ -982,39 +954,34 @@ export default function PaymentRequest({ params }) {
                     <div className="mb-3">
                       <label className="text-xs text-gray-400">Title</label>
                     </div>
-                    {!editRequest && (
-                      <Typography.Text className="text-xs">
-                        {paymentRequest?.title}
-                      </Typography.Text>
-                    )}
-                    {editRequest && (
-                      <div className="">
-                        <Form.Item
-                          name="title"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Title is required",
-                            },
-                          ]}
-                          initialValue={paymentRequest?.title}
-                        >
-                          <Input
-                            // size="small"
 
-                            className="h-11 text-xs"
-                            // placeholder={paymentRequest?.title}
-                            // defaultValue={paymentRequest?.title}
-                            value={paymentRequest?.title}
-                            onChange={(e) => {
-                              let _p = { ...paymentRequest };
-                              _p.title = e.target.value;
-                              setPaymentRequest(_p);
-                            }}
-                          />
-                        </Form.Item>
-                      </div>
-                    )}
+                    {paymentRequest && <div className="">
+                      <Form.Item
+                        name="title"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Title is required",
+                          },
+                        ]}
+                        initialValue={paymentRequest?.title}
+                      >
+                        <Input
+                          // size="small"
+
+                          className="h-11 text-xs"
+                          // placeholder={paymentRequest?.title}
+                          // defaultValue={paymentRequest?.title}
+                          value={paymentRequest?.title}
+                          onChange={(e) => {
+                            let _p = { ...paymentRequest };
+                            _p.title = e.target.value;
+                            setPaymentRequest(_p);
+                          }}
+                          disabled={!conditions}
+                        />
+                      </Form.Item>
+                    </div>}
                   </div>
 
                   {/* Request Amount due*/}
@@ -1024,125 +991,117 @@ export default function PaymentRequest({ params }) {
                         Amount due
                       </label>
                     </div>
-                    {!editRequest && (
-                      <div className="text-xs">
-                        {paymentRequest?.amount?.toLocaleString()}{" "}
-                        {paymentRequest?.currency}
-                      </div>
-                    )}
-                    {editRequest && (
-                      <div className="">
-                        {/* <InputNumber
-                      size="small"
-                      name="title"
-                      className="text-xs w-full"
-                      placeholder={paymentRequest?.amount}
-                      onChange={(e) => {
-                        paymentRequest.amount = e;
-                      }}
-                    /> */}
 
-                        <Form.Item>
-                          <Form.Item
-                            name="amount"
-                            noStyle
-                            rules={[
-                              {
-                                required: true,
-                                message: "Amount is required",
+                    {paymentRequest && <div className="">
+                      {/* <InputNumber
+                        size="small"
+                        name="title"
+                        className="text-xs w-full"
+                        placeholder={paymentRequest?.amount}
+                        onChange={(e) => {
+                          paymentRequest.amount = e;
+                        }}
+                      /> */}
+
+                      <Form.Item>
+                        <Form.Item
+                          name="amount"
+                          noStyle
+                          rules={[
+                            {
+                              required: true,
+                              message: "Amount is required",
+                            },
+                            {
+                              validator(rule, value) {
+                                return new Promise((resolve, reject) => {
+                                  if (
+                                    ((poVal > -1 &&
+                                      value >
+                                        getPoTotalVal()?.grossTotal -
+                                          totalPaymentVal +
+                                          paymentRequest?.amount) ||
+                                      (poVal == -1 &&
+                                        value > getPoTotalVal()?.grossTotal)) &&
+                                    paymentRequest?.category === "external"
+                                  ) {
+                                    reject(
+                                      "Requested amount should not exceed the PO Value!"
+                                    );
+                                  } else {
+                                    resolve();
+                                  }
+                                });
                               },
-                              {
-                                validator(rule, value) {
-                                  return new Promise((resolve, reject) => {
-                                    if (
-                                      ((poVal > -1 &&
-                                        value >
-                                          getPoTotalVal()?.grossTotal -
-                                            totalPaymentVal +
-                                            paymentRequest?.amount) ||
-                                        (poVal == -1 &&
-                                          value >
-                                            getPoTotalVal()?.grossTotal)) &&
-                                      paymentRequest?.category === "external"
-                                    ) {
-                                      reject(
-                                        "Requested amount should not exceed the PO Value!"
-                                      );
-                                    } else {
-                                      resolve();
-                                    }
-                                  });
-                                },
-                              },
-                            ]}
-                            initialValue={paymentRequest.amount}
-                          >
-                            <InputNumber
-                              className="h-10 w-full pt-1.5"
-                              addonBefore={
-                                <Form.Item
-                                  noStyle
-                                  name="currencyEd"
-                                  initialValue={currency}
-                                  rules={[
+                            },
+                          ]}
+                          initialValue={paymentRequest?.amount}
+                        >
+                          <InputNumber
+                            className="h-10 w-full pt-1.5"
+                            addonBefore={
+                              <Form.Item
+                                noStyle
+                                name="currencyEd"
+                                initialValue={currency}
+                                rules={[
+                                  {
+                                    validator(rule, value) {
+                                      return new Promise((resolve, reject) => {
+                                        if (
+                                          value !== currency &&
+                                          paymentRequest?.category ===
+                                            "external"
+                                        ) {
+                                          reject(
+                                            "The currency can not differ from the PO currency!"
+                                          );
+                                        } else {
+                                          resolve();
+                                        }
+                                      });
+                                    },
+                                  },
+                                ]}
+                              >
+                                <Select
+                                  onChange={(value) =>
+                                    (paymentRequest.currency = value)
+                                  }
+                                  size="large"
+                                  value={paymentRequest?.currency}
+                                  options={[
                                     {
-                                      validator(rule, value) {
-                                        return new Promise(
-                                          (resolve, reject) => {
-                                            if (
-                                              value !== currency &&
-                                              paymentRequest?.category ===
-                                                "external"
-                                            ) {
-                                              reject(
-                                                "The currency can not differ from the PO currency!"
-                                              );
-                                            } else {
-                                              resolve();
-                                            }
-                                          }
-                                        );
-                                      },
+                                      value: "RWF",
+                                      label: "RWF",
+                                      key: "RWF",
+                                    },
+                                    {
+                                      value: "USD",
+                                      label: "USD",
+                                      key: "USD",
+                                    },
+                                    {
+                                      value: "EUR",
+                                      label: "EUR",
+                                      key: "EUR",
                                     },
                                   ]}
-                                >
-                                  <Select
-                                    onChange={(value) =>
-                                      (paymentRequest.currency = value)
-                                    }
-                                    size="large"
-                                    value={paymentRequest.currency}
-                                    options={[
-                                      {
-                                        value: "RWF",
-                                        label: "RWF",
-                                        key: "RWF",
-                                      },
-                                      {
-                                        value: "USD",
-                                        label: "USD",
-                                        key: "USD",
-                                      },
-                                      {
-                                        value: "EUR",
-                                        label: "EUR",
-                                        key: "EUR",
-                                      },
-                                    ]}
-                                  ></Select>
-                                </Form.Item>
-                              }
-                              // defaultValue={paymentRequest.amount}
-                              value={paymentRequest.amount}
-                              onChange={(e) => {
-                                setAmount(e);
-                                // paymentRequest.amount = e;
-                              }}
-                            />
-                          </Form.Item>
+                                  disabled={!conditions}
+                                ></Select>
+                              </Form.Item>
+                            }
+                            // defaultValue={paymentRequest.amount}
+                            value={paymentRequest?.amount}
+                            onChange={(e) => {
+                              setAmount(e);
+                              // paymentRequest.amount = e;
+                            }}
+                            disabled={!conditions}
+                          />
                         </Form.Item>
-                      </div>
-                    )}
+                      </Form.Item>
+                    </div>}
                   </div>
 
                   {/* Request Attached Invoice*/}
@@ -1219,51 +1178,43 @@ export default function PaymentRequest({ params }) {
                   </div>
 
                   {/* Budgeted */}
-                  {user?.userType !== "VENDOR" && (
+                  {(user?.userType !== "VENDOR" && paymentRequest) && (
                     <div className="flex flex-col space-y-1 items-start">
                       <div className="mb-3">
                         <label className="text-xs text-gray-400">
                           Budgeted
                         </label>
                       </div>
-                      {!editRequest && (
-                        <div className="text-sm font-semibold text-gray-600">
-                          {paymentRequest?.budgeted ? "Yes" : "No"}
-                        </div>
-                      )}
-                      {editRequest && (
-                        <div>
-                          <Form.Item
-                            name="budgeted"
-                            valuePropName="checked"
-                            // wrapperCol={{ offset: 8, span: 16 }}
+
+                      <div>
+                        <Form.Item
+                          name="budgeted"
+                          valuePropName="checked"
+                          // wrapperCol={{ offset: 8, span: 16 }}
+                        >
+                          <Radio.Group
+                            onChange={({ target }) => {
+                              paymentRequest.budgeted = target.value;
+                              if (target.value === false)
+                                paymentRequest.budgetLine = null;
+                              setBudgeted(target.value);
+                            }}
+                            className="mt-3"
+                            defaultValue={
+                              paymentRequest?.budgeted ? true : false
+                            }
+                            value={paymentRequest?.budgeted ? true : false}
+                            disabled={!conditions}
                           >
-                            <Radio.Group
-                              onChange={({ target }) => {
-                                paymentRequest.budgeted = target.value;
-                                if (target.value === false)
-                                  paymentRequest.budgetLine = null;
-                                setBudgeted(target.value);
-                              }}
-                              className="mt-3"
-                              defaultValue={
-                                paymentRequest?.budgeted ? true : false
-                              }
-                              disabled={
-                                paymentRequest?.status === "approved" ||
-                                paymentRequest?.status === "approved (pm)"
-                              }
-                            >
-                              <Radio value={true} className="mr-3">
-                                <span className="ml-2 text-[18px]">Yes</span>
-                              </Radio>
-                              <Radio value={false} className="mx-3">
-                                <span className="ml-2 text-[18px]">No</span>
-                              </Radio>
-                            </Radio.Group>
-                          </Form.Item>
-                        </div>
-                      )}
+                            <Radio value={true} className="mr-3">
+                              <span className="ml-2 text-[18px]">Yes</span>
+                            </Radio>
+                            <Radio value={false} className="mx-3">
+                              <span className="ml-2 text-[18px]">No</span>
+                            </Radio>
+                          </Radio.Group>
+                        </Form.Item>
+                      </div>
                     </div>
                   )}
 
@@ -1277,13 +1228,8 @@ export default function PaymentRequest({ params }) {
                           </label>
                         </div>
                       )}
-                      {!editRequest && (
-                        <div className="text-sm font-semibold text-gray-600">
-                          {paymentRequest?.budgetLine?.description}
-                        </div>
-                      )}
 
-                      {editRequest && budgeted && (
+                      {budgeted && (
                         // <Select
                         //   // mode="multiple"
                         //   // allowClear
@@ -1358,6 +1304,7 @@ export default function PaymentRequest({ params }) {
                                 }),
                               };
                             })}
+                            disabled={!conditions}
                           ></Select>
                         </Form.Item>
                       )}
@@ -1369,36 +1316,31 @@ export default function PaymentRequest({ params }) {
                     <div className="mb-3">
                       <label className="text-xs text-gray-400">Comment</label>
                     </div>
-                    {!editRequest && (
-                      <Typography.Text className="text-xs">
-                        {paymentRequest?.description}
-                      </Typography.Text>
-                    )}
-                    {editRequest && (
-                      <div className="">
-                        <Form.Item
-                          name="description"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Description is required",
-                            },
-                          ]}
-                          initialValue={paymentRequest?.description}
-                        >
-                          <Input.TextArea
-                            className="w-full"
-                            rows={4}
-                            placeholder={paymentRequest?.description}
-                            // defaultValue={paymentRequest?.description}
-                            value={paymentRequest?.description}
-                            onChange={(e) => {
-                              paymentRequest.description = e.target.value;
-                            }}
-                          />
-                        </Form.Item>
-                      </div>
-                    )}
+
+                    <div className="">
+                      <Form.Item
+                        name="description"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Description is required",
+                          },
+                        ]}
+                        initialValue={paymentRequest?.description}
+                      >
+                        <Input.TextArea
+                          className="w-full"
+                          rows={4}
+                          placeholder={paymentRequest?.description}
+                          // defaultValue={paymentRequest?.description}
+                          value={paymentRequest?.description}
+                          onChange={(e) => {
+                            paymentRequest.description = e.target.value;
+                          }}
+                          disabled={!conditions}
+                        />
+                      </Form.Item>
+                    </div>
                   </div>
                 </div>
                 {paymentRequest && (
@@ -1420,6 +1362,7 @@ export default function PaymentRequest({ params }) {
                             }}
                             value={bankPay}
                             className="mb-2 mt-5"
+                            disabled={!conditions}
                           >
                             <div className="flex gap-x-10">
                               <div className="my-1 border-t-2 border-x-2 border-[#BFC5C5]">
@@ -1476,7 +1419,7 @@ export default function PaymentRequest({ params }) {
                                       paymentRequest?.paymentDetails?.bankName
                                     }
                                     placeholder="Type in Bank name"
-                                    disabled={!editRequest}
+                                    disabled={!conditions}
                                   />
                                 </Form.Item>
                               </div>
@@ -1514,7 +1457,7 @@ export default function PaymentRequest({ params }) {
                                       // setAccountName(e.target.value)
                                     }}
                                     placeholder="Type in User account name"
-                                    disabled={!editRequest}
+                                    disabled={!conditions}
                                   />
                                 </Form.Item>
                               </div>
@@ -1552,7 +1495,7 @@ export default function PaymentRequest({ params }) {
                                       // setAccountNumber(e.target.value)
                                     }}
                                     placeholder="Type in User account number"
-                                    disabled={!editRequest}
+                                    disabled={!conditions}
                                   />
                                 </Form.Item>
                               </div>
@@ -1589,7 +1532,7 @@ export default function PaymentRequest({ params }) {
                                       setPaymentRequest(_p);
                                     }}
                                     placeholder="Type in Phone name"
-                                    disabled={!editRequest}
+                                    disabled={!conditions}
                                   />
                                 </Form.Item>
                               </div>
@@ -1637,7 +1580,38 @@ export default function PaymentRequest({ params }) {
                   </div>
                 )}
                 <div className="flex justify-end gap-x-5 my-4">
-                  {editRequest && (
+                  <div className="space-x-3 ">
+                    {!paymentRequest?.status?.includes("approved") &&
+                      paymentRequest?.status !== "declined" &&
+                      paymentRequest?.status !== "withdrawn" &&
+                      paymentRequest?.status !== "paid" &&
+                      user?._id == paymentRequest?.createdBy?._id && (
+                        <Popconfirm
+                          title="Are you sure?"
+                          open={openWithdraw}
+                          icon={
+                            <QuestionCircleOutlined style={{ color: "red" }} />
+                          }
+                          onConfirm={() => {
+                            withdrawRequest();
+                          }}
+                          // okButtonProps={{
+                          //   loading: confirmRejectLoading,
+                          // }}
+                          onCancel={() => setOpenWithdraw(false)}
+                        >
+                          <Button
+                            type="primary"
+                            danger
+                            onClick={() => setOpenWithdraw(true)}
+                            className="rounded-lg px-8 pt-3 pb-8 bg-[#F5365C] border-none"
+                          >
+                            Withdraw this request
+                          </Button>
+                        </Popconfirm>
+                      )}
+                  </div>
+                  {conditions && (
                     <div>
                       <Button
                         loading={saving}
@@ -1655,6 +1629,8 @@ export default function PaymentRequest({ params }) {
                             }
                           });
                         }}
+                        className="rounded-lg px-8 pt-3 pb-8 bg-[#0065DD] border-none"
+                        // className="bg-[#0065DD] rounded-lg px-8 py-2 border-none cursor-pointer"
                       >
                         Update
                       </Button>
