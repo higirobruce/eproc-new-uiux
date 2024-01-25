@@ -20,7 +20,7 @@ let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
 
 async function getApprovers() {
-  let token = localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const res = await fetch(`${url}/users/level1Approvers`, {
     method: "GET",
     headers: {
@@ -42,8 +42,9 @@ async function getApprovers() {
 }
 
 export default function NewPaymentRequest() {
-  let user = JSON.parse(localStorage.getItem("user"));
-  let token = localStorage.getItem("token");
+  let user =
+    typeof window !== "undefined" && JSON.parse(localStorage.getItem("user"));
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   let [po, setPo] = useState(null);
   let router = useRouter();
   let [form] = Form.useForm();
@@ -170,7 +171,7 @@ export default function NewPaymentRequest() {
         approver: level1Approver,
         // purchaseOrder: params?.poId,
         docIds: _fileList,
-        status:'pending-approval'
+        status: "pending-approval",
       }),
     })
       .then((res) => {
