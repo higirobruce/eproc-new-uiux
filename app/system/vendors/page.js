@@ -510,7 +510,7 @@ export default function Vendors() {
               ></Button>
             </div>
           </div>
-          <div className="mr-6 bg-white rounded-lg h-[calc(100vh-160px)] mb-10 px-5 pb-2">
+          <div className="request mr-6 bg-white rounded-lg h-[calc(100vh-160px)] mb-10 px-5 pb-2 overflow-y-auto">
             <div className="flex justify-between items-center mb-5">
               <h4 className="text-[19px] text-[#344767]">Vendors List</h4>
               <div className="flex items-center rounded-lg bg-[#F5F7FA] p-1.5">

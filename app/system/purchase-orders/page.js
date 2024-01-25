@@ -942,7 +942,7 @@ export default function PurchaseOrders() {
                                 className="text-[13px] flex items-center gap-3 no-underline text-[#1677FF]"
                               >
                                 <FaLink />
-                                Reference Docs
+                                Check Request
                               </Link>
                             )}
                           {po?.reqAttachmentDocId && (
@@ -951,7 +951,7 @@ export default function PurchaseOrders() {
                               className="text-[13px] flex items-center gap-3 no-underline text-[#1677FF]"
                             >
                               <IoLink />
-                              Check request
+                              Reference Docs
                             </Link>
                           )}
                         </div>
