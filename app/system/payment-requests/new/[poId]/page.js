@@ -222,6 +222,13 @@ export default function NewPaymentRequest({ params }) {
         createdBy: user?._id,
         purchaseOrder: params?.poId,
         docIds: _fileList,
+        paymentDetails: {
+          bankName,
+          accountName,
+          accountNumber,
+          phoneName,
+          phoneNumber,
+        },
       }),
     })
       .then((res) => {
@@ -717,7 +724,7 @@ export default function NewPaymentRequest({ params }) {
               });
             }}
             disabled={submitting}
-            className="flex item-center border-none text-[16px] text-white gap-x-4 bg-[#0065DD] rounded-lg py-3 px-6"
+            className="flex item-center cursor-pointer border-none text-[16px] text-white gap-x-4 bg-[#0065DD] rounded-lg py-3 px-6"
           >
             <SaveOutlined className="font-[19px]" />
             Save

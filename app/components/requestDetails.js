@@ -2813,7 +2813,7 @@ const RequestDetails = ({
                     type="primary"
                     danger
                     onClick={() => setOpenWithdraw(true)}
-                    className="rounded-lg px-8 pt-2 pb-9 bg-[#F5365C] border-none"
+                    className="rounded-lg px-8 pt-3 pb-8 bg-[#F5365C] border-none"
                   >
                     Withdraw request
                   </Button>

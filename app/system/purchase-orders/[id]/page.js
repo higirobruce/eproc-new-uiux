@@ -234,7 +234,7 @@ export default function page({ params }) {
 
   const content = () => {
     return (
-      <div className="space-y-5 p-3 overflow-x-scroll bg-white mx-11 shadow-md">
+      <div className="space-y-5 p-3 overflow-scroll bg-white mx-11 shadow-md h-full">
         <div className="flex flex-row justify-between items-center">
           <Typography.Title level={4} className="flex flex-row items-center">
             PURCHASE ORDER #{po?.number}{" "}

@@ -1641,6 +1641,7 @@ export default function PaymentRequest({ params }) {
                         loading={saving}
                         icon={<SaveOutlined />}
                         type="primary"
+                        className="rounded-lg px-8 pt-3 pb-8 bg-[#0065DD] border-none"
                         onClick={async () => {
                           form.validateFields().then(() => {
                             if (files?.length < 1) {
