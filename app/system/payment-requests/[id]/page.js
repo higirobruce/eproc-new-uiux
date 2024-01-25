@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { encode } from "base-64";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -21,6 +21,7 @@ import {
   Tooltip,
 } from "antd";
 import {
+  LikeOutlined,
   ArrowLeftOutlined,
   CheckCircleOutlined,
   CheckOutlined,
@@ -35,8 +36,6 @@ import {
   PlusOutlined,
   QuestionCircleOutlined,
   SaveOutlined,
-  UploadOutlined,
-  FileSyncOutlined,
 } from "@ant-design/icons";
 import Link from "next/link";
 import moment from "moment";
@@ -49,18 +48,21 @@ import {
   LockClosedIcon,
   UserGroupIcon,
   LightBulbIcon,
-  CloudArrowUpIcon,
-  XCircleIcon,
 } from "@heroicons/react/24/outline";
 import UploadPaymentReq from "@/app/components/uploadPaymentReq";
 import UpdatePaymentReqDoc from "@/app/components/updatePaymentReqDoc";
+import { FaCheck } from "react-icons/fa6";
+import { MdApproval, MdOutlinePayments } from "react-icons/md";
+import { RiForbidLine, RiArrowDropDownLine } from "react-icons/ri";
+import { MdAccountBalance } from "react-icons/md";
+import { FaMobileAlt } from "react-icons/fa";
+
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
-let fend_url = process.env.NEXT_PUBLIC_FTEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
 
 async function getPaymentRequestDetails(id, router) {
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
 
   const res = await fetch(`${url}/paymentRequests/${id}`, {
     headers: {
@@ -68,11 +70,9 @@ async function getPaymentRequestDetails(id, router) {
       token: token,
       "Content-Type": "application/json",
     },
-  }).catch((err) => {
-    console.log(err);
   });
 
-  if (!res?.ok) {
+  if (!res.ok) {
     // This will activate the closest `error.js` Error Boundary
 
     if (res.status === 401) {
@@ -90,7 +90,7 @@ async function getPaymentRequestDetails(id, router) {
 }
 
 async function getPoPaymentProgress(id, router) {
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
 
   if (id) {
     const res = await fetch(`${url}/purchaseOrders/paymentProgress/${id}`, {
@@ -100,11 +100,9 @@ async function getPoPaymentProgress(id, router) {
         token: token,
         "Content-Type": "application/json",
       },
-    }).catch((err) => {
-      console.log(err);
     });
 
-    if (!res?.ok) {
+    if (!res.ok) {
       if (res.status === 401) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -122,7 +120,7 @@ async function getPoPaymentProgress(id, router) {
 }
 
 async function getPoPaidRequests(id, router) {
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const res = await fetch(`${url}/purchaseOrders/paymentsDone/${id}`, {
     method: "GET",
     headers: {
@@ -130,11 +128,9 @@ async function getPoPaidRequests(id, router) {
       token: token,
       "Content-Type": "application/json",
     },
-  }).catch((err) => {
-    console.log(err);
   });
 
-  if (!res?.ok) {
+  if (!res.ok) {
     if (res.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
@@ -149,7 +145,7 @@ async function getPoPaidRequests(id, router) {
 }
 
 async function getApprovers() {
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const res = await fetch(`${url}/users/level1Approvers`, {
     method: "GET",
     headers: {
@@ -158,11 +154,9 @@ async function getApprovers() {
       token: token,
       "Content-Type": "application/json",
     },
-  }).catch((err) => {
-    console.log(err);
   });
 
-  if (!res?.ok) {
+  if (!res.ok) {
     // This will activate the closest `error.js` Error Boundary
 
     return null;
@@ -173,7 +167,7 @@ async function getApprovers() {
 }
 
 async function getAccounts() {
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const res = await fetch(`${url}/b1/accounts`, {
     method: "GET",
     headers: {
@@ -182,11 +176,9 @@ async function getAccounts() {
       token: token,
       "Content-Type": "application/json",
     },
-  }).catch((err) => {
-    console.log(err);
   });
 
-  if (!res?.ok) {
+  if (!res.ok) {
     // This will activate the closest `error.js` Error Boundary
 
     return null;
@@ -197,7 +189,7 @@ async function getAccounts() {
 }
 
 async function getDistributionRules() {
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const res = await fetch(`${url}/b1/distributionRules`, {
     method: "GET",
     headers: {
@@ -206,11 +198,9 @@ async function getDistributionRules() {
       token: token,
       "Content-Type": "application/json",
     },
-  }).catch((err) => {
-    console.log(err);
   });
 
-  if (!res?.ok) {
+  if (!res.ok) {
     // This will activate the closest `error.js` Error Boundary
 
     return null;
@@ -223,7 +213,7 @@ async function getDistributionRules() {
 async function getBudgetLines() {}
 
 async function getFile(path) {
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const res = await fetch(path, {
     method: "GET",
     headers: {
@@ -232,11 +222,9 @@ async function getFile(path) {
       token: token,
       "Content-Type": "application/json",
     },
-  }).catch((err) => {
-    console.log(err);
   });
 
-  if (!res?.ok) {
+  if (!res.ok) {
     // This will activate the closest `error.js` Error Boundary
 
     return null;
@@ -247,8 +235,10 @@ async function getFile(path) {
 }
 
 export default function PaymentRequest({ params }) {
-  let user = JSON.parse(localStorage.getItem("user"));
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let user = JSON.parse(
+    typeof window !== "undefined" && localStorage.getItem("user")
+  );
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   let [paymentRequest, setPaymentRequest] = useState(null);
   let router = useRouter();
   let [form] = Form.useForm();
@@ -267,7 +257,6 @@ export default function PaymentRequest({ params }) {
   let [amountOverride, setAmountOverride] = useState(0);
 
   let [editRequest, setEditRequest] = useState(false);
-  let [updateFiles, setUpdateFiles] = useState(false);
 
   const [open, setOpen] = useState(false);
   const [openConfirmDeliv, setOpenConfirmDeliv] = useState([]);
@@ -294,6 +283,14 @@ export default function PaymentRequest({ params }) {
   let [poVal, setPoVal] = useState(0);
   let [totalPaymentVal, setTotalPaymentVal] = useState(0);
   let [totalPaid, setTotalPaid] = useState(0);
+  const [activeIndex, setActiveIndex] = useState("request");
+  const contentHeight = useRef();
+  const [bankPay, setBankPay] = useState(true);
+  let [bankName, setBankName] = useState("");
+  let [accountName, setAccountName] = useState("");
+  let [accountNumber, setAccountNumber] = useState("");
+  let [phoneName, setPhoneName] = useState("");
+  let [phoneNumber, setPhoneNumber] = useState("");
 
   useEffect(() => {
     getPaymentRequestDetails(params.id, router).then((res) => {
@@ -305,15 +302,11 @@ export default function PaymentRequest({ params }) {
 
       _paymentRequest?.docIds?.map(async (doc, i) => {
         let uid = `rc-upload-${moment().milliseconds()}-${i}`;
-        let _url = `${fend_url}/api/?folder=paymentRequests&name=${encodeURI(
-          doc
-        )}`;
+        let _url = `${url}/file/paymentRequests/${encodeURI(doc)}`;
         let status = "done";
         let name = `${doc}`;
 
-        let response = await fetch(_url).catch((err) => {
-          console.log(err);
-        });
+        let response = await fetch(_url);
         let data = await response.blob();
         getBase64(data).then((res) => {
           let newFile = new File([data], name, {
@@ -588,6 +581,13 @@ export default function PaymentRequest({ params }) {
       paymentRequest.reviewedAt = null;
       paymentRequest.reviewedBy = null;
     }
+    paymentRequest.paymentDetails = {
+      bankName: paymentRequest?.paymentDetails?.bankName || "",
+      accountName: paymentRequest?.paymentDetails?.accountName || "",
+      accountNumber: paymentRequest?.paymentDetails?.accountNumber || "",
+      phoneName: paymentRequest?.paymentDetails?.phoneName || "",
+      phoneNumber: paymentRequest?.paymentDetails?.phoneNumber || "",
+    };
     paymentRequest.status =
       paymentRequest.status == "declined" ||
       paymentRequest.status == "withdrawn"
@@ -757,15 +757,11 @@ export default function PaymentRequest({ params }) {
 
       _paymentRequest?.docIds?.map(async (doc, i) => {
         let uid = `rc-upload-${moment().milliseconds()}-${i}`;
-        let _url = `${fend_url}/api/?folder=paymentRequests&name=${encodeURI(
-          doc
-        )}`;
+        let _url = `${url}/file/paymentRequests/${encodeURI(doc)}`;
         let status = "done";
         let name = `${doc}`;
 
-        let response = await fetch(_url).catch((err) => {
-          console.log(err);
-        });
+        let response = await fetch(_url);
         let data = await response.blob();
         getBase64(data).then((res) => {
           let newFile = new File([data], name, {
@@ -875,7 +871,7 @@ export default function PaymentRequest({ params }) {
         type: "tween",
         ease: "circOut",
       }}
-      className="flex flex-col mx-10 py-5 flex-1 space-y-3 h-full"
+      className="flex flex-col mr-5 transition-opacity ease-in-out duration-1000 py-5 flex-1 space-y-3 h-screen mb-10"
     >
       {contextHolder}
       <div className="request-details gap-4 items-start h-screen overflow-y-auto">
@@ -906,7 +902,7 @@ export default function PaymentRequest({ params }) {
                   </div>
                 </div>
               </div>
-              {/* {conditions && (
+              {/* {(
                 <Switch
                   checked={editRequest}
                   checkedChildren={<EditOutlined />}
@@ -942,6 +938,36 @@ export default function PaymentRequest({ params }) {
                       {paymentRequest?.status}
                     </Tag>
                   </div>
+                  {/* <div className="space-x-3 ">
+                    {!paymentRequest?.status?.includes("approved") &&
+                      paymentRequest?.status !== "declined" &&
+                      paymentRequest?.status !== "withdrawn" &&
+                      paymentRequest?.status !== "paid" &&
+                      user?._id == paymentRequest?.createdBy?._id && (
+                        <Popconfirm
+                          title="Are you sure?"
+                          open={openWithdraw}
+                          icon={
+                            <QuestionCircleOutlined style={{ color: "red" }} />
+                          }
+                          onConfirm={() => {
+                            withdrawRequest();
+                          }}
+                          // okButtonProps={{
+                          //   loading: confirmRejectLoading,
+                          // }}
+                          onCancel={() => setOpenWithdraw(false)}
+                        >
+                          <Button
+                            type="primary"
+                            danger
+                            onClick={() => setOpenWithdraw(true)}
+                          >
+                            Withdraw this request
+                          </Button>
+                        </Popconfirm>
+                      )}
+                  </div> */}
                 </div>
               </div>
 
@@ -957,7 +983,6 @@ export default function PaymentRequest({ params }) {
                     <div className="mb-3">
                       <label className="text-xs text-gray-400">Title</label>
                     </div>
-
                     {paymentRequest && (
                       <div className="">
                         <Form.Item
@@ -982,7 +1007,6 @@ export default function PaymentRequest({ params }) {
                               _p.title = e.target.value;
                               setPaymentRequest(_p);
                             }}
-                            disabled={!conditions}
                           />
                         </Form.Item>
                       </div>
@@ -996,19 +1020,8 @@ export default function PaymentRequest({ params }) {
                         Amount due
                       </label>
                     </div>
-
                     {paymentRequest && (
                       <div className="">
-                        {/* <InputNumber
-                        size="small"
-                        name="title"
-                        className="text-xs w-full"
-                        placeholder={paymentRequest?.amount}
-                        onChange={(e) => {
-                          paymentRequest.amount = e;
-                        }}
-                      /> */}
-
                         <Form.Item>
                           <Form.Item
                             name="amount"
@@ -1042,7 +1055,7 @@ export default function PaymentRequest({ params }) {
                                 },
                               },
                             ]}
-                            initialValue={paymentRequest?.amount}
+                            initialValue={paymentRequest.amount}
                           >
                             <InputNumber
                               className="h-10 w-full pt-1.5"
@@ -1078,7 +1091,7 @@ export default function PaymentRequest({ params }) {
                                       (paymentRequest.currency = value)
                                     }
                                     size="large"
-                                    value={paymentRequest?.currency}
+                                    value={paymentRequest.currency}
                                     options={[
                                       {
                                         value: "RWF",
@@ -1101,7 +1114,7 @@ export default function PaymentRequest({ params }) {
                                 </Form.Item>
                               }
                               // defaultValue={paymentRequest.amount}
-                              value={paymentRequest?.amount}
+                              value={paymentRequest.amount}
                               onChange={(e) => {
                                 setAmount(e);
                                 // paymentRequest.amount = e;
@@ -1115,62 +1128,13 @@ export default function PaymentRequest({ params }) {
                   </div>
 
                   {/* Request Attached Invoice*/}
-                  <div className="flex flex-col  space-y-2 ">
-                    <div className="flex flex-row items-center space-x-2">
-                      <div className="text-xs text-gray-400">
+                  <div className="flex flex-col space-y-2">
+                    <div className="mb-3">
+                      <label className="text-xs text-gray-400">
                         Attached Invoice(s)
-                      </div>
-                      {((user?.permissions?.canApproveAsHod &&
-                        user?._id === paymentRequest?.approver?._id) ||
-                        (paymentRequest?.status == "pending-review" &&
-                          user?._id == paymentRequest?.createdBy?._id) ||
-                        user?.permissions?.canApproveAsHof) &&
-                        !updateFiles && (
-                          // <div
-                          //   onClick={() => setUpdateFiles(true)}
-                          //   className="text-grey-500 hover:text-blue-500 cursor-pointer flex flex-row items-center space-x-1"
-                          // >
-                          //   <CloudArrowUpIcon className="h-5 w-5 " />{" "}
-                          //   <div>update</div>
-                          // </div>
-
-                          <Button
-                            // className="bg-blue-50"
-                            size="small"
-                            type="text"
-                            onClick={() => setUpdateFiles(true)}
-                            icon={<FileSyncOutlined width="10px" />}
-                          >
-                            {/* Update */}
-                          </Button>
-                          // <UpdatePaymentReqDoc
-                          //   iconOnly={true}
-                          //   uuid={doc}
-                          //   label="update"
-                          //   reloadFileList={refresh}
-                          // />
-                        )}
-                      {updateFiles && (
-                        <>
-                          <Button
-                            // className="bg-orange-50"
-                            size="small"
-                            type="text"
-                            onClick={() => setUpdateFiles(false)}
-                            icon={<CloseOutlined width="10px" />}
-                          >
-                            {/* Cancel */}
-                          </Button>
-                        </>
-                        // <div
-                        //   onClick={() => setUpdateFiles(false)}
-                        //   className="rounded border border-gray-500 text-grey-500 hover:text-blue-500 cursor-pointer flex flex-row items-center space-x-1"
-                        // >
-                        //   <XCircleIcon className="h-5 w-5 "/> <div>cancle</div>
-                        // </div>
-                      )}
+                      </label>
                     </div>
-                    {!editRequest && !updateFiles && (
+                    {!editRequest && (
                       <div className="grid grid-cols-2 gap-y-2">
                         {paymentRequest?.docIds?.map((doc, i) => {
                           const truncatedFileName =
@@ -1180,11 +1144,11 @@ export default function PaymentRequest({ params }) {
                                 )}`
                               : doc;
                           return (
-                            <div className="flex flex-col border-b-2 border-b-slate-600">
+                            <div className="border-b-2 border-b-slate-600">
                               <Tooltip title={doc}>
                                 <Typography.Text ellipsis>
                                   <Link
-                                    href={`${fend_url}/api/?folder=paymentRequests&name=${encodeURI(
+                                    href={`${url}/file/paymentRequests/${encodeURI(
                                       doc
                                     )}`}
                                     target="_blank"
@@ -1201,65 +1165,80 @@ export default function PaymentRequest({ params }) {
                               </Tooltip>
 
                               {/* <Link
-                            href={`${fend_url}/api/?folder=paymentRequests&name=${encodeURI(doc)}`}
-                            target="_blank"
-                          >
-                            <div className="text-xs">
-                              <div className="flex flex-row space-x-1 items-center">
-                                {" "}
-                                <PaperClipOutlined /> Invoice {i + 1}
+                              href={`${url}/file/paymentRequests/${encodeURI(doc)}`}
+                              target="_blank"
+                            >
+                              <div className="text-xs">
+                                <div className="flex flex-row space-x-1 items-center">
+                                  {" "}
+                                  <PaperClipOutlined /> Invoice {i + 1}
+                                </div>
                               </div>
-                            </div>
-                          </Link> */}
+                            </Link> */}
+
+                              {((user?.permissions?.canApproveAsHod &&
+                                user?._id === paymentRequest?.approver?._id) ||
+                                (paymentRequest.status == "pending-review" &&
+                                  user?._id ==
+                                    paymentRequest?.createdBy?._id) ||
+                                user?.permissions?.canApproveAsHof) && (
+                                <UpdatePaymentReqDoc
+                                  iconOnly={true}
+                                  uuid={doc}
+                                  label="update"
+                                  reloadFileList={refresh}
+                                />
+                              )}
                             </div>
                           );
                         })}
                       </div>
                     )}
 
-                    {(editRequest || updateFiles) && (
+                    {conditions && (
                       <UploadOtherFiles files={files} setFiles={setFiles} />
                     )}
                   </div>
 
                   {/* Budgeted */}
-                  {user?.userType !== "VENDOR" && paymentRequest && (
+                  {(user?.userType !== "VENDOR" && paymentRequest) && (
                     <div className="flex flex-col space-y-1 items-start">
                       <div className="mb-3">
                         <label className="text-xs text-gray-400">
                           Budgeted
                         </label>
                       </div>
-
-                      <div>
-                        <Form.Item
-                          name="budgeted"
-                          valuePropName="checked"
-                          // wrapperCol={{ offset: 8, span: 16 }}
-                        >
-                          <Radio.Group
-                            onChange={({ target }) => {
-                              paymentRequest.budgeted = target.value;
-                              if (target.value === false)
-                                paymentRequest.budgetLine = null;
-                              setBudgeted(target.value);
-                            }}
-                            className="mt-3"
-                            defaultValue={
-                              paymentRequest?.budgeted ? true : false
-                            }
-                            value={paymentRequest?.budgeted ? true : false}
-                            disabled={!conditions}
+                      {paymentRequest && (
+                        <div>
+                          <Form.Item
+                            name="budgeted"
+                            valuePropName="checked"
+                            // wrapperCol={{ offset: 8, span: 16 }}
                           >
-                            <Radio value={true} className="mr-3">
-                              <span className="ml-2 text-[18px]">Yes</span>
-                            </Radio>
-                            <Radio value={false} className="mx-3">
-                              <span className="ml-2 text-[18px]">No</span>
-                            </Radio>
-                          </Radio.Group>
-                        </Form.Item>
-                      </div>
+                            <Radio.Group
+                              onChange={({ target }) => {
+                                paymentRequest.budgeted = target.value;
+                                if (target.value === false)
+                                  paymentRequest.budgetLine = null;
+                                setBudgeted(target.value);
+                              }}
+                              className="mt-3"
+                              defaultValue={
+                                paymentRequest?.budgeted ? true : false
+                              }
+                              value={paymentRequest?.budgeted ? true : false}
+                              disabled={!conditions}
+                            >
+                              <Radio value={true} className="mr-3">
+                                <span className="ml-2 text-[18px]">Yes</span>
+                              </Radio>
+                              <Radio value={false} className="mx-3">
+                                <span className="ml-2 text-[18px]">No</span>
+                              </Radio>
+                            </Radio.Group>
+                          </Form.Item>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -1274,7 +1253,7 @@ export default function PaymentRequest({ params }) {
                         </div>
                       )}
 
-                      {budgeted && (
+                      {paymentRequest && budgeted && (
                         // <Select
                         //   // mode="multiple"
                         //   // allowClear
@@ -1308,6 +1287,7 @@ export default function PaymentRequest({ params }) {
                               message: "Budget Line is required",
                             },
                           ]}
+                          className="w-full"
                           initialValue={paymentRequest?.budgetLine?._id}
                         >
                           <Select
@@ -1360,31 +1340,32 @@ export default function PaymentRequest({ params }) {
                     <div className="mb-3">
                       <label className="text-xs text-gray-400">Comment</label>
                     </div>
-
-                    <div className="">
-                      <Form.Item
-                        name="description"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Description is required",
-                          },
-                        ]}
-                        initialValue={paymentRequest?.description}
-                      >
-                        <Input.TextArea
-                          className="w-full"
-                          rows={4}
-                          placeholder={paymentRequest?.description}
-                          // defaultValue={paymentRequest?.description}
-                          value={paymentRequest?.description}
-                          onChange={(e) => {
-                            paymentRequest.description = e.target.value;
-                          }}
-                          disabled={!conditions}
-                        />
-                      </Form.Item>
-                    </div>
+                    {paymentRequest && (
+                      <div className="">
+                        <Form.Item
+                          name="description"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Description is required",
+                            },
+                          ]}
+                          initialValue={paymentRequest?.description}
+                        >
+                          <Input.TextArea
+                            className="w-full"
+                            rows={4}
+                            placeholder={paymentRequest?.description}
+                            // defaultValue={paymentRequest?.description}
+                            value={paymentRequest?.description}
+                            onChange={(e) => {
+                              paymentRequest.description = e.target.value;
+                            }}
+                            disabled={!conditions}
+                          />
+                        </Form.Item>
+                      </div>
+                    )}
                   </div>
                 </div>
                 {paymentRequest && (
@@ -1406,7 +1387,6 @@ export default function PaymentRequest({ params }) {
                             }}
                             value={bankPay}
                             className="mb-2 mt-5"
-                            disabled={!conditions}
                           >
                             <div className="flex gap-x-10">
                               <div className="my-1 border-t-2 border-x-2 border-[#BFC5C5]">
@@ -1612,7 +1592,7 @@ export default function PaymentRequest({ params }) {
                                       setPaymentRequest(_p);
                                     }}
                                     placeholder="Type in phone number"
-                                    disabled={!editRequest}
+                                    disabled={!conditions}
                                   />
                                 </Form.Item>
                               </div>
@@ -1673,8 +1653,6 @@ export default function PaymentRequest({ params }) {
                             }
                           });
                         }}
-                        className="rounded-lg px-8 pt-3 pb-8 bg-[#0065DD] border-none"
-                        // className="bg-[#0065DD] rounded-lg px-8 py-2 border-none cursor-pointer"
                       >
                         Update
                       </Button>
@@ -1684,61 +1662,53 @@ export default function PaymentRequest({ params }) {
               </Form>
 
               {paymentRequest?.category === "external" && editRequest && (
-                <div className="bg-gray-50 py-3 px-10  my-5 rounded">
-                  <div className="flex flex-row items-center text-blue-500">
-                    <LightBulbIcon className="h-8 w-8" />
-                    <div>
-                      <Typography.Title level={5}>Hints</Typography.Title>
+                <div className="bg-[#F1F3FF] pb-5 px-10  my-5 rounded">
+                  <div className="flex flex-row space-x-2 items-center text-[#FFD275]">
+                    <LightBulbIcon className="h-7 w-7" />
+                    <h5 className="text-[18px] text-[#FFD275]">Hints</h5>
+                  </div>
+
+                  <div className="flex flex-col space-y-6 my-5">
+                    <div className="w-full flex justify-between text-gray-700">
+                      <div>Related PO {po?.number} (Total Value): </div>
+                      <div className="font-semibold text-[13px]">
+                        {po?.items[0]?.currency +
+                          " " +
+                          getPoTotalVal().grossTotal?.toLocaleString()}
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex flex-col space-y-3 w-1/2 mt-5">
-                    <Typography.Text>
-                      <div className="text-gray-700 grid grid-cols-2">
-                        <div>Related PO {po?.number} (Total Value): </div>
-                        <div className="font-semibold">
-                          {po?.items[0]?.currency +
-                            " " +
-                            getPoTotalVal().grossTotal?.toLocaleString()}
-                        </div>
-                      </div>
-                    </Typography.Text>
+                  <div className="w-full flex justify-between text-gray-700">
+                    <div>Paid Requests' Value: </div>
+                    <div className="font-semibold text-[13px]">
+                      {po?.items[0]?.currency +
+                        " " +
+                        totalPaid?.toLocaleString()}
+                    </div>
+                  </div>
 
-                    <Typography.Text>
-                      <div className="text-gray-700 grid grid-cols-2">
-                        <div>Paid Requests' Value: </div>
-                        <div className="font-semibold">
-                          {po?.items[0]?.currency +
-                            " " +
-                            totalPaid?.toLocaleString()}
-                        </div>
-                      </div>
-                    </Typography.Text>
-
-                    <Typography.Text>
-                      <div className="text-gray-700 grid grid-cols-2">
-                        <div>Linked Payment Requests' Value: </div>
-                        <div
-                          className={`font-semibold
-                  
-                      ${
-                        amount >
-                          getPoTotalVal().grossTotal -
-                            totalPaymentVal +
-                            paymentRequest?.amount && "text-red-500"
-                      }
-                  `}
-                        >
-                          {po?.items[0]?.currency +
-                            " " +
-                            (
+                  <div className="w-full flex justify-between text-gray-700">
+                    <div>Linked Payment Requests' Value: </div>
+                    <div
+                      className={`font-semibold text-[13px]
+                    
+                        ${
+                          amount >
+                            getPoTotalVal().grossTotal -
                               totalPaymentVal +
-                              amount -
-                              paymentRequest?.amount
-                            )?.toLocaleString()}
-                        </div>
-                      </div>
-                    </Typography.Text>
+                              paymentRequest?.amount && "text-red-500"
+                        }
+                    `}
+                    >
+                      {po?.items[0]?.currency +
+                        " " +
+                        (
+                          totalPaymentVal +
+                          amount -
+                          paymentRequest?.amount
+                        )?.toLocaleString()}
+                    </div>
                   </div>
                 </div>
               )}
@@ -1761,307 +1731,360 @@ export default function PaymentRequest({ params }) {
                     </div>
                   )}
 
-                  {paymentRequest?.approver && user?.userType !== "VENDOR" && (
-                    <div className="mx-3 mt-5 ">
-                      <Steps
-                        direction="vertical"
-                        current={currentCode}
-                        items={[
-                          // {
-                          //   title: `Reviewed by ${paymentRequest?.reviewedBy?.firstName} ${paymentRequest?.reviewedBy?.lastName}`,
-                          //   icon: <DocumentMagnifyingGlassIcon className="h-5" />,
-                          //   subTitle: currentCode > 0 && (
-                          //     <div className="flex flex-row items-center space-x-1 text-xs font-semibold">
-                          //       <div>
-                          //         {currentCode > 0 &&
-                          //           paymentRequest?.reviewedAt && (
-                          //             <CheckOutlined className="h-5 w-5 text-green-500" />
-                          //           )}
-                          //       </div>
-                          //       <div>
-                          //         {currentCode > 0 &&
-                          //           paymentRequest?.reviewedAt &&
-                          //           `Reviewed ` +
-                          //             moment(paymentRequest?.reviewedAt).fromNow()}
-                          //       </div>
-                          //     </div>
-                          //   ),
-
-                          //   disabled:
-                          //     !user?.permissions?.canApproveAsHod ||
-                          //     currentCode > 0,
-                          // },
-                          {
-                            title: `Level 1 (${
-                              paymentRequest?.approver?.firstName +
-                              " " +
-                              paymentRequest?.approver?.lastName
-                            })`,
-                            icon: (
-                              <ClipboardDocumentCheckIcon className="h-5" />
-                            ),
-                            subTitle: currentCode > 1 && (
-                              <div className="flex flex-row items-center space-x-1 text-xs font-semibold">
-                                <div>
-                                  {currentCode === 5 &&
-                                    !paymentRequest?.hod_approvalDate && (
-                                      <CloseOutlined className="h-5 w-5 text-red-500" />
-                                    )}
-                                  {currentCode > 1 &&
-                                    paymentRequest?.hod_approvalDate && (
-                                      <CheckOutlined className="h-5 w-5 text-green-500" />
-                                    )}
-                                </div>
-                                <div>
-                                  {currentCode === 5 &&
-                                    !paymentRequest?.hod_approvalDate &&
-                                    `Declined ` +
-                                      moment(
-                                        paymentRequest?.rejectionDate
-                                      ).fromNow()}
-                                  {currentCode > 1 &&
-                                    paymentRequest?.hod_approvalDate &&
-                                    `Approved ` +
-                                      moment(
-                                        paymentRequest?.hod_approvalDate
-                                      ).fromNow()}
-                                </div>
-                              </div>
-                            ),
-                            description: currentCode == 1 && (
-                              <div className="flex flex-col">
-                                <div>
-                                  Kindly check if the request is relevant and
-                                  take action accordingly.
-                                </div>
-                                <div className="flex flex-row space-x-5">
-                                  <div>
-                                    <Popconfirm
-                                      title="Are you sure?"
-                                      open={openApprove}
-                                      icon={
-                                        <QuestionCircleOutlined
-                                          style={{ color: "red" }}
-                                        />
-                                      }
-                                      onConfirm={() => {
-                                        // changeStatus(2);
-                                        approveRequest(getRequestStatus(2));
-                                        setOpenApprove(false);
-                                      }}
-                                      // okButtonProps={{
-                                      //   loading: confirmRejectLoading,
-                                      // }}
-                                      onCancel={() => setOpenApprove(false)}
-                                    >
-                                      <Button
-                                        disabled={
-                                          !user?.permissions?.canApproveAsHod ||
-                                          user?._id !==
-                                            paymentRequest?.approver?._id ||
-                                          currentCode > 1
-                                        }
-                                        onClick={() => setOpenApprove(true)}
-                                        type="primary"
-                                        size="small"
-                                      >
-                                        Approve
-                                      </Button>
-                                    </Popconfirm>
-                                  </div>
-                                  <div>
-                                    <Popconfirm
-                                      title="Are you sure?"
-                                      open={open}
-                                      icon={
-                                        <QuestionCircleOutlined
-                                          style={{ color: "red" }}
-                                        />
-                                      }
-                                      onConfirm={() => {
-                                        if (reason?.length >= 3)
-                                          declineRequest();
-                                      }}
-                                      description={
-                                        <>
-                                          <Input
-                                            onChange={(v) =>
-                                              setReason(v.target.value)
-                                            }
-                                            placeholder="Please insert a reason for the rejection"
-                                          ></Input>
-                                        </>
-                                      }
-                                      okButtonProps={{
-                                        disabled: reason?.length < 3,
-                                        loading: confirmRejectLoading,
-                                      }}
-                                      onCancel={handleCancel}
-                                    >
-                                      <Button
-                                        icon={<DislikeOutlined />}
-                                        disabled={
-                                          !user?.permissions?.canApproveAsHod ||
-                                          user?._id !==
-                                            paymentRequest?.approver?._id ||
-                                          currentCode > 1
-                                        }
-                                        danger
-                                        size="small"
-                                        type="primary"
-                                        onClick={showPopconfirm}
-                                      >
-                                        Reject
-                                      </Button>
-                                    </Popconfirm>
-                                  </div>
-                                </div>
-                              </div>
-                            ),
-                            disabled:
-                              !user?.permissions?.canApproveAsHod ||
-                              currentCode > 1,
-                          },
-                          {
-                            title: "Level 2 (Finance)",
-                            icon: <CreditCardIcon className="h-5" />,
-                            subTitle: currentCode > 2 &&
-                              paymentRequest?.hod_approvalDate && (
-                                <div className="flex flex-row items-center space-x-1 text-xs font-semibold">
-                                  <div>
-                                    {currentCode === 5 &&
-                                      !paymentRequest?.hof_approvalDate && (
-                                        <CloseOutlined className="h-5 w-5 text-red-500" />
-                                      )}
-                                    {currentCode > 2 &&
-                                      paymentRequest?.hof_approvalDate && (
-                                        <CheckOutlined className="h-5 w-5 text-green-500" />
-                                      )}
-                                  </div>
-                                  <div>
-                                    {currentCode === 5 &&
-                                      !paymentRequest?.hof_approvalDate &&
-                                      `Declined ` +
-                                        moment(
-                                          paymentRequest?.rejectionDate
-                                        ).fromNow()}
-                                    {currentCode > 2 &&
-                                      paymentRequest?.hof_approvalDate &&
-                                      `Approved ` +
-                                        moment(
-                                          paymentRequest?.hof_approvalDate
-                                        ).fromNow()}
-                                  </div>
-                                </div>
-                              ),
-                            description: currentCode === 2 && (
-                              <div className="flex flex-col">
-                                <div>
-                                  Kindly check if the request is relevant and
-                                  take action accordingly.
-                                </div>
-                                <div className="flex flex-row space-x-5">
-                                  <div>
-                                    <Popconfirm
-                                      title="Are you sure?"
-                                      open={openApprove}
-                                      icon={
-                                        <QuestionCircleOutlined
-                                          style={{ color: "red" }}
-                                        />
-                                      }
-                                      onConfirm={() => {
-                                        approveRequest("approved");
-                                        setOpenApprove(false);
-                                      }}
-                                      // okButtonProps={{
-                                      //   loading: confirmRejectLoading,
-                                      // }}
-                                      onCancel={() => setOpenApprove(false)}
-                                    >
-                                      <Button
-                                        disabled={
-                                          !user?.permissions?.canApproveAsHof ||
-                                          currentCode > 2 ||
-                                          currentCode < 0
-                                        }
-                                        onClick={() => setOpenApprove(true)}
-                                        type="primary"
-                                        size="small"
-                                      >
-                                        Approve
-                                      </Button>
-                                    </Popconfirm>
-                                  </div>
-                                  <div>
-                                    <Popconfirm
-                                      title="Are you sure?"
-                                      open={open}
-                                      icon={
-                                        <QuestionCircleOutlined
-                                          style={{ color: "red" }}
-                                        />
-                                      }
-                                      onConfirm={() => {
-                                        if (reason?.length >= 3)
-                                          declineRequest();
-                                      }}
-                                      okButtonProps={{
-                                        disabled: reason?.length < 3,
-                                        loading: confirmRejectLoading,
-                                      }}
-                                      onCancel={handleCancel}
-                                      description={
-                                        <>
-                                          <Input
-                                            onChange={(v) =>
-                                              setReason(v.target.value)
-                                            }
-                                            placeholder="Reason for rejection"
-                                          ></Input>
-                                        </>
-                                      }
-                                    >
-                                      <Button
-                                        disabled={
-                                          !user?.permissions?.canApproveAsHof ||
-                                          currentCode > 2 ||
-                                          currentCode < 0
-                                        }
-                                        type="primary"
-                                        danger
-                                        size="small"
-                                        onClick={showPopconfirm}
-                                      >
-                                        Reject
-                                      </Button>
-                                    </Popconfirm>
-                                  </div>
-                                </div>
-                              </div>
-                            ),
-                            disabled:
-                              !user?.permissions?.canApproveAsHof ||
-                              currentCode > 2 ||
-                              currentCode < 0,
-                          },
-                        ]}
+                  <div className="-mt-3.5 mb-5">
+                    <button
+                      className={`cursor-pointer w-full pr-5 flex justify-between items-center bg-transparent border-none ${
+                        activeIndex == "delivery" ? "active" : ""
+                      }`}
+                      onClick={() => handleItemClick("request")}
+                    >
+                      <div className="flex flex-col items-start justify-start gap-4">
+                        <h6 className="text-[#344767] text-[15px] -mb-1">
+                          Request Approval Process
+                        </h6>
+                        <span className="text-[#8392AB]">
+                          Proceed with approving the above request by adding
+                          your stamp mark where needed
+                        </span>
+                      </div>
+                      <RiArrowDropDownLine
+                        className={`text-[36px] text-[#344767] arrow ${
+                          activeIndex == "request" ? "active" : ""
+                        }`}
                       />
-                      {paymentRequest?.reasonForRejection && (
-                        <div className="bg-red-50 p-2 rounded-md">
-                          {paymentRequest?.reasonForRejection}
-                        </div>
-                      )}
+                    </button>
+                    <div
+                      ref={contentHeight}
+                      className="answer-container"
+                      style={
+                        activeIndex == "request"
+                          ? { display: "block" }
+                          : { display: "none" }
+                      }
+                    >
+                      {paymentRequest?.approver &&
+                        user?.userType !== "VENDOR" && (
+                          <div className="mx-3 mt-5 ">
+                            <Steps
+                              direction="vertical"
+                              current={currentCode}
+                              items={[
+                                // {
+                                //   title: `Reviewed by ${paymentRequest?.reviewedBy?.firstName} ${paymentRequest?.reviewedBy?.lastName}`,
+                                //   icon: <DocumentMagnifyingGlassIcon className="h-5" />,
+                                //   subTitle: currentCode > 0 && (
+                                //     <div className="flex flex-row items-center space-x-1 text-xs font-semibold">
+                                //       <div>
+                                //         {currentCode > 0 &&
+                                //           paymentRequest?.reviewedAt && (
+                                //             <CheckOutlined className="h-5 w-5 text-green-500" />
+                                //           )}
+                                //       </div>
+                                //       <div>
+                                //         {currentCode > 0 &&
+                                //           paymentRequest?.reviewedAt &&
+                                //           `Reviewed ` +
+                                //             moment(paymentRequest?.reviewedAt).fromNow()}
+                                //       </div>
+                                //     </div>
+                                //   ),
+
+                                //   disabled:
+                                //     !user?.permissions?.canApproveAsHod ||
+                                //     currentCode > 0,
+                                // },
+                                {
+                                  title: `Level 1 (${
+                                    paymentRequest?.approver?.firstName +
+                                    " " +
+                                    paymentRequest?.approver?.lastName
+                                  })`,
+                                  icon: (
+                                    <ClipboardDocumentCheckIcon className="h-5" />
+                                  ),
+                                  subTitle: currentCode > 1 && (
+                                    <div className="flex flex-row items-center space-x-1 text-xs font-semibold">
+                                      <div>
+                                        {currentCode === 5 &&
+                                          !paymentRequest?.hod_approvalDate && (
+                                            <CloseOutlined className="h-5 w-5 text-red-500" />
+                                          )}
+                                        {currentCode > 1 &&
+                                          paymentRequest?.hod_approvalDate && (
+                                            <CheckOutlined className="h-5 w-5 text-green-500" />
+                                          )}
+                                      </div>
+                                      <div>
+                                        {currentCode === 5 &&
+                                          !paymentRequest?.hod_approvalDate &&
+                                          `Declined ` +
+                                            moment(
+                                              paymentRequest?.rejectionDate
+                                            ).fromNow()}
+                                        {currentCode > 1 &&
+                                          paymentRequest?.hod_approvalDate &&
+                                          `Approved ` +
+                                            moment(
+                                              paymentRequest?.hod_approvalDate
+                                            ).fromNow()}
+                                      </div>
+                                    </div>
+                                  ),
+                                  description: currentCode == 1 && (
+                                    <div className="flex flex-col">
+                                      <div className="text-[#8392AB] mb-4">
+                                        Kindly check if the request is relevant
+                                        and take action accordingly.
+                                      </div>
+                                      <div className="flex flex-row space-x-5">
+                                        <div>
+                                          <Popconfirm
+                                            title="Are you sure?"
+                                            open={openApprove}
+                                            icon={
+                                              <QuestionCircleOutlined
+                                                style={{ color: "red" }}
+                                              />
+                                            }
+                                            onConfirm={() => {
+                                              // changeStatus(2);
+                                              approveRequest(
+                                                getRequestStatus(2)
+                                              );
+                                              setOpenApprove(false);
+                                            }}
+                                            // okButtonProps={{
+                                            //   loading: confirmRejectLoading,
+                                            // }}
+                                            onCancel={() =>
+                                              setOpenApprove(false)
+                                            }
+                                          >
+                                            <Button
+                                              icon={<LikeOutlined />}
+                                              disabled={
+                                                !user?.permissions
+                                                  ?.canApproveAsHod ||
+                                                user?._id !==
+                                                  paymentRequest?.approver
+                                                    ?._id ||
+                                                currentCode > 1
+                                              }
+                                              onClick={() =>
+                                                setOpenApprove(true)
+                                              }
+                                              type="primary"
+                                              className="pb-4 pt-1.5 border-none"
+                                            >
+                                              Approve
+                                            </Button>
+                                          </Popconfirm>
+                                        </div>
+                                        <div>
+                                          <Popconfirm
+                                            title="Are you sure?"
+                                            open={open}
+                                            icon={
+                                              <QuestionCircleOutlined
+                                                style={{ color: "red" }}
+                                              />
+                                            }
+                                            onConfirm={() => {
+                                              if (reason?.length >= 3)
+                                                declineRequest();
+                                            }}
+                                            description={
+                                              <>
+                                                <Input
+                                                  onChange={(v) =>
+                                                    setReason(v.target.value)
+                                                  }
+                                                  placeholder="Please insert a reason for the rejection"
+                                                ></Input>
+                                              </>
+                                            }
+                                            okButtonProps={{
+                                              disabled: reason?.length < 3,
+                                              loading: confirmRejectLoading,
+                                            }}
+                                            onCancel={handleCancel}
+                                          >
+                                            <Button
+                                              icon={<DislikeOutlined />}
+                                              disabled={
+                                                !user?.permissions
+                                                  ?.canApproveAsHod ||
+                                                user?._id !==
+                                                  paymentRequest?.approver
+                                                    ?._id ||
+                                                currentCode > 1
+                                              }
+                                              danger
+                                              type="primary"
+                                              className="pb-4 pt-1.5 border-none"
+                                              onClick={showPopconfirm}
+                                            >
+                                              Reject
+                                            </Button>
+                                          </Popconfirm>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ),
+                                  disabled:
+                                    !user?.permissions?.canApproveAsHod ||
+                                    currentCode > 1,
+                                },
+                                {
+                                  title: "Level 2 (Finance)",
+                                  icon: <CreditCardIcon className="h-5" />,
+                                  subTitle: currentCode > 2 &&
+                                    paymentRequest?.hod_approvalDate && (
+                                      <div className="flex flex-row items-center space-x-1 text-xs font-semibold">
+                                        <div>
+                                          {currentCode === 5 &&
+                                            !paymentRequest?.hof_approvalDate && (
+                                              <CloseOutlined className="h-5 w-5 text-red-500" />
+                                            )}
+                                          {currentCode > 2 &&
+                                            paymentRequest?.hof_approvalDate && (
+                                              <CheckOutlined className="h-5 w-5 text-green-500" />
+                                            )}
+                                        </div>
+                                        <div>
+                                          {currentCode === 5 &&
+                                            !paymentRequest?.hof_approvalDate &&
+                                            `Declined ` +
+                                              moment(
+                                                paymentRequest?.rejectionDate
+                                              ).fromNow()}
+                                          {currentCode > 2 &&
+                                            paymentRequest?.hof_approvalDate &&
+                                            `Approved ` +
+                                              moment(
+                                                paymentRequest?.hof_approvalDate
+                                              ).fromNow()}
+                                        </div>
+                                      </div>
+                                    ),
+                                  description: currentCode === 2 && (
+                                    <div className="flex flex-col">
+                                      <div className="text-[#8392AB] mb-4">
+                                        Kindly check if the request is relevant
+                                        and take action accordingly.
+                                      </div>
+                                      <div className="flex flex-row space-x-5">
+                                        <div>
+                                          <Popconfirm
+                                            title="Are you sure?"
+                                            open={openApprove}
+                                            icon={
+                                              <QuestionCircleOutlined
+                                                style={{ color: "red" }}
+                                              />
+                                            }
+                                            onConfirm={() => {
+                                              approveRequest("approved");
+                                              setOpenApprove(false);
+                                            }}
+                                            // okButtonProps={{
+                                            //   loading: confirmRejectLoading,
+                                            // }}
+                                            onCancel={() =>
+                                              setOpenApprove(false)
+                                            }
+                                          >
+                                            <Button
+                                              icon={<LikeOutlined />}
+                                              disabled={
+                                                !user?.permissions
+                                                  ?.canApproveAsHof ||
+                                                currentCode > 2 ||
+                                                currentCode < 0
+                                              }
+                                              onClick={() =>
+                                                setOpenApprove(true)
+                                              }
+                                              type="primary"
+                                              className="pb-4 pt-1.5 border-none"
+                                            >
+                                              Approve
+                                            </Button>
+                                          </Popconfirm>
+                                        </div>
+                                        <div>
+                                          <Popconfirm
+                                            title="Are you sure?"
+                                            open={open}
+                                            icon={
+                                              <QuestionCircleOutlined
+                                                style={{ color: "red" }}
+                                              />
+                                            }
+                                            onConfirm={() => {
+                                              if (reason?.length >= 3)
+                                                declineRequest();
+                                            }}
+                                            okButtonProps={{
+                                              disabled: reason?.length < 3,
+                                              loading: confirmRejectLoading,
+                                            }}
+                                            onCancel={handleCancel}
+                                            description={
+                                              <>
+                                                <Input
+                                                  onChange={(v) =>
+                                                    setReason(v.target.value)
+                                                  }
+                                                  placeholder="Reason for rejection"
+                                                ></Input>
+                                              </>
+                                            }
+                                          >
+                                            <Button
+                                              icon={<DislikeOutlined />}
+                                              disabled={
+                                                !user?.permissions
+                                                  ?.canApproveAsHof ||
+                                                currentCode > 2 ||
+                                                currentCode < 0
+                                              }
+                                              type="primary"
+                                              danger
+                                              className="pb-4 pt-1.5 border-none"
+                                              onClick={showPopconfirm}
+                                            >
+                                              Reject
+                                            </Button>
+                                          </Popconfirm>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ),
+                                  disabled:
+                                    !user?.permissions?.canApproveAsHof ||
+                                    currentCode > 2 ||
+                                    currentCode < 0,
+                                },
+                              ]}
+                            />
+                            {paymentRequest?.reasonForRejection && (
+                              <div className="bg-red-50 p-2 rounded-md">
+                                {paymentRequest?.reasonForRejection}
+                              </div>
+                            )}
+                          </div>
+                        )}
                     </div>
-                  )}
+                  </div>
 
                   {!paymentRequest?.approver &&
                     user?.userType !== "VENDOR" &&
                     user?.permissions?.canEditPaymentRequests && (
                       <div className="flex flex-col space-y-2">
                         {/* <div className="text-xs text-gray-500">
-                  {showAddApproverForm ? "" : "No approver selected yet"}
-                </div> */}
+                    {showAddApproverForm ? "" : "No approver selected yet"}
+                  </div> */}
                         {!showAddApproverForm &&
                           user?.permissions?.canEditPaymentRequests &&
                           !user?.approver && (
@@ -2112,6 +2135,7 @@ export default function PaymentRequest({ params }) {
                             defaultValue={paymentRequest?.approver?._id}
                             placeholder="Select Approver"
                             showSearch
+                            size="large"
                             onChange={(value) => {
                               setLevel1Approver(value);
                             }}
@@ -2163,47 +2187,47 @@ export default function PaymentRequest({ params }) {
                     paymentRequest?.category === "internal" && (
                       <>
                         <Form form={paymentForm}>
-                          <UploadOtherFiles
-                            files={filesProof}
-                            setFiles={setFilesProof}
-                            label="Select Payment proof"
-                          />
-
-                          <div className="grid lg:grid-cols-2 gap-6 divide-x">
+                          <div className="grid lg:grid-cols-2 items-center mt-5 gap-6 divide-x">
+                            <UploadOtherFiles
+                              files={filesProof}
+                              setFiles={setFilesProof}
+                              label="Select Payment proof"
+                            />
                             {/* <div className="flex flex-col">
-                        <div>DistributionRule</div>
-                        <Form.Item
-                          // label="Select level 1 approver"
-                          name="distributionRule"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Can not be empty!",
-                            },
-                          ]}
-                        >
-                          <Select
-                            // defaultValue={defaultApprover}
-                            placeholder="Select rule"
-                            showSearch
-                            onChange={(value) => {
-                              // setLevel1Approver(value);
-                              setDistributionRule(value);
-                            }}
-                            filterOption={(input, option) =>
-                              (option?.label ?? "")
-                                .toLowerCase()
-                                .includes(input.toLowerCase())
-                            }
-                            options={distributionRules?.map((l) => {
-                              return {
-                                label: l?.FactorDescription,
-                                value: l?.FactorCode,
-                              };
-                            })}
-                          ></Select>
-                        </Form.Item>
-                      </div> */}
+                                <div>DistributionRule</div>
+                                <Form.Item
+                                  // label="Select level 1 approver"
+                                  name="distributionRule"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "Can not be empty!",
+                                    },
+                                  ]}
+                                >
+                                  <Select
+                                    // defaultValue={defaultApprover}
+                                    placeholder="Select rule"
+                                    showSearch
+                                    onChange={(value) => {
+                                      // setLevel1Approver(value);
+                                      setDistributionRule(value);
+                                    }}
+                                    filterOption={(input, option) =>
+                                      (option?.label ?? "")
+                                        .toLowerCase()
+                                        .includes(input.toLowerCase())
+                                    }
+                                    options={distributionRules?.map((l) => {
+                                      return {
+                                        label: l?.FactorDescription,
+                                        value: l?.FactorCode,
+                                      };
+                                    })}
+                                  ></Select>
+                                </Form.Item>
+                              </div> 
+                            */}
                             <Form.Item
                               label="Distribution Rule - Debit Acc"
                               name="currency"
@@ -2217,6 +2241,7 @@ export default function PaymentRequest({ params }) {
                               <Select
                                 // style={{ marginLeft: 8, maxWidth: 200 }}
                                 showSearch
+                                size="large"
                                 onChange={(value) => {
                                   // setLevel1Approver(value);
                                   setDistributionRuleDb(value);
@@ -2237,200 +2262,203 @@ export default function PaymentRequest({ params }) {
                               ></Select>
                             </Form.Item>
 
-                            <div>
-                              <Form.Item
-                                label="Debit Account"
-                                name="accountToDebit"
-                                rules={[
-                                  {
-                                    required: true,
-                                    message: "Can not be empty!",
-                                  },
-                                ]}
-                              >
-                                <Select
-                                  // defaultValue={defaultApprover}
-                                  // style={{ marginLeft: 8, maxWidth: 250 }}
-                                  // style={{ marginLeft: 8 }}
-                                  placeholder="Account to debit"
-                                  showSearch
-                                  onChange={(value) => {
-                                    // setLevel1Approver(value);
-                                    setDebitAccount(value);
-                                  }}
-                                  filterOption={(input, option) =>
-                                    (option?.label ?? "")
-                                      .toLowerCase()
-                                      .includes(input.toLowerCase())
-                                  }
-                                  options={accounts?.map((l) => {
-                                    return {
-                                      label: l?.Name,
-                                      value: l?.Code,
-                                    };
-                                  })}
-                                ></Select>
-                              </Form.Item>
-                              <Form.Item
-                                label="Credit Account"
-                                name="accountToCredit"
-                                rules={[
-                                  {
-                                    required: true,
-                                    message: "Can not be empty!",
-                                  },
-                                ]}
-                              >
-                                <Select
-                                  // style={{ marginLeft: 8, maxWidth: 250 }}
-                                  // defaultValue={defaultApprover}
-                                  // style={{ marginLeft: 8 }}
-                                  placeholder="Account to Credit"
-                                  showSearch
-                                  onChange={(value) => {
-                                    // setLevel1Approver(value);
-                                    setCreditAccount(value);
-                                  }}
-                                  filterOption={(input, option) =>
-                                    (option?.label ?? "")
-                                      .toLowerCase()
-                                      .includes(input.toLowerCase())
-                                  }
-                                  options={accounts?.map((l) => {
-                                    return {
-                                      label: l?.Name,
-                                      value: l?.Code,
-                                    };
-                                  })}
-                                ></Select>
-                              </Form.Item>
-                            </div>
                             {/* <div className="flex flex-row items-center"></div> */}
 
                             {/*<div className="flex flex-row items-center">
-                         <Form.Item
-                          label="Distribution Rule - Credit Acc"
-                          name="currency"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Can not be empty!",
-                            },
-                          ]}
-                        >
-                          <Select
-                            // style={{ marginLeft: 8, maxWidth: 200 }}
-                            showSearch
-                            placeholder="Distribution rule"
-                            onChange={(value) => {
-                              // setLevel1Approver(value);
-                              setDistributionRuleCr(value);
-                            }}
-                            filterOption={(input, option) =>
-                              (option?.label ?? "")
-                                .toLowerCase()
-                                .includes(input.toLowerCase())
-                            }
-                            options={distributionRules?.map((l) => {
-                              return {
-                                label: l?.FactorDescription,
-                                value: l?.FactorCode,
-                              };
-                            })}
-                          ></Select>
-                        </Form.Item> 
-                      </div>*/}
+                          <Form.Item
+                            label="Distribution Rule - Credit Acc"
+                            name="currency"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Can not be empty!",
+                              },
+                            ]}
+                          >
+                            <Select
+                              // style={{ marginLeft: 8, maxWidth: 200 }}
+                              showSearch
+                              placeholder="Distribution rule"
+                              onChange={(value) => {
+                                // setLevel1Approver(value);
+                                setDistributionRuleCr(value);
+                              }}
+                              filterOption={(input, option) =>
+                                (option?.label ?? "")
+                                  .toLowerCase()
+                                  .includes(input.toLowerCase())
+                              }
+                              options={distributionRules?.map((l) => {
+                                return {
+                                  label: l?.FactorDescription,
+                                  value: l?.FactorCode,
+                                };
+                              })}
+                            ></Select>
+                          </Form.Item> 
+                        </div>*/}
 
                             <div className="mr-10 space-y-2 flex flex-col">
                               {/* <InputNumber
-                    size="small"
-                    name="title"
-                    className="text-xs w-full"
-                    placeholder={paymentRequest?.amount}
-                    onChange={(e) => {
-                      paymentRequest.amount = e;
-                    }}
-                  /> */}
-                              <div className="flex flex-row space-x-2 items-center">
-                                <Switch
-                                  onChange={setOverrideAmount}
-                                  checked={overrideAmount}
-                                  disabled={paymentRequest?.currency === "RWF"}
-                                />
-                                <div>Override Amount</div>
-                              </div>
-                              {overrideAmount && (
-                                <div>
-                                  <Form.Item>
-                                    <Form.Item
-                                      label="Override RWF Amount"
-                                      name="overrideAmount"
-                                      noStyle
-                                      rules={[
-                                        {
-                                          required: true,
-                                          message: "Amount is required",
-                                        },
-                                        {
-                                          validator(rule, value) {
-                                            return new Promise(
-                                              (resolve, reject) => {
-                                                if (value <= 0) {
-                                                  reject(
-                                                    "The amount should exceed Zero"
-                                                  );
-                                                } else {
-                                                  resolve();
-                                                }
-                                              }
-                                            );
-                                          },
-                                        },
-                                      ]}
-                                      initialValue={0}
-                                    >
-                                      <InputNumber
-                                        label="Override RWF Amount"
-                                        style={{ width: "100%" }}
-                                        addonBefore={
-                                          <Form.Item
-                                            noStyle
-                                            // name="currency"
-                                          >
-                                            <Select
-                                              disabled={true}
-                                              defaultValue="RWF"
-                                              value="RWF"
-                                              options={[
-                                                {
-                                                  value: "RWF",
-                                                  label: "RWF",
-                                                  key: "RWF",
-                                                },
-                                                // {
-                                                //   value: "USD",
-                                                //   label: "USD",
-                                                //   key: "USD",
-                                                // },
-                                                // {
-                                                //   value: "EUR",
-                                                //   label: "EUR",
-                                                //   key: "EUR",
-                                                // },
-                                              ]}
-                                            ></Select>
-                                          </Form.Item>
-                                        }
-                                        // defaultValue={paymentRequest.amount}
-                                        value={amountOverride}
-                                        onChange={setAmountOverride}
-                                      />
-                                    </Form.Item>
-                                  </Form.Item>
-                                </div>
-                              )}
+                                size="small"
+                                name="title"
+                                className="text-xs w-full"
+                                placeholder={paymentRequest?.amount}
+                                onChange={(e) => {
+                                  paymentRequest.amount = e;
+                                }}
+                              /> */}
                             </div>
                           </div>
+
+                          <div className="grid lg:grid-cols-2 items-center gap-x-6 mt-2">
+                            <Form.Item
+                              label="Debit Account"
+                              name="accountToDebit"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "Can not be empty!",
+                                },
+                              ]}
+                            >
+                              <Select
+                                // defaultValue={defaultApprover}
+                                // style={{ marginLeft: 8, maxWidth: 250 }}
+                                // style={{ marginLeft: 8 }}
+                                placeholder="Account to debit"
+                                size="large"
+                                showSearch
+                                onChange={(value) => {
+                                  // setLevel1Approver(value);
+                                  setDebitAccount(value);
+                                }}
+                                filterOption={(input, option) =>
+                                  (option?.label ?? "")
+                                    .toLowerCase()
+                                    .includes(input.toLowerCase())
+                                }
+                                options={accounts?.map((l) => {
+                                  return {
+                                    label: l?.Name,
+                                    value: l?.Code,
+                                  };
+                                })}
+                              ></Select>
+                            </Form.Item>
+                            <Form.Item
+                              label="Credit Account"
+                              name="accountToCredit"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "Can not be empty!",
+                                },
+                              ]}
+                            >
+                              <Select
+                                // style={{ marginLeft: 8, maxWidth: 250 }}
+                                // defaultValue={defaultApprover}
+                                // style={{ marginLeft: 8 }}
+                                placeholder="Account to Credit"
+                                showSearch
+                                size="large"
+                                onChange={(value) => {
+                                  // setLevel1Approver(value);
+                                  setCreditAccount(value);
+                                }}
+                                filterOption={(input, option) =>
+                                  (option?.label ?? "")
+                                    .toLowerCase()
+                                    .includes(input.toLowerCase())
+                                }
+                                options={accounts?.map((l) => {
+                                  return {
+                                    label: l?.Name,
+                                    value: l?.Code,
+                                  };
+                                })}
+                              ></Select>
+                            </Form.Item>
+                          </div>
+                          <div className="flex flex-row space-x-2 items-center my-4">
+                            <Switch
+                              onChange={setOverrideAmount}
+                              checked={overrideAmount}
+                              disabled={paymentRequest?.currency === "RWF"}
+                            />
+                            <div>Override Amount</div>
+                          </div>
+                          {overrideAmount && (
+                            <div className="grid md:grid-cols-3">
+                              <Form.Item>
+                                <Form.Item
+                                  label="Override RWF Amount"
+                                  name="overrideAmount"
+                                  noStyle
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "Amount is required",
+                                    },
+                                    {
+                                      validator(rule, value) {
+                                        return new Promise(
+                                          (resolve, reject) => {
+                                            if (value <= 0) {
+                                              reject(
+                                                "The amount should exceed Zero"
+                                              );
+                                            } else {
+                                              resolve();
+                                            }
+                                          }
+                                        );
+                                      },
+                                    },
+                                  ]}
+                                  initialValue={0}
+                                >
+                                  <InputNumber
+                                    label="Override RWF Amount"
+                                    className="h-11 w-full pt-2"
+                                    addonBefore={
+                                      <Form.Item
+                                        noStyle
+                                        // name="currency"
+                                      >
+                                        <Select
+                                          disabled={true}
+                                          defaultValue="RWF"
+                                          value="RWF"
+                                          options={[
+                                            {
+                                              value: "RWF",
+                                              label: "RWF",
+                                              key: "RWF",
+                                            },
+                                            // {
+                                            //   value: "USD",
+                                            //   label: "USD",
+                                            //   key: "USD",
+                                            // },
+                                            // {
+                                            //   value: "EUR",
+                                            //   label: "EUR",
+                                            //   key: "EUR",
+                                            // },
+                                          ]}
+                                        ></Select>
+                                      </Form.Item>
+                                    }
+                                    // defaultValue={paymentRequest.amount}
+                                    value={amountOverride}
+                                    onChange={setAmountOverride}
+                                  />
+                                </Form.Item>
+                              </Form.Item>
+                            </div>
+                          )}
 
                           <div className="mt-10">
                             <Button
@@ -2512,7 +2540,7 @@ export default function PaymentRequest({ params }) {
                               <Tooltip title={doc}>
                                 <Typography.Text ellipsis>
                                   <Link
-                                    href={`${fend_url}/api/?folder=paymentRequests&name=${encodeURI(
+                                    href={`${url}/file/paymentRequests/${encodeURI(
                                       doc
                                     )}`}
                                     target="_blank"
@@ -2528,14 +2556,13 @@ export default function PaymentRequest({ params }) {
                                 </Typography.Text>
                               </Tooltip>
                               {user?.permissions?.canApproveAsHof && (
-                                <></>
-                                // <UpdatePaymentReqDoc
-                                //   iconOnly={true}
-                                //   uuid={doc}
-                                //   label="update"
-                                //   reloadFileList={refresh}
-                                //   paymentProof={true}
-                                // />
+                                <UpdatePaymentReqDoc
+                                  iconOnly={true}
+                                  uuid={doc}
+                                  label="update"
+                                  reloadFileList={refresh}
+                                  paymentProof={true}
+                                />
                               )}
                             </div>
                           );
@@ -2555,8 +2582,8 @@ export default function PaymentRequest({ params }) {
                             <div className="flex flex-col space-y-2">
                               <div className="mt-2">
                                 {/* <div className="text-xs text-gray-400">
-                              Debit: 10090189 - Legal
-                            </div> */}
+                                Debit: 10090189 - Legal
+                              </div> */}
 
                                 <Tag color="blue">
                                   Debit:{" "}
@@ -2594,63 +2621,83 @@ export default function PaymentRequest({ params }) {
                 </>
               )}
             </div>
+          </div>
 
-            <div className="flex flex-col rounded space-y-5 bg-white px-4 pt-2 shadow ">
-              <Typography.Title level={5}>Workflow tracker</Typography.Title>
-              <Timeline
-                items={[
-                  {
-                    children: (
-                      <div className="text-xs text-gray-500">Review</div>
+          <div className="flex flex-col rounded-xl space-y-5 bg-white px-4">
+            <Typography.Title level={5}>Workflow tracker</Typography.Title>
+            <Timeline
+              items={[
+                {
+                  children: (
+                    <div className="flex flex-col mb-1">
+                      <h6 className="m-0 py-0.5 px-0 text-[12px] text-[#344767]">
+                        Review
+                      </h6>
+                      <small className="text-[#A3AEB4]">
+                        You can perfom sourcing action here.
+                      </small>
+                    </div>
+                  ),
+                  color: paymentRequest?.status !== "declined" ? "blue" : "red",
+                  dot:
+                    paymentRequest?.status == "reviewed" ||
+                    paymentRequest?.status?.includes("approved") ||
+                    paymentRequest?.status == "paid" ? (
+                      <FaCheck className=" text-green-500" />
+                    ) : paymentRequest?.status == "declined" ? (
+                      <RiForbidLine className=" text-red-500" />
+                    ) : (
+                      <LoadingOutlined className=" text-blue-500" />
                     ),
-                    color:
-                      paymentRequest?.status !== "declined" ? "blue" : "red",
-                    dot:
-                      paymentRequest?.status == "reviewed" ||
-                      paymentRequest?.status?.includes("approved") ||
-                      paymentRequest?.status == "paid" ? (
-                        <CheckCircleOutlined className=" text-green-500" />
-                      ) : paymentRequest?.status == "declined" ? (
-                        <CloseCircleOutlined className=" text-red-500" />
-                      ) : (
-                        <LoadingOutlined className=" text-blue-500" />
-                      ),
-                  },
-                  {
-                    children: (
-                      <div className="text-xs text-gray-500">Approval</div>
-                    ),
-                    color:
-                      paymentRequest?.status == "approved" ||
-                      paymentRequest?.status == "paid"
-                        ? "blue"
-                        : "gray",
-                    dot:
-                      ((paymentRequest?.status == "approved" ||
-                        paymentRequest?.status == "paid") && (
-                        <CheckCircleOutlined className=" text-green-500" />
-                      )) ||
-                      ((paymentRequest?.status == "reviewed" ||
-                        paymentRequest?.status?.includes("approved (")) && (
-                        <LoadingOutlined className=" text-blue-500" />
-                      )),
-                  },
-                  {
-                    children: (
-                      <div className="text-xs text-gray-500">Payment</div>
-                    ),
-                    color: paymentRequest?.status == "paid" ? "blue" : "gray",
-                    dot:
-                      (paymentRequest?.status == "paid" && (
-                        <CheckCircleOutlined className=" text-green-500" />
-                      )) ||
-                      (paymentRequest?.status == "approved" && (
-                        <LoadingOutlined className=" text-blue-500" />
-                      )),
-                  },
-                ]}
-              />
-            </div>
+                },
+                {
+                  children: (
+                    <div className="flex flex-col mb-1">
+                      <h6 className="m-0 py-0.5 px-0 text-[12px] text-[#344767]">
+                        Approval
+                      </h6>
+                      <small className="text-[#A3AEB4]">
+                        You can perfom sourcing action here.
+                      </small>
+                    </div>
+                  ),
+                  color:
+                    paymentRequest?.status == "approved" ||
+                    paymentRequest?.status == "paid"
+                      ? "blue"
+                      : "gray",
+                  dot:
+                    ((paymentRequest?.status == "approved" ||
+                      paymentRequest?.status == "paid") && (
+                      <MdApproval className=" text-green-500" />
+                    )) ||
+                    ((paymentRequest?.status == "reviewed" ||
+                      paymentRequest?.status?.includes("approved (")) && (
+                      <LoadingOutlined className=" text-blue-500" />
+                    )),
+                },
+                {
+                  children: (
+                    <div className="flex flex-col mb-1">
+                      <h6 className="m-0 py-0.5 px-0 text-[12px] text-[#344767]">
+                        Payment
+                      </h6>
+                      <small className="text-[#A3AEB4]">
+                        You can perfom sourcing action here.
+                      </small>
+                    </div>
+                  ),
+                  color: paymentRequest?.status == "paid" ? "blue" : "gray",
+                  dot:
+                    (paymentRequest?.status == "paid" && (
+                      <MdOutlinePayments className=" text-green-500" />
+                    )) ||
+                    (paymentRequest?.status == "approved" && (
+                      <LoadingOutlined className=" text-blue-500" />
+                    )),
+                },
+              ]}
+            />
           </div>
         </div>
       </div>

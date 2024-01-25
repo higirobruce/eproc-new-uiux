@@ -35,6 +35,7 @@ import { useRouter } from "next/navigation";
 import { encode } from "base-64";
 import { motion } from "framer-motion";
 import PaymentRequestsTable from "@/app/components/paymentRequestsTable";
+import { FiSearch } from "react-icons/fi";
 
 export default function UserRequests() {
   let router = useRouter();
@@ -43,9 +44,7 @@ export default function UserRequests() {
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
-  let user =
-    typeof window !== "undefined" && JSON.parse(localStorage.getItem("user"));
-
+  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
   let [dataset, setDataset] = useState([]);
   let [tempDataset, setTempDataset] = useState([]);
   let [updatingId, setUpdatingId] = useState("");
@@ -69,7 +68,7 @@ export default function UserRequests() {
   const [currentUser, setCurrentUser] = useState("");
   const [sourcingMethod, setSourcingMethod] = useState("");
   let [submitting, setSubmitting] = useState(false);
-  let token = typeof window !== "undefined" && localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
 
   useEffect(() => {
     setDataLoaded(false);
@@ -188,7 +187,8 @@ export default function UserRequests() {
           ? item.status == "approved (hod)"
           : user?.permissions?.canApproveAsHod
           ? user._id == item?.approver?._id &&
-            (item?.status == "pending-review" || item?.status == "reviewed")
+            (item?.status == "pending-review" ||
+              item?.status == "reviewed")
           : true
       );
 
@@ -216,8 +216,8 @@ export default function UserRequests() {
     <>
       {contextHolder}
       {dataLoaded && !submitting ? (
-        <motion.div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-10 h-full">
-          <Row className="flex flex-col custom-sticky bg-white px-10 py-3 shadow space-y-2">
+        <motion.div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-5 h-screen mt-6 pb-10">
+          {/* <Row className="flex flex-col custom-sticky bg-white px-10 py-3 shadow space-y-2">
             <div className="flex flex-row items-center justify-between">
               <div className="text-xl font-semibold">Payment Requests</div>
 
@@ -237,19 +237,17 @@ export default function UserRequests() {
                       />
                     </div>
                   )}
-                {user?.userType !== "VENDOR" && (
-                  <div className="flex flex-row items-center space-x-1">
-                    <div>My requests</div>
-                    {
-                      <Checkbox
-                        checked={onlyMine}
-                        onChange={(e) => {
-                          setOnlyMine(e.target.checked);
-                        }}
-                      />
-                    }
-                  </div>
-                )}
+                <div className="flex flex-row items-center space-x-1">
+                  <div>My requests</div>
+                  {
+                    <Checkbox
+                      checked={onlyMine}
+                      onChange={(e) => {
+                        setOnlyMine(e.target.checked);
+                      }}
+                    />
+                  }
+                </div>
               </div>
             </div>
             <Row className="flex flex-row justify-between items-center space-x-4">
@@ -310,20 +308,102 @@ export default function UserRequests() {
                 </Button>
               )}
             </Row>
-          </Row>
+          </Row> */}
+          <div className="flex items-center justify-between mr-6">
+            {user?.userType !== "VENDOR" ? (
+              <Button
+                className="bg-white h-9 px-5 text-[11px] font-semibold rounded text-[#0063CF]"
+                icon={<PlusOutlined />}
+                onClick={() => {
+                  setSubmitting(true);
+                  router.push("/system/payment-requests/new");
+                }}
+              >
+                New Payment request
+              </Button>
+            ) : <div />}
+            <div className="flex items-center gap-5">
+              <Select
+                // mode="tags"
+                className="text-[9px] w-32 rounded-sm"
+                placeholder="Select status"
+                onChange={(value) => setSearchStatus(value)}
+                value={searchStatus}
+                options={[
+                  // { value: "mine", label: "My requests" },
+                  { value: "all", label: "All requests" },
+                  { value: "pending-approval", label: "Pending approval" },
+                  { value: "pending-review", label: "Pending review" },
+                  {
+                    value: "approved",
+                    label: "Approved",
+                  },
+                  {
+                    value: "paid",
+                    label: "Paid",
+                  },
+                  {
+                    value: "declined",
+                    label: "Declined",
+                  },
+                ]}
+              />
+              <Button
+                type="text"
+                className="bg-white h-8 text-[#0063CF]"
+                icon={<ReloadOutlined />}
+                onClick={() => refresh()}
+              ></Button>
+            </div>
+
+          </div>
           {/* <RequestStats totalRequests={dataset?.length}/> */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{
-              opacity: tempDataset ? 1 : 0,
-            }}
-            transition={{
-              duration: 0.2,
-              type: "tween",
-              ease: "circOut",
-            }}
-            className="mx-10"
-          >
+          <div className="request mr-6 bg-white h-[calc(100vh-161px)] rounded-lg mb-10 px-5 overflow-y-auto">
+            <div className="flex justify-between items-center mb-5">
+              <h4 className="text-[19px] text-[#344767]">Payment Request</h4>
+              <div className="flex items-center gap-5">
+                <div className="flex items-center space-x-5">
+                  {user?.userType !== "VENDOR" &&
+                    (currentUser?.permissions?.canApproveAsHod ||
+                      currentUser?.permissions?.canApproveAsHof ||
+                      currentUser?.permissions?.canApproveAsPM) && (
+                      <div className="flex flex-row items-center space-x-1">
+                        <Checkbox
+                          checked={myPendingRequest}
+                          disabled={onlyMine}
+                          onChange={(e) => {
+                            getMyPendingRequest(e.target.checked);
+                          }}
+                        />
+                        <div className="text-[13px] text-[#344767]">Awaiting my approval</div>
+                      </div>
+                    )
+                  }
+                  {user?.userType !== "VENDOR" && (
+                    <div className="flex flex-row items-center space-x-1">
+                      <Checkbox
+                        checked={onlyMine}
+                        onChange={(e) => {
+                          setOnlyMine(e.target.checked);
+                        }}
+                        />
+                        <div className="text-[13px] text-[#344767]">My requests</div>
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center rounded-lg bg-[#F5F7FA] p-1.5">
+                  <FiSearch size={18} className="text-[#E4E4E4] ml-2" />
+                  <Input
+                    onChange={(e) => {
+                      setSearchText(e?.target?.value);
+                    }}
+                    placeholder="Search by request#, po#, initiator"
+                    className="border-0 text-[#8392AB] bg-transparent text-[12px] hover:border-none hover:outline-none"
+                  />
+                  <div></div>
+                </div>
+              </div>
+            </div>
             <PaymentRequestsTable
               // handleSetRow={handleSetRow}
               dataSet={tempDataset}
@@ -332,11 +412,10 @@ export default function UserRequests() {
               // handleDeclineRequest={declineRequest}
               updatingId={updatingId}
             />
-          </motion.div>
-
-          <div class="absolute -bottom-32 right-10 opacity-10">
-            <Image src="/icons/blue icon.png" width={110} height={100} />
           </div>
+          {/* <div class="absolute -bottom-32 right-10 opacity-10">
+            <Image src="/icons/blue icon.png" width={110} height={100} />
+          </div> */}
         </motion.div>
       ) : (
         <div className="flex items-center justify-center flex-1 h-screen">

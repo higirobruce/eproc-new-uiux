@@ -15,12 +15,15 @@ import {
 } from "antd";
 import { ArrowLeftOutlined, SaveOutlined } from "@ant-design/icons";
 import UploadPaymentReq from "@/app/components/uploadPaymentReq";
+import { MdAccountBalance } from "react-icons/md";
+import { FaMobileAlt } from "react-icons/fa";
+
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
 
 async function getApprovers() {
-  let token = typeof window !== "undefined" && localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
   const res = await fetch(`${url}/users/level1Approvers`, {
     method: "GET",
     headers: {
@@ -42,9 +45,8 @@ async function getApprovers() {
 }
 
 export default function NewPaymentRequest() {
-  let user =
-    typeof window !== "undefined" && JSON.parse(localStorage.getItem("user"));
-  let token = typeof window !== "undefined" && localStorage.getItem("token");
+  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
   let [po, setPo] = useState(null);
   let router = useRouter();
   let [form] = Form.useForm();
@@ -57,9 +59,15 @@ export default function NewPaymentRequest() {
   let [submitting, setSubmitting] = useState(false);
   let [budgetLines, setBudgetLines] = useState([]);
   let [budgetLine, setBudgetLine] = useState(null);
-  let [budgeted, setBudgeted] = useState(false);
+  let [budgeted, setBudgeted] = useState(true);
   let [level1Approver, setLevel1Approver] = useState(null);
   let [level1Approvers, setLevel1Approvers] = useState([]);
+  const [bankPay, setBankPay] = useState(true);
+  let [bankName, setBankName] = useState("");
+  let [accountName, setAccountName] = useState("");
+  let [accountNumber, setAccountNumber] = useState("");
+  let [phoneName, setPhoneName] = useState("");
+  let [phoneNumber, setPhoneNumber] = useState("");
 
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -172,6 +180,13 @@ export default function NewPaymentRequest() {
         // purchaseOrder: params?.poId,
         docIds: _fileList,
         status: "pending-approval",
+        paymentDetails: {
+          bankName,
+          accountName,
+          accountNumber,
+          phoneName,
+          phoneNumber,
+        },
       }),
     })
       .then((res) => {
@@ -203,10 +218,10 @@ export default function NewPaymentRequest() {
         type: "tween",
         ease: "circOut",
       }}
-      className="flex flex-col mx-10 transition-opacity ease-in-out duration-1000 py-5 flex-1 space-y-3 h-full"
+      className="flex flex-col transition-opacity ease-in-out duration-1000 py-5 flex-1 space-y-3 mt-6 h-screen pb-10"
     >
       {contextHolder}
-      <div className="flex flex-row justify-between items-center">
+      {/* <div className="flex flex-row justify-between items-center">
         <div className="flex flex-row space-x-10 items-center">
           <div>
             <Button
@@ -221,277 +236,447 @@ export default function NewPaymentRequest() {
           </div>
           <div className="text-lg font-semibold">New Payment Request</div>
         </div>
-      </div>
-
-      <div className="grid md:grid-cols-5 gap-1">
-        <div className="md:col-span-4 flex flex-col ring-1 ring-gray-200 p-3 rounded shadow-md bg-white  overflow-y-scroll">
-          <Form
-            className="mt-5"
-            // layout="horizontal"
-            form={form}
-            // onFinish={handleUpload}
-          >
-            <div className="grid md:grid-cols-3 gap-10">
-              {/* Form grid 1 */}
-              <div>
-                {/* Title */}
-                <div>
-                  <div> Request title</div>
-                  <div>
-                    <Form.Item
-                      name="title"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Request title is required",
-                        },
-                      ]}
-                    >
-                      <Input
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        placeholder="How would you name your request?"
-                      />
-                    </Form.Item>
-                  </div>
-                </div>
-
-                {/* Description */}
-                <div>
-                  <div>Comment/additional note</div>
-                  <div>
-                    <Form.Item
-                      name="description"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Request description is required",
-                        },
-                      ]}
-                    >
-                      <Input.TextArea
-                        value={description}
-                        onChange={(e) => {
-                          setDescription(e.target.value);
-                        }}
-                        placeholder="Describe your request"
-                      />
-                    </Form.Item>
-                  </div>
-                </div>
-              </div>
-
-              {/* Form grid 2 */}
-              <div>
-                {/* Amount */}
-                {/* <div>
-                  <div>Amount due</div>
-                  <div>
-                    <Form.Item
-                      name="amount"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Request title is required",
-                        },
-                      ]}
-                    >
-                      <InputNumber
-                        className="w-full"
-                        value={amount}
-                        onChange={(e) => setAmout(e)}
-                        placeholder="100000"
-                      />
-                    </Form.Item>
-                  </div>
-                </div> */}
-
-                <div className="flex flex-col">
-                  <div>Amount due</div>
-                  <Form.Item>
-                    <Form.Item
-                      name="amount"
-                      noStyle
-                      rules={[
-                        {
-                          required: true,
-                          message: "Amount is required",
-                        },
-                      ]}
-                    >
-                      <InputNumber
-                        style={{ width: "100%" }}
-                        addonBefore={
-                          <Form.Item noStyle name="currency">
-                            <Select
-                              onChange={(value) => setCurrency(value)}
-                              defaultValue="RWF"
-                              options={[
-                                {
-                                  value: "RWF",
-                                  label: "RWF",
-                                  key: "RWF",
-                                },
-                                {
-                                  value: "USD",
-                                  label: "USD",
-                                  key: "USD",
-                                },
-                                {
-                                  value: "EUR",
-                                  label: "EUR",
-                                  key: "EUR",
-                                },
-                              ]}
-                            ></Select>
-                          </Form.Item>
-                        }
-                        value={amount}
-                        onChange={(e) => setAmout(e)}
-                      />
-                    </Form.Item>
-                  </Form.Item>
-                </div>
-                <div>
-                  <div>Invoice attachement(s)</div>
-                  <UploadPaymentReq files={files} setFiles={setFiles} />
-                </div>
-              </div>
-
-              {/* Form grid 3 */}
-              <div>
-                <div className="flex flex-col">
-                  <div>Level 1 approver</div>
-                  <Form.Item
-                    // label="Select level 1 approver"
-                    name="level1Approver"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Level 1 approver is required",
-                      },
-                    ]}
-                  >
-                    <Select
-                      // defaultValue={defaultApprover}
-                      placeholder="Select Approver"
-                      showSearch
-                      onChange={(value) => {
-                        setLevel1Approver(value);
-                      }}
-                      filterOption={(input, option) =>
-                        (option?.label ?? "")
-                          .toLowerCase()
-                          .includes(input.toLowerCase())
-                      }
-                      options={level1Approvers.map((l) => {
-                        return {
-                          label: l?.firstName + " " + l?.lastName,
-                          value: l?._id,
-                        };
-                      })}
-                    ></Select>
-                  </Form.Item>
-                </div>
-                {/* Budgeted */}
-                <div>
-                  <div>Budgeted?</div>
-                  <div>
-                    <Form.Item
-                      name="budgeted"
-                      valuePropName="checked"
-                      // wrapperCol={{ offset: 8, span: 16 }}
-                    >
-                      <Radio.Group
-                        onChange={(e) => {
-                          setBudgeted(e.target.value);
-                          if (e.target.value === false) setBudgetLine(null);
-                        }}
-                        value={budgeted}
-                      >
-                        <Radio value={true}>Yes</Radio>
-                        <Radio value={false}>No</Radio>
-                      </Radio.Group>
-                    </Form.Item>
-                  </div>
-                </div>
-
-                {/* Budget Lines */}
-                {budgeted && (
-                  // <Form.Item label="Budget Line" name="budgetLine">
-                  //   <Input
-                  //     onChange={(e) => {
-                  //       setBudgetLine(e.target.value);
-                  //     }}
-                  //     placeholder=""
-                  //   />
-                  // </Form.Item>
-
-                  <div>
-                    <div>Budget Line</div>
+      </div> */}
+      <div className="request mr-6 bg-white h-[calc(100vh-165px)] rounded-lg mb-10 px-5 overflow-y-auto py-2 flex flex-col justify-between pb-8 md:mr-5">
+        <div className="flex flex-col">
+          <div className="flex items-start gap-x-5">
+            <h4 className="text-[21px] text-[#344767] mb-3">
+              New Payment Request
+            </h4>
+            <sup className="bg-[#F1F3FF] px-3 py-1 rounded-full mt-2 text-[#1677FF] font-semibold">
+              INTERNAL
+            </sup>
+          </div>
+          <small className="text-[13.5px] text-[#8392AB]">
+            Please fill the form and submit the form below to create your
+            payment request
+          </small>
+        </div>
+        <div className="grid lg:grid-cols-3 gap-x-10 mt-5 items-start justify-start h-full">
+          <div className="lg:col-span-2">
+            <h5 className="text-[18px] text-[#344767] ml-3 mb-4">
+              Request Details
+            </h5>
+            <div className="gap-1">
+              <div className="flex flex-col p-3">
+                <Form
+                  className="mt-5"
+                  // layout="horizontal"
+                  form={form}
+                  // onFinish={handleUpload}
+                >
+                  <div className="grid md:grid-cols-2 gap-x-10">
+                    {/* Form grid 1 */}
+                    {/* Title */}
                     <div>
+                      <div className="text-[14px] text-[#344767] mb-2">
+                        {" "}
+                        Request title
+                      </div>
+                      <div>
+                        <Form.Item
+                          name="title"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Request title is required",
+                            },
+                          ]}
+                        >
+                          <Input
+                            value={title}
+                            className="h-10"
+                            onChange={(e) => setTitle(e.target.value)}
+                            placeholder="How would you name your request?"
+                          />
+                        </Form.Item>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col">
+                      <div className="text-[14px] text-[#344767] mb-2">
+                        Level 1 approver
+                      </div>
                       <Form.Item
-                        name="budgetLine"
+                        // label="Select level 1 approver"
+                        name="level1Approver"
                         rules={[
                           {
-                            required: budgeted,
-                            message: "Budget Line is required",
+                            required: true,
+                            message: "Level 1 approver is required",
                           },
                         ]}
                       >
                         <Select
-                          // defaultValue={budgetLine}
-                          placeholder="Select service category"
+                          // defaultValue={defaultApprover}
+                          placeholder="Select Approver"
                           showSearch
-                          onChange={(value, option) => {
-                            setBudgetLine(value);
+                          size="large"
+                          onChange={(value) => {
+                            setLevel1Approver(value);
                           }}
-                          // filterSort={(optionA, optionB) =>
-                          //   (optionA?.label ?? "")
-                          //     .toLowerCase()
-                          //     .localeCompare(
-                          //       (optionB?.label ?? "").toLowerCase()
-                          //     )
-                          // }
-                          filterOption={(inputValue, option) => {
-                            return option.label
+                          filterOption={(input, option) =>
+                            (option?.label ?? "")
                               .toLowerCase()
-                              .includes(inputValue.toLowerCase());
-                          }}
-                          options={budgetLines?.map((s) => {
+                              .includes(input.toLowerCase())
+                          }
+                          options={level1Approvers.map((l) => {
                             return {
-                              label: s.description.toUpperCase(),
-                              options: s.budgetlines?.map((sub) => {
-                                return {
-                                  label: sub.description,
-                                  value: sub._id,
-                                  title: sub.description,
-                                };
-                              }),
+                              label: l?.firstName + " " + l?.lastName,
+                              value: l?._id,
                             };
                           })}
                         ></Select>
                       </Form.Item>
                     </div>
+
+                    {/* Description */}
+                    <div>
+                      <div className="text-[14px] text-[#344767] mb-2">
+                        Comment/additional note
+                      </div>
+                      <div>
+                        <Form.Item
+                          name="description"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Request description is required",
+                            },
+                          ]}
+                        >
+                          <Input.TextArea
+                            value={description}
+                            rows={4}
+                            onChange={(e) => {
+                              setDescription(e.target.value);
+                            }}
+                            placeholder="Describe your request"
+                          />
+                        </Form.Item>
+                      </div>
+                    </div>
+                    <div className="flex flex-col">
+                      <div className="text-[14px] text-[#344767] mb-2">
+                        Amount due
+                      </div>
+                      <Form.Item>
+                        <Form.Item
+                          name="amount"
+                          noStyle
+                          rules={[
+                            {
+                              required: true,
+                              message: "Amount is required",
+                            },
+                          ]}
+                        >
+                          <InputNumber
+                            className="w-full h-10"
+                            addonBefore={
+                              <Form.Item noStyle name="currency">
+                                <Select
+                                  onChange={(value) => setCurrency(value)}
+                                  defaultValue="RWF"
+                                  options={[
+                                    {
+                                      value: "RWF",
+                                      label: "RWF",
+                                      key: "RWF",
+                                    },
+                                    {
+                                      value: "USD",
+                                      label: "USD",
+                                      key: "USD",
+                                    },
+                                    {
+                                      value: "EUR",
+                                      label: "EUR",
+                                      key: "EUR",
+                                    },
+                                  ]}
+                                ></Select>
+                              </Form.Item>
+                            }
+                            value={amount}
+                            onChange={(e) => setAmout(e)}
+                          />
+                        </Form.Item>
+                      </Form.Item>
+                    </div>
+
+                    <div>
+                      <div className="text-[14px] text-[#344767] mb-2">
+                        Budgeted?
+                      </div>
+                      <div>
+                        <Form.Item
+                          name="budgeted"
+                          valuePropName="checked"
+                          // wrapperCol={{ offset: 8, span: 16 }}
+                        >
+                          <Radio.Group
+                            onChange={(e) => {
+                              setBudgeted(e.target.value);
+                              if (e.target.value === false) setBudgetLine(null);
+                            }}
+                            value={budgeted}
+                          >
+                            <Radio value={true}>Yes</Radio>
+                            <Radio value={false}>No</Radio>
+                          </Radio.Group>
+                        </Form.Item>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-[14px] text-[#344767] mb-2">
+                        Invoice attachement(s)
+                      </div>
+                      <UploadPaymentReq files={files} setFiles={setFiles} />
+                    </div>
+
+                    {/* Form grid 3 */}
+                    <div>
+                      {/* Budget Lines */}
+                      {budgeted && (
+                        // <Form.Item label="Budget Line" name="budgetLine">
+                        //   <Input
+                        //     onChange={(e) => {
+                        //       setBudgetLine(e.target.value);
+                        //     }}
+                        //     placeholder=""
+                        //   />
+                        // </Form.Item>
+
+                        <div>
+                          <div className="text-[14px] text-[#344767] mb-2">
+                            Budget Line
+                          </div>
+                          <div>
+                            <Form.Item
+                              name="budgetLine"
+                              rules={[
+                                {
+                                  required: budgeted,
+                                  message: "Budget Line is required",
+                                },
+                              ]}
+                            >
+                              <Select
+                                // defaultValue={budgetLine}
+                                placeholder="Select service category"
+                                showSearch
+                                size="large"
+                                onChange={(value, option) => {
+                                  setBudgetLine(value);
+                                }}
+                                // filterSort={(optionA, optionB) =>
+                                //   (optionA?.label ?? "")
+                                //     .toLowerCase()
+                                //     .localeCompare(
+                                //       (optionB?.label ?? "").toLowerCase()
+                                //     )
+                                // }
+                                filterOption={(inputValue, option) => {
+                                  return option.label
+                                    .toLowerCase()
+                                    .includes(inputValue.toLowerCase());
+                                }}
+                                options={budgetLines?.map((s) => {
+                                  return {
+                                    label: s.description.toUpperCase(),
+                                    options: s.budgetlines?.map((sub) => {
+                                      return {
+                                        label: sub.description,
+                                        value: sub._id,
+                                        title: sub.description,
+                                      };
+                                    }),
+                                  };
+                                })}
+                              ></Select>
+                            </Form.Item>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                )}
+                </Form>
               </div>
             </div>
-
-            <Button
-              icon={<SaveOutlined />}
-              type="primary"
-              onClick={() => {
-                form.validateFields().then(() => {
-                  setSubmitting(true);
-                  handleUpload();
-                });
-              }}
-              disabled={submitting}
-            >
-              Save
-            </Button>
-          </Form>
+          </div>
+          <div className="mr-5 lg:col-span-1 bg-[#EFF4F8] pb-10 px-10">
+            <h5 className="text-[18px] text-[#344767]">Payment Details</h5>
+            <div className="flex items-center">
+              <Form.Item
+                name="budgeted"
+                valuePropName="checked"
+                // wrapperCol={{ offset: 8, span: 16 }}
+              >
+                <Radio.Group
+                  onChange={(e) => {
+                    setBankPay(e.target.value);
+                    if (e.target.value === false) setBudgetLine(null);
+                  }}
+                  value={bankPay}
+                  className="mb-2 mt-5"
+                >
+                  <div className="flex gap-x-10">
+                    <div className="my-1 border-t-2 border-x-2 border-[#BFC5C5]">
+                      <Radio value={true} className="flex gap-x-1 items-center">
+                        <MdAccountBalance /> &nbsp;<span>Bank Info</span>
+                      </Radio>
+                    </div>
+                    <div className="my-1 border-2 border-[#BFC5C5]">
+                      <Radio
+                        value={false}
+                        className="flex gap-x-1 items-center"
+                      >
+                        <FaMobileAlt /> &nbsp;<span>Mobile Pay</span>
+                      </Radio>
+                    </div>
+                  </div>
+                </Radio.Group>
+              </Form.Item>
+            </div>
+            {bankPay ? (
+              <>
+                <div>
+                  <div className="text-[14px] text-[#344767] mb-2">
+                    Bank Name
+                  </div>
+                  <div>
+                    <Form.Item
+                      name="bankName"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Request Bank name is required",
+                        },
+                      ]}
+                    >
+                      <Input
+                        value={bankName}
+                        className="h-11"
+                        onChange={(e) => setBankName(e.target.value)}
+                        placeholder="Type in Bank Name"
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+                <div>
+                  <div className="text-[14px] text-[#344767] mb-2">
+                    Account Name
+                  </div>
+                  <div>
+                    <Form.Item
+                      name="accountName"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Request account name is required",
+                        },
+                      ]}
+                    >
+                      <Input
+                        value={accountName}
+                        className="h-11"
+                        onChange={(e) => setAccountName(e.target.value)}
+                        placeholder="Type in User account name"
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+                <div>
+                  <div className="text-[14px] text-[#344767] mb-2">
+                    Account Number
+                  </div>
+                  <div>
+                    <Form.Item
+                      name="accountNumber"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Request account number is required",
+                        },
+                      ]}
+                    >
+                      <Input
+                        value={accountNumber}
+                        className="h-11"
+                        onChange={(e) => setAccountNumber(e.target.value)}
+                        placeholder="Type in User account number"
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <div className="text-[14px] text-[#344767] mb-2">
+                    Phone Name
+                  </div>
+                  <div>
+                    <Form.Item
+                      name="phoneName"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Request Phone name is required",
+                        },
+                      ]}
+                    >
+                      <Input
+                        value={phoneName}
+                        className="h-11"
+                        onChange={(e) => setPhoneName(e.target.value)}
+                        placeholder="Type in Phone name"
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+                <div>
+                  <div className="text-[14px] text-[#344767] mb-2">
+                    Phone Number
+                  </div>
+                  <div>
+                    <Form.Item
+                      name="phoneNumber"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Request Phone number required",
+                        },
+                      ]}
+                    >
+                      <Input
+                        value={phoneNumber}
+                        className="h-11"
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        placeholder="Type in phone number"
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+        <div className="flex w-full justify-end items-end self-end">
+          <button
+            onClick={() => {
+              form.validateFields().then(() => {
+                setSubmitting(true);
+                handleUpload();
+              });
+            }}
+            disabled={submitting}
+            className="flex item-center border-none text-[16px] text-white gap-x-4 bg-[#0065DD] rounded-lg py-3 px-6"
+          >
+            <SaveOutlined className="font-[19px]" />
+            Save
+          </button>
         </div>
       </div>
     </motion.div>

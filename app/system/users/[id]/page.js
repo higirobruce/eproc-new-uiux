@@ -654,7 +654,7 @@ export default function page({ params }) {
               <div className="text-md font-semibold my-5 flex flex-row justify-between items-center">
                 <div>Approval permissions</div>
               </div>
-              {row && (
+              {(row && row?.permissions) && (
                 <Form className="w-full">
                   <Form.Item
                     name="canApproveAsHod"

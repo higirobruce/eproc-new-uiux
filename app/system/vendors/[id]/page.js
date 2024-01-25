@@ -53,7 +53,7 @@ import { PiBagSimpleBold } from "react-icons/pi";
 import {
   MdOutlineAlternateEmail,
   MdPhoneAndroid,
-  MdOutlineMapsHomeWork,
+  MdHomeWork,
 } from "react-icons/md";
 import { FaFirefoxBrowser } from "react-icons/fa6";
 
@@ -425,6 +425,8 @@ export default function page({ params }) {
       });
   }
 
+  console.log('Row Data ', rowData)
+
   return (
     <div className="payment-request flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-screen pb-1 mb-32 overflow-y-auto">
       {contextHolder}
@@ -437,19 +439,19 @@ export default function page({ params }) {
               <div className="flex items-center gap-x-5 my-2">
                 <LuUser className="text-[#ADB6BF]" />
                 <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
-                  {row?.firstName} {row?.lastName}
+                  {rowData?.contactPersonNames}
                 </h6>
               </div>
               <div className="flex items-center gap-x-5 my-2">
-                <MdOutlineAlternateEmail className="text-[#ADB6BF]" />
+                <MdHomeWork className="text-[#ADB6BF]" />
                 <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
-                  {row?.department?.description}
+                  {rowData?.companyName}
                 </h6>
               </div>
               <div className="flex items-center gap-x-5 my-2">
                 <FaFirefoxBrowser className="text-[#ADB6BF]" />
                 <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
-                  {row?.telephone}
+                  {rowData?.webSite}
                 </h6>
               </div>
             </div>
@@ -458,13 +460,13 @@ export default function page({ params }) {
               <div className="flex items-center gap-x-5 my-2">
                 <MdOutlineAlternateEmail className="text-[#ADB6BF]" />
                 <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
-                  {row?.email}
+                  {rowData?.email}
                 </h6>
               </div>
               <div className="flex items-center gap-x-5 my-2">
                 <MdPhoneAndroid className="text-[#ADB6BF]" />
                 <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
-                  {row?.telephone}
+                  {rowData?.telephone}
                 </h6>
               </div>
             </div>

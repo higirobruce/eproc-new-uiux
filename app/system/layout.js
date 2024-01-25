@@ -137,12 +137,12 @@ export default function SystemLayout({ children }) {
         <div
           className={`relative bg-white w-[420px] min-h-fit mb-10 rounded-lg ml-4`}
         >
-          <div className="flex flex-col justify-between h-full pl-8 pr-2">
-            <div className="mt-16">
+          <div className="payment-request flex flex-col justify-between h-full pl-8 pr-2 overflow-auto">
+            <div className="mt-12">
               <div className="w-[152px]">
                 <Image src={Logo} alt="" className="w-full h-auto" />
               </div>
-              <div className="mt-20">
+              <div className="mt-12">
                 {loggedInUser && (
                   <SideMenu
                     user={JSON.parse(loggedInUser)}
@@ -157,7 +157,7 @@ export default function SystemLayout({ children }) {
                 className="flex items-center bg-[#F2F4FD] w-[calc(100%-30px)] px-5 py-4 cursor-pointer rounded-lg border-0 gap-3 no-underline"
               >
                 <UserGroupIcon className="w-5 h-5 text-[#1677FF]" />
-                <small className="font-semibold text-[14.5px] text-[#1677FF]">
+                <small className="font-semibold text-[13px] text-[#1677FF]">
                   User Management
                 </small>
               </a>

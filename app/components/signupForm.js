@@ -2172,7 +2172,7 @@ const SignupForm = () => {
             </small>
           </p>
         </div>
-        <div className="px-10 py-5 flex flex-col h-[calc(100%-25px)]">
+        <div className="payment-request px-10 pt-5 flex flex-col h-[calc(100%-25px)] overflow-auto">
           <div className="flex justify-between items-center mb-3">
             <small className="text-[#455A64]">
               Already have an account?{" "}
