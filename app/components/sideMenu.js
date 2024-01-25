@@ -231,7 +231,7 @@ const SideMenu = ({ setScreen, screen, user }) => {
   if (!user) return;
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-x-10 gap-y-7">
       {itemsSet &&
         items?.map((item) => {
           return (
@@ -245,7 +245,7 @@ const SideMenu = ({ setScreen, screen, user }) => {
                   {item.icon}
                   {/* <PieChartOutlined size={28} className="text-[#1677FF]" /> */}
                   <span
-                    className={`text-[18px] ${
+                    className={`text-[17px] ${
                       current == item.key ? `text-[#1677FF]` : `text-[#95A1B3]`
                     }`}
                   >
