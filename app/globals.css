@@ -114,6 +114,16 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
+.ant-statistic-title {
+  margin-left: -3.5rem !important;
+}
+
+.ant-statistic-content-value {
+  font-size: 26px !important;
+  color: #344767 !important;
+  font-weight: 700 !important;
+}
+
 .request-details::-webkit-scrollbar {
   display: none !important;
 }

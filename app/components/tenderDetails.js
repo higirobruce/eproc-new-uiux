@@ -111,7 +111,7 @@ const TenderDetails = ({
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const [messageApi, contextHolder] = message.useMessage();
   const [size, setSize] = useState("small");
   const [currentCode, setCurrentCode] = useState(-1);
@@ -155,6 +155,7 @@ const TenderDetails = ({
   let [sections, setSections] = useState([
     { title: "Set section title", body: "" },
   ]);
+  const [tab, setTab] = useState(0);
 
   const itemColumns =
     user?.userType !== "VENDOR"
@@ -166,7 +167,7 @@ const TenderDetails = ({
             render: (_, item) => (
               <>
                 <Typography.Text className="flex flex-row items-center space-x-2">
-                  <div>{item.title}</div>{" "}
+                  <div className="text-[15px] text-[#6A757B] font-extralight">{item.title}</div>{" "}
                 </Typography.Text>
               </>
             ),
@@ -175,17 +176,17 @@ const TenderDetails = ({
             title: "Quantity",
             dataIndex: "quantity",
             key: "quantity",
-            render: (_, item) => <>{(item?.quantity).toLocaleString()}</>,
+            render: (_, item) => <div className="text-[15px] text-[#6A757B] font-extralight">{(item?.quantity).toLocaleString()}</div>,
           },
           {
             title: "Unit Price",
             dataIndex: "estimatedUnitCost",
             key: "estimatedUnitCost",
             render: (_, item) => (
-              <>
+              <div className="text-[14px] text-[#6A757B] font-extralight">
                 {item?.currency +
                   (item?.estimatedUnitCost * 1).toLocaleString()}
-              </>
+              </div>
             ),
           },
 
@@ -194,10 +195,10 @@ const TenderDetails = ({
             dataIndex: "totalAmount",
             key: "totalAmount",
             render: (_, item) => (
-              <>
+              <div className="text-[14px] text-[#6A757B] font-extralight">
                 {item.currency +
                   (item?.quantity * item?.estimatedUnitCost).toLocaleString()}
-              </>
+              </div>
             ),
           },
           {
@@ -243,7 +244,7 @@ const TenderDetails = ({
             render: (_, item) => (
               <>
                 <Typography.Text className="flex flex-row items-center space-x-2">
-                  <div>{item.title}</div>{" "}
+                  <div className="text-[15px] text-[#6A757B] font-extralight">{item.title}</div>{" "}
                 </Typography.Text>
               </>
             ),
@@ -252,7 +253,7 @@ const TenderDetails = ({
             title: "Quantity",
             dataIndex: "quantity",
             key: "quantity",
-            render: (_, item) => <>{(item?.quantity).toLocaleString()}</>,
+            render: (_, item) => <div className="text-[15px] text-[#6A757B] font-extralight">{(item?.quantity).toLocaleString()}</div>,
           },
           {
             title: "Supporting docs",
@@ -299,20 +300,20 @@ const TenderDetails = ({
       title: "Quantity",
       dataIndex: "quantity",
       key: "quantity",
-      render: (_, item) => <>{(item?.quantity).toLocaleString()}</>,
+      render: (_, item) => <div className="text-[15px] text-[#6A757B] font-extralight">{(item?.quantity).toLocaleString()}</div>,
     },
     {
       title: "Unit Price",
       dataIndex: "estimatedUnitCost",
       key: "estimatedUnitCost",
-      render: (_, item) => <>{(item?.estimatedUnitCost).toLocaleString()}</>,
+      render: (_, item) => <div className="text-[14px] text-[#6A757B] font-extralight">{(item?.estimatedUnitCost).toLocaleString()}</div>,
     },
     {
       title: "Total Amount (Rwf)",
       dataIndex: "totalAmount",
       key: "totalAmount",
       render: (_, item) => (
-        <>{(item?.quantity * item?.estimatedUnitCost).toLocaleString()}</>
+        <div className="text-[14px] text-[#6A757B] font-extralight">{(item?.quantity * item?.estimatedUnitCost).toLocaleString()}</div>
       ),
     },
   ];
@@ -2516,75 +2517,83 @@ const TenderDetails = ({
   function buildTabHeader() {
     return (
       <div className="flex flex-col space-y-5">
-        <div className="grid grid-cols-5 items-start">
-          <div className="flex flex-col items-start">
-            <div className="text-xs font-semibold ml-3 text-gray-400">
-              Tender Number
-            </div>
-            <div className="text-sm font-semibold ml-3 text-gray-600">
-              {data?.number}
-            </div>
-          </div>
-
-          <div className="flex flex-col items-start">
-            <div className="text-xs font-semibold ml-3 text-gray-400">
-              Service category
-            </div>
-            <div className="text-sm font-semibold ml-3 text-gray-600">
-              {data?.purchaseRequest?.serviceCategory}
-            </div>
-          </div>
-
-          <div className="flex flex-col items-start">
-            <div className="text-xs font-semibold ml-3 text-gray-400">
-              Due date
-            </div>
-            <div className="text-sm font-semibold ml-3 text-gray-600">
-              {moment(data?.dueDate).format("YYYY-MMM-DD")}
-            </div>
-          </div>
-
-          <div className="flex flex-col space-y-3">
-            <div>
-              <Link
-                href={`${url}/file/tenderDocs/${data?.docId}.pdf`}
-                target="_blank"
-              >
-                <Typography.Link>
-                  <FileTextOutlined /> Tender document
-                </Typography.Link>
-              </Link>
-            </div>
-
-            {user?.permissions?.canApproveAsPM &&
-              moment().isBefore(moment(data?.submissionDeadLine)) &&
-              data?.status === "open" &&
-              !iSubmitted &&
-              bidList?.length < 1 && (
-                <div className="flex flex-row space-x-1 items-center">
-                  <UploadTenderDoc
-                    iconOnly={true}
-                    uuid={data?.docId}
-                    setTendeDocSelected={() => {}}
-                    setStatus={() => {}}
-                    label="Update the doc"
-                  />
-                  {/* <div className="text-sm text-blue-500">
-                  Update tender document
-                </div> */}
+        <div className="grid lg:grid-cols-3 grid-cols-1 gap-x-5">
+          <div className="lg:col-span-2 bg-white px-3 pb-8 rounded-lg">
+            <h5 className="mx-3 my-5 text-[18px] font-medium text-[#263238]">Tender - {data?.purchaseRequest?.title}</h5>
+            <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1">
+              <div className="flex flex-col items-start">
+                <div className="text-[14px] font-medium m-3 text-[#344767]">
+                  Tender Number
                 </div>
-              )}
+                <div className="text-[13px] mt-2 font-medium ml-3 text-[#87A1AA]">
+                  {data?.number}
+                </div>
+              </div>
+
+              <div className="flex flex-col items-start">
+                <div className="text-[14px] font-medium m-3 text-[#344767]">
+                  Service category
+                </div>
+                <div className="text-[13px] mt-2 font-medium ml-3 text-[#87A1AA]">
+                  {data?.purchaseRequest?.serviceCategory}
+                </div>
+              </div>
+
+              <div className="flex flex-col items-start">
+                <div className="text-[14px] font-medium m-3 text-[#344767]">
+                  Due date
+                </div>
+                <div className="text-[13px] mt-2 font-medium ml-3 text-[#87A1AA]">
+                  {moment(data?.dueDate).format("YYYY-MMM-DD")}
+                </div>
+              </div>
+
+              <div className="flex flex-col space-y-3">
+                <div className="text-[14px] font-medium mt-3 text-[#344767]">
+                  Tender Specification
+                </div>
+                <div>
+                  <Link
+                    href={`${url}/file/tenderDocs/${data?.docId}.pdf`}
+                    target="_blank"
+                  >
+                    <Typography.Link>
+                      <FileTextOutlined /> Tender document
+                    </Typography.Link>
+                  </Link>
+                </div>
+
+                {user?.permissions?.canApproveAsPM &&
+                  moment().isBefore(moment(data?.submissionDeadLine)) &&
+                  data?.status === "open" &&
+                  !iSubmitted &&
+                  bidList?.length < 1 && (
+                    <div className="flex flex-row space-x-1 items-center">
+                      <UploadTenderDoc
+                        iconOnly={true}
+                        uuid={data?.docId}
+                        setTendeDocSelected={() => {}}
+                        setStatus={() => {}}
+                        label="Update the doc"
+                      />
+                      {/* <div className="text-sm text-blue-500">
+                      Update tender document
+                    </div> */}
+                    </div>
+                  )}
+              </div>
+            </div>
           </div>
 
-          <div className="flex flex-col space-y-2 items-start">
-            <div className="flex flex-row space-x-3">
+          <div className="relative flex flex-col space-y-2 bg-white px-5 pt-5 rounded-lg">
+            <div className="flex flex-row space-x-3 pl-14">
               {!extending &&
                 (submittingExtensionRe ? (
                   <Spin size="small" />
                 ) : (
                   <Statistic.Countdown
-                    title="Deadline (days:hrs:min:sec)"
-                    className="text-xs text-gray-500"
+                    title="Submission Deadline (days:hrs:min:sec)"
+                    className="text-[26px] text-gray-500"
                     // valueStyle={{ fontSize: "0.75rem", lineHeight: "1rem" }}
                     format="DD:HH:mm:ss"
                     value={moment(deadLine)}
@@ -2610,7 +2619,7 @@ const TenderDetails = ({
                 !extending &&
                 data?.status !== "bidSelected" &&
                 data?.status !== "bidAwarded" && (
-                  <div>
+                  <div className="absolute left-2 mt-7">
                     <Tooltip title="Extend submission deadline">
                       <div
                         onClick={extendSubmissionDadeline}
@@ -2620,39 +2629,41 @@ const TenderDetails = ({
                       </div>
                     </Tooltip>
                   </div>
-                )}
-
-              {user?.permissions?.canEditTenders && extending && (
-                <div className="flex flex-row space-x-1">
-                  <div>
-                    <Popconfirm
-                      title="Are you sure?"
-                      onConfirm={() => {
-                        submitExtensionRequest();
-                        // setExtending(false);
-                      }}
-                    >
-                      <div
-                        onClick={extendSubmissionDadeline}
-                        className="p-2 rounded ring-1 ring-green-300 shadow-md flex items-center text-green-500 justify-center cursor-pointer active:shadow-sm active:text-green-300"
-                      >
-                        <CheckIcon className="h-4 w-4  " />
-                      </div>
-                    </Popconfirm>
-                  </div>
-                  <div>
-                    <div
-                      onClick={() => setExtending(false)}
-                      className="p-2 rounded ring-1 ring-red-300 shadow-md flex items-center text-red-500 justify-center cursor-pointer active:shadow-sm active:text-red-300"
-                    >
-                      <CloseOutlined className="h-4 w-4  " />
-                    </div>
-                  </div>
-                </div>
-              )}
+                )
+              }
             </div>
 
-            {user?.userType !== "VENDOR" && (
+            {user?.permissions?.canEditTenders && (
+              <div className="flex flex-row self-end items-center space-x-2">
+                <div>
+                  <Popconfirm
+                    title="Are you sure?"
+                    onConfirm={() => {
+                      submitExtensionRequest();
+                      // setExtending(false);
+                    }}
+                  >
+                    <div
+                      onClick={extendSubmissionDadeline}
+                      className="py-2 px-4 rounded bg-[#F2F4FD] flex items-center gap-x-2 text-[#0063CF] justify-center cursor-pointer active:shadow-sm active:text-[#0063CF]"
+                    >
+                      <CheckIcon className="h-4 w-4  " />
+                      <small>Extend Deadline</small>
+                    </div>
+                  </Popconfirm>
+                </div>
+                <div>
+                  <div
+                    onClick={() => setExtending(false)}
+                    className="p-2 rounded ring-1 ring-red-300 shadow-md flex items-center text-red-500 justify-center cursor-pointer active:shadow-sm active:text-red-300"
+                  >
+                    <CloseOutlined className="h-3 w-3h-3  " />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* {user?.userType !== "VENDOR" && (
               <Tag color="magenta">
                 {iSubmitted
                   ? "submitted"
@@ -2660,7 +2671,7 @@ const TenderDetails = ({
                   ? "closed"
                   : data?.status}
               </Tag>
-            )}
+            )} */}
           </div>
         </div>
       </div>
@@ -2820,27 +2831,63 @@ const TenderDetails = ({
   }
 
   return (
-    <div className="flex flex-col ring-1 ring-gray-200 p-3 rounded shadow-md bg-white">
+    <div className="flex flex-col p-3 rounded">
       <contextHolder />
       <div className="flex flex-row justify-between items-start">
-        <div className="flex-1 ">
-          <Tabs defaultActiveKey="1" type="card" size={size}>
-            <Tabs.TabPane tab="Overview" key="1">
+        <div className="flex-1">
+          <div className="bg-white py-3 px-3 rounded my-1">
+            <div className="flex items-center gap-x-14 px-7 bg-[#F5F5F5]">
+              <button
+                className={`bg-transparent py-3 my-3 ${
+                  tab == 0
+                    ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238]`
+                    : `border-none text-[#8392AB]`
+                } text-[14px] cursor-pointer`}
+                onClick={() => setTab(0)}
+              >
+                Overview
+              </button>
+              {user?.userType !== "VENDOR" && (
+                <button
+                  className={`bg-transparent py-3 my-3 ${
+                    tab == 2
+                      ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238]`
+                      : `border-none text-[#8392AB]`
+                  } text-[14px] cursor-pointer`}
+                  onClick={() => setTab(1)}
+                >
+                  Bid Selection
+                </button>
+              )}
+              <button
+                className={`bg-transparent py-3 my-3 ${
+                  tab == 2
+                    ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238]`
+                    : `border-none text-[#8392AB]`
+                } text-[14px] cursor-pointer`}
+                onClick={() => setTab(2)}
+              >
+                Tenders Award
+              </button>
+            </div>
+          </div>
+          {tab == 0 ? (
+            <>
               {data ? (
                 <Spin
                   spinning={loading || checkingSubmission}
                   indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />}
                 >
-                  <div className="overflow-x-auto p-3 flex flex-col space-y-10">
+                  <div className="overflow-x-auto py-3 flex flex-col space-y-5 payment-request">
                     {/* TItle */}
                     {buildTabHeader()}
 
-                    <div className="">
+                    <div className="bg-white p-5 rounded-xl">
+                      <h6 className="text-[17px] text-[#263238] font-semibold mt-0">Items Specification</h6>
                       <Table
                         size="small"
                         dataSource={data.items}
                         columns={itemColumns}
-                        bordered
                         pagination={false}
                       />
                     </div>
@@ -2882,7 +2929,14 @@ const TenderDetails = ({
               ) : (
                 <Empty />
               )}
-            </Tabs.TabPane>
+            </>
+          ) : tab == 1 ? (
+            <></>
+          ) : (
+            <></>
+          )}
+          <Tabs defaultActiveKey="1" type="card" size={size}>
+            <Tabs.TabPane tab="Overview" key="1"></Tabs.TabPane>
             {user?.userType !== "VENDOR" && (
               <>
                 <Tabs.TabPane tab="Bids list" key="2">
@@ -3703,7 +3757,7 @@ const TenderDetails = ({
           </Tabs>
         </div>
 
-        <CloseOutlined className="cursor-pointer" onClick={handleClose} />
+        {/* <CloseOutlined className="cursor-pointer" onClick={handleClose} /> */}
       </div>
 
       {createPOMOdal()}
