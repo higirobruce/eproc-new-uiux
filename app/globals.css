@@ -213,3 +213,25 @@ body {
 .permission .ant-switch.ant-switch-checked {
   background-color: #1db954 !important;
 }
+
+.ant-collapse {
+  border: none !important;
+}
+
+.ant-collapse>.ant-collapse-item {
+  border-bottom: 1px solid #e9e9e9 !important;
+}
+
+.ant-collapse .ant-collapse-content {
+  border-top: none !important;
+}
+
+.ant-collapse-header-text {
+  font-size: 21px !important;
+  margin-left: 10px !important;
+}
+
+.ant-collapse>.ant-collapse-item >.ant-collapse-header {
+  background-color: #FAFAFA !important;
+  padding: 25px 20px !important;
+}
