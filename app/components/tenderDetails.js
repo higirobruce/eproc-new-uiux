@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import parse from "html-react-parser";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
@@ -65,7 +65,9 @@ import { AiOutlineFileSync } from "react-icons/ai";
 import { FiSend } from "react-icons/fi";
 import UploadTenderDoc from "./uploadTenderDoc";
 import { IoCheckmarkOutline } from "react-icons/io5";
-import { RiForbidLine } from "react-icons/ri";
+import { RiArrowDropDownLine, RiForbidLine } from "react-icons/ri";
+import { MdOutlineAccountBalance } from "react-icons/md";
+import { LuHash, LuUser } from "react-icons/lu";
 // import MyPdfViewer from "./pdfViewer";
 // import { PDFDownloadLink } from "@react-pdf/renderer";
 // import MyDocument from "./MyDocument";
@@ -160,6 +162,8 @@ const TenderDetails = ({
   ]);
   const [tab, setTab] = useState(0);
   const [open, setOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const contentHeight = useRef();
 
   const itemColumns =
     user?.userType !== "VENDOR"
@@ -762,15 +766,18 @@ const TenderDetails = ({
   const buildBankDetailsForm = (
     <div className="">
       <div className="font-semibold mb-4">Banking details</div>
-      <div className="grid md:grid-cols-3 gap-3">
+      <div className="grid md:grid-cols-4 gap-3">
         <div>
           <div className="flex flex-col">
-            <div>Bank Name</div>
+            <div className="mb-3">
+              <label>Bank Name</label>
+            </div>
             <Form.Item name="bankName" noStyle>
               <Input
                 required
                 placeholder="ABCX Bank"
                 style={{ width: "100%" }}
+                className="h-11"
                 onChange={(v) => {
                   setBankName(v.target.value);
                 }}
@@ -781,12 +788,15 @@ const TenderDetails = ({
 
         <div>
           <div className="flex flex-col">
-            <div>Bank Account Name</div>
+            <div className="mb-3">
+              <label>Bank Account Name</label>
+            </div>
             <Form.Item name="bankAccountName" noStyle>
               <Input
                 required
                 placeholder="John Doe"
                 style={{ width: "100%" }}
+                className="h-11"
                 onChange={(v) => {
                   setBankAccountName(v.target.value);
                 }}
@@ -797,12 +807,15 @@ const TenderDetails = ({
 
         <div>
           <div className="flex flex-col">
-            <div>Account Number</div>
+            <div className="mb-3">
+              <label>Account Number</label>
+            </div>
             <Form.Item name="bankAccountNumber" noStyle>
               <Input
                 required
                 placeholder="1892-0092-0900"
                 style={{ width: "100%" }}
+                className="h-11"
                 onChange={(v) => {
                   setBankAccountNumber(v.target.value);
                 }}
@@ -816,12 +829,12 @@ const TenderDetails = ({
 
   const buildSubmissionForm = (
     <div className="">
-      <Typography.Title className="pb-4" level={5}>
-        Bid Overview
-      </Typography.Title>
-      <div className="grid md:grid-cols-2 gap-5 ">
+      <h6 className="text-[14px] text-[#263238] mt-5 mb-3 p-0">Bid Overview</h6>
+      <div className="grid md:grid-cols-4 gap-x-5">
         <div className="flex flex-col">
-          <div>Delivery date</div>
+          <div className="mb-3">
+            <label> Delivery date</label>
+          </div>
           <Form.Item
             name="deliveryDate"
             // label="Delivery date"
@@ -834,7 +847,7 @@ const TenderDetails = ({
             ]}
           >
             <DatePicker
-              className="w-full"
+              className="w-full h-11"
               onChange={(value) => setDeliveryDate(value)}
               disabledDate={(current) =>
                 current.isBefore(moment().subtract(1, "d"))
@@ -844,7 +857,9 @@ const TenderDetails = ({
         </div>
 
         <div className="flex flex-col">
-          <div>Total Bid Amount</div>
+          <div className="mb-2">
+            <label> Total Bid Amount</label>
+          </div>
           <Form.Item>
             <Form.Item
               name="price"
@@ -858,11 +873,13 @@ const TenderDetails = ({
             >
               <InputNumber
                 style={{ width: "100%" }}
+                className="h-11 pt-1"
                 addonBefore={
                   <Form.Item noStyle name="currency">
                     <Select
                       onChange={(value) => setCurrency(value)}
                       defaultValue="RWF"
+                      size="large"
                       options={[
                         {
                           value: "RWF",
@@ -893,19 +910,20 @@ const TenderDetails = ({
             </Form.Item>
           </Form.Item>
         </div>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-5">
         <div className="flex flex-col">
-          <div>Warranty (where applicable)</div>
+          <div className="mb-2">
+            <label> Warranty (where applicable)</label>
+          </div>
           <Form.Item name="warranty" noStyle>
             <InputNumber
               style={{ width: "100%" }}
+              className="h-11 pt-1"
               addonBefore={
                 <Form.Item noStyle name="warrantyDuration">
                   <Select
                     onChange={(value) => setWarrantyDuration(value)}
                     defaultValue="months"
+                    size="large"
                     options={[
                       {
                         value: "days",
@@ -929,10 +947,13 @@ const TenderDetails = ({
         </div>
 
         <div className="flex flex-col">
-          <div>Discount (%)</div>
+          <div className="mb-3">
+            <label>Discount (%)</label>
+          </div>
           <Form.Item name="discount">
             <InputNumber
               style={{ width: "100%" }}
+              className="h-11"
               onChange={(value) => setDiscount(value)}
             />
           </Form.Item>
@@ -940,49 +961,54 @@ const TenderDetails = ({
       </div>
 
       {buildBankDetailsForm}
-
-      <Typography.Title className="pb-4" level={5}>
+      <h6 className="text-[14px] text-[#263238] mt-7 mb-3 p-0">
         Supporting Documents
-      </Typography.Title>
+      </h6>
 
-      <div className="grid md:grid-cols-2 gap-5">
-        <div className="grid grid-cols-2">
-          <div className="flex flex-col">
-            <div>My proposal</div>
-            <Form.Item
-              name="proposal"
-              rules={[
-                {
-                  validator: (_, value) =>
-                    proposalSelected
-                      ? Promise.resolve()
-                      : Promise.reject(
-                          new Error("Should attach the proposal document")
-                        ),
-                },
-              ]}
-            >
-              <UploadBidDoc
-                uuid={proposalDocId}
-                setSelected={setProposalSelected}
-              />
-            </Form.Item>
-          </div>
+      <div className="grid md:grid-cols-4 gap-5">
+        {/* <div className="grid grid-cols-1">
 
-          <div className="flex flex-col">
-            <div>Other documents</div>
-            <Form.Item name="otherDocs">
-              <UploadBidDoc
-                uuid={otherDocId}
-                setSelected={setOtherDocSelected}
-              />
-            </Form.Item>
+        </div> */}
+        <div className="flex flex-col">
+          <div className="mb-3">
+            <label>My proposal</label>
           </div>
+          <Form.Item
+            name="proposal"
+            rules={[
+              {
+                validator: (_, value) =>
+                  proposalSelected
+                    ? Promise.resolve()
+                    : Promise.reject(
+                        new Error("Should attach the proposal document")
+                      ),
+              },
+            ]}
+          >
+            <UploadBidDoc
+              uuid={proposalDocId}
+              setSelected={setProposalSelected}
+            />
+          </Form.Item>
         </div>
         <div className="flex flex-col">
-          <div>Any additional comments</div>
+          <div className="mb-3">
+            <label>Other documents</label>
+          </div>
+          <Form.Item name="otherDocs">
+            <UploadBidDoc uuid={otherDocId} setSelected={setOtherDocSelected} />
+          </Form.Item>
+        </div>
+        <div className="flex flex-col">
+          <div className="mb-3">
+            <label>Any additional comments</label>
+          </div>
           <Form.Item name="comment">
-            <Input.TextArea onChange={(e) => setComment(e.target.value)} />
+            <Input.TextArea
+              onChange={(e) => setComment(e.target.value)}
+              rows={4}
+            />
           </Form.Item>
         </div>
       </div>
@@ -2705,7 +2731,7 @@ const TenderDetails = ({
                   !extending &&
                   data?.status !== "bidSelected" &&
                   data?.status !== "bidAwarded" && (
-                    <div className="absolute left-2">
+                    <div className="absolute left-2 mt-7">
                       <Tooltip title="Extend submission deadline">
                         <div
                           onClick={extendSubmissionDadeline}
@@ -2916,6 +2942,17 @@ const TenderDetails = ({
     // );
   }
 
+  const handleItemClick = (value) => {
+    setActiveIndex((prevIndex) => (prevIndex === value ? "" : value));
+  };
+
+  const statusClass = {
+    pending: { bgColor: "#FFFFD3", color: "#BDC00A", status: "Pending" },
+    selected: { bgColor: "#F0FEF3", color: "#00CE82", status: "Selected" },
+    awarded: { bgColor: "#F0FEF3", color: "#00CE82", status: "Awarded" },
+    "not awarded": { bgColor: "#FEE", color: "#F5365C", status: "Not Awarded" },
+  };
+
   return (
     <div className="flex flex-col p-3 rounded">
       <contextHolder />
@@ -2945,16 +2982,30 @@ const TenderDetails = ({
                   Bid Selection
                 </button>
               )}
-              <button
-                className={`bg-transparent py-3 my-3 ${
-                  tab == 2
-                    ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238]`
-                    : `border-none text-[#8392AB]`
-                } text-[14px] cursor-pointer`}
-                onClick={() => setTab(2)}
-              >
-                Tenders Award
-              </button>
+              {user?.userType !== "VENDOR" && (
+                <button
+                  className={`bg-transparent py-3 my-3 ${
+                    tab == 2
+                      ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238]`
+                      : `border-none text-[#8392AB]`
+                  } text-[14px] cursor-pointer`}
+                  onClick={() => setTab(2)}
+                >
+                  Tenders Award
+                </button>
+              )}
+              {user?.userType === "VENDOR" && (
+                <button
+                  className={`bg-transparent py-3 my-3 ${
+                    tab == 3
+                      ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238]`
+                      : `border-none text-[#8392AB]`
+                  } text-[14px] cursor-pointer`}
+                  onClick={() => setTab(3)}
+                >
+                  My Bid
+                </button>
+              )}
             </div>
           </div>
           {tab == 0 ? (
@@ -2964,54 +3015,61 @@ const TenderDetails = ({
                   spinning={loading || checkingSubmission}
                   indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />}
                 >
-                  <div className="overflow-x-auto py-3 flex flex-col space-y-5 payment-request">
+                  <div className="payment-request py-3 space-y-5 h-[calc(100vh-200px)] overflow-y-auto">
                     {/* TItle */}
                     {buildTabHeader(false)}
 
-                    <div className="bg-white p-5 rounded-xl">
-                      <h6 className="text-[17px] text-[#263238] font-semibold mt-0">
-                        Items Specification
-                      </h6>
-                      <Table
-                        size="small"
-                        dataSource={data.items}
-                        columns={itemColumns}
-                        pagination={false}
-                      />
+                    <div className="bids">
+                      <div className="bg-white p-5 rounded-xl flex flex-col">
+                        <h6 className="text-[17px] text-[#263238] font-semibold mt-0">
+                          Items Specification
+                        </h6>
+                        <Table
+                          size="small"
+                          dataSource={data.items}
+                          columns={itemColumns}
+                          pagination={false}
+                        />
+                      </div>
                     </div>
+                    <div className="bg-white px-5 rounded-xl flex flex-col">
+                      {user?.userType === "VENDOR" &&
+                        moment().isBefore(moment(data?.submissionDeadLine)) &&
+                        data?.status === "open" &&
+                        !iSubmitted && (
+                          <>
+                            <Form form={form} onFinish={submitSubmissionData}>
+                              <div className="ml-3 mt-5 items-center">
+                                {/* <Divider></Divider> */}
+                                <h6 className="text-[#263238] text-[16px] m-0 p-0">
+                                  Bid Submission
+                                </h6>
 
-                    {user?.userType === "VENDOR" &&
-                      moment().isBefore(moment(data?.submissionDeadLine)) &&
-                      data?.status === "open" &&
-                      !iSubmitted && (
-                        <>
-                          <Form form={form} onFinish={submitSubmissionData}>
-                            <div className="ml-3 mt-5 items-center">
-                              {/* <Divider></Divider> */}
-
-                              <Typography.Title className="" level={4}>
-                                Bid Submission
-                              </Typography.Title>
-
-                              <div className="grid grid-cols-2 gap-20">
-                                {/* Bid information */}
-                                {buildSubmissionForm}
+                                <div className="gap-10">
+                                  {buildSubmissionForm}
+                                </div>
                               </div>
-                            </div>
-                            <div className="flex flex-row space-x-1 ml-3 mt-5 items-center">
-                              <Form.Item>
-                                <Button
-                                  type="primary"
-                                  htmlType="submit"
-                                  size="small"
+                              <div className="flex flex-row justify-end space-x-1 ml-3 mt-2 mb-3 items-center">
+                                <button
+                                  type="submit"
+                                  className="bg-[#1677FF] py-3 px-6 rounded-lg text-white text-[15px] font-semibold border-none"
                                 >
-                                  Submit
-                                </Button>
-                              </Form.Item>
-                            </div>
-                          </Form>
-                        </>
-                      )}
+                                  Submit Proposal
+                                </button>
+                                {/* <Form.Item>
+                                  <Button
+                                    type="primary"
+                                    htmlType="submit"
+                                    size="small"
+                                  >
+                                    Submit
+                                  </Button>
+                                </Form.Item> */}
+                              </div>
+                            </Form>
+                          </>
+                        )}
+                    </div>
                   </div>
                 </Spin>
               ) : (
@@ -3372,7 +3430,7 @@ const TenderDetails = ({
                 </div>
               )}
             </>
-          ) : (
+          ) : tab == 2 ? (
             <div className="flex flex-col space-y-5 p-3">
               {buildTabHeader(false)}
               <div className="payment-request bg-white rounded-lg h-[calc(100vh-450px)] overflow-y-auto px-3 pt-5">
@@ -3398,7 +3456,7 @@ const TenderDetails = ({
                                     title={
                                       <a
                                         href="#"
-                                        className="bg-[#EDEDED] py-1.5 px-3 mt-3 rounded-lg"
+                                        className="bg-[#EDEDED] py-1.5 px-3 my-3 rounded-lg"
                                       >
                                         {item.number}
                                       </a>
@@ -3653,9 +3711,221 @@ const TenderDetails = ({
                 }
               </div>
             </div>
+          ) : (
+            <div className="flex flex-col space-y-5 p-3">
+              {buildTabHeader(false)}
+              <div className="payment-request bg-white rounded-lg h-[calc(100vh-450px)] overflow-y-auto px-3 pt-5">
+                {bidList?.filter((d) => d?.createdBy?._id === user?._id)
+                  .length >= 1 ? (
+                  <div>
+                    {bidList
+                      ?.filter((d) => d?.createdBy?._id === user?._id)
+                      ?.map((item, key) => {
+                        return (
+                          <>
+                            <button
+                              className={`cursor-pointer w-full pr-5 mt-4 pt-1 -pb-4 flex justify-evenly items-center border-b-0 border-[#f5f2f2] border-t border-x-0 ${
+                                activeIndex == key
+                                  ? "bg-[#F7F7F8]"
+                                  : "bg-transparent"
+                              }`}
+                              onClick={() => handleItemClick(key)}
+                            >
+                              <div className="flex flex-1 items-center justify-between gap-x-4 my-1 py-1 px-5">
+                                <h6 className="text-[#344767] text-[13px] py-0 my-0">
+                                  {item?.number}
+                                </h6>
+                                <div className="flex flex-col items-start gap-2">
+                                  <small className="text-[10px] text-[#8392AB]">
+                                    Vendor
+                                  </small>
+                                  <p className="text-[#344767] font-medium text-[15px] py-0 my-0">
+                                    {item?.createdBy?.companyName}
+                                  </p>
+                                </div>
+                                <div className="flex flex-col items-start gap-2">
+                                  <small className="text-[10px] text-[#8392AB]">
+                                    Price
+                                  </small>
+                                  <p className="text-[#344767] font-semibold text-[15px] py-0 my-0">
+                                    {item?.price.toLocaleString() +
+                                      " " +
+                                      item?.currency}
+                                  </p>
+                                </div>
+                                <div className="flex flex-col items-start gap-2">
+                                  <small className="text-[10px] text-[#8392AB]">
+                                    Discount
+                                  </small>
+                                  <p className="text-[#344767] font-semibold text-[15px] py-0 my-0">
+                                    {item?.discount}%
+                                  </p>
+                                </div>
+                                <div className="flex flex-col items-start gap-2">
+                                  <small className="text-[10px] text-[#8392AB]">
+                                    Bid Decision
+                                  </small>
+                                  <div>
+                                    <div
+                                      className={`px-3 py-1.5 bg-[${
+                                        statusClass[item?.status].bgColor
+                                      }] rounded-xl`}
+                                    >
+                                      <small
+                                        className={`text-[${
+                                          statusClass[item?.status].color
+                                        }] text-[13px]`}
+                                      >
+                                        {statusClass[item?.status].status}
+                                      </small>
+                                    </div>
+                                  </div>
+                                </div>
+                                <RiArrowDropDownLine
+                                  className={`text-[36px] text-[#344767] arrow ml-10 ${
+                                    activeIndex == key ? "active" : ""
+                                  }`}
+                                />
+                              </div>
+                            </button>
+                            <div
+                              ref={contentHeight}
+                              className="answer-container mt-1 -mb-[21px] px-8 rounded-lg"
+                              style={
+                                activeIndex == key
+                                  ? {
+                                      display: "flex",
+                                      flexDirection: "column",
+                                      borderWidth: 1,
+                                      borderStyle: "solid",
+                                      borderColor: "#F1F3FF",
+                                      background: "#FDFEFF",
+                                    }
+                                  : { display: "none" }
+                              }
+                            >
+                              <div className="py-5 flex justify-between">
+                                <div className="flex flex-col gap-5">
+                                  <small className="text-[12px] text-[#8392AB]">
+                                    Supporting Docs
+                                  </small>
+                                  <div className="">
+                                    {item?.proposalDocId && (
+                                      <div className="flex flex-row items-center mb-4">
+                                        <a
+                                          href={`${url}/file/bidDocs/${item?.proposalDocId}.pdf`}
+                                          target="_blank"
+                                          // onClick={() => {
+                                          //   setAttachmentId(
+                                          //     `bidDocs/${item?.proposalDocId}.pdf`
+                                          //   );
+                                          //   setPreviewAttachment(true);
+                                          // }}
+                                          className="text-xs no-underline text-[#1677FF]"
+                                        >
+                                          Proposal{" "}
+                                          <PaperClipIcon className="h-3 w-3" />
+                                        </a>
+                                      </div>
+                                    )}
+                                    {!item?.proposalDocId && (
+                                      <div className="text-xs">
+                                        No proposal doc found!
+                                      </div>
+                                    )}
+                                    {item?.otherDocId && (
+                                      <div>
+                                        <a
+                                          href={`${url}/file/bidDocs/${item?.otherDocId}.pdf`}
+                                          target="_blank"
+                                          // onClick={() => {
+                                          //   // router.push(`bidDocs/${item?.otherDocId}.pdf`)
+                                          //   // setAttachmentId(
+                                          //   //   `bidDocs/${item?.otherDocId}.pdf`
+                                          //   // );
+                                          //   // setPreviewAttachment(true);
+                                          // }}
+                                          className="text-xs no-underline text-[#1677FF]"
+                                        >
+                                          Other Doc{" "}
+                                          <PaperClipIcon className="h-3 w-3" />
+                                        </a>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                                <div className="flex flex-col gap-5">
+                                  <small className="text-[12px] text-[#8392AB]">
+                                    Bank Details
+                                  </small>
+                                  <div className="flex flex-col gap-3">
+                                    <div className="flex items-center gap-3">
+                                      <MdOutlineAccountBalance className="text-[#8392AB]" />
+                                      {/* {po?.vendor?.companyEmail} */}
+                                      <small className="text-[#455A64] text-[13px] font-medium">
+                                        {item?.bankName || "-"}
+                                      </small>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                      <LuUser className="text-[#8392AB]" />
+                                      {/* {po?.vendor?.companyName} */}
+                                      <small className="text-[#455A64] text-[13px] font-medium">
+                                        {item?.bankAccountName || "-"}
+                                      </small>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                      <LuHash className="text-[#8392AB]" />
+                                      {/* {po?.vendor?.tin} */}
+                                      <small className="text-[#455A64] text-[13px] font-medium">
+                                        {item?.bankAccountNumber || "-"}
+                                      </small>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="flex flex-col">
+                                  <small className="text-[12px] text-[#8392AB]">
+                                    Additional Bid Info
+                                  </small>
+                                  <div className="flex flex-col gap-y-3.5 mt-5">
+                                    <div className="flex items-center gap-3">
+                                      <small className="text-[#455A64] text-[13px] font-medium">
+                                        {item?.warranty}{" "}
+                                        {item?.warrantyDuration}
+                                      </small>
+                                      <div className="bg-[#F1F3FF] py-1 px-3 rounded-xl text-[11px] font-medium text-[#353531]">
+                                        Warranty
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                      <small className="text-[#455A64] text-[13px] font-medium">
+                                        {moment(item?.deliveryDate).fromNow()}
+                                      </small>
+                                      <div className="bg-[#F1F3FF] py-1 px-3 rounded-xl text-[11px] font-medium text-[#353531]">
+                                        Delivery timeframe
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="flex flex-col gap-5">
+                                  <small className="text-[12px] text-[#8392AB]">
+                                    Additional Comments
+                                  </small>
+                                  <textarea value={item?.comment} className="border-[#D9D9D9] px-3 py-2.5 rounded-lg text-[12px] text-[#8392AB]" rows={4}></textarea>
+                                </div>
+                              </div>
+                            </div>
+                          </>
+                        );
+                      })}
+                  </div>
+                ) : (
+                  <Empty />
+                )}
+              </div>
+            </div>
           )}
           <Tabs defaultActiveKey="1" type="card" size={size}>
-            <Tabs.TabPane tab="Overview" key="1"></Tabs.TabPane>
+            {/* <Tabs.TabPane tab="Overview" key="1"></Tabs.TabPane>
             {user?.userType !== "VENDOR" && (
               <>
                 <Tabs.TabPane tab="Bids list" key="2"></Tabs.TabPane>
@@ -3669,194 +3939,8 @@ const TenderDetails = ({
             )}
 
             {user?.userType === "VENDOR" && (
-              <Tabs.TabPane tab="My Bid" key="2">
-                <div className="flex flex-col space-y-5 p-3">
-                  {buildTabHeader(false)}
-                  {bidList?.filter((d) => d?.createdBy?._id === user?._id)
-                    .length >= 1 ? (
-                    <div>
-                      {bidList
-                        ?.filter((d) => d?.createdBy?._id === user?._id)
-                        ?.map((item) => {
-                          return (
-                            <>
-                              <div className="p-3 grid md:grid-cols-8 ">
-                                <div className="self-center">
-                                  <a href="#">{item.number}</a>
-                                  <div className="text-xs text-gray-400">
-                                    Vendor
-                                  </div>
-                                  <div className="text-xs text-gray-600">
-                                    {item?.createdBy?.companyName}
-                                  </div>
-                                </div>
-
-                                <div className="self-center">
-                                  <div className="text-xs text-gray-400">
-                                    Bank Info
-                                  </div>
-                                  <div className="flex flex-col">
-                                    {/* <div className="text-xs text-gray-400">
-                                      Bank Name:
-                                    </div> */}
-                                    <div className="text-xs text-gray-600">
-                                      {item?.bankName}
-                                    </div>
-                                  </div>
-
-                                  <div className="flex flex-col">
-                                    {/* <div className="text-xs text-gray-400">
-                                      Account Name:
-                                    </div> */}
-                                    <div className="text-xs text-gray-600">
-                                      {item?.bankAccountName}
-                                    </div>
-                                  </div>
-
-                                  <div className="flex flex-col">
-                                    {/* <div className="text-xs text-gray-400">
-                                      Account Number
-                                    </div> */}
-                                    <div className="text-xs text-gray-600">
-                                      {item?.bankAccountNumber}
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <div className="self-center">
-                                  <div className="text-xs text-gray-400">
-                                    Price
-                                  </div>
-                                  <div className="text-xs text-gray-600">
-                                    {item?.price.toLocaleString() +
-                                      " " +
-                                      item?.currency}
-                                  </div>
-                                  <div className="text-xs text-gray-400">
-                                    Comment
-                                  </div>
-                                  <div className="text-xs text-gray-600">
-                                    {item?.comment}
-                                  </div>
-                                </div>
-
-                                <div className="self-center">
-                                  <div className="text-xs text-gray-400">
-                                    Discount
-                                  </div>
-                                  <div className="text-xs text-gray-600">
-                                    {item?.discount}%
-                                  </div>
-                                </div>
-
-                                <div className="self-center">
-                                  <div className="text-xs text-gray-400">
-                                    Warranty
-                                  </div>
-                                  <div className="text-xs text-gray-600">
-                                    {item?.warranty} {item?.warrantyDuration}
-                                  </div>
-                                </div>
-
-                                <div className="self-center">
-                                  <div className="text-xs text-gray-400">
-                                    Delivery date
-                                  </div>
-                                  <div className="text-xs text-gray-600">
-                                    {moment(item?.deliveryDate).fromNow()}
-                                  </div>
-                                </div>
-
-                                <div className="self-center">
-                                  <div className="text-xs text-gray-400">
-                                    Docs
-                                  </div>
-                                  {item?.proposalDocId && (
-                                    <div className="flex flex-row items-center space-x-2">
-                                      <a
-                                        href={`${url}/file/bidDocs/${item?.proposalDocId}.pdf`}
-                                        className="text-xs"
-                                        target="_blank"
-                                      >
-                                        Proposal{" "}
-                                        <PaperClipIcon className="h-3 w-3" />
-                                      </a>
-                                      <UploadBidDoc
-                                        iconOnly={true}
-                                        setSelected={() => {}}
-                                        // label="Update the doc"
-                                        uuid={item?.proposalDocId}
-                                      />
-                                    </div>
-                                  )}
-                                  {!item?.proposalDocId && (
-                                    <div className="text-xs">
-                                      No proposal doc found!
-                                    </div>
-                                  )}
-                                  {item?.otherDocId && (
-                                    <div className="flex flex-row items-center space-x-2">
-                                      <a
-                                        href={`${url}/file/bidDocs/${item?.otherDocId}.pdf`}
-                                        className="text-xs"
-                                        target="_blank"
-                                      >
-                                        Other Doc{" "}
-                                        <PaperClipIcon className="h-3 w-3" />
-                                      </a>
-                                      <UploadBidDoc
-                                        iconOnly={true}
-                                        // label="Update the doc"
-                                        setSelected={() => {}}
-                                        uuid={item?.otherDocId}
-                                      />
-                                    </div>
-                                  )}
-                                </div>
-
-                                <div className="self-center">
-                                  <div>
-                                    {item?.status === "pending" && (
-                                      <Tag color="blue">{item?.status}</Tag>
-                                    )}
-                                    {item?.status === "selected" && (
-                                      <Tag color="green">{item?.status}</Tag>
-                                    )}
-                                    {item?.status === "awarded" && (
-                                      <>
-                                        <Tag color="green">selected</Tag>
-                                        <Tag color="green">{item?.status}</Tag>
-                                      </>
-                                    )}
-                                    {item?.status === "not awarded" && (
-                                      <>
-                                        <Tag color="red">not selected</Tag>
-                                        <Tag color="red">{item?.status}</Tag>
-                                      </>
-                                    )}
-                                  </div>
-                                </div>
-
-                                {/* {(item?.status === "not selected" || item?.status === "not awarded") && (
-                    <Button
-                      size="small"
-                      disabled
-                      //   onClick={() => handleSelectBid(item._id)}
-                    >
-                      Select Bid
-                    </Button>
-                  )} */}
-                              </div>
-                            </>
-                          );
-                        })}
-                    </div>
-                  ) : (
-                    <Empty />
-                  )}
-                </div>
-              </Tabs.TabPane>
-            )}
+              <Tabs.TabPane tab="My Bid" key="2"></Tabs.TabPane>
+            )} */}
 
             {user?.userType === "VENDOR" &&
               contract?.vendor?._id === user?._id && (

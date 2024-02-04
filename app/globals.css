@@ -87,6 +87,10 @@ body {
   height: calc(100vh - 260px) !important;
 }
 
+.bids, .ant-spin-container {
+  height: fit-content !important;
+}
+
 .ant-form input[type="radio"] {
   width: 20px !important;
   height: 20px !important;
