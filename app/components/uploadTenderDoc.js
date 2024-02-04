@@ -9,6 +9,7 @@ function UploadTenderDoc({
   setTendeDocSelected,
   iconOnly,
   setStatus,
+  loading
 }) {
   const [messageApi, contextHolder] = message.useMessage();
   let url = process.env.NEXT_PUBLIC_BKEND_URL;

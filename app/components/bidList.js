@@ -1,5 +1,5 @@
 "Use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   Avatar,
@@ -35,6 +35,9 @@ import UploadEvaluationReport from "./uploadEvaluationReport";
 import { v4 } from "uuid";
 import { encode } from "base-64";
 import { useRouter } from "next/navigation";
+import { RiArrowDropDownLine } from "react-icons/ri";
+import { MdOutlineAccountBalance } from "react-icons/md";
+import { LuUser, LuHash } from "react-icons/lu";
 const fakeDataUrl =
   "https://randomuser.me/api/?results=20&inc=name,gender,email,nat,picture&noinfo";
 
@@ -61,8 +64,10 @@ const BidList = ({
   let [ContainerHeight, setContainerHeight] = useState(0);
   let [openSelectBid, setOpenSelectBid] = useState(false);
   let [evaluationReportId, setEvaluationRptId] = useState(v4());
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   let [fileSelected, setFileSelected] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const contentHeight = useRef();
 
   const appendData = () => {
     fetch(`${url}/submissions/byTender/${tenderId}`, {
@@ -86,6 +91,10 @@ const BidList = ({
       });
   };
 
+  const handleItemClick = (value) => {
+    setActiveIndex((prevIndex) => (prevIndex === value ? "" : value));
+  };
+
   useEffect(() => {
     appendData();
   }, [refresh]);
@@ -102,208 +111,230 @@ const BidList = ({
     }
   };
 
+  const statusClass = {
+    "pending": { bgColor: "#FFFFD3", color: "#BDC00A", status: "Pending" },
+    "selected": { bgColor: "#F0FEF3", color: "#00CE82", status: "Selected" },
+    "awarded": { bgColor: "#F0FEF3", color: "#00CE82", status: "Awarded" },
+    "not awarded": { bgColor: "#FEE", color: "#F5365C", status: "Not Awarded" },
+  };
+
   return (
     <>
       {contextHolder}
-      {data && (
-        <List size="small">
-          <VirtualList
-            data={data}
-            // height={ContainerHeight}
-            itemHeight={47}
-            itemKey="number"
-            onScroll={onScroll}
-          >
-            {(item) => (
-              <List.Item key={item?.number}>
-                <List.Item.Meta
-                  //   avatar={<Avatar src={item.picture.large} />}
-                  title={<a href="#">{item.number}</a>}
-                  description={
-                    <div className="grid md:grid-cols-9 ">
-                      <div className="self-center">
-                        <div className="text-xs text-gray-400">Vendor</div>
-                        <div className="text-xs text-gray-600">
-                          {item?.createdBy?.companyName}
-                        </div>
-                      </div>
-
-                      <div className="self-center">
-                        <div className="text-xs text-gray-400">Bank Info</div>
-                        <div className="flex flex-row">
-                          <div className="text-xs text-gray-600">
-                            {item?.bankName}
-                          </div>
-                        </div>
-
-                        <div className="flex flex-row">
-                          <div className="text-xs text-gray-600">
-                            {item?.bankAccountName}
-                          </div>
-                        </div>
-                        <div className="flex flex-row">
-                          <div className="text-xs text-gray-600">
-                            {item?.bankAccountNumber}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="self-center">
-                        <div className="text-xs text-gray-400">Price</div>
-                        <div className="text-xs text-gray-600">
-                          {item?.price.toLocaleString() + " " + item?.currency}
-                        </div>
-                        <div className="text-xs text-gray-400">Comment</div>
-                        <div className="text-xs text-gray-600">
-                          {item?.comment}
-                        </div>
-                      </div>
-
-                      <div className="self-center flex flex-col">
-                        <div className="text-xs text-gray-400">Discount</div>
-                        <div className="text-xs text-gray-600">
-                          {item?.discount}%
-                        </div>
-                      </div>
-
-                      <div className="self-center">
-                        <div className="text-xs text-gray-400">Warranty</div>
-                        <div className="text-xs text-gray-600">
-                          {item?.warranty} {item?.warrantyDuration}
-                        </div>
-                      </div>
-
-                      <div className="self-center">
-                        <div className="text-xs text-gray-400">
-                          Delivery date
-                        </div>
-                        <div className="text-xs text-gray-600">
-                          {moment(item?.deliveryDate).fromNow()}
-                        </div>
-                      </div>
-
-                      <div className="self-center">
-                        <div className="text-xs text-gray-400">Docs</div>
-                        {item?.proposalDocId && (
-                          <div className="flex flex-row items-center space-x-2">
-                            <a
-                              href={`${url}/file/bidDocs/${item?.proposalDocId}.pdf`}
-                              target="_blank"
-                              // onClick={() => {
-                              //   setAttachmentId(
-                              //     `bidDocs/${item?.proposalDocId}.pdf`
-                              //   );
-                              //   setPreviewAttachment(true);
-                              // }}
-                              className="text-xs"
-                            >
-                              Proposal <PaperClipIcon className="h-3 w-3" />
-                            </a>
-                            
-                          </div>
-                        )}
-                        {!item?.proposalDocId && (
-                          <div className="text-xs">No proposal doc found!</div>
-                        )}
-                        {item?.otherDocId && (
-                          <div>
-                            <a
-                              href={`${url}/file/bidDocs/${item?.otherDocId}.pdf`}
-                              target="_blank"
-                              // onClick={() => {
-                              //   // router.push(`bidDocs/${item?.otherDocId}.pdf`)
-                              //   // setAttachmentId(
-                              //   //   `bidDocs/${item?.otherDocId}.pdf`
-                              //   // );
-                              //   // setPreviewAttachment(true);
-                              // }}
-                              className="text-xs"
-                            >
-                              Other Doc <PaperClipIcon className="h-3 w-3" />
-                            </a>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="self-center">
-                        <div>
-                          {item?.status === "pending" && (
-                            <Tag color="blue">{item?.status}</Tag>
-                          )}
-                          {item?.status === "selected" && (
-                            <Tag color="green">{item?.status}</Tag>
-                          )}
-                          {item?.status === "awarded" && (
-                            <>
-                              <Tag color="green">selected</Tag>
-                              <Tag color="green">{item?.status}</Tag>
-                            </>
-                          )}
-                          {item?.status === "not awarded" && (
-                            <>
-                              <Tag color="red">not selected</Tag>
-                              <Tag color="red">{item?.status}</Tag>
-                            </>
-                          )}
-                        </div>
-                      </div>
-
-                      {item?.status === "pending" && (
-                        <Button
-                          className="self-center"
-                          size="small"
-                          type="primary"
-                          disabled={
-                            !canSelectBid || !user?.permissions?.canApproveBids
-                          }
-                          onClick={() => {
-                            setSelectedBid(item._id);
-                            setOpenSelectBid(true);
-                          }}
-                        >
-                          Select Bid
-                        </Button>
-                      )}
-
-                      {item?.status === "selected" &&
-                        tenderData?.evaluationReportId && (
-                          <>
-                            <Button
-                              size="small"
-                              disabled={
-                                !documentFullyApproved(data) ||
-                                !user?.permissions?.canCreateContracts
-                              }
-                              type="primary"
-                              onClick={() => handleAwardBid(item._id)}
-                            >
-                              Award Tender
-                            </Button>
-                          </>
-                        )}
-
-                      {/* {(item?.status === "not selected" || item?.status === "not awarded") && (
-                    <Button
-                      size="small"
-                      disabled
-                      //   onClick={() => handleSelectBid(item._id)}
+      {data?.length > 0 &&
+        data.map((item, key) => (
+          <>
+            <button
+              className={`cursor-pointer w-full pr-5 mt-4 pt-1 -pb-4 flex justify-evenly items-center border-b-0 border-[#f5f2f2] border-t border-x-0 ${
+                activeIndex == key ? "bg-[#F7F7F8]" : "bg-transparent"
+              }`}
+              onClick={() => handleItemClick(key)}
+            >
+              <div className="flex flex-1 items-center justify-between gap-x-4 my-1 py-1 px-5">
+                <h6 className="text-[#344767] text-[13px] py-0 my-0">
+                  {item?.number}
+                </h6>
+                <div className="flex flex-col items-start gap-2">
+                  <small className="text-[10px] text-[#8392AB]">Vendor</small>
+                  <p className="text-[#344767] font-medium text-[15px] py-0 my-0">
+                    {item?.createdBy?.companyName}
+                  </p>
+                </div>
+                <div className="flex flex-col items-start gap-2">
+                  <small className="text-[10px] text-[#8392AB]">Price</small>
+                  <p className="text-[#344767] font-semibold text-[15px] py-0 my-0">
+                    {item?.price.toLocaleString() + " " + item?.currency}
+                  </p>
+                </div>
+                <div className="flex flex-col items-start gap-2">
+                  <small className="text-[10px] text-[#8392AB]">Discount</small>
+                  <p className="text-[#344767] font-semibold text-[15px] py-0 my-0">
+                    {item?.discount}%
+                  </p>
+                </div>
+                <div className="flex flex-col items-start gap-2">
+                  <small className="text-[10px] text-[#8392AB]">
+                    Bid Decision
+                  </small>
+                  <div>
+                    <div
+                      className={`px-3 py-1.5 bg-[${
+                        statusClass[item?.status].bgColor
+                      }] rounded-xl`}
                     >
-                      Select Bid
-                    </Button>
-                  )} */}
+                      <small
+                        className={`text-[${
+                          statusClass[item?.status].color
+                        }] text-[13px]`}
+                      >
+                        {statusClass[item?.status].status}
+                      </small>
                     </div>
-                  }
-                />
-                <div className="flex flex-row items-end space-x-10 justify-between">
-                  <div className="flex flex-row space-x-2">
-                    <div className="flex flex-col"></div>
                   </div>
                 </div>
-              </List.Item>
-            )}
-          </VirtualList>
-        </List>
-      )}
+                {item?.status === "pending" && (
+                  <Button
+                    className="self-center"
+                    size="middle"
+                    type="primary"
+                    disabled={
+                      !canSelectBid || !user?.permissions?.canApproveBids
+                    }
+                    onClick={() => {
+                      setSelectedBid(item._id);
+                      setOpenSelectBid(true);
+                    }}
+                  >
+                    Select Bid
+                  </Button>
+                )}
+                {item?.status === "selected" &&
+                  tenderData?.evaluationReportId && (
+                    <>
+                      <Button
+                        size="middle"
+                        disabled={
+                          !documentFullyApproved(data) ||
+                          !user?.permissions?.canCreateContracts
+                        }
+                        type="primary"
+                        onClick={() => handleAwardBid(item._id)}
+                      >
+                        Award Tender
+                      </Button>
+                    </>
+                  )}
+                <RiArrowDropDownLine
+                  className={`text-[36px] text-[#344767] arrow ml-10 ${
+                    activeIndex == key ? "active" : ""
+                  }`}
+                />
+              </div>
+            </button>
+            <div
+              ref={contentHeight}
+              className="answer-container mt-1 -mb-[21px] px-8 rounded-lg"
+              style={
+                activeIndex == key
+                  ? {
+                      display: "flex",
+                      flexDirection: "column",
+                      borderWidth: 1,
+                      borderStyle: "solid",
+                      borderColor: "#F1F3FF",
+                      background: "#FDFEFF",
+                    }
+                  : { display: "none" }
+              }
+            >
+              <div className="py-5 flex justify-between">
+                <div className="flex flex-col gap-5">
+                  <small className="text-[12px] text-[#8392AB]">
+                    Supporting Docs
+                  </small>
+                  <div className="">
+                    {item?.proposalDocId && (
+                      <div className="flex flex-row items-center">
+                        <a
+                          href={`${url}/file/bidDocs/${item?.proposalDocId}.pdf`}
+                          target="_blank"
+                          // onClick={() => {
+                          //   setAttachmentId(
+                          //     `bidDocs/${item?.proposalDocId}.pdf`
+                          //   );
+                          //   setPreviewAttachment(true);
+                          // }}
+                          className="text-xs no-underline text-[#1677FF]"
+                        >
+                          Proposal <PaperClipIcon className="h-3 w-3" />
+                        </a>
+                      </div>
+                    )}
+                    {!item?.proposalDocId && (
+                      <div className="text-xs">No proposal doc found!</div>
+                    )}
+                    {item?.otherDocId && (
+                      <div>
+                        <a
+                          href={`${url}/file/bidDocs/${item?.otherDocId}.pdf`}
+                          target="_blank"
+                          // onClick={() => {
+                          //   // router.push(`bidDocs/${item?.otherDocId}.pdf`)
+                          //   // setAttachmentId(
+                          //   //   `bidDocs/${item?.otherDocId}.pdf`
+                          //   // );
+                          //   // setPreviewAttachment(true);
+                          // }}
+                          className="text-xs no-underline text-[#1677FF]"
+                        >
+                          Other Doc <PaperClipIcon className="h-3 w-3" />
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="flex flex-col gap-5">
+                  <small className="text-[12px] text-[#8392AB]">
+                    Bank Details
+                  </small>
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center gap-3">
+                      <MdOutlineAccountBalance className="text-[#8392AB]" />
+                      {/* {po?.vendor?.companyEmail} */}
+                      <small className="text-[#455A64] text-[13px] font-medium">
+                        {item?.bankName || "-"}
+                      </small>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <LuUser className="text-[#8392AB]" />
+                      {/* {po?.vendor?.companyName} */}
+                      <small className="text-[#455A64] text-[13px] font-medium">
+                        {item?.bankAccountName || "-"}
+                      </small>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <LuHash className="text-[#8392AB]" />
+                      {/* {po?.vendor?.tin} */}
+                      <small className="text-[#455A64] text-[13px] font-medium">
+                        {item?.bankAccountNumber || "-"}
+                      </small>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col">
+                  <small className="text-[12px] text-[#8392AB]">
+                    Additional Bid Info
+                  </small>
+                  <div className="flex flex-col gap-y-3.5 mt-5">
+                    <div className="flex items-center gap-3">
+                      <small className="text-[#455A64] text-[13px] font-medium">
+                        {item?.warranty} {item?.warrantyDuration}
+                      </small>
+                      <div className="bg-[#F1F3FF] py-1 px-3 rounded-xl text-[11px] font-medium text-[#353531]">
+                        Warranty
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <small className="text-[#455A64] text-[13px] font-medium">
+                        {moment(item?.deliveryDate).fromNow()}
+                      </small>
+                      <div className="bg-[#F1F3FF] py-1 px-3 rounded-xl text-[11px] font-medium text-[#353531]">
+                        Delivery timeframe
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-5">
+                  <small className="text-[12px] text-[#8392AB]">
+                    Additional Comments
+                  </small>
+                  <textarea value={item?.comment} className="border-[#D9D9D9] px-3 py-2.5 rounded-lg text-[12px] text-[#8392AB]" rows={4}></textarea>
+                </div>
+              </div>
+            </div>
+          </>
+        ))}
+      
 
       {(!data || data?.length < 1) && <Empty />}
 

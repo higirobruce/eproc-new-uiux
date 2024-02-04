@@ -87,6 +87,10 @@ body {
   height: calc(100vh - 260px) !important;
 }
 
+.bids, .ant-spin-container {
+  height: fit-content !important;
+}
+
 .ant-form input[type="radio"] {
   width: 20px !important;
   height: 20px !important;
@@ -112,6 +116,16 @@ body {
   overflow-x: hidden !important;
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch;
+}
+
+.ant-statistic-title {
+  margin-left: -3.5rem !important;
+}
+
+.ant-statistic-content-value {
+  font-size: 26px !important;
+  color: #344767 !important;
+  font-weight: 700 !important;
 }
 
 .request-details::-webkit-scrollbar {

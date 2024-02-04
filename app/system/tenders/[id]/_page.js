@@ -17,7 +17,7 @@ let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
 
 async function getTenderDetails(id, router) {
-  let token = typeof window !== "undefined" && localStorage.getItem("token");
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
 
   const res = await fetch(`${url}/tenders/${id}`, {
     headers: {
@@ -45,10 +45,8 @@ async function getTenderDetails(id, router) {
 
 export default function page({ params }) {
   let router = useRouter();
-  let user = JSON.parse(
-    typeof window !== "undefined" && localStorage.getItem("user")
-  );
-  let token = typeof window !== "undefined" && localStorage.getItem("token");
+  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+  let token = typeof window !== 'undefined' && localStorage.getItem("token");
 
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -361,10 +359,10 @@ export default function page({ params }) {
         type: "tween",
         ease: "circOut",
       }}
-      className="flex flex-col transition-opacity ease-in-out duration-1000 py-5 flex-1 space-y-3 h-screen pb-10 mr-6"
+      className="flex flex-col transition-opacity ease-in-out duration-1000 px-10 py-5 flex-1 space-y-3"
     >
       {contextHolder}
-      {/* <div className="flex flex-row items-center">
+      <div className="flex flex-row items-center">
         <div className="flex flex-row justify-between items-center w-full">
           <div className="flex flex-row items-center space-x-5">
             <Button
@@ -392,7 +390,7 @@ export default function page({ params }) {
               </Popover>
             )}
         </div>
-      </div> */}
+      </div>
       {rowData && (
         <TenderDetails
           handleUpdateStatus={updateStatus}

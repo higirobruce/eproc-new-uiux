@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import parse from "html-react-parser";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
@@ -62,7 +62,12 @@ import {
 } from "@heroicons/react/24/solid";
 import Link from "next/link";
 import { AiOutlineFileSync } from "react-icons/ai";
+import { FiSend } from "react-icons/fi";
 import UploadTenderDoc from "./uploadTenderDoc";
+import { IoCheckmarkOutline } from "react-icons/io5";
+import { RiArrowDropDownLine, RiForbidLine } from "react-icons/ri";
+import { MdOutlineAccountBalance } from "react-icons/md";
+import { LuHash, LuUser } from "react-icons/lu";
 // import MyPdfViewer from "./pdfViewer";
 // import { PDFDownloadLink } from "@react-pdf/renderer";
 // import MyDocument from "./MyDocument";
@@ -111,7 +116,7 @@ const TenderDetails = ({
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const [messageApi, contextHolder] = message.useMessage();
   const [size, setSize] = useState("small");
   const [currentCode, setCurrentCode] = useState(-1);
@@ -155,6 +160,10 @@ const TenderDetails = ({
   let [sections, setSections] = useState([
     { title: "Set section title", body: "" },
   ]);
+  const [tab, setTab] = useState(0);
+  const [open, setOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const contentHeight = useRef();
 
   const itemColumns =
     user?.userType !== "VENDOR"
@@ -166,7 +175,9 @@ const TenderDetails = ({
             render: (_, item) => (
               <>
                 <Typography.Text className="flex flex-row items-center space-x-2">
-                  <div>{item.title}</div>{" "}
+                  <div className="text-[15px] text-[#6A757B] font-extralight">
+                    {item.title}
+                  </div>{" "}
                 </Typography.Text>
               </>
             ),
@@ -175,17 +186,21 @@ const TenderDetails = ({
             title: "Quantity",
             dataIndex: "quantity",
             key: "quantity",
-            render: (_, item) => <>{(item?.quantity).toLocaleString()}</>,
+            render: (_, item) => (
+              <div className="text-[15px] text-[#6A757B] font-extralight">
+                {(item?.quantity).toLocaleString()}
+              </div>
+            ),
           },
           {
             title: "Unit Price",
             dataIndex: "estimatedUnitCost",
             key: "estimatedUnitCost",
             render: (_, item) => (
-              <>
+              <div className="text-[14px] text-[#6A757B] font-extralight">
                 {item?.currency +
                   (item?.estimatedUnitCost * 1).toLocaleString()}
-              </>
+              </div>
             ),
           },
 
@@ -194,10 +209,10 @@ const TenderDetails = ({
             dataIndex: "totalAmount",
             key: "totalAmount",
             render: (_, item) => (
-              <>
+              <div className="text-[14px] text-[#6A757B] font-extralight">
                 {item.currency +
                   (item?.quantity * item?.estimatedUnitCost).toLocaleString()}
-              </>
+              </div>
             ),
           },
           {
@@ -243,7 +258,9 @@ const TenderDetails = ({
             render: (_, item) => (
               <>
                 <Typography.Text className="flex flex-row items-center space-x-2">
-                  <div>{item.title}</div>{" "}
+                  <div className="text-[15px] text-[#6A757B] font-extralight">
+                    {item.title}
+                  </div>{" "}
                 </Typography.Text>
               </>
             ),
@@ -252,7 +269,11 @@ const TenderDetails = ({
             title: "Quantity",
             dataIndex: "quantity",
             key: "quantity",
-            render: (_, item) => <>{(item?.quantity).toLocaleString()}</>,
+            render: (_, item) => (
+              <div className="text-[15px] text-[#6A757B] font-extralight">
+                {(item?.quantity).toLocaleString()}
+              </div>
+            ),
           },
           {
             title: "Supporting docs",
@@ -299,20 +320,30 @@ const TenderDetails = ({
       title: "Quantity",
       dataIndex: "quantity",
       key: "quantity",
-      render: (_, item) => <>{(item?.quantity).toLocaleString()}</>,
+      render: (_, item) => (
+        <div className="text-[15px] text-[#6A757B] font-extralight">
+          {(item?.quantity).toLocaleString()}
+        </div>
+      ),
     },
     {
       title: "Unit Price",
       dataIndex: "estimatedUnitCost",
       key: "estimatedUnitCost",
-      render: (_, item) => <>{(item?.estimatedUnitCost).toLocaleString()}</>,
+      render: (_, item) => (
+        <div className="text-[14px] text-[#6A757B] font-extralight">
+          {(item?.estimatedUnitCost).toLocaleString()}
+        </div>
+      ),
     },
     {
       title: "Total Amount (Rwf)",
       dataIndex: "totalAmount",
       key: "totalAmount",
       render: (_, item) => (
-        <>{(item?.quantity * item?.estimatedUnitCost).toLocaleString()}</>
+        <div className="text-[14px] text-[#6A757B] font-extralight">
+          {(item?.quantity * item?.estimatedUnitCost).toLocaleString()}
+        </div>
       ),
     },
   ];
@@ -693,6 +724,7 @@ const TenderDetails = ({
     _data.invitationSent = true;
 
     handleSendInvitation(_data);
+    setOpen(false);
   }
 
   function documentFullySigned(document) {
@@ -734,15 +766,18 @@ const TenderDetails = ({
   const buildBankDetailsForm = (
     <div className="">
       <div className="font-semibold mb-4">Banking details</div>
-      <div className="grid md:grid-cols-3 gap-3">
+      <div className="grid md:grid-cols-4 gap-3">
         <div>
           <div className="flex flex-col">
-            <div>Bank Name</div>
+            <div className="mb-3">
+              <label>Bank Name</label>
+            </div>
             <Form.Item name="bankName" noStyle>
               <Input
                 required
                 placeholder="ABCX Bank"
                 style={{ width: "100%" }}
+                className="h-11"
                 onChange={(v) => {
                   setBankName(v.target.value);
                 }}
@@ -753,12 +788,15 @@ const TenderDetails = ({
 
         <div>
           <div className="flex flex-col">
-            <div>Bank Account Name</div>
+            <div className="mb-3">
+              <label>Bank Account Name</label>
+            </div>
             <Form.Item name="bankAccountName" noStyle>
               <Input
                 required
                 placeholder="John Doe"
                 style={{ width: "100%" }}
+                className="h-11"
                 onChange={(v) => {
                   setBankAccountName(v.target.value);
                 }}
@@ -769,12 +807,15 @@ const TenderDetails = ({
 
         <div>
           <div className="flex flex-col">
-            <div>Account Number</div>
+            <div className="mb-3">
+              <label>Account Number</label>
+            </div>
             <Form.Item name="bankAccountNumber" noStyle>
               <Input
                 required
                 placeholder="1892-0092-0900"
                 style={{ width: "100%" }}
+                className="h-11"
                 onChange={(v) => {
                   setBankAccountNumber(v.target.value);
                 }}
@@ -788,12 +829,12 @@ const TenderDetails = ({
 
   const buildSubmissionForm = (
     <div className="">
-      <Typography.Title className="pb-4" level={5}>
-        Bid Overview
-      </Typography.Title>
-      <div className="grid md:grid-cols-2 gap-5 ">
+      <h6 className="text-[14px] text-[#263238] mt-5 mb-3 p-0">Bid Overview</h6>
+      <div className="grid md:grid-cols-4 gap-x-5">
         <div className="flex flex-col">
-          <div>Delivery date</div>
+          <div className="mb-3">
+            <label> Delivery date</label>
+          </div>
           <Form.Item
             name="deliveryDate"
             // label="Delivery date"
@@ -806,7 +847,7 @@ const TenderDetails = ({
             ]}
           >
             <DatePicker
-              className="w-full"
+              className="w-full h-11"
               onChange={(value) => setDeliveryDate(value)}
               disabledDate={(current) =>
                 current.isBefore(moment().subtract(1, "d"))
@@ -816,7 +857,9 @@ const TenderDetails = ({
         </div>
 
         <div className="flex flex-col">
-          <div>Total Bid Amount</div>
+          <div className="mb-2">
+            <label> Total Bid Amount</label>
+          </div>
           <Form.Item>
             <Form.Item
               name="price"
@@ -830,11 +873,13 @@ const TenderDetails = ({
             >
               <InputNumber
                 style={{ width: "100%" }}
+                className="h-11 pt-1"
                 addonBefore={
                   <Form.Item noStyle name="currency">
                     <Select
                       onChange={(value) => setCurrency(value)}
                       defaultValue="RWF"
+                      size="large"
                       options={[
                         {
                           value: "RWF",
@@ -865,19 +910,20 @@ const TenderDetails = ({
             </Form.Item>
           </Form.Item>
         </div>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-5">
         <div className="flex flex-col">
-          <div>Warranty (where applicable)</div>
+          <div className="mb-2">
+            <label> Warranty (where applicable)</label>
+          </div>
           <Form.Item name="warranty" noStyle>
             <InputNumber
               style={{ width: "100%" }}
+              className="h-11 pt-1"
               addonBefore={
                 <Form.Item noStyle name="warrantyDuration">
                   <Select
                     onChange={(value) => setWarrantyDuration(value)}
                     defaultValue="months"
+                    size="large"
                     options={[
                       {
                         value: "days",
@@ -901,10 +947,13 @@ const TenderDetails = ({
         </div>
 
         <div className="flex flex-col">
-          <div>Discount (%)</div>
+          <div className="mb-3">
+            <label>Discount (%)</label>
+          </div>
           <Form.Item name="discount">
             <InputNumber
               style={{ width: "100%" }}
+              className="h-11"
               onChange={(value) => setDiscount(value)}
             />
           </Form.Item>
@@ -912,49 +961,54 @@ const TenderDetails = ({
       </div>
 
       {buildBankDetailsForm}
-
-      <Typography.Title className="pb-4" level={5}>
+      <h6 className="text-[14px] text-[#263238] mt-7 mb-3 p-0">
         Supporting Documents
-      </Typography.Title>
+      </h6>
 
-      <div className="grid md:grid-cols-2 gap-5">
-        <div className="grid grid-cols-2">
-          <div className="flex flex-col">
-            <div>My proposal</div>
-            <Form.Item
-              name="proposal"
-              rules={[
-                {
-                  validator: (_, value) =>
-                    proposalSelected
-                      ? Promise.resolve()
-                      : Promise.reject(
-                          new Error("Should attach the proposal document")
-                        ),
-                },
-              ]}
-            >
-              <UploadBidDoc
-                uuid={proposalDocId}
-                setSelected={setProposalSelected}
-              />
-            </Form.Item>
-          </div>
+      <div className="grid md:grid-cols-4 gap-5">
+        {/* <div className="grid grid-cols-1">
 
-          <div className="flex flex-col">
-            <div>Other documents</div>
-            <Form.Item name="otherDocs">
-              <UploadBidDoc
-                uuid={otherDocId}
-                setSelected={setOtherDocSelected}
-              />
-            </Form.Item>
+        </div> */}
+        <div className="flex flex-col">
+          <div className="mb-3">
+            <label>My proposal</label>
           </div>
+          <Form.Item
+            name="proposal"
+            rules={[
+              {
+                validator: (_, value) =>
+                  proposalSelected
+                    ? Promise.resolve()
+                    : Promise.reject(
+                        new Error("Should attach the proposal document")
+                      ),
+              },
+            ]}
+          >
+            <UploadBidDoc
+              uuid={proposalDocId}
+              setSelected={setProposalSelected}
+            />
+          </Form.Item>
         </div>
         <div className="flex flex-col">
-          <div>Any additional comments</div>
+          <div className="mb-3">
+            <label>Other documents</label>
+          </div>
+          <Form.Item name="otherDocs">
+            <UploadBidDoc uuid={otherDocId} setSelected={setOtherDocSelected} />
+          </Form.Item>
+        </div>
+        <div className="flex flex-col">
+          <div className="mb-3">
+            <label>Any additional comments</label>
+          </div>
           <Form.Item name="comment">
-            <Input.TextArea onChange={(e) => setComment(e.target.value)} />
+            <Input.TextArea
+              onChange={(e) => setComment(e.target.value)}
+              rows={4}
+            />
           </Form.Item>
         </div>
       </div>
@@ -2513,117 +2567,185 @@ const TenderDetails = ({
       });
   }
 
-  function buildTabHeader() {
+  function buildTabHeader(value) {
     return (
       <div className="flex flex-col space-y-5">
-        <div className="grid grid-cols-5 items-start">
-          <div className="flex flex-col items-start">
-            <div className="text-xs font-semibold ml-3 text-gray-400">
-              Tender Number
-            </div>
-            <div className="text-sm font-semibold ml-3 text-gray-600">
-              {data?.number}
-            </div>
-          </div>
-
-          <div className="flex flex-col items-start">
-            <div className="text-xs font-semibold ml-3 text-gray-400">
-              Service category
-            </div>
-            <div className="text-sm font-semibold ml-3 text-gray-600">
-              {data?.purchaseRequest?.serviceCategory}
-            </div>
-          </div>
-
-          <div className="flex flex-col items-start">
-            <div className="text-xs font-semibold ml-3 text-gray-400">
-              Due date
-            </div>
-            <div className="text-sm font-semibold ml-3 text-gray-600">
-              {moment(data?.dueDate).format("YYYY-MMM-DD")}
-            </div>
-          </div>
-
-          <div className="flex flex-col space-y-3">
-            <div>
-              <Link
-                href={`${url}/file/tenderDocs/${data?.docId}.pdf`}
-                target="_blank"
-              >
-                <Typography.Link>
-                  <FileTextOutlined /> Tender document
-                </Typography.Link>
-              </Link>
-            </div>
-
-            {user?.permissions?.canApproveAsPM &&
-              moment().isBefore(moment(data?.submissionDeadLine)) &&
-              data?.status === "open" &&
-              !iSubmitted &&
-              bidList?.length < 1 && (
-                <div className="flex flex-row space-x-1 items-center">
-                  <UploadTenderDoc
-                    iconOnly={true}
-                    uuid={data?.docId}
-                    setTendeDocSelected={() => {}}
-                    setStatus={() => {}}
-                    label="Update the doc"
-                  />
-                  {/* <div className="text-sm text-blue-500">
-                  Update tender document
-                </div> */}
+        <div
+          className={`grid ${
+            value ? `lg:grid-cols-2` : `lg:grid-cols-3`
+          } grid-cols-1 gap-x-5`}
+        >
+          <div className="lg:col-span-2 bg-white px-3 pb-8 rounded-lg">
+            <div className="flex justify-between w-full">
+              <h5 className="mx-3 my-5 text-[18px] font-medium text-[#263238]">
+                Tender - {data?.purchaseRequest?.title}
+              </h5>
+              {value && (
+                <div className="relative flex flex-col space-y-2 bg-white px-5 pt-5 rounded-lg">
+                  <div className="relative flex flex-row space-x-3 pl-14">
+                    {!extending &&
+                      (submittingExtensionRe ? (
+                        <Spin size="small" />
+                      ) : (
+                        <Statistic.Countdown
+                          title=""
+                          // className="text-[12px] text-gray-500"
+                          valueStyle={{
+                            fontSize: "0.5rem",
+                            lineHeight: "1rem",
+                          }}
+                          format="DD:HH:mm:ss"
+                          value={moment(deadLine)}
+                        />
+                      ))}
+                    {extending && (
+                      <DatePicker
+                        format="YYYY-MM-DD HH:mm"
+                        showTime
+                        showNow={false}
+                        disabledDate={(current) =>
+                          current.isBefore(moment().subtract(1, "d"))
+                        }
+                        onChange={(v, str) => {
+                          // console.log(moment(str).toISOString());
+                          setDeadLine(moment(str).toISOString());
+                        }}
+                      />
+                    )}
+                    {user?.permissions?.canEditTenders &&
+                      !extending &&
+                      data?.status !== "bidSelected" &&
+                      data?.status !== "bidAwarded" && (
+                        <div className="absolute left-1">
+                          <Tooltip title="Extend submission deadline">
+                            <div
+                              onClick={extendSubmissionDadeline}
+                              className="p-1 -mt-1.5 rounded ring-1 ring-red-300 shadow-md flex items-center text-red-500 justify-center cursor-pointer active:shadow-sm active:text-red-300"
+                            >
+                              <CalendarDaysIcon className="h-4 w-4  " />
+                            </div>
+                          </Tooltip>
+                        </div>
+                      )}
+                  </div>
                 </div>
               )}
+            </div>
+            <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1">
+              <div className="flex flex-col items-start">
+                <div className="text-[14px] font-medium m-3 text-[#344767]">
+                  Tender Number
+                </div>
+                <div className="text-[13px] mt-2 font-medium ml-3 text-[#87A1AA]">
+                  {data?.number}
+                </div>
+              </div>
+
+              <div className="flex flex-col items-start">
+                <div className="text-[14px] font-medium m-3 text-[#344767]">
+                  Service category
+                </div>
+                <div className="text-[13px] mt-2 font-medium ml-3 text-[#87A1AA]">
+                  {data?.purchaseRequest?.serviceCategory}
+                </div>
+              </div>
+
+              <div className="flex flex-col items-start">
+                <div className="text-[14px] font-medium m-3 text-[#344767]">
+                  Due date
+                </div>
+                <div className="text-[13px] mt-2 font-medium ml-3 text-[#87A1AA]">
+                  {moment(data?.dueDate).format("YYYY-MMM-DD")}
+                </div>
+              </div>
+
+              <div className="flex flex-col space-y-3">
+                <div className="text-[14px] font-medium mt-3 text-[#344767]">
+                  Tender Specification
+                </div>
+                <div>
+                  <Link
+                    href={`${url}/file/tenderDocs/${data?.docId}.pdf`}
+                    target="_blank"
+                  >
+                    <Typography.Link>
+                      <FileTextOutlined /> Tender document
+                    </Typography.Link>
+                  </Link>
+                </div>
+
+                {user?.permissions?.canApproveAsPM &&
+                  moment().isBefore(moment(data?.submissionDeadLine)) &&
+                  data?.status === "open" &&
+                  !iSubmitted &&
+                  bidList?.length < 1 && (
+                    <div className="flex flex-row space-x-1 items-center">
+                      <UploadTenderDoc
+                        iconOnly={true}
+                        uuid={data?.docId}
+                        setTendeDocSelected={() => {}}
+                        setStatus={() => {}}
+                        label="Update the doc"
+                      />
+                      {/* <div className="text-sm text-blue-500">
+                      Update tender document
+                    </div> */}
+                    </div>
+                  )}
+              </div>
+            </div>
           </div>
 
-          <div className="flex flex-col space-y-2 items-start">
-            <div className="flex flex-row space-x-3">
-              {!extending &&
-                (submittingExtensionRe ? (
-                  <Spin size="small" />
-                ) : (
-                  <Statistic.Countdown
-                    title="Deadline (days:hrs:min:sec)"
-                    className="text-xs text-gray-500"
-                    // valueStyle={{ fontSize: "0.75rem", lineHeight: "1rem" }}
-                    format="DD:HH:mm:ss"
-                    value={moment(deadLine)}
+          {!value && (
+            <div className="relative flex flex-col space-y-2 bg-white px-5 pt-5 rounded-lg">
+              <div className="flex flex-row space-x-3 pl-14">
+                {!extending &&
+                  (submittingExtensionRe ? (
+                    <Spin size="small" />
+                  ) : (
+                    <Statistic.Countdown
+                      title="Submission Deadline (days:hrs:min:sec)"
+                      className="text-[26px] text-gray-500"
+                      // valueStyle={{ fontSize: "0.75rem", lineHeight: "1rem" }}
+                      format="DD:HH:mm:ss"
+                      value={moment(deadLine)}
+                    />
+                  ))}
+
+                {extending && (
+                  <DatePicker
+                    format="YYYY-MM-DD HH:mm"
+                    showTime
+                    showNow={false}
+                    disabledDate={(current) =>
+                      current.isBefore(moment().subtract(1, "d"))
+                    }
+                    onChange={(v, str) => {
+                      // console.log(moment(str).toISOString());
+                      setDeadLine(moment(str).toISOString());
+                    }}
                   />
-                ))}
-
-              {extending && (
-                <DatePicker
-                  format="YYYY-MM-DD HH:mm"
-                  showTime
-                  showNow={false}
-                  disabledDate={(current) =>
-                    current.isBefore(moment().subtract(1, "d"))
-                  }
-                  onChange={(v, str) => {
-                    // console.log(moment(str).toISOString());
-                    setDeadLine(moment(str).toISOString());
-                  }}
-                />
-              )}
-
-              {user?.permissions?.canEditTenders &&
-                !extending &&
-                data?.status !== "bidSelected" &&
-                data?.status !== "bidAwarded" && (
-                  <div>
-                    <Tooltip title="Extend submission deadline">
-                      <div
-                        onClick={extendSubmissionDadeline}
-                        className="p-2 rounded ring-1 ring-red-300 shadow-md flex items-center text-red-500 justify-center cursor-pointer active:shadow-sm active:text-red-300"
-                      >
-                        <CalendarDaysIcon className="h-4 w-4  " />
-                      </div>
-                    </Tooltip>
-                  </div>
                 )}
 
-              {user?.permissions?.canEditTenders && extending && (
-                <div className="flex flex-row space-x-1">
+                {user?.permissions?.canEditTenders &&
+                  !extending &&
+                  data?.status !== "bidSelected" &&
+                  data?.status !== "bidAwarded" && (
+                    <div className="absolute left-2 mt-7">
+                      <Tooltip title="Extend submission deadline">
+                        <div
+                          onClick={extendSubmissionDadeline}
+                          className="p-2 rounded ring-1 ring-red-300 shadow-md flex items-center text-red-500 justify-center cursor-pointer active:shadow-sm active:text-red-300"
+                        >
+                          <CalendarDaysIcon className="h-4 w-4  " />
+                        </div>
+                      </Tooltip>
+                    </div>
+                  )}
+              </div>
+
+              {user?.permissions?.canEditTenders && (
+                <div className="flex flex-row self-end items-center space-x-2">
                   <div>
                     <Popconfirm
                       title="Are you sure?"
@@ -2634,9 +2756,10 @@ const TenderDetails = ({
                     >
                       <div
                         onClick={extendSubmissionDadeline}
-                        className="p-2 rounded ring-1 ring-green-300 shadow-md flex items-center text-green-500 justify-center cursor-pointer active:shadow-sm active:text-green-300"
+                        className="py-2 px-4 rounded bg-[#F2F4FD] flex items-center gap-x-2 text-[#0063CF] justify-center cursor-pointer active:shadow-sm active:text-[#0063CF]"
                       >
                         <CheckIcon className="h-4 w-4  " />
+                        <small>Extend Deadline</small>
                       </div>
                     </Popconfirm>
                   </div>
@@ -2645,14 +2768,13 @@ const TenderDetails = ({
                       onClick={() => setExtending(false)}
                       className="p-2 rounded ring-1 ring-red-300 shadow-md flex items-center text-red-500 justify-center cursor-pointer active:shadow-sm active:text-red-300"
                     >
-                      <CloseOutlined className="h-4 w-4  " />
+                      <CloseOutlined className="h-3 w-3h-3  " />
                     </div>
                   </div>
                 </div>
               )}
-            </div>
 
-            {user?.userType !== "VENDOR" && (
+              {/* {user?.userType !== "VENDOR" && (
               <Tag color="magenta">
                 {iSubmitted
                   ? "submitted"
@@ -2660,8 +2782,9 @@ const TenderDetails = ({
                   ? "closed"
                   : data?.status}
               </Tag>
-            )}
-          </div>
+            )} */}
+            </div>
+          )}
         </div>
       </div>
     );
@@ -2819,748 +2942,1011 @@ const TenderDetails = ({
     // );
   }
 
+  const handleItemClick = (value) => {
+    setActiveIndex((prevIndex) => (prevIndex === value ? "" : value));
+  };
+
+  const statusClass = {
+    pending: { bgColor: "#FFFFD3", color: "#BDC00A", status: "Pending" },
+    selected: { bgColor: "#F0FEF3", color: "#00CE82", status: "Selected" },
+    awarded: { bgColor: "#F0FEF3", color: "#00CE82", status: "Awarded" },
+    "not awarded": { bgColor: "#FEE", color: "#F5365C", status: "Not Awarded" },
+  };
+
   return (
-    <div className="flex flex-col ring-1 ring-gray-200 p-3 rounded shadow-md bg-white">
+    <div className="flex flex-col p-3 rounded">
       <contextHolder />
       <div className="flex flex-row justify-between items-start">
-        <div className="flex-1 ">
-          <Tabs defaultActiveKey="1" type="card" size={size}>
-            <Tabs.TabPane tab="Overview" key="1">
+        <div className="flex-1">
+          <div className="bg-white py-3 px-3 rounded my-1">
+            <div className="flex items-center gap-x-14 px-7 bg-[#F5F5F5]">
+              <button
+                className={`bg-transparent py-3 my-3 ${
+                  tab == 0
+                    ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238]`
+                    : `border-none text-[#8392AB]`
+                } text-[14px] cursor-pointer`}
+                onClick={() => setTab(0)}
+              >
+                Overview
+              </button>
+              {user?.userType !== "VENDOR" && (
+                <button
+                  className={`bg-transparent py-3 my-3 ${
+                    tab == 1
+                      ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238]`
+                      : `border-none text-[#8392AB]`
+                  } text-[14px] cursor-pointer`}
+                  onClick={() => setTab(1)}
+                >
+                  Bid Selection
+                </button>
+              )}
+              {user?.userType !== "VENDOR" && (
+                <button
+                  className={`bg-transparent py-3 my-3 ${
+                    tab == 2
+                      ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238]`
+                      : `border-none text-[#8392AB]`
+                  } text-[14px] cursor-pointer`}
+                  onClick={() => setTab(2)}
+                >
+                  Tenders Award
+                </button>
+              )}
+              {user?.userType === "VENDOR" && (
+                <button
+                  className={`bg-transparent py-3 my-3 ${
+                    tab == 3
+                      ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238]`
+                      : `border-none text-[#8392AB]`
+                  } text-[14px] cursor-pointer`}
+                  onClick={() => setTab(3)}
+                >
+                  My Bid
+                </button>
+              )}
+            </div>
+          </div>
+          {tab == 0 ? (
+            <>
               {data ? (
                 <Spin
                   spinning={loading || checkingSubmission}
                   indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />}
                 >
-                  <div className="overflow-x-auto p-3 flex flex-col space-y-10">
+                  <div className="payment-request py-3 space-y-5 h-[calc(100vh-200px)] overflow-y-auto">
                     {/* TItle */}
-                    {buildTabHeader()}
+                    {buildTabHeader(false)}
 
-                    <div className="">
-                      <Table
-                        size="small"
-                        dataSource={data.items}
-                        columns={itemColumns}
-                        bordered
-                        pagination={false}
-                      />
+                    <div className="bids">
+                      <div className="bg-white p-5 rounded-xl flex flex-col">
+                        <h6 className="text-[17px] text-[#263238] font-semibold mt-0">
+                          Items Specification
+                        </h6>
+                        <Table
+                          size="small"
+                          dataSource={data.items}
+                          columns={itemColumns}
+                          pagination={false}
+                        />
+                      </div>
                     </div>
+                    <div className="bg-white px-5 rounded-xl flex flex-col">
+                      {user?.userType === "VENDOR" &&
+                        moment().isBefore(moment(data?.submissionDeadLine)) &&
+                        data?.status === "open" &&
+                        !iSubmitted && (
+                          <>
+                            <Form form={form} onFinish={submitSubmissionData}>
+                              <div className="ml-3 mt-5 items-center">
+                                {/* <Divider></Divider> */}
+                                <h6 className="text-[#263238] text-[16px] m-0 p-0">
+                                  Bid Submission
+                                </h6>
 
-                    {user?.userType === "VENDOR" &&
-                      moment().isBefore(moment(data?.submissionDeadLine)) &&
-                      data?.status === "open" &&
-                      !iSubmitted && (
-                        <>
-                          <Form form={form} onFinish={submitSubmissionData}>
-                            <div className="ml-3 mt-5 items-center">
-                              {/* <Divider></Divider> */}
-
-                              <Typography.Title className="" level={4}>
-                                Bid Submission
-                              </Typography.Title>
-
-                              <div className="grid grid-cols-2 gap-20">
-                                {/* Bid information */}
-                                {buildSubmissionForm}
+                                <div className="gap-10">
+                                  {buildSubmissionForm}
+                                </div>
                               </div>
-                            </div>
-                            <div className="flex flex-row space-x-1 ml-3 mt-5 items-center">
-                              <Form.Item>
-                                <Button
-                                  type="primary"
-                                  htmlType="submit"
-                                  size="small"
+                              <div className="flex flex-row justify-end space-x-1 ml-3 mt-2 mb-3 items-center">
+                                <button
+                                  type="submit"
+                                  className="bg-[#1677FF] py-3 px-6 rounded-lg text-white text-[15px] font-semibold border-none"
                                 >
-                                  Submit
-                                </Button>
-                              </Form.Item>
-                            </div>
-                          </Form>
-                        </>
-                      )}
+                                  Submit Proposal
+                                </button>
+                                {/* <Form.Item>
+                                  <Button
+                                    type="primary"
+                                    htmlType="submit"
+                                    size="small"
+                                  >
+                                    Submit
+                                  </Button>
+                                </Form.Item> */}
+                              </div>
+                            </Form>
+                          </>
+                        )}
+                    </div>
                   </div>
                 </Spin>
               ) : (
                 <Empty />
               )}
-            </Tabs.TabPane>
-            {user?.userType !== "VENDOR" && (
-              <>
-                <Tabs.TabPane tab="Bids list" key="2">
-                  <div className="flex flex-col space-y-2 p-3">
-                    {buildTabHeader()}
-                    {/* Evaluators section */}
-                    {data?.invitees && (
-                      <div className="ml-3 flex flex-col space-y-2">
-                        {
-                          <>
-                            <div className="text-lg flex flex-row items-center space-x-5">
-                              <div>Evaluators List </div>
-                              {data?.evaluationReportId && (
-                                <a
-                                  href={`${url}/file/evaluationReports/${data?.evaluationReportId}.pdf`}
-                                  target="_blank"
-                                  className="text-sm"
-                                  // onClick={() => {
-                                  //   setAttachmentId(
-                                  //     `evaluationReports/${data?.evaluationReportId}.pdf`
-                                  //   );
-                                  //   setPreviewAttachment(true);
-                                  // }}
-                                >
-                                  <FileTextOutlined /> Evaluation report
-                                </a>
+            </>
+          ) : tab == 1 ? (
+            <>
+              {user?.userType !== "VENDOR" && (
+                <div className="flex flex-col space-y-2 py-3">
+                  <div className="grid lg:grid-cols-3 gap-x-3">
+                    <div className="lg:col-span-2">{buildTabHeader(true)}</div>
+                    <div className="flex flex-col justify-between lg:col-span-1 bg-white rounded-lg px-4">
+                      <p className="mb-0 pb-0">Bids Evaluators</p>
+                      {data?.invitees && (
+                        <div className="flex flex-col space-y-2 mb-3">
+                          <div className="text-lg flex flex-row  justify-end items-center space-x-5">
+                            {data?.evaluationReportId && (
+                              <a
+                                href={`${url}/file/evaluationReports/${data?.evaluationReportId}.pdf`}
+                                target="_blank"
+                                className="text-sm no-underline text-[#1677FF]"
+                                onClick={() => {
+                                  setAttachmentId(
+                                    `evaluationReports/${data?.evaluationReportId}.pdf`
+                                  );
+                                  setPreviewAttachment(true);
+                                }}
+                              >
+                                <FileTextOutlined className="text-[#1677FF]" />{" "}
+                                Evaluation report
+                              </a>
+                            )}
+                          </div>
+                          <div className="flex flex-row space-x-2">
+                            {iBelongToEvaluators() &&
+                              !iHaveApprovedEvalReport() &&
+                              data?.evaluationReportId && (
+                                <>
+                                  <Button
+                                    size="small"
+                                    type="primary"
+                                    icon={<LikeOutlined />}
+                                    onClick={() => {
+                                      let invitees = [...data?.invitees];
+                                      let inv = invitees?.filter(
+                                        (i) => i?.approver === user?.email
+                                      );
+                                      let invIndex = invitees?.filter(
+                                        (i, index) => index
+                                      );
+                                      let objToUpdate =
+                                        inv?.length >= 1 ? inv[0] : {};
+                                      objToUpdate.approved = true;
+                                      objToUpdate.approvedAt =
+                                        moment().toDate();
+                                      invitees[invIndex] = objToUpdate;
+                                      handleSendEvalApproval(data, invitees);
+                                    }}
+                                  >
+                                    I agree with the recomendations
+                                  </Button>
+                                  <Button
+                                    size="small"
+                                    type="text"
+                                    danger
+                                    icon={<DislikeOutlined />}
+                                  >
+                                    I disagree
+                                  </Button>
+                                </>
                               )}
-                            </div>
-                            <div className="flex flex-row space-x-2">
-                              {iBelongToEvaluators() &&
-                                !iHaveApprovedEvalReport() &&
-                                data?.evaluationReportId && (
-                                  <>
-                                    <Button
-                                      size="small"
-                                      type="primary"
-                                      icon={<LikeOutlined />}
-                                      onClick={() => {
-                                        let invitees = [...data?.invitees];
-                                        let inv = invitees?.filter(
-                                          (i) => i?.approver === user?.email
-                                        );
-                                        let invIndex = invitees?.filter(
-                                          (i, index) => index
-                                        );
-                                        let objToUpdate =
-                                          inv?.length >= 1 ? inv[0] : {};
-                                        objToUpdate.approved = true;
-                                        objToUpdate.approvedAt =
-                                          moment().toDate();
-                                        invitees[invIndex] = objToUpdate;
-                                        handleSendEvalApproval(data, invitees);
-                                      }}
-                                    >
-                                      I agree with the recomendations
-                                    </Button>
-                                    <Button
-                                      size="small"
-                                      type="text"
-                                      danger
-                                      icon={<DislikeOutlined />}
-                                    >
-                                      I disagree
-                                    </Button>
-                                  </>
-                                )}
-                            </div>
-                          </>
-                        }
-
-                        <div className="flex flex-row space-x-3 text-gray-600">
-                          {data?.invitees?.map((c) => {
-                            return (
-                              <div
-                                key={c.approver}
-                                className="flex flex-row items-center space-x-1"
-                              >
-                                <div>
-                                  {c?.approved ? (
-                                    <Popover
-                                      content={`approved: ${moment(
-                                        c?.approvedAt
-                                      ).format("DD MMM YYYY")} at ${moment(
-                                        c?.approvedAt
-                                      )
-                                        .tz("Africa/Kigali")
-                                        .format("h:mm a z z")}`}
-                                    >
-                                      <span>
-                                        <LockClosedIcon className="h-5 text-green-500" />
-                                      </span>
-                                    </Popover>
-                                  ) : (
-                                    <Popover content="Approval still pending">
-                                      <span>
-                                        <LockOpenIcon className="h-5 text-yellow-500" />
-                                      </span>
-                                    </Popover>
-                                  )}
+                          </div>
+                          <div className="flex flex-wrap space-2 text-gray-600">
+                            {data?.invitees?.map((c) => {
+                              return (
+                                <div
+                                  key={c.approver}
+                                  className="flex flex-row items-center space-x-1 my-1.5 mr-1"
+                                >
+                                  <div>
+                                    {c?.approved ? (
+                                      <Popover
+                                        content={`approved: ${moment(
+                                          c?.approvedAt
+                                        ).format("DD MMM YYYY")} at ${moment(
+                                          c?.approvedAt
+                                        )
+                                          .tz("Africa/Kigali")
+                                          .format("h:mm a z z")}`}
+                                      >
+                                        <span>
+                                          <IoCheckmarkOutline className="h-3 text-green-500" />
+                                        </span>
+                                      </Popover>
+                                    ) : (
+                                      <Popover content="Approval still pending">
+                                        <span>
+                                          <RiForbidLine className="h-3 text-yellow-500" />
+                                        </span>
+                                      </Popover>
+                                    )}
+                                  </div>
+                                  <div className="flex flex-col text-gray-600 text-[13.5px]">
+                                    <div>{c?.approver}</div>
+                                  </div>
                                 </div>
-                                <div className="flex flex-col text-gray-600 text-sm">
-                                  <div>{c?.approver}</div>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-                    {!data?.invitationSent &&
-                      user.permissions.canApproveAsPM && (
-                        <div className="ml-3 flex">
-                          <div className="">
-                            <div>Invite Evaluators</div>
-
-                            <div className="flex flex-row space-x-1">
-                              <Form
-                                onFinish={() => sendInvitation()}
-                                className="flex flex-row space-x-1"
-                              >
-                                <div>
-                                  <Form.Item name="ivitees" required>
-                                    <Select
-                                      showSearch
-                                      showArrow
-                                      onChange={(value) =>
-                                        setSelectionComitee(value)
-                                      }
-                                      style={{ width: "400px" }}
-                                      mode="multiple"
-                                      options={users.map((user) => {
-                                        return {
-                                          label: user?.email,
-                                          value: user?.email,
-                                        };
-                                      })}
-                                    />
-                                  </Form.Item>
-                                </div>
-                                <div>
-                                  <Form.Item>
-                                    <Button
-                                      htmlType="submit"
-                                      disabled={selectionComitee?.length < 1}
-                                      icon={
-                                        <PaperAirplaneIcon className="h-5 w-5" />
-                                      }
-                                    />
-                                  </Form.Item>
-                                </div>
-                              </Form>
-                            </div>
+                              );
+                            })}
                           </div>
                         </div>
                       )}
-                    <Divider></Divider>
-                    <div className="text-lg ml-3">Bids List</div>
-                    <div>
-                      <BidList
-                        tenderId={data?._id}
-                        handleSelectBid={handleSelectBid}
-                        handleAwardBid={handleAwardBid}
-                        refresh={refresh}
-                        canSelectBid={
-                          data?.invitationSent &&
-                          moment(data?.submissionDeadLine).isSameOrBefore(
-                            moment()
-                          )
-                        }
-                        handleSetBidList={setBidList}
-                        comitee={data?.invitees}
-                        user={user}
-                        // previewAttachment={previewAttachment}
-                        setPreviewAttachment={setPreviewAttachment}
-                        // attachmentId={attachmentId}
-                        setAttachmentId={setAttachmentId}
-                        tenderData={data}
-                      />
+                      {!data?.invitationSent &&
+                        user.permissions.canApproveAsPM && (
+                          <button
+                            onClick={() => setOpen(true)}
+                            className="text-white text-[15px] font-semibold mb-4 mx-6 border-0 bg-[#1677FF] rounded py-3.5 cursor-pointer"
+                          >
+                            <FiSend className="h-4 w-4 -mb-1" /> &nbsp; Invite
+                            Evaluators
+                          </button>
+                        )}
                     </div>
                   </div>
-                </Tabs.TabPane>
-                <Tabs.TabPane tab="Tender award" key="3">
-                  <div className="flex flex-col space-y-5 p-3">
-                    {buildTabHeader()}
-                    <Divider></Divider>
 
-                    {
-                      // (contract?.status === "reviewed" ||
-                      //   (contract?.status === "draft" &&
-                      //     user?.permissions?.canEditContracts) ||
-                      //   !contract) &&
-                      bidList?.filter((d) => d.status === "awarded").length >=
-                      1 ? (
-                        !poCreated || !contractCreated ? (
-                          <div>
-                            <div className="text-xl ml-3">
-                              <FolderOpenOutlined /> Selected Bid
+                  {/* Modal Invitee */}
+                  <Modal
+                    centered
+                    onCancel={() => setOpen(false)}
+                    open={open}
+                    footer={null}
+                    width={900}
+                  >
+                    <h6 className="text-[22px] text-[#263238] my-0 py-0">
+                      Invite Evaluators
+                    </h6>
+                    <small className="text-[#87A1AA] text-[15px]">
+                      Select a member that will participate in evaluating the
+                      bid
+                    </small>
+                    <Form
+                      onFinish={() => sendInvitation()}
+                      className="flex flex-col mt-10"
+                    >
+                      <div>
+                        <Form.Item name="ivitees" required>
+                          <Select
+                            showSearch
+                            showArrow
+                            onChange={(value) => setSelectionComitee(value)}
+                            size="large"
+                            mode="multiple"
+                            options={users.map((user) => {
+                              return {
+                                label: user?.email,
+                                value: user?.email,
+                              };
+                            })}
+                          />
+                        </Form.Item>
+                      </div>
+                      <div>
+                        <button
+                          type="submit"
+                          disabled={selectionComitee?.length < 1}
+                          className="bg-[#0065DD] py-4 font-semibold w-full text-white border-none rounded-lg"
+                        >
+                          Send Invite to selected evaluators
+                        </button>
+                        {/* <Form.Item>
+                          <Button
+                            htmlType="submit"
+                            disabled={selectionComitee?.length < 1}
+                            className="w-full bg-[#0065DD]"
+                            icon={
+                              <PaperAirplaneIcon className="h-5 w-5" />
+                            }
+                          />
+                        </Form.Item> */}
+                      </div>
+                    </Form>
+                  </Modal>
+                  {/* Evaluators section */}
+                  {/* {data?.invitees && (
+                    <div className="ml-3 flex flex-col space-y-2">
+                      {
+                        <>
+                          <div className="text-lg flex flex-row items-center space-x-5">
+                            <div>Evaluators List </div>
+                            {data?.evaluationReportId && (
+                              <a
+                                href={`${url}/file/evaluationReports/${data?.evaluationReportId}.pdf`}
+                                target="_blank"
+                                className="text-sm"
+                                onClick={() => {
+                                  setAttachmentId(
+                                    `evaluationReports/${data?.evaluationReportId}.pdf`
+                                  );
+                                  setPreviewAttachment(true);
+                                }}
+                              >
+                                <FileTextOutlined /> Evaluation report
+                              </a>
+                            )}
+                          </div>
+                          <div className="flex flex-row space-x-2">
+                            {iBelongToEvaluators() &&
+                              !iHaveApprovedEvalReport() &&
+                              data?.evaluationReportId && (
+                                <>
+                                  <Button
+                                    size="small"
+                                    type="primary"
+                                    icon={<LikeOutlined />}
+                                    onClick={() => {
+                                      let invitees = [...data?.invitees];
+                                      let inv = invitees?.filter(
+                                        (i) => i?.approver === user?.email
+                                      );
+                                      let invIndex = invitees?.filter(
+                                        (i, index) => index
+                                      );
+                                      let objToUpdate =
+                                        inv?.length >= 1 ? inv[0] : {};
+                                      objToUpdate.approved = true;
+                                      objToUpdate.approvedAt =
+                                        moment().toDate();
+                                      invitees[invIndex] = objToUpdate;
+                                      handleSendEvalApproval(data, invitees);
+                                    }}
+                                  >
+                                    I agree with the recomendations
+                                  </Button>
+                                  <Button
+                                    size="small"
+                                    type="text"
+                                    danger
+                                    icon={<DislikeOutlined />}
+                                  >
+                                    I disagree
+                                  </Button>
+                                </>
+                              )}
+                          </div>
+                        </>
+                      }
+
+                      <div className="flex flex-row space-x-3 text-gray-600">
+                        {data?.invitees?.map((c) => {
+                          return (
+                            <div
+                              key={c.approver}
+                              className="flex flex-row items-center space-x-1"
+                            >
+                              <div>
+                                {c?.approved ? (
+                                  <Popover
+                                    content={`approved: ${moment(
+                                      c?.approvedAt
+                                    ).format("DD MMM YYYY")} at ${moment(
+                                      c?.approvedAt
+                                    )
+                                      .tz("Africa/Kigali")
+                                      .format("h:mm a z z")}`}
+                                  >
+                                    <span>
+                                      <LockClosedIcon className="h-5 text-green-500" />
+                                    </span>
+                                  </Popover>
+                                ) : (
+                                  <Popover content="Approval still pending">
+                                    <span>
+                                      <LockOpenIcon className="h-5 text-yellow-500" />
+                                    </span>
+                                  </Popover>
+                                )}
+                              </div>
+                              <div className="flex flex-col text-gray-600 text-sm">
+                                <div>{c?.approver}</div>
+                              </div>
                             </div>
-                            {bidList
-                              ?.filter((d) => d.status === "awarded")
-                              ?.map((item) => {
-                                return (
-                                  <List size="small" key={item?.number}>
-                                    <List.Item>
-                                      <List.Item.Meta
-                                        //   avatar={<Avatar src={item.picture.large} />}
-                                        title={<a href="#">{item.number}</a>}
-                                        description={
-                                          <div className="grid grid-cols-6">
-                                            <div>
-                                              <div className="text-xs text-gray-600">
-                                                {item?.createdBy?.companyName}
-                                              </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                  {!data?.invitationSent && user.permissions.canApproveAsPM && (
+                    <div className="ml-3 flex">
+                      <div className="">
+                        <div>Invite Evaluators</div>
 
-                                              <div className="flex flex-col">
-                                                <Link
-                                                  href={`${url}/file/bidDocs/${item?.proposalDocId}.pdf`}
-                                                  target="_blank"
-                                                >
-                                                  <Typography.Link className="flex flex-row items-center space-x-2">
-                                                    <div>Proposal</div>{" "}
-                                                    <div>
-                                                      <PaperClipIcon className="h-4 w-4" />
-                                                    </div>
-                                                  </Typography.Link>
-                                                </Link>
+                        <div className="flex flex-row space-x-1">
+                          <Form
+                            onFinish={() => sendInvitation()}
+                            className="flex flex-row space-x-1"
+                          >
+                            <div>
+                              <Form.Item name="ivitees" required>
+                                <Select
+                                  showSearch
+                                  showArrow
+                                  onChange={(value) =>
+                                    setSelectionComitee(value)
+                                  }
+                                  style={{ width: "400px" }}
+                                  mode="multiple"
+                                  options={users.map((user) => {
+                                    return {
+                                      label: user?.email,
+                                      value: user?.email,
+                                    };
+                                  })}
+                                />
+                              </Form.Item>
+                            </div>
+                            <div>
+                              <Form.Item>
+                                <Button
+                                  htmlType="submit"
+                                  disabled={selectionComitee?.length < 1}
+                                  icon={
+                                    <PaperAirplaneIcon className="h-5 w-5" />
+                                  }
+                                />
+                              </Form.Item>
+                            </div>
+                          </Form>
+                        </div>
+                      </div>
+                    </div>
+                  )} */}
+                  <div className="payment-request bg-white rounded-lg h-[calc(100vh-450px)] overflow-y-auto px-3 pt-5">
+                    <div className="text-[19px] text-[#263238] ml-3">
+                      Bids List
+                    </div>
+                    <BidList
+                      tenderId={data?._id}
+                      handleSelectBid={handleSelectBid}
+                      handleAwardBid={handleAwardBid}
+                      refresh={refresh}
+                      canSelectBid={
+                        data?.invitationSent &&
+                        moment(data?.submissionDeadLine).isSameOrBefore(
+                          moment()
+                        )
+                      }
+                      handleSetBidList={setBidList}
+                      comitee={data?.invitees}
+                      user={user}
+                      // previewAttachment={previewAttachment}
+                      setPreviewAttachment={setPreviewAttachment}
+                      // attachmentId={attachmentId}
+                      setAttachmentId={setAttachmentId}
+                      tenderData={data}
+                    />
+                    <div></div>
+                  </div>
+                </div>
+              )}
+            </>
+          ) : tab == 2 ? (
+            <div className="flex flex-col space-y-5 p-3">
+              {buildTabHeader(false)}
+              <div className="payment-request bg-white rounded-lg h-[calc(100vh-450px)] overflow-y-auto px-3 pt-5">
+                {
+                  // (contract?.status === "reviewed" ||
+                  //   (contract?.status === "draft" &&
+                  //     user?.permissions?.canEditContracts) ||
+                  //   !contract) &&
+                  bidList?.filter((d) => d.status === "awarded").length >= 1 ? (
+                    !poCreated || !contractCreated ? (
+                      <div>
+                        <div className="text-[19px] ml-3 mb-4">
+                          <FolderOpenOutlined /> Selected Bid
+                        </div>
+                        {bidList
+                          ?.filter((d) => d.status === "awarded")
+                          ?.map((item) => {
+                            return (
+                              <List size="small" key={item?.number}>
+                                <List.Item>
+                                  <List.Item.Meta
+                                    //   avatar={<Avatar src={item.picture.large} />}
+                                    title={
+                                      <a
+                                        href="#"
+                                        className="bg-[#EDEDED] py-1.5 px-3 my-3 rounded-lg"
+                                      >
+                                        {item.number}
+                                      </a>
+                                    }
+                                    description={
+                                      <div className="grid grid-cols-6 border-x-0 border-t-0 border-b border-red-700 mt-5">
+                                        <div>
+                                          <div className="text-xs text-gray-600">
+                                            {item?.createdBy?.companyName}
+                                          </div>
 
-                                                <Link
-                                                  href={`${url}/file/bidDocs/${item?.otherDocId}.pdf`}
-                                                  target="_blank"
-                                                >
-                                                  <Typography.Link className="flex flex-row items-center space-x-2">
-                                                    <div>
-                                                      Other supporting doc
-                                                    </div>{" "}
-                                                    <div>
-                                                      <PaperClipIcon className="h-4 w-4" />
-                                                    </div>
-                                                  </Typography.Link>
-                                                </Link>
-                                              </div>
-                                            </div>
+                                          <div className="flex flex-col">
+                                            <Link
+                                              href={`${url}/file/bidDocs/${item?.proposalDocId}.pdf`}
+                                              target="_blank"
+                                            >
+                                              <Typography.Link className="flex flex-row items-center space-x-2">
+                                                <div>Proposal</div>{" "}
+                                                <div>
+                                                  <PaperClipIcon className="h-4 w-4" />
+                                                </div>
+                                              </Typography.Link>
+                                            </Link>
 
-                                            <div className="">
-                                              <div className="text-xs text-gray-400">
-                                                Price
-                                              </div>
-                                              <div className="text-xs text-gray-600">
-                                                {item?.price.toLocaleString() +
-                                                  " " +
-                                                  item?.currency}
-                                              </div>
-                                            </div>
+                                            <Link
+                                              href={`${url}/file/bidDocs/${item?.otherDocId}.pdf`}
+                                              target="_blank"
+                                            >
+                                              <Typography.Link className="flex flex-row items-center space-x-2">
+                                                <div>Other supporting doc</div>{" "}
+                                                <div>
+                                                  <PaperClipIcon className="h-4 w-4" />
+                                                </div>
+                                              </Typography.Link>
+                                            </Link>
+                                          </div>
+                                        </div>
 
-                                            <div className="">
-                                              <div className="text-xs text-gray-400">
-                                                Discount
-                                              </div>
-                                              <div className="text-xs text-gray-600">
-                                                {item?.discount}%
-                                              </div>
-                                            </div>
+                                        <div className="">
+                                          <div className="text-xs text-gray-400">
+                                            Price
+                                          </div>
+                                          <div className="text-[15px] text-[#344767]">
+                                            {item?.price.toLocaleString() +
+                                              " " +
+                                              item?.currency}
+                                          </div>
+                                        </div>
 
-                                            <div className="">
-                                              <div className="text-xs text-gray-400">
-                                                Delivery date
-                                              </div>
-                                              <div className="text-xs text-gray-600">
-                                                {moment(
-                                                  item?.deliveryDate
-                                                ).fromNow()}
-                                              </div>
-                                            </div>
+                                        <div className="">
+                                          <div className="text-xs text-gray-400">
+                                            Discount
+                                          </div>
+                                          <div className="text-[15px] text-[#344767]">
+                                            {item?.discount}%
+                                          </div>
+                                        </div>
 
-                                            <div className="flex flex-row">
-                                              <Form
-                                                // size="small"
-                                                className="flex flex-row space-x-1"
-                                              >
-                                                {/* <Form.Item>
+                                        <div className="">
+                                          <div className="text-xs text-gray-400">
+                                            Delivery date
+                                          </div>
+                                          <div className="text-[15px] text-[#344767]">
+                                            {moment(
+                                              item?.deliveryDate
+                                            ).fromNow()}
+                                          </div>
+                                        </div>
+
+                                        <div className="flex flex-row">
+                                          <Form
+                                            // size="small"
+                                            className="flex flex-row space-x-1"
+                                          >
+                                            {/* <Form.Item>
                                           <UploadFiles label="Contract" />
                                         </Form.Item> */}
 
-                                                {contract ? (
-                                                  <Form.Item>
-                                                    <Button
-                                                      type="default"
-                                                      icon={
-                                                        <FileTextOutlined />
-                                                      }
-                                                      onClick={() => {
-                                                        setOpenViewContract(
-                                                          true
-                                                        );
-                                                        setVendor(
+                                            {contract ? (
+                                              <button
+                                                onClick={() => {
+                                                  setOpenViewContract(true);
+                                                  setVendor(item?.createdBy);
+                                                  setTendor(item?.tender);
+                                                }}
+                                                className="bg-[#0065DD] py-0.5 px-4 text-white font-semibold rounded border-none"
+                                              >
+                                                <FileTextOutlined />
+                                                &nbsp; View Contract{" "}
+                                                {contract?.status === "draft" &&
+                                                  `(under review)`}
+                                              </button>
+                                            ) : (
+                                              <Form.Item>
+                                                <Button
+                                                  // size="small"
+                                                  disabled={
+                                                    !user?.permissions
+                                                      ?.canCreateContracts
+                                                  }
+                                                  type="primary"
+                                                  icon={<FileDoneOutlined />}
+                                                  onClick={() => {
+                                                    let _signatories = [
+                                                      {
+                                                        onBehalfOf:
+                                                          "Irembo Ltd",
+                                                        title:
+                                                          "Procurement Manager",
+                                                        names: "",
+                                                        email: "",
+                                                      },
+                                                      {
+                                                        onBehalfOf:
+                                                          "Irembo Ltd",
+                                                        title:
+                                                          "Director of Finance",
+                                                        names: "",
+                                                        email: "",
+                                                      },
+
+                                                      {
+                                                        onBehalfOf:
                                                           item?.createdBy
-                                                        );
-                                                        setTendor(item?.tender);
-                                                      }}
-                                                    >
-                                                      View Contract{" "}
-                                                      {contract?.status ===
-                                                        "draft" &&
-                                                        `(under review)`}
-                                                    </Button>
-                                                  </Form.Item>
-                                                ) : (
-                                                  <Form.Item>
-                                                    <Button
-                                                      // size="small"
-                                                      disabled={
-                                                        !user?.permissions
-                                                          ?.canCreateContracts
-                                                      }
-                                                      type="primary"
-                                                      icon={
-                                                        <FileDoneOutlined />
-                                                      }
-                                                      onClick={() => {
-                                                        let _signatories = [
-                                                          {
-                                                            onBehalfOf:
-                                                              "Irembo Ltd",
-                                                            title:
-                                                              "Procurement Manager",
-                                                            names: "",
-                                                            email: "",
-                                                          },
-                                                          {
-                                                            onBehalfOf:
-                                                              "Irembo Ltd",
-                                                            title:
-                                                              "Director of Finance",
-                                                            names: "",
-                                                            email: "",
-                                                          },
-
-                                                          {
-                                                            onBehalfOf:
-                                                              item?.createdBy
-                                                                ?.companyName,
-                                                            title:
-                                                              item?.createdBy
-                                                                ?.title,
-                                                            names:
-                                                              item?.createdBy
-                                                                ?.contactPersonNames,
-                                                            email:
-                                                              item?.createdBy
-                                                                ?.email,
-                                                          },
-                                                        ];
-                                                        setSignatories(
-                                                          _signatories
-                                                        );
-                                                        setOpenCreateContract(
-                                                          true
-                                                        );
-                                                        setVendor(
+                                                            ?.companyName,
+                                                        title:
                                                           item?.createdBy
-                                                        );
-                                                        setTendor(item?.tender);
-                                                      }}
-                                                    >
-                                                      Create Contract
-                                                    </Button>
-                                                  </Form.Item>
-                                                )}
+                                                            ?.title,
+                                                        names:
+                                                          item?.createdBy
+                                                            ?.contactPersonNames,
+                                                        email:
+                                                          item?.createdBy
+                                                            ?.email,
+                                                      },
+                                                    ];
+                                                    setSignatories(
+                                                      _signatories
+                                                    );
+                                                    setOpenCreateContract(true);
+                                                    setVendor(item?.createdBy);
+                                                    setTendor(item?.tender);
+                                                  }}
+                                                >
+                                                  Create Contract
+                                                </Button>
+                                              </Form.Item>
+                                            )}
 
-                                                {contractCreated &&
-                                                  documentFullySigned(
-                                                    contract
-                                                  ) && (
-                                                    <Form.Item>
-                                                      <Button
-                                                        // size="small"
-                                                        type="primary"
-                                                        icon={
-                                                          <FileDoneOutlined />
-                                                        }
-                                                        onClick={() => {
-                                                          let _signatories = [
-                                                            {
-                                                              onBehalfOf:
-                                                                "Irembo Ltd",
-                                                              title:
-                                                                "Procurement Manager",
-                                                              names: "",
-                                                              email: "",
-                                                            },
-                                                            {
-                                                              onBehalfOf:
-                                                                "Irembo Ltd",
-                                                              title:
-                                                                "Director of Finance",
-                                                              names: "",
-                                                              email: "",
-                                                            },
+                                            {contractCreated &&
+                                              documentFullySigned(contract) && (
+                                                <Form.Item>
+                                                  <Button
+                                                    // size="small"
+                                                    type="primary"
+                                                    icon={<FileDoneOutlined />}
+                                                    onClick={() => {
+                                                      let _signatories = [
+                                                        {
+                                                          onBehalfOf:
+                                                            "Irembo Ltd",
+                                                          title:
+                                                            "Procurement Manager",
+                                                          names: "",
+                                                          email: "",
+                                                        },
+                                                        {
+                                                          onBehalfOf:
+                                                            "Irembo Ltd",
+                                                          title:
+                                                            "Director of Finance",
+                                                          names: "",
+                                                          email: "",
+                                                        },
 
-                                                            {
-                                                              onBehalfOf:
-                                                                item?.createdBy
-                                                                  ?.companyName,
-                                                              title:
-                                                                item?.createdBy
-                                                                  ?.title,
-                                                              names:
-                                                                item?.createdBy
-                                                                  ?.contactPersonNames,
-                                                              email:
-                                                                item?.createdBy
-                                                                  ?.email,
-                                                            },
-                                                          ];
-
-                                                          setSignatories(
-                                                            _signatories
-                                                          );
-                                                          setOpenCreatePO(true);
-                                                          setVendor(
+                                                        {
+                                                          onBehalfOf:
                                                             item?.createdBy
-                                                          );
-                                                          setTendor(
-                                                            item?.tender
-                                                          );
-                                                        }}
-                                                      >
-                                                        Create PO
-                                                      </Button>
-                                                    </Form.Item>
-                                                  )}
-                                              </Form>
-                                            </div>
-                                          </div>
-                                        }
-                                      />
-                                    </List.Item>
-                                  </List>
-                                );
-                              })}
-                          </div>
-                        ) : (
-                          <div className="mx-3 flex flex-row space-x-5 items-center justify-center">
-                            <div className="flex flex-col items-center justify-center">
-                              <Typography.Title level={5}>
-                                Contract
-                              </Typography.Title>
-                              {/* <Popover content={'PO: '+po?.number}> */}
-                              <Image
-                                onClick={() => setOpenViewContract(true)}
-                                className=" cursor-pointer hover:opacity-60"
-                                width={40}
-                                height={40}
-                                src="/icons/icons8-file-64.png"
-                              />
-                              {/* </Popover> */}
-                            </div>
+                                                              ?.companyName,
+                                                          title:
+                                                            item?.createdBy
+                                                              ?.title,
+                                                          names:
+                                                            item?.createdBy
+                                                              ?.contactPersonNames,
+                                                          email:
+                                                            item?.createdBy
+                                                              ?.email,
+                                                        },
+                                                      ];
 
-                            <div className="flex flex-col items-center justify-center">
-                              <Typography.Title level={5}>
-                                Purchase order
-                              </Typography.Title>
-                              {/* <Popover content={po?.number}> */}
-                              <Image
-                                onClick={() => setOpenViewPO(true)}
-                                className=" cursor-pointer hover:opacity-60"
-                                width={40}
-                                height={40}
-                                src="/icons/icons8-file-64.png"
-                              />
-                              {/* </Popover> */}
+                                                      setSignatories(
+                                                        _signatories
+                                                      );
+                                                      setOpenCreatePO(true);
+                                                      setVendor(
+                                                        item?.createdBy
+                                                      );
+                                                      setTendor(item?.tender);
+                                                    }}
+                                                  >
+                                                    Create PO
+                                                  </Button>
+                                                </Form.Item>
+                                              )}
+                                          </Form>
+                                        </div>
+                                      </div>
+                                    }
+                                  />
+                                </List.Item>
+                              </List>
+                            );
+                          })}
+                      </div>
+                    ) : (
+                      <div className="mx-3 flex flex-row space-x-5 items-center justify-center">
+                        <div className="flex flex-col items-center justify-center">
+                          <Typography.Title level={5}>
+                            Contract
+                          </Typography.Title>
+                          {/* <Popover content={'PO: '+po?.number}> */}
+                          <Image
+                            onClick={() => setOpenViewContract(true)}
+                            className=" cursor-pointer hover:opacity-60"
+                            width={40}
+                            height={40}
+                            src="/icons/icons8-file-64.png"
+                          />
+                          {/* </Popover> */}
+                        </div>
+
+                        <div className="flex flex-col items-center justify-center">
+                          <Typography.Title level={5}>
+                            Purchase order
+                          </Typography.Title>
+                          {/* <Popover content={po?.number}> */}
+                          <Image
+                            onClick={() => setOpenViewPO(true)}
+                            className=" cursor-pointer hover:opacity-60"
+                            width={40}
+                            height={40}
+                            src="/icons/icons8-file-64.png"
+                          />
+                          {/* </Popover> */}
+                        </div>
+                      </div>
+                    )
+                  ) : (
+                    <Empty />
+                  )
+                }
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col space-y-5 p-3">
+              {buildTabHeader(false)}
+              <div className="payment-request bg-white rounded-lg h-[calc(100vh-450px)] overflow-y-auto px-3 pt-5">
+                {bidList?.filter((d) => d?.createdBy?._id === user?._id)
+                  .length >= 1 ? (
+                  <div>
+                    {bidList
+                      ?.filter((d) => d?.createdBy?._id === user?._id)
+                      ?.map((item, key) => {
+                        return (
+                          <>
+                            <button
+                              className={`cursor-pointer w-full pr-5 mt-4 pt-1 -pb-4 flex justify-evenly items-center border-b-0 border-[#f5f2f2] border-t border-x-0 ${
+                                activeIndex == key
+                                  ? "bg-[#F7F7F8]"
+                                  : "bg-transparent"
+                              }`}
+                              onClick={() => handleItemClick(key)}
+                            >
+                              <div className="flex flex-1 items-center justify-between gap-x-4 my-1 py-1 px-5">
+                                <h6 className="text-[#344767] text-[13px] py-0 my-0">
+                                  {item?.number}
+                                </h6>
+                                <div className="flex flex-col items-start gap-2">
+                                  <small className="text-[10px] text-[#8392AB]">
+                                    Vendor
+                                  </small>
+                                  <p className="text-[#344767] font-medium text-[15px] py-0 my-0">
+                                    {item?.createdBy?.companyName}
+                                  </p>
+                                </div>
+                                <div className="flex flex-col items-start gap-2">
+                                  <small className="text-[10px] text-[#8392AB]">
+                                    Price
+                                  </small>
+                                  <p className="text-[#344767] font-semibold text-[15px] py-0 my-0">
+                                    {item?.price.toLocaleString() +
+                                      " " +
+                                      item?.currency}
+                                  </p>
+                                </div>
+                                <div className="flex flex-col items-start gap-2">
+                                  <small className="text-[10px] text-[#8392AB]">
+                                    Discount
+                                  </small>
+                                  <p className="text-[#344767] font-semibold text-[15px] py-0 my-0">
+                                    {item?.discount}%
+                                  </p>
+                                </div>
+                                <div className="flex flex-col items-start gap-2">
+                                  <small className="text-[10px] text-[#8392AB]">
+                                    Bid Decision
+                                  </small>
+                                  <div>
+                                    <div
+                                      className={`px-3 py-1.5 bg-[${
+                                        statusClass[item?.status].bgColor
+                                      }] rounded-xl`}
+                                    >
+                                      <small
+                                        className={`text-[${
+                                          statusClass[item?.status].color
+                                        }] text-[13px]`}
+                                      >
+                                        {statusClass[item?.status].status}
+                                      </small>
+                                    </div>
+                                  </div>
+                                </div>
+                                <RiArrowDropDownLine
+                                  className={`text-[36px] text-[#344767] arrow ml-10 ${
+                                    activeIndex == key ? "active" : ""
+                                  }`}
+                                />
+                              </div>
+                            </button>
+                            <div
+                              ref={contentHeight}
+                              className="answer-container mt-1 -mb-[21px] px-8 rounded-lg"
+                              style={
+                                activeIndex == key
+                                  ? {
+                                      display: "flex",
+                                      flexDirection: "column",
+                                      borderWidth: 1,
+                                      borderStyle: "solid",
+                                      borderColor: "#F1F3FF",
+                                      background: "#FDFEFF",
+                                    }
+                                  : { display: "none" }
+                              }
+                            >
+                              <div className="py-5 flex justify-between">
+                                <div className="flex flex-col gap-5">
+                                  <small className="text-[12px] text-[#8392AB]">
+                                    Supporting Docs
+                                  </small>
+                                  <div className="">
+                                    {item?.proposalDocId && (
+                                      <div className="flex flex-row items-center mb-4">
+                                        <a
+                                          href={`${url}/file/bidDocs/${item?.proposalDocId}.pdf`}
+                                          target="_blank"
+                                          // onClick={() => {
+                                          //   setAttachmentId(
+                                          //     `bidDocs/${item?.proposalDocId}.pdf`
+                                          //   );
+                                          //   setPreviewAttachment(true);
+                                          // }}
+                                          className="text-xs no-underline text-[#1677FF]"
+                                        >
+                                          Proposal{" "}
+                                          <PaperClipIcon className="h-3 w-3" />
+                                        </a>
+                                      </div>
+                                    )}
+                                    {!item?.proposalDocId && (
+                                      <div className="text-xs">
+                                        No proposal doc found!
+                                      </div>
+                                    )}
+                                    {item?.otherDocId && (
+                                      <div>
+                                        <a
+                                          href={`${url}/file/bidDocs/${item?.otherDocId}.pdf`}
+                                          target="_blank"
+                                          // onClick={() => {
+                                          //   // router.push(`bidDocs/${item?.otherDocId}.pdf`)
+                                          //   // setAttachmentId(
+                                          //   //   `bidDocs/${item?.otherDocId}.pdf`
+                                          //   // );
+                                          //   // setPreviewAttachment(true);
+                                          // }}
+                                          className="text-xs no-underline text-[#1677FF]"
+                                        >
+                                          Other Doc{" "}
+                                          <PaperClipIcon className="h-3 w-3" />
+                                        </a>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                                <div className="flex flex-col gap-5">
+                                  <small className="text-[12px] text-[#8392AB]">
+                                    Bank Details
+                                  </small>
+                                  <div className="flex flex-col gap-3">
+                                    <div className="flex items-center gap-3">
+                                      <MdOutlineAccountBalance className="text-[#8392AB]" />
+                                      {/* {po?.vendor?.companyEmail} */}
+                                      <small className="text-[#455A64] text-[13px] font-medium">
+                                        {item?.bankName || "-"}
+                                      </small>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                      <LuUser className="text-[#8392AB]" />
+                                      {/* {po?.vendor?.companyName} */}
+                                      <small className="text-[#455A64] text-[13px] font-medium">
+                                        {item?.bankAccountName || "-"}
+                                      </small>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                      <LuHash className="text-[#8392AB]" />
+                                      {/* {po?.vendor?.tin} */}
+                                      <small className="text-[#455A64] text-[13px] font-medium">
+                                        {item?.bankAccountNumber || "-"}
+                                      </small>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="flex flex-col">
+                                  <small className="text-[12px] text-[#8392AB]">
+                                    Additional Bid Info
+                                  </small>
+                                  <div className="flex flex-col gap-y-3.5 mt-5">
+                                    <div className="flex items-center gap-3">
+                                      <small className="text-[#455A64] text-[13px] font-medium">
+                                        {item?.warranty}{" "}
+                                        {item?.warrantyDuration}
+                                      </small>
+                                      <div className="bg-[#F1F3FF] py-1 px-3 rounded-xl text-[11px] font-medium text-[#353531]">
+                                        Warranty
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                      <small className="text-[#455A64] text-[13px] font-medium">
+                                        {moment(item?.deliveryDate).fromNow()}
+                                      </small>
+                                      <div className="bg-[#F1F3FF] py-1 px-3 rounded-xl text-[11px] font-medium text-[#353531]">
+                                        Delivery timeframe
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="flex flex-col gap-5">
+                                  <small className="text-[12px] text-[#8392AB]">
+                                    Additional Comments
+                                  </small>
+                                  <textarea value={item?.comment} className="border-[#D9D9D9] px-3 py-2.5 rounded-lg text-[12px] text-[#8392AB]" rows={4}></textarea>
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        )
-                      ) : (
-                        <Empty />
-                      )
-                    }
+                          </>
+                        );
+                      })}
+                  </div>
+                ) : (
+                  <Empty />
+                )}
+              </div>
+            </div>
+          )}
+          <Tabs defaultActiveKey="1" type="card" size={size}>
+            {/* <Tabs.TabPane tab="Overview" key="1"></Tabs.TabPane>
+            {user?.userType !== "VENDOR" && (
+              <>
+                <Tabs.TabPane tab="Bids list" key="2"></Tabs.TabPane>
+                <Tabs.TabPane tab="Tender award" key="3">
+                  <div className="flex flex-col space-y-5 p-3">
+                    {buildTabHeader(true)}
+                    <Divider></Divider>
                   </div>
                 </Tabs.TabPane>
               </>
             )}
 
             {user?.userType === "VENDOR" && (
-              <Tabs.TabPane tab="My Bid" key="2">
-                <div className="flex flex-col space-y-5 p-3">
-                  {buildTabHeader()}
-                  {bidList?.filter((d) => d?.createdBy?._id === user?._id)
-                    .length >= 1 ? (
-                    <div>
-                      {bidList
-                        ?.filter((d) => d?.createdBy?._id === user?._id)
-                        ?.map((item) => {
-                          return (
-                            <>
-                              <div className="p-3 grid md:grid-cols-8 ">
-                                <div className="self-center">
-                                  <a href="#">{item.number}</a>
-                                  <div className="text-xs text-gray-400">
-                                    Vendor
-                                  </div>
-                                  <div className="text-xs text-gray-600">
-                                    {item?.createdBy?.companyName}
-                                  </div>
-                                </div>
-
-                                <div className="self-center">
-                                  <div className="text-xs text-gray-400">
-                                    Bank Info
-                                  </div>
-                                  <div className="flex flex-col">
-                                    {/* <div className="text-xs text-gray-400">
-                                      Bank Name:
-                                    </div> */}
-                                    <div className="text-xs text-gray-600">
-                                      {item?.bankName}
-                                    </div>
-                                  </div>
-
-                                  <div className="flex flex-col">
-                                    {/* <div className="text-xs text-gray-400">
-                                      Account Name:
-                                    </div> */}
-                                    <div className="text-xs text-gray-600">
-                                      {item?.bankAccountName}
-                                    </div>
-                                  </div>
-
-                                  <div className="flex flex-col">
-                                    {/* <div className="text-xs text-gray-400">
-                                      Account Number
-                                    </div> */}
-                                    <div className="text-xs text-gray-600">
-                                      {item?.bankAccountNumber}
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <div className="self-center">
-                                  <div className="text-xs text-gray-400">
-                                    Price
-                                  </div>
-                                  <div className="text-xs text-gray-600">
-                                    {item?.price.toLocaleString() +
-                                      " " +
-                                      item?.currency}
-                                  </div>
-                                  <div className="text-xs text-gray-400">
-                                    Comment
-                                  </div>
-                                  <div className="text-xs text-gray-600">
-                                    {item?.comment}
-                                  </div>
-                                </div>
-
-                                <div className="self-center">
-                                  <div className="text-xs text-gray-400">
-                                    Discount
-                                  </div>
-                                  <div className="text-xs text-gray-600">
-                                    {item?.discount}%
-                                  </div>
-                                </div>
-
-                                <div className="self-center">
-                                  <div className="text-xs text-gray-400">
-                                    Warranty
-                                  </div>
-                                  <div className="text-xs text-gray-600">
-                                    {item?.warranty} {item?.warrantyDuration}
-                                  </div>
-                                </div>
-
-                                <div className="self-center">
-                                  <div className="text-xs text-gray-400">
-                                    Delivery date
-                                  </div>
-                                  <div className="text-xs text-gray-600">
-                                    {moment(item?.deliveryDate).fromNow()}
-                                  </div>
-                                </div>
-
-                                <div className="self-center">
-                                  <div className="text-xs text-gray-400">
-                                    Docs
-                                  </div>
-                                  {item?.proposalDocId && (
-                                    <div className="flex flex-row items-center space-x-2">
-                                      <a
-                                        href={`${url}/file/bidDocs/${item?.proposalDocId}.pdf`}
-                                        className="text-xs"
-                                        target="_blank"
-                                      >
-                                        Proposal{" "}
-                                        <PaperClipIcon className="h-3 w-3" />
-                                      </a>
-                                      <UploadBidDoc
-                                        iconOnly={true}
-                                        setSelected={() => {}}
-                                        // label="Update the doc"
-                                        uuid={item?.proposalDocId}
-                                      />
-                                    </div>
-                                  )}
-                                  {!item?.proposalDocId && (
-                                    <div className="text-xs">
-                                      No proposal doc found!
-                                    </div>
-                                  )}
-                                  {item?.otherDocId && (
-                                    <div className="flex flex-row items-center space-x-2">
-                                      <a
-                                        href={`${url}/file/bidDocs/${item?.otherDocId}.pdf`}
-                                        className="text-xs"
-                                        target="_blank"
-                                      >
-                                        Other Doc{" "}
-                                        <PaperClipIcon className="h-3 w-3" />
-                                      </a>
-                                      <UploadBidDoc
-                                        iconOnly={true}
-                                        // label="Update the doc"
-                                        setSelected={() => {}}
-                                        uuid={item?.otherDocId}
-                                      />
-                                    </div>
-                                  )}
-                                </div>
-
-                                <div className="self-center">
-                                  <div>
-                                    {item?.status === "pending" && (
-                                      <Tag color="blue">{item?.status}</Tag>
-                                    )}
-                                    {item?.status === "selected" && (
-                                      <Tag color="green">{item?.status}</Tag>
-                                    )}
-                                    {item?.status === "awarded" && (
-                                      <>
-                                        <Tag color="green">selected</Tag>
-                                        <Tag color="green">{item?.status}</Tag>
-                                      </>
-                                    )}
-                                    {item?.status === "not awarded" && (
-                                      <>
-                                        <Tag color="red">not selected</Tag>
-                                        <Tag color="red">{item?.status}</Tag>
-                                      </>
-                                    )}
-                                  </div>
-                                </div>
-
-                                {/* {(item?.status === "not selected" || item?.status === "not awarded") && (
-                    <Button
-                      size="small"
-                      disabled
-                      //   onClick={() => handleSelectBid(item._id)}
-                    >
-                      Select Bid
-                    </Button>
-                  )} */}
-                              </div>
-                            </>
-                          );
-                        })}
-                    </div>
-                  ) : (
-                    <Empty />
-                  )}
-                </div>
-              </Tabs.TabPane>
-            )}
+              <Tabs.TabPane tab="My Bid" key="2"></Tabs.TabPane>
+            )} */}
 
             {user?.userType === "VENDOR" &&
               contract?.vendor?._id === user?._id && (
                 <Tabs.TabPane tab="Tender award" key="3">
                   <div className="flex flex-col space-y-5 p-3">
-                    {buildTabHeader()}
+                    {buildTabHeader(true)}
                     {bidList?.filter((d) => d.status === "awarded").length >=
                     1 ? (
                       (!poCreated || !contractCreated) &&
@@ -3703,7 +4089,7 @@ const TenderDetails = ({
           </Tabs>
         </div>
 
-        <CloseOutlined className="cursor-pointer" onClick={handleClose} />
+        {/* <CloseOutlined className="cursor-pointer" onClick={handleClose} /> */}
       </div>
 
       {createPOMOdal()}
