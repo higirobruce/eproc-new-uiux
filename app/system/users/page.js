@@ -97,7 +97,7 @@ export default function Users() {
 
   const prefixSelector = (
     <Form.Item name="prefix" noStyle>
-      <Select style={{ width: 100 }}>
+      <Select size="large" style={{ width: 100 }}>
         <Select.Option value="+250">+250</Select.Option>
         <Select.Option value="+254">+254</Select.Option>
       </Select>
@@ -693,9 +693,7 @@ export default function Users() {
             <Button
               className="bg-white h-9 px-5 text-[11px] font-semibold rounded text-[#0063CF]"
               icon={<PlusOutlined />}
-              onClick={() => {
-                () => setOpenCreateUser(true)
-              }}
+              onClick={() => setOpenCreateUser(true)}
             >
               New user
             </Button>
@@ -1156,7 +1154,6 @@ export default function Users() {
   function buildCreateUserScreen() {
     return (
       <Modal
-        title="Create new user"
         centered
         open={openCreateUser}
         onOk={() => {
@@ -1172,8 +1169,8 @@ export default function Users() {
         }}
         okText={"Save"}
         onCancel={() => setOpenCreateUser(false)}
-        width={"80%"}
-        bodyStyle={{ maxHeight: "700px", overflow: "scroll" }}
+        width={"60%"}
+        bodyStyle={{ maxHeight: "700px", overflow: "hidden" }}
       >
         <Form
           {...formItemLayout}
@@ -1193,7 +1190,7 @@ export default function Users() {
               <Typography.Title className="" level={4}>
                 General Information
               </Typography.Title>
-              <div className="">
+              <div className="pt-6">
                 {/* Grid 1 */}
 
                 <div className="grid grid-cols-2 gap-5">
@@ -1212,7 +1209,7 @@ export default function Users() {
                         },
                       ]}
                     >
-                      <Input />
+                      <Input className="h-11 mt-3" placeholder="Enter First name" />
                     </Form.Item>
                   </div>
                   <div>
@@ -1229,7 +1226,7 @@ export default function Users() {
                         },
                       ]}
                     >
-                      <Input />
+                      <Input className="h-11 mt-3" placeholder="Enter Last name" />
                     </Form.Item>
                   </div>
                 </div>
@@ -1249,11 +1246,11 @@ export default function Users() {
                       //   },
                       // ]}
                     >
-                      <Input addonBefore={prefixSelector} />
+                      <Input className="mt-3" addonBefore={prefixSelector} />
                     </Form.Item>
                   </div>
                   <div>
-                    <div className="flex flex-row spacex-3">
+                    <div className="flex flex-row spacex-3 mb-3">
                       Department
                       <div className="text-red-500">*</div>
                     </div>
@@ -1266,7 +1263,7 @@ export default function Users() {
                         // mode="multiple"
                         // allowClear
                         // style={{width:'100%'}}
-
+                        size="large"
                         placeholder="Please select"
                       >
                         {dpts?.map((dpt) => {
@@ -1298,12 +1295,12 @@ export default function Users() {
                         },
                       ]}
                     >
-                      <Input />
+                      <Input className="h-10 mt-3" placeholder="Enter email" />
                     </Form.Item>
                   </div>
 
                   <div>
-                    <div className="flex flex-row space-x-1">
+                    <div className="flex flex-row space-x-1 mb-3">
                       <div className="flex flex-row">
                         Basic Permissions <div className="text-red-500">*</div>
                       </div>
@@ -1320,6 +1317,7 @@ export default function Users() {
                       <Select
                         mode="multiple"
                         allowClear
+                        size="large"
                         // style={{width:'100%'}}
                         placeholder="Please select"
                         options={[

@@ -3104,13 +3104,19 @@ const TenderDetails = ({
                               </a>
                             )}
                           </div>
+                          {iBelongToEvaluators() &&
+                            !iHaveApprovedEvalReport() &&
+                            data?.evaluationReportId && (
+                              <p className="my-4 py-3 text-[15px] text-[#344767] font-semibold">Do you agree with the evalution report recommendations?</p>
+                          )}
+                          
                           <div className="flex flex-row space-x-2">
                             {iBelongToEvaluators() &&
                               !iHaveApprovedEvalReport() &&
                               data?.evaluationReportId && (
                                 <>
                                   <Button
-                                    size="small"
+                                    size="middle"
                                     type="primary"
                                     icon={<LikeOutlined />}
                                     onClick={() => {
@@ -3130,15 +3136,14 @@ const TenderDetails = ({
                                       handleSendEvalApproval(data, invitees);
                                     }}
                                   >
-                                    I agree with the recomendations
+                                    I Agree
                                   </Button>
                                   <Button
-                                    size="small"
-                                    type="text"
+                                    size="middle"
                                     danger
                                     icon={<DislikeOutlined />}
                                   >
-                                    I disagree
+                                    Disagree
                                   </Button>
                                 </>
                               )}
