@@ -226,31 +226,34 @@ function buildTenderForm(
           setTendeDocSelected={setTendeDocSelected}
           updateTender={() => {}}
         />
-        <Form.Item
-          className="my-2"
-          name="deadLine"
-          label="Indicate Bid Submission Deadline"
-          rules={[
-            {
-              required: true,
-              message: "Please enter the submission deadline!",
-            },
-          ]}
-        >
-        </Form.Item>
-        <DatePicker
-          format="YYYY-MM-DD HH:mm"
-          showTime
-          showNow={false}
-          disabledDate={(current) => current.isBefore(moment())}
-          onChange={(v, str) => {
-            // console.log(moment(str).toISOString());
-            setDeadLine(moment(str).toISOString());
-          }}
-          className="w-full"
-        />
+        <div className="py-3">
+          <label>Indicate Bid Submission Deadline</label>
+          <Form.Item
+            name="deadLine"
+            label=""
+            rules={[
+              {
+                required: true,
+                message: "Please enter the submission deadline!",
+              },
+            ]}
+            className="my-3"
+          >
+            <DatePicker
+              format="YYYY-MM-DD HH:mm"
+              showTime
+              showNow={false}
+              disabledDate={(current) => current.isBefore(moment())}
+              onChange={(v, str) => {
+                // console.log(moment(str).toISOString());
+                setDeadLine(moment(str).toISOString());
+              }}
+              className="w-full"
+            />
+          </Form.Item>
+        </div>
       </div>
-      <div className="flex flex-row space-x-1 mt-5 items-center">
+      <div className="flex flex-row space-x-1 items-center">
         <Form.Item>
           <Button
             icon={<FileDoneOutlined />}
@@ -3173,7 +3176,7 @@ const RequestDetails = ({
               )}
 
             {tender && data?.sourcingMethod === "Tendering" && (
-              <div className="ml-3">
+              <div className="mb-5">
                 <Typography.Text type="secondary">
                   Tender reference:{" "}
                   <Link href={`/system/tenders/${tender?._id}`}>

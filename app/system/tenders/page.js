@@ -330,15 +330,11 @@ export default function Tenders() {
                   value={searchStatus}
                   options={[
                     // { value: "mine", label: "My requests" },
-                    { value: "all", label: "Filters" },
-                    { value: "pending", label: "Pending approval" },
+                    { value: "all", label: "All" },
+                    { value: "open", label: "Open" },
                     {
-                      value: "approved",
-                      label: "Approved",
-                    },
-                    {
-                      value: "declined",
-                      label: "Declined",
+                      value: "closed",
+                      label: "Closed",
                     },
                   ]}
                 />

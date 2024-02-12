@@ -232,7 +232,7 @@ export default function page() {
       {contextHolder}
 
       {dataLoaded ? (
-        <div className="mt-10">
+        <div className="payment-request mt-10 h-screen pb-1 overflow-y-auto">
           <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4 mr-6 my-5">
             <div className="bg-white rounded p-5">
               <div className="flex items-center gap-7">

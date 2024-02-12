@@ -404,7 +404,7 @@ export default function page() {
                           <Spin indicator={antIcon} />
                         ) : (
                           <div className="flex flex-row items-center justify-between mt-3">
-                            <Button type="primary" danger htmlType="submit">
+                            <Button type="primary" size="large" danger htmlType="submit">
                               Update my password
                             </Button>
                           </div>
