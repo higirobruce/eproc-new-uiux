@@ -178,13 +178,12 @@ export default function SystemLayout({ children }) {
               </div> */}
               <div className="flex items-center gap-3 ml-3">
                 <div className="flex items-center gap-x-1">
-                  <div className="text-[14px] font-medium text-white">Hi,</div>
-                  <div className="text-[14px] font-medium text-white">
-                    {" "}
+                  <p className="text-[14px] font-medium text-white">Hi,</p>
+                  <p className="text-[14px] font-medium text-white">
                     {user?.userType === "VENDOR"
                       ? user?.contactPersonNames
                       : user?.firstName}
-                  </div>
+                  </p>
                 </div>
                 {/* <Image src={UserImage} className="w-8 h-8 rounded-full" /> */}
                 <Dropdown
