@@ -1523,7 +1523,7 @@ export default function Contracts() {
               ></Button>
             </div>
           </div>
-          <div className="request mr-6 bg-white h-[calc(100vh-150px)] rounded-lg mb-10 px-5 overflow-y-auto">
+          <div className="request mr-6 bg-white h-[calc(100vh-170px)] rounded-lg mb-10 px-5 overflow-y-auto">
             <div className="flex justify-between items-center mb-5">
               <h4 className="text-[19px] text-[#344767]">Contracts List</h4>
               <div className="flex items-center gap-5">

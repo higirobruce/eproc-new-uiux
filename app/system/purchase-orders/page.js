@@ -49,8 +49,10 @@ import { RiForbidLine } from "react-icons/ri";
 // import MyPdfViewer from "../common/pdfViewer";
 
 export default function PurchaseOrders() {
-  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let user = JSON.parse(
+    typeof window !== "undefined" && localStorage.getItem("user")
+  );
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   let router = useRouter();
   const [dataLoaded, setDataLoaded] = useState(false);
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
@@ -797,25 +799,22 @@ export default function PurchaseOrders() {
             </div>
           </div>
 
-          {(getData()?.length < 1 || !getData()) && <Empty />}
-
-          {getData() && getData()?.length >= 1 && (
-            <div className="request mr-6 bg-white h-[calc(100vh-150px)] rounded-lg mb-10 px-5 overflow-y-auto">
-              <div className="flex justify-between items-center mb-5">
-                <h4 className="text-[19px] text-[#344767]">
-                  Purchase Orders List
-                </h4>
-                <div className="flex items-center gap-5">
-                  <div className="flex items-center rounded-lg bg-[#F5F7FA] p-1.5">
-                    <FiSearch size={18} className="text-[#E4E4E4] ml-2" />
-                    <Input
-                      className="border-0 text-[#8392AB] bg-transparent text-[12px] hover:bg-transparent hover:border-none hover:outline-none"
-                      onChange={(e) => {
-                        setSearchText(e?.target?.value);
-                      }}
-                      placeholder="Search by po#, vendor name"
-                    />
-                    {/* <Input.Search
+          <div className="request mr-6 bg-white h-[calc(100vh-170px)] rounded-lg mb-10 px-5 overflow-y-auto">
+            <div className="flex justify-between items-center mb-5">
+              <h4 className="text-[19px] text-[#344767]">
+                Purchase Orders List
+              </h4>
+              <div className="flex items-center gap-5">
+                <div className="flex items-center rounded-lg bg-[#F5F7FA] p-1.5">
+                  <FiSearch size={18} className="text-[#E4E4E4] ml-2" />
+                  <Input
+                    className="border-0 text-[#8392AB] bg-transparent text-[12px] hover:bg-transparent hover:border-none hover:outline-none"
+                    onChange={(e) => {
+                      setSearchText(e?.target?.value);
+                    }}
+                    placeholder="Search by po#, vendor name"
+                  />
+                  {/* <Input.Search
                       style={{ width: "300px" }}
                       autoFocus
                       onChange={(e) => {
@@ -823,11 +822,15 @@ export default function PurchaseOrders() {
                       }}
                       placeholder="Search by request#, initiator"
                     /> */}
-                    <div></div>
-                  </div>
+                  <div></div>
                 </div>
               </div>
-              {getData()?.data?.map((po, key) => {
+            </div>
+            {(getData()?.length < 1 || !getData()) && <Empty />}
+
+            {getData() &&
+              getData()?.length >= 1 &&
+              getData()?.data?.map((po, key) => {
                 let t = 0;
                 return (
                   <div className="my-5">
@@ -920,7 +923,14 @@ export default function PurchaseOrders() {
                       className="answer-container mt-3 -mb-[21px] px-8 rounded-lg"
                       style={
                         activeIndex == key
-                          ? { display: "flex", flexDirection: 'column', borderWidth: 2, borderStyle: 'solid', borderColor: '#F1F3FF', background: '#FDFEFF' }
+                          ? {
+                              display: "flex",
+                              flexDirection: "column",
+                              borderWidth: 2,
+                              borderStyle: "solid",
+                              borderColor: "#F1F3FF",
+                              background: "#FDFEFF",
+                            }
                           : { display: "none" }
                       }
                     >
@@ -1024,7 +1034,6 @@ export default function PurchaseOrders() {
                                   </div>
                                 );
                               })}
-                              
                             </div>
                           )}
                         </div>
@@ -1053,8 +1062,7 @@ export default function PurchaseOrders() {
                   </div>
                 );
               })}
-            </div>
-          )}
+          </div>
         </div>
       ) : (
         <div className="flex items-center justify-center flex-1 h-screen">
