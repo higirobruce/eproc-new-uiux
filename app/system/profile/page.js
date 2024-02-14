@@ -156,7 +156,7 @@ export default function page() {
 
   function buildUser() {
     return (
-      <div className="payment-request flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-screen pb-1 mb-32 overflow-y-auto">
+      <div className="request mr-6 bg-white rounded-lg h-[calc(100vh-160px)] mb-10 px-5 pb-2 overflow-y-auto">
         {contextHolder}
           <div className="grid md:grid-cols-3 gap-5 mb-16">
             <div className="flex flex-col space-y-5">
@@ -304,7 +304,7 @@ export default function page() {
                   <div className="flex flex-col space-y-5">
 
                   {/* Reset password */}
-                  <div className="bg-white ring-1 ring-gray-100 rounded shadow p-5">
+                  <div className="bg-white ring-1 ring-gray-100 rounded shadow px-5 pt-5">
                     <div className="text-xl font-semibold mb-5 flex flex-row justify-between items-center">
                       <div className="pb-3 text-[13px] text-[#344767]">Reset password</div>
                     </div>
@@ -399,7 +399,7 @@ export default function page() {
                         </Form.Item>
                       </div>
 
-                      <Form.Item>
+                      <Form.Item className="m-0">
                         {submitting ? (
                           <Spin indicator={antIcon} />
                         ) : (
@@ -469,7 +469,7 @@ export default function page() {
 
   function buildVendor() {
     return (
-      <div className="flex flex-col  transition-opacity ease-in-out duration-1000 px-10 py-5 flex-1 space-y-3 h-full">
+      <div className="flex flex-col  transition-opacity ease-in-out duration-1000 px-10 py-5 flex-1 space-y-3 h-full mb-3">
         {contextHolder}
         <div className="flex flex-col space-y-5">
           <div className="flex flex-row justify-between">
@@ -1230,5 +1230,5 @@ export default function page() {
       });
   }
 
-  return <div>{user?.userType === "VENDOR" ? buildVendor() : buildUser()}</div>;
+  return <div className="payment-request mr-6 rounded-lg h-[calc(100vh-115px)] pb-10 px-5 overflow-y-auto">{user?.userType === "VENDOR" ? buildVendor() : buildUser()}</div>;
 }

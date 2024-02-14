@@ -2744,7 +2744,7 @@ const TenderDetails = ({
                   )}
               </div>
 
-              {user?.permissions?.canEditTenders && (
+              {(user?.permissions?.canEditTenders && extending) && (
                 <div className="flex flex-row self-end items-center space-x-2">
                   <div>
                     <Popconfirm
@@ -2755,7 +2755,7 @@ const TenderDetails = ({
                       }}
                     >
                       <div
-                        onClick={extendSubmissionDadeline}
+                        // onClick={extendSubmissionDadeline}
                         className="py-2 px-4 rounded bg-[#F2F4FD] flex items-center gap-x-2 text-[#0063CF] justify-center cursor-pointer active:shadow-sm active:text-[#0063CF]"
                       >
                         <CheckIcon className="h-4 w-4  " />
@@ -3052,7 +3052,7 @@ const TenderDetails = ({
                               <div className="flex flex-row justify-end space-x-1 ml-3 mt-2 mb-3 items-center">
                                 <button
                                   type="submit"
-                                  className="bg-[#1677FF] py-3 px-6 rounded-lg text-white text-[15px] font-semibold border-none"
+                                  className="bg-[#1677FF] py-3 px-6 rounded-lg text-white text-[15px] font-semibold border-none cursor-pointer"
                                 >
                                   Submit Proposal
                                 </button>
@@ -3240,7 +3240,7 @@ const TenderDetails = ({
                         <button
                           type="submit"
                           disabled={selectionComitee?.length < 1}
-                          className="bg-[#0065DD] py-4 font-semibold w-full text-white border-none rounded-lg"
+                          className="bg-[#0065DD] py-4 font-semibold w-full text-white border-none rounded-lg cursor-pointer"
                         >
                           Send Invite to selected evaluators
                         </button>

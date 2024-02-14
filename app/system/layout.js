@@ -151,7 +151,7 @@ export default function SystemLayout({ children }) {
                 )}
               </div>
             </div>
-            {JSON.parse(loggedInUser)?.userType !== "VENDOR" && <div className="mb-10 mr-7">
+            {(JSON.parse(loggedInUser)?.userType !== "VENDOR" && JSON.parse(loggedInUser)?.permissions?.canViewUsers) && <div className="mb-10 mr-7">
               <a
                 href="/system/users"
                 className="flex items-center bg-[#F2F4FD] w-[calc(100%-30px)] px-5 py-4 cursor-pointer rounded-lg border-0 gap-3 no-underline"
