@@ -2615,13 +2615,11 @@ export default function PaymentRequest({ params }) {
                         <Tag color="">
                           SAP Journal Entry: {paymentRequest?.journalEntry}
                         </Tag>
-                        {paymentRequest?.category == "internal" && (
+                        {/* {paymentRequest?.category == "internal" && (
                           <div className="grid grid-cols-2 gap-2">
                             <div className="flex flex-col space-y-2">
                               <div className="mt-2">
-                                {/* <div className="text-xs text-gray-400">
-                                Debit: 10090189 - Legal
-                              </div> */}
+                               
 
                                 <Tag color="blue">
                                   Debit:{" "}
@@ -2653,7 +2651,7 @@ export default function PaymentRequest({ params }) {
                               </div>
                             </div>
                           </div>
-                        )}
+                        )} */}
                       </div>
                     )}
                 </>
