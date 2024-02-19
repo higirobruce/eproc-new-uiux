@@ -234,6 +234,51 @@ export default function NewRequest() {
     }
   };
 
+  const handleUpload = (files) => {
+    if (files?.length < 1) {
+      messageApi.error("Please add at least one doc.");
+      setConfirmLoading(false);
+    } else {
+      files.forEach((filesPerRow, rowIndex) => {
+        filesPerRow.map((rowFile, fileIndex) => {
+          const formData = new FormData();
+          formData.append("files[]", rowFile);
+
+          // You can use any AJAX library you like
+          fetch(`${url}/uploads/termsOfReference/`, {
+            method: "POST",
+            body: formData,
+            headers: {
+              Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+              token: token,
+              // "Content-Type": "multipart/form-data",
+            },
+          })
+            .then((res) => getResultFromServer(res))
+            .then((savedFiles) => {
+              let _filenames = savedFiles?.map((f) => {
+                return f?.filename;
+              });
+
+              let _files = [...files];
+              _files[rowIndex][fileIndex] = _filenames[0];
+
+              if (
+                rowIndex === files?.length - 1 &&
+                fileIndex === filesPerRow.length - 1
+              ) {
+                save(_files);
+              }
+            })
+            .catch((err) => {
+              messageApi.error("upload failed.");
+            })
+            .finally(() => {});
+        });
+      });
+    }
+  };
+
   return (
     <div className="payment-request h-[calc(100vh-128px)] overflow-y-auto mr-4 rounded-lg mt-6 bg-white pb-5 px-7 pt-3">
       <div className="flex flex-col justify-between h-full">
@@ -242,8 +287,7 @@ export default function NewRequest() {
             New Purchase request
           </h4>
           <small className="text-[#8392AB]">
-            Below is a generic form to create a user purchase request for items
-            inside the department
+            Fill and submit the form below to create your purchase request.
           </small>
           <Form
             // labelCol={{ span: 8 }}
@@ -254,7 +298,7 @@ export default function NewRequest() {
             form={form}
             onFinish={save}
           >
-            <h3 className="my-4 font-bold text-[15px]">Basic</h3>
+            <h3 className="my-4 font-bold text-[15px]">Overview</h3>
             <div className="grid md:grid-cols-3 gap-10">
               <div>
                 <div className="mb-3">
@@ -498,7 +542,7 @@ export default function NewRequest() {
                 </div>
               )}
             </div>
-            <h3 className="my-5 font-bold text-[15px]">Item Specification</h3>
+            <h3 className="my-5 font-bold text-[15px]">Request specifications</h3>
             <ItemsTable
               setDataSource={setValues}
               dataSource={values}
@@ -513,7 +557,23 @@ export default function NewRequest() {
           <button className="bg-white rounded-lg px-8 py-3 border border-[#0065DD]">
             <small className="py-0 text-[15px] text-[#0065DD]">Cancel</small>
           </button>
-          <button className="bg-[#0065DD] rounded-lg px-8 py-3 border-none cursor-pointer" onClick={save}>
+          <button className="bg-[#0065DD] rounded-lg px-8 py-3 border-none cursor-pointer" onClick={async () => {
+              await form.validateFields();
+              if (values && values[0]) {
+                let invalidValues = values?.filter(
+                  (v) =>
+                    v?.title == "" ||
+                    v?.quantity == "" ||
+                    v?.estimatedUnitCost === ""
+                );
+                if (invalidValues?.length == 0) {
+                  setConfirmLoading(true);
+                  handleUpload(files);
+                }
+              } else {
+                messageApi.error("Please add atleast one item!");
+              }
+            }}>
             <small className="py-5 text-[15px] text-white">
               Submit for Approval
             </small>
