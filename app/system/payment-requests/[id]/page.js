@@ -1470,6 +1470,7 @@ export default function PaymentRequest({ params }) {
                                     className="h-11"
                                     onChange={(e) => {
                                       let _p = { ...paymentRequest };
+
                                       _p.paymentDetails.bankName =
                                         e.target.value;
                                       setPaymentRequest(_p);
@@ -2268,7 +2269,7 @@ export default function PaymentRequest({ params }) {
                                 </Form.Item>
                               </div> 
                             */}
-                            <Form.Item
+                            {/* <Form.Item
                               label="Distribution Rule - Debit Acc"
                               name="currency"
                               rules={[
@@ -2300,7 +2301,7 @@ export default function PaymentRequest({ params }) {
                                   };
                                 })}
                               ></Select>
-                            </Form.Item>
+                            </Form.Item> */}
 
                             {/* <div className="flex flex-row items-center"></div> */}
 
@@ -2351,7 +2352,7 @@ export default function PaymentRequest({ params }) {
                             </div>
                           </div>
 
-                          <div className="grid lg:grid-cols-2 items-center gap-x-6 mt-2">
+                          {/* <div className="grid lg:grid-cols-2 items-center gap-x-6 mt-2">
                             <Form.Item
                               label="Debit Account"
                               name="accountToDebit"
@@ -2420,16 +2421,16 @@ export default function PaymentRequest({ params }) {
                                 })}
                               ></Select>
                             </Form.Item>
-                          </div>
-                          <div className="flex flex-row space-x-2 items-center my-4">
+                          </div> */}
+                          {/* <div className="flex flex-row space-x-2 items-center my-4">
                             <Switch
                               onChange={setOverrideAmount}
                               checked={overrideAmount}
                               disabled={paymentRequest?.currency === "RWF"}
                             />
                             <div>Override Amount</div>
-                          </div>
-                          {overrideAmount && (
+                          </div> */}
+                          {/* {overrideAmount && (
                             <div className="grid md:grid-cols-3">
                               <Form.Item>
                                 <Form.Item
@@ -2498,7 +2499,7 @@ export default function PaymentRequest({ params }) {
                                 </Form.Item>
                               </Form.Item>
                             </div>
-                          )}
+                          )} */}
 
                           <div className="mt-10">
                             <Button
@@ -2511,11 +2512,7 @@ export default function PaymentRequest({ params }) {
                               type="primary"
                               disabled={
                                 !filesProof ||
-                                filesProof.length == 0 ||
-                                !debitAccount ||
-                                !creditAccount ||
-                                !distributionRuleCr ||
-                                !distributionRuleDb
+                                filesProof.length == 0
                               }
                             >
                               Submit
