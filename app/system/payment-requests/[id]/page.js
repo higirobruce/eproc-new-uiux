@@ -36,6 +36,7 @@ import {
   PlusOutlined,
   QuestionCircleOutlined,
   SaveOutlined,
+  FileSyncOutlined,
 } from "@ant-design/icons";
 import Link from "next/link";
 import moment from "moment";
@@ -58,6 +59,7 @@ import { MdAccountBalance } from "react-icons/md";
 import { FaMobileAlt } from "react-icons/fa";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
+let fend_url = process.env.NEXT_PUBLIC_FTEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
 
@@ -257,6 +259,7 @@ export default function PaymentRequest({ params }) {
   let [amountOverride, setAmountOverride] = useState(0);
 
   let [editRequest, setEditRequest] = useState(false);
+  let [updateFiles, setUpdateFiles] = useState(false);
 
   const [open, setOpen] = useState(false);
   const [openConfirmDeliv, setOpenConfirmDeliv] = useState([]);
@@ -1128,13 +1131,63 @@ export default function PaymentRequest({ params }) {
                   </div>
 
                   {/* Request Attached Invoice*/}
-                  <div className="flex flex-col space-y-2">
-                    <div className="mb-3">
-                      <label className="text-xs text-gray-400">
+                  {/* Request Attached Invoice*/}
+                  <div className="flex flex-col  space-y-2 ">
+                    <div className="flex flex-row items-center space-x-2">
+                      <div className="text-xs text-gray-400">
                         Attached Invoice(s)
-                      </label>
+                      </div>
+                      {((user?.permissions?.canApproveAsHod &&
+                        user?._id === paymentRequest?.approver?._id) ||
+                        (paymentRequest?.status == "pending-review" &&
+                          user?._id == paymentRequest?.createdBy?._id) ||
+                        user?.permissions?.canApproveAsHof) &&
+                        !updateFiles && (
+                          // <div
+                          //   onClick={() => setUpdateFiles(true)}
+                          //   className="text-grey-500 hover:text-blue-500 cursor-pointer flex flex-row items-center space-x-1"
+                          // >
+                          //   <CloudArrowUpIcon className="h-5 w-5 " />{" "}
+                          //   <div>update</div>
+                          // </div>
+
+                          <Button
+                            // className="bg-blue-50"
+                            size="small"
+                            type="text"
+                            onClick={() => setUpdateFiles(true)}
+                            icon={<FileSyncOutlined width="10px" />}
+                          >
+                            {/* Update */}
+                          </Button>
+                          // <UpdatePaymentReqDoc
+                          //   iconOnly={true}
+                          //   uuid={doc}
+                          //   label="update"
+                          //   reloadFileList={refresh}
+                          // />
+                        )}
+                      {updateFiles && (
+                        <>
+                          <Button
+                            // className="bg-orange-50"
+                            size="small"
+                            type="text"
+                            onClick={() => setUpdateFiles(false)}
+                            icon={<CloseOutlined width="10px" />}
+                          >
+                            {/* Cancel */}
+                          </Button>
+                        </>
+                        // <div
+                        //   onClick={() => setUpdateFiles(false)}
+                        //   className="rounded border border-gray-500 text-grey-500 hover:text-blue-500 cursor-pointer flex flex-row items-center space-x-1"
+                        // >
+                        //   <XCircleIcon className="h-5 w-5 "/> <div>cancle</div>
+                        // </div>
+                      )}
                     </div>
-                    {!editRequest && (
+                    {!editRequest && !updateFiles && (
                       <div className="grid grid-cols-2 gap-y-2">
                         {paymentRequest?.docIds?.map((doc, i) => {
                           const truncatedFileName =
@@ -1144,11 +1197,11 @@ export default function PaymentRequest({ params }) {
                                 )}`
                               : doc;
                           return (
-                            <div className="border-b-2 border-b-slate-600">
+                            <div className="flex flex-col border-b-2 border-b-slate-600">
                               <Tooltip title={doc}>
                                 <Typography.Text ellipsis>
                                   <Link
-                                    href={`${url}/file/paymentRequests/${encodeURI(
+                                    href={`${fend_url}/api/?folder=paymentRequests&name=${encodeURIComponent(
                                       doc
                                     )}`}
                                     target="_blank"
@@ -1165,43 +1218,29 @@ export default function PaymentRequest({ params }) {
                               </Tooltip>
 
                               {/* <Link
-                              href={`${url}/file/paymentRequests/${encodeURI(doc)}`}
-                              target="_blank"
-                            >
-                              <div className="text-xs">
-                                <div className="flex flex-row space-x-1 items-center">
-                                  {" "}
-                                  <PaperClipOutlined /> Invoice {i + 1}
-                                </div>
+                            href={`${fend_url}/api/?folder=paymentRequests&name=${encodeURIComponent(doc)}`}
+                            target="_blank"
+                          >
+                            <div className="text-xs">
+                              <div className="flex flex-row space-x-1 items-center">
+                                {" "}
+                                <PaperClipOutlined /> Invoice {i + 1}
                               </div>
-                            </Link> */}
-
-                              {((user?.permissions?.canApproveAsHod &&
-                                user?._id === paymentRequest?.approver?._id) ||
-                                (paymentRequest.status == "pending-review" &&
-                                  user?._id ==
-                                    paymentRequest?.createdBy?._id) ||
-                                user?.permissions?.canApproveAsHof) && (
-                                <UpdatePaymentReqDoc
-                                  iconOnly={true}
-                                  uuid={doc}
-                                  label="update"
-                                  reloadFileList={refresh}
-                                />
-                              )}
+                            </div>
+                          </Link> */}
                             </div>
                           );
                         })}
                       </div>
                     )}
 
-                    {conditions && (
+                    {(editRequest || updateFiles) && (
                       <UploadOtherFiles files={files} setFiles={setFiles} />
                     )}
                   </div>
 
                   {/* Budgeted */}
-                  {(user?.userType !== "VENDOR" && paymentRequest) && (
+                  {user?.userType !== "VENDOR" && paymentRequest && (
                     <div className="flex flex-col space-y-1 items-start">
                       <div className="mb-3">
                         <label className="text-xs text-gray-400">
@@ -2541,7 +2580,7 @@ export default function PaymentRequest({ params }) {
                               <Tooltip title={doc}>
                                 <Typography.Text ellipsis>
                                   <Link
-                                    href={`${url}/file/paymentRequests/${encodeURI(
+                                    href={`${fend_url}/api/?folder=paymentRequests&name=${encodeURIComponent(
                                       doc
                                     )}`}
                                     target="_blank"
@@ -2557,13 +2596,14 @@ export default function PaymentRequest({ params }) {
                                 </Typography.Text>
                               </Tooltip>
                               {user?.permissions?.canApproveAsHof && (
-                                <UpdatePaymentReqDoc
-                                  iconOnly={true}
-                                  uuid={doc}
-                                  label="update"
-                                  reloadFileList={refresh}
-                                  paymentProof={true}
-                                />
+                                <></>
+                                // <UpdatePaymentReqDoc
+                                //   iconOnly={true}
+                                //   uuid={doc}
+                                //   label="update"
+                                //   reloadFileList={refresh}
+                                //   paymentProof={true}
+                                // />
                               )}
                             </div>
                           );
