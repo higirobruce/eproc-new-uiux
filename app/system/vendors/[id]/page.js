@@ -428,7 +428,7 @@ export default function page({ params }) {
   console.log("Row Data ", rowData);
 
   return (
-    <div className="payment-request flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-screen pb-1 mb-32 overflow-y-auto">
+    <div className="payment-request flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-[calc(100vh-40px)] pb-1 overflow-y-auto">
       {contextHolder}
       <div className="grid md:grid-cols-3 gap-5 mb-16">
         <div className="flex flex-col space-y-5">
@@ -928,8 +928,19 @@ export default function page({ params }) {
             <></>
           ) : (
             <div className="bg-white rounded-lg pb-4 px-8">
-              <h5 className="text-[#263238] text-[18px]">Password Change</h5>
-              <div>
+              <div className="flex items-center justify-between">
+                <h5 className="text-[#263238] text-[18px]">Password Change</h5>
+                <Button
+                    icon={<SaveOutlined />}
+                    danger
+                    type="primary"
+                    size="large"
+                    onClick={() => {
+                      updatePassword()
+                    }}
+                  >Update Vendor Password</Button>
+              </div>
+              {/* <div>
                 <div className="pb-3 text-[13px] text-[#344767]">
                   Current Password
                 </div>
@@ -960,7 +971,7 @@ export default function page({ params }) {
                     />
                   </Form.Item>
                 </div>
-              </div>
+              </div> */}
             </div>
           )}
         </div>
