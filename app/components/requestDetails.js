@@ -2560,6 +2560,13 @@ const RequestDetails = ({
       });
   }
 
+  const disable = ((data?.level1Approver?._id === user?._id ||
+      data?.createdBy?._id === user?._id) &&
+      data?.status.startsWith("approved")) ||
+    data?.status === "withdrawn" ||
+    data?.status === "approved" ||
+    data?.status === "approved (pm)";
+
   return (
     <div className="request-details grid md:grid-cols-5 gap-4 items-start h-screen overflow-y-auto">
       {contextHolder}
@@ -2603,11 +2610,7 @@ const RequestDetails = ({
                         handleUpdateRequest(r);
                       }}
                       className="h-11 mt-3"
-                      disabled={
-                        data?.status === "withdrawn" ||
-                        data?.status === "approved" ||
-                        data?.status === "approved (pm)"
-                      }
+                      disabled={disable}
                     />
                   </Form.Item>
                 </div>
@@ -2658,11 +2661,7 @@ const RequestDetails = ({
                       r.serviceCategory = value;
                       handleUpdateRequest(r);
                     }}
-                    disabled={
-                      data?.status === "withdrawn" ||
-                      data?.status === "approved" ||
-                      data?.status === "approved (pm)"
-                    }
+                    disabled={disable}
                   >
                     {servCategories?.map((s) => {
                       return (
@@ -2696,11 +2695,7 @@ const RequestDetails = ({
                       showCount
                       maxLength={100}
                       rows={4}
-                      disabled={
-                        data?.status === "withdrawn" ||
-                        data?.status === "approved" ||
-                        data?.status === "approved (pm)"
-                      }
+                      disabled={disable}
                     />
                   </Form.Item>
                 </div>
@@ -2722,11 +2717,7 @@ const RequestDetails = ({
                         }}
                         className="mt-3"
                         defaultValue={data.budgeted}
-                        disabled={
-                          data?.status === "withdrawn" ||
-                          data?.status === "approved" ||
-                          data?.status === "approved (pm)"
-                        }
+                        disabled={disable}
                       >
                         <Radio value={true} className="mr-3">
                           <span className="ml-2 text-[18px]">Yes</span>
@@ -2750,11 +2741,7 @@ const RequestDetails = ({
                         placeholder="Select service category"
                         showSearch
                         defaultValue={data?.budgetLine?._id}
-                        disabled={
-                          data?.status === "withdrawn" ||
-                          data?.status === "approved" ||
-                          data?.status === "approved (pm)"
-                        }
+                        disabled={disable}
                         onChange={(value, option) => {
                           let r = { ...data };
                           r.budgetLine = value;
@@ -2811,16 +2798,12 @@ const RequestDetails = ({
                         _d.dueDate = dstr;
                         handleUpdateRequest(_d);
                       }}
-                      disabled={
-                        data?.status === "withdrawn" ||
-                        data?.status === "approved" ||
-                        data?.status === "approved (pm)"
-                      }
+                      disabled={disable}
                     />
                   </Form.Item>
                 </div>
               </div>
-              <div className="edit-requests my-10 pt-5 border-2 border-[#732083]">
+              <div className="my-10 pt-5 border-2 border-[#732083]">
                 <ItemsTable
                   setDataSource={(v) => {
                     setValues(v);
@@ -2835,11 +2818,10 @@ const RequestDetails = ({
                   setFiles={_setFiles}
                   editingRequest={true}
                   status={data?.status}
+                  disable={disable ? true : false}
                 />
               </div>
-              {(data?.status === "withdrawn" ||
-                (data?.status !== "approved" &&
-                  data?.status !== "approved (pm)")) && (
+              {!disable && (
                 <div className="flex justify-end gap-5 mb-5">
                   <Popconfirm
                     title="Are you sure?"
@@ -2979,7 +2961,6 @@ const RequestDetails = ({
               {currentCode !== 5 && (
                 <div className="w-full">
                   <div className="ml-3 mt-6">
-                    
                     <Button
                       className="bg-[#F3F5FF] px-4 border-none rounded-xl text-[#3287FF]"
                       disabled={
@@ -3000,7 +2981,10 @@ const RequestDetails = ({
                   {data?.items?.map((i, index) => {
                     let deliveredQty = po?.items[index]?.deliveredQty || 0;
                     return (
-                      <div key={i.key} className="flex justify-between w-full mt-5">
+                      <div
+                        key={i.key}
+                        className="flex justify-between w-full mt-5"
+                      >
                         <div className="ml-5">
                           {i.title}: {deliveredQty || 0} delivered out of{" "}
                           {i?.quantity}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { DatePicker, Form, Input, Select, Radio, message } from "antd";
 import ItemsTable from "../../../components/itemsTable";
 import moment from "moment/moment";
@@ -279,6 +279,12 @@ export default function NewRequest() {
     }
   };
 
+  const totalAmount = useMemo(() => {
+    return values.reduce((sum, value) => sum + (parseInt(value.estimatedUnitCost == '' ? '0' : value.estimatedUnitCost) * parseInt(value.quantity == '' ? '0' : value.quantity)), 0);
+  }, [values]);
+
+  {console.log('Values ', values)}
+
   return (
     <div className="payment-request h-[calc(100vh-128px)] overflow-y-auto mr-4 rounded-lg mt-6 bg-white pb-5 px-7 pt-3">
       <div className="flex flex-col justify-between h-full">
@@ -542,7 +548,10 @@ export default function NewRequest() {
                 </div>
               )}
             </div>
-            <h3 className="my-5 font-bold text-[15px]">Request specifications</h3>
+            <div className="flex justify-between items-center">
+              <h3 className="my-5 font-bold text-[15px]">Request specifications</h3>
+              {values[0]?.currency && <h4 className="my-5 font-bold text-[14px]">Total: {values[0]?.currency + ' ' + totalAmount.toLocaleString()}</h4>}
+            </div>
             <ItemsTable
               setDataSource={setValues}
               dataSource={values}

@@ -46,6 +46,7 @@ const EditableCell = ({
   record,
   handleSave,
   status,
+  disable,
   ...restProps
 }) => {
   const [editing, setEditing] = useState(true);
@@ -98,7 +99,7 @@ const EditableCell = ({
             onPressEnter={save}
             placeholder={dataIndex === "title" ? "enter title" : "eg. 1000000"}
             onBlur={save}
-            disabled={status === "approved" || status === "approved (pm)"}
+            disabled={disable}
           />
         ) : (
           <Input
@@ -107,7 +108,7 @@ const EditableCell = ({
             onPressEnter={save}
             placeholder={dataIndex === "title" ? "enter title" : "eg. 1000000"}
             onBlur={save}
-            disabled={status === "approved" || status === "approved (pm)"}
+            disabled={disable}
           />
         )}
       </Form.Item>
@@ -135,6 +136,7 @@ const ItemsTable = ({
   setFiles,
   editingRequest,
   status,
+  disable
 }) => {
   const [count, setCount] = useState(dataSource?.length + 1);
   const [rowForm] = Form.useForm();
@@ -144,24 +146,25 @@ const ItemsTable = ({
     setCount(count - 1);
     setDataSource(newData);
   };
+
   const defaultColumns = [
     {
       title: "Item title",
       dataIndex: "title",
       width: "25%",
-      editable: true,
+      editable: !disable,
     },
     {
       title: "Quantity",
       dataIndex: "quantity",
       width: "15%",
-      editable: true,
+      editable: !disable,
     },
     {
       title: "Estimated Unit cost",
       dataIndex: "estimatedUnitCost",
       width: "15%",
-      editable: true,
+      editable: !disable,
       render: (_, item) => {
         return (
           <div>
@@ -178,7 +181,7 @@ const ItemsTable = ({
         return (
           <Select
             defaultValue={record.currency}
-            disabled={status === "approved" || status === "approved (pm)"}
+            disabled={disable}
             size="large"
             className="w-full"
             onChange={(value) => (record.currency = value)}
@@ -227,7 +230,7 @@ const ItemsTable = ({
         return (
           dataSource?.length >= 1 && (
             <div>
-              {status != "approved" && status != "approved (pm)" && (
+              {!disable && (
                 <UploadTORs
                   uuid={record?.key - 1}
                   setFileList={setFileList}
@@ -235,7 +238,7 @@ const ItemsTable = ({
                   files={files}
                   setFiles={setFiles}
                   itemFiles={files[index]}
-                  disabled={editingRequest}
+                  disabled={disable}
                   setStatus={() => {}}
                   iconOnly={false}
                 />
@@ -285,8 +288,7 @@ const ItemsTable = ({
       dataIndex: "operation",
       render: (_, record) =>
         dataSource?.length >= 1 &&
-        status != "approved" &&
-        status != "approved (pm)" ? (
+        (!disable) ? (
           <Popconfirm
             title="Are you sure?"
             onConfirm={() => handleDelete(record.key)}
@@ -347,7 +349,7 @@ const ItemsTable = ({
 
   return (
     <>
-      <div className="item-requests flex flex-col gap-2 overflow-y-auto">
+      <div className="flex flex-col gap-2">
         <Table
           components={components}
           rowClassName={() => "editable-row"}
@@ -357,9 +359,10 @@ const ItemsTable = ({
           size="small"
           pagination={false}
           status={status}
+          disable={disable}
         />
       </div>
-      {status !== "approved" && status !== "approved (pm)" && (
+      {(!disable)&& (
         <Button
           onClick={handleAdd}
           className="flex self-start items-center gap-1 border-0 bg-[#EAF1FC] text-[#0065DD] mt-3"
