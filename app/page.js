@@ -21,7 +21,7 @@ export default function PublicPortal() {
         <title>EPROC</title>
         <meta name="description" content="the #1 e-procurement tool" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.png" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
       </Head>
 
       <main className="overflow-x-hidden bg-white flex flex-col h-screen">
