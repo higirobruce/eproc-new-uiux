@@ -446,8 +446,13 @@ export default function page({ params }) {
       .then((res) => {
         // setFileList([])
         // setFiles([])
+        messageApi.open({
+          type: "success",
+          content: "Purchase Request Updated!",
+        });
         loadData();
         setLoadingRowData(false);
+        router.push('/system/requests')
       })
       .catch((err) => {
         setLoadingRowData(false);
@@ -539,113 +544,115 @@ export default function page({ params }) {
   }
 
   return (
-    // <h1>{rowData?.number}</h1>
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{
-        opacity: rowData ? 1 : 0,
-      }}
-      transition={{
-        duration: 0.2,
-        type: "tween",
-        ease: "circOut",
-      }}
-      className="flex flex-col mr-5 transition-opacity ease-in-out duration-1000 py-5 flex-1 space-y-3 h-screen"
-    >
+    <>
       {contextHolder}
-      {/* <div className="flex flex-row justify-between items-center">
-        <div className="flex flex-row space-x-10 items-center">
-          <div>
-            <Button
-              icon={<ArrowLeftOutlined />}
-              type="primary"
-              onClick={() => {
-                setEditRequest(false);
-                router.back();
-              }}
-            >
-              Back
-            </Button>
-          </div>
-
-          {editRequest && (
-            <div className="flex flex-row items-center text-xl font-semibold">
-              <Typography.Text
-                level={5}
-                editable={
-                  editRequest && {
-                    text: rowData?.title,
-                    onChange: (e) => {
-                      let req = { ...rowData };
-                      req.title = e;
-                      setRowData(req);
-                    },
-                  }
-                }
-              >
-                {rowData?.title}
-              </Typography.Text>
-            </div>
-          )}
-
-          {editRequest && (
+      {/* <h1>{rowData?.number}</h1> */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{
+          opacity: rowData ? 1 : 0,
+        }}
+        transition={{
+          duration: 0.2,
+          type: "tween",
+          ease: "circOut",
+        }}
+        className="flex flex-col mr-5 transition-opacity ease-in-out duration-1000 py-5 flex-1 space-y-3 h-screen"
+      >
+        {/* <div className="flex flex-row justify-between items-center">
+          <div className="flex flex-row space-x-10 items-center">
             <div>
               <Button
-                icon={<SaveOutlined />}
+                icon={<ArrowLeftOutlined />}
                 type="primary"
                 onClick={() => {
-                  // updateRequest();
-                  handleUpload();
+                  setEditRequest(false);
+                  router.back();
                 }}
               >
-                Save
+                Back
               </Button>
             </div>
-          )}
 
-          {!editRequest && (
-            <div className="text-xl font-semibold">
-              Request - {rowData?.title}
-            </div>
-          )}
-        </div>
-        {(rowData?.level1Approver?._id === user?._id ||
-          rowData?.createdBy?._id === user?._id) &&
-          !rowData?.status.startsWith("approved") && (
-            <Switch
-              checked={editRequest}
-              checkedChildren={<EditOutlined />}
-              unCheckedChildren={<EyeOutlined />}
-              onChange={(e) => setEditRequest(e)}
-            />
-          )}
-      </div> */}
-      {rowData && (
-        <RequestDetails
-          handleUpdateStatus={updateStatus}
-          loading={loadingRowData}
-          data={rowData}
-          handleCreateTender={createTender}
-          handleReject={declineRequest}
-          setConfirmRejectLoading={setConfirmRejectLoading}
-          confirmRejectLoading={confirmRejectLoading}
-          handleUpdateProgress={updateProgress}
-          reload={reload}
-          handleCreatePO={createPO}
-          handleCreateContract={createContract}
-          edit={editRequest}
-          handleUpdateRequest={setRowData}
-          handleRateDelivery={rateDelivery}
-          refDoc={sourcingMethod}
-          setRefDoc={setSourcingMethod}
-          setFilePaths={setFilePaths}
-          fileList={fileList}
-          files={files}
-          setFileList={setFileList}
-          setFiles={setFiles}
-          handleUpload={handleUpload}
-        />
-      )}
-    </motion.div>
+            {editRequest && (
+              <div className="flex flex-row items-center text-xl font-semibold">
+                <Typography.Text
+                  level={5}
+                  editable={
+                    editRequest && {
+                      text: rowData?.title,
+                      onChange: (e) => {
+                        let req = { ...rowData };
+                        req.title = e;
+                        setRowData(req);
+                      },
+                    }
+                  }
+                >
+                  {rowData?.title}
+                </Typography.Text>
+              </div>
+            )}
+
+            {editRequest && (
+              <div>
+                <Button
+                  icon={<SaveOutlined />}
+                  type="primary"
+                  onClick={() => {
+                    // updateRequest();
+                    handleUpload();
+                  }}
+                >
+                  Save
+                </Button>
+              </div>
+            )}
+
+            {!editRequest && (
+              <div className="text-xl font-semibold">
+                Request - {rowData?.title}
+              </div>
+            )}
+          </div>
+          {(rowData?.level1Approver?._id === user?._id ||
+            rowData?.createdBy?._id === user?._id) &&
+            !rowData?.status.startsWith("approved") && (
+              <Switch
+                checked={editRequest}
+                checkedChildren={<EditOutlined />}
+                unCheckedChildren={<EyeOutlined />}
+                onChange={(e) => setEditRequest(e)}
+              />
+            )}
+        </div> */}
+        {rowData && (
+          <RequestDetails
+            handleUpdateStatus={updateStatus}
+            loading={loadingRowData}
+            data={rowData}
+            handleCreateTender={createTender}
+            handleReject={declineRequest}
+            setConfirmRejectLoading={setConfirmRejectLoading}
+            confirmRejectLoading={confirmRejectLoading}
+            handleUpdateProgress={updateProgress}
+            reload={reload}
+            handleCreatePO={createPO}
+            handleCreateContract={createContract}
+            edit={editRequest}
+            handleUpdateRequest={setRowData}
+            handleRateDelivery={rateDelivery}
+            refDoc={sourcingMethod}
+            setRefDoc={setSourcingMethod}
+            setFilePaths={setFilePaths}
+            fileList={fileList}
+            files={files}
+            setFileList={setFileList}
+            setFiles={setFiles}
+            handleUpload={handleUpload}
+          />
+        )}
+      </motion.div>
+    </>
   );
 }

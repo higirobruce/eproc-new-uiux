@@ -209,6 +209,10 @@ export default function NewRequest() {
               setDataLoaded(true);
               setDataset(res);
               setTempDataset(res);
+              messageApi.open({
+                type: "success",
+                content: "Purchase Request created!",
+              });
               setConfirmLoading(false);
             })
             .catch((err) => {
@@ -283,312 +287,313 @@ export default function NewRequest() {
     return values.reduce((sum, value) => sum + (parseInt(value.estimatedUnitCost == '' ? '0' : value.estimatedUnitCost) * parseInt(value.quantity == '' ? '0' : value.quantity)), 0);
   }, [values]);
 
-  {console.log('Values ', values)}
-
   return (
-    <div className="payment-request h-[calc(100vh-128px)] overflow-y-auto mr-4 rounded-lg mt-6 bg-white pb-5 px-7 pt-3">
-      <div className="flex flex-col justify-between h-full">
-        <div>
-          <h4 className="mb-2.5 font-semibold text-[19px]">
-            New Purchase request
-          </h4>
-          <small className="text-[#8392AB]">
-            Fill and submit the form below to create your purchase request.
-          </small>
-          <Form
-            // labelCol={{ span: 8 }}
-            // wrapperCol={{ span: 16 }}
-            // style={{ maxWidth: 600 }}
-            className="md:mr-16 mr-5"
-            // layout="horizontal"
-            form={form}
-            onFinish={save}
-          >
-            <h3 className="my-4 font-bold text-[15px]">Overview</h3>
-            <div className="grid md:grid-cols-3 gap-10">
-              <div>
-                <div className="mb-3">
-                  <label>Due Date</label>
-                </div>
-                <div>
-                  <Form.Item
-                    name="dueDate"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Due date is required",
-                      },
-                    ]}
-                  >
-                    <DatePicker
-                      className="w-full h-11"
-                      defaultValue={null}
-                      value={dueDate}
-                      disabledDate={(current) =>
-                        current.isBefore(moment().subtract(1, "d"))
-                      }
-                      onChange={(v, dstr) => setDueDate(dstr)}
-                    />
-                  </Form.Item>
-                </div>
-              </div>
-              <div>
-                <div className="mb-3">
-                  <label>Approver</label>
-                </div>
-                <div>
-                  <Form.Item
-                    name="level1Approver"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Who Approves",
-                      },
-                    ]}
-                  >
-                    <Select
-                      // defaultValue={defaultApprover}
-                      placeholder="Select who should approve this request"
-                      size="large"
-                      showSearch
-                      onChange={(value) => {
-                        setLevel1Approver(value);
-                      }}
-                      filterOption={(input, option) =>
-                        (option?.label ?? "")
-                          .toLowerCase()
-                          .includes(input.toLowerCase())
-                      }
-                      options={level1Approvers.map((l) => {
-                        return {
-                          label: l?.firstName + " " + l?.lastName,
-                          value: l?._id,
-                        };
-                      })}
-                    ></Select>
-                  </Form.Item>
-                </div>
-              </div>
-              <div>
-                <div className="mb-3">
-                  <label>Category</label>
-                </div>
-                <div>
-                  <Form.Item
-                    name="serviceCategory"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Service category is required",
-                      },
-                    ]}
-                  >
-                    <Select
-                      // defaultValue={serviceCategory}
-                      placeholder="Select service category"
-                      className="text-[7px]"
-                      size="large"
-                      showSearch
-                      onChange={(value) => {
-                        setServiceCategory(value);
-                      }}
-                      filterSort={(optionA, optionB) =>
-                        (optionA?.label ?? "")
-                          .toLowerCase()
-                          .localeCompare((optionB?.label ?? "").toLowerCase())
-                      }
-                      filterOption={(inputValue, option) =>
-                        option.label
-                          .toLowerCase()
-                          .includes(inputValue.toLowerCase())
-                      }
-                      // defaultValue="RWF"
-                      options={[
-                        ...serviceCategories,
-                        { description: "Others" },
-                      ].map((s) => {
-                        return {
-                          value: s.description,
-                          label: s.description,
-                        };
-                      })}
-                    ></Select>
-                  </Form.Item>
-                </div>
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-10 mb-1">
-              <div>
-                <div className="mb-3">
-                  <label> Request title</label>
-                </div>
-                <div>
-                  <Form.Item
-                    name="title"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Request title is required",
-                      },
-                    ]}
-                  >
-                    <Input
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      placeholder="How would you name your request?"
-                      className="w-full h-11"
-                    />
-                  </Form.Item>
-                </div>
-              </div>
-              <div className="col-span-2">
-                <div className="mb-3">
-                  <label>Description</label>
-                </div>
-                <div>
-                  <Form.Item
-                    name="description"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Description is required",
-                      },
-                    ]}
-                  >
-                    <Input.TextArea
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      placeholder="Briefly describe your request"
-                      showCount
-                      maxLength={100}
-                      rows={4}
-                    />
-                  </Form.Item>
-                </div>
-              </div>
-            </div>
-            <div className="grid grid-cols-3">
-              <div>
-                <div className="mb-3">
-                  <label>Is this a budgeted request?</label>
-                </div>
-                <div>
-                  <Form.Item
-                    name="budgeted"
-                    valuePropName="checked"
-                    // wrapperCol={{ offset: 8, span: 16 }}
-                  >
-                    <Radio.Group
-                      onChange={(e) => {
-                        setBudgeted(e.target.value);
-                        if (e.target.value === false) setBudgetLine(null);
-                      }}
-                      value={budgeted}
-                    >
-                      <Radio value={true} className="mr-3">
-                        <span className="ml-2 text-[15px]">Yes</span>
-                      </Radio>
-                      <Radio value={false} className="mx-3">
-                        <span className="ml-2 text-[15px]">No</span>
-                      </Radio>
-                    </Radio.Group>
-                  </Form.Item>
-                </div>
-              </div>
-              {budgeted && (
+    <>
+      {contextHolder}
+      <div className="payment-request h-[calc(100vh-128px)] overflow-y-auto mr-4 rounded-lg mt-6 bg-white pb-5 px-7 pt-3">
+        <div className="flex flex-col justify-between h-full">
+          <div>
+            <h4 className="mb-2.5 font-semibold text-[19px]">
+              New Purchase request
+            </h4>
+            <small className="text-[#8392AB]">
+              Fill and submit the form below to create your purchase request.
+            </small>
+            <Form
+              // labelCol={{ span: 8 }}
+              // wrapperCol={{ span: 16 }}
+              // style={{ maxWidth: 600 }}
+              className="md:mr-16 mr-5"
+              // layout="horizontal"
+              form={form}
+              onFinish={save}
+            >
+              <h3 className="my-4 font-bold text-[15px]">Overview</h3>
+              <div className="grid md:grid-cols-3 gap-10">
                 <div>
                   <div className="mb-3">
-                    <label>Budget Line</label>
+                    <label>Due Date</label>
                   </div>
                   <div>
                     <Form.Item
-                      name="budgetLine"
+                      name="dueDate"
                       rules={[
                         {
-                          required: budgeted,
-                          message: "Budget Line is required",
+                          required: true,
+                          message: "Due date is required",
+                        },
+                      ]}
+                    >
+                      <DatePicker
+                        className="w-full h-11"
+                        defaultValue={null}
+                        value={dueDate}
+                        disabledDate={(current) =>
+                          current.isBefore(moment().subtract(1, "d"))
+                        }
+                        onChange={(v, dstr) => setDueDate(dstr)}
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+                <div>
+                  <div className="mb-3">
+                    <label>Approver</label>
+                  </div>
+                  <div>
+                    <Form.Item
+                      name="level1Approver"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Who Approves",
                         },
                       ]}
                     >
                       <Select
-                        // defaultValue={budgetLine}
-                        placeholder="Select service category"
-                        showSearch
+                        // defaultValue={defaultApprover}
+                        placeholder="Select who should approve this request"
                         size="large"
-                        onChange={(value, option) => {
-                          setBudgetLine(value);
+                        showSearch
+                        onChange={(value) => {
+                          setLevel1Approver(value);
                         }}
-                        // filterSort={(optionA, optionB) =>
-                        //   (optionA?.label ?? "")
-                        //     .toLowerCase()
-                        //     .localeCompare(
-                        //       (optionB?.label ?? "").toLowerCase()
-                        //     )
-                        // }
-                        filterOption={(inputValue, option) => {
-                          return option.label
+                        filterOption={(input, option) =>
+                          (option?.label ?? "")
                             .toLowerCase()
-                            .includes(inputValue.toLowerCase());
-                        }}
-                        options={budgetLines.map((s) => {
+                            .includes(input.toLowerCase())
+                        }
+                        options={level1Approvers.map((l) => {
                           return {
-                            label: s.description.toUpperCase(),
-                            options: s.budgetlines.map((sub) => {
-                              return {
-                                label: sub.description,
-                                value: sub._id,
-                                title: sub.description,
-                              };
-                            }),
+                            label: l?.firstName + " " + l?.lastName,
+                            value: l?._id,
                           };
                         })}
                       ></Select>
                     </Form.Item>
                   </div>
                 </div>
-              )}
-            </div>
-            <div className="flex justify-between items-center">
-              <h3 className="my-5 font-bold text-[15px]">Request specifications</h3>
-              {values[0]?.currency && <h4 className="my-5 font-bold text-[14px]">Total: {values[0]?.currency + ' ' + totalAmount.toLocaleString()}</h4>}
-            </div>
-            <ItemsTable
-              setDataSource={setValues}
-              dataSource={values}
-              fileList={fileList}
-              setFileList={_setFileList}
-              files={files}
-              setFiles={_setFiles}
-            />
-          </Form>
-        </div>
-        <div className="flex justify-end gap-5 xl:-mt-7 md:-mt-5 -mt-3">
-          <button className="bg-white rounded-lg px-8 py-3 border border-[#0065DD]">
-            <small className="py-0 text-[15px] text-[#0065DD]">Cancel</small>
-          </button>
-          <button className="bg-[#0065DD] rounded-lg px-8 py-3 border-none cursor-pointer" onClick={async () => {
-              await form.validateFields();
-              if (values && values[0]) {
-                let invalidValues = values?.filter(
-                  (v) =>
-                    v?.title == "" ||
-                    v?.quantity == "" ||
-                    v?.estimatedUnitCost === ""
-                );
-                if (invalidValues?.length == 0) {
-                  setConfirmLoading(true);
-                  handleUpload(files);
+                <div>
+                  <div className="mb-3">
+                    <label>Category</label>
+                  </div>
+                  <div>
+                    <Form.Item
+                      name="serviceCategory"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Service category is required",
+                        },
+                      ]}
+                    >
+                      <Select
+                        // defaultValue={serviceCategory}
+                        placeholder="Select service category"
+                        className="text-[7px]"
+                        size="large"
+                        showSearch
+                        onChange={(value) => {
+                          setServiceCategory(value);
+                        }}
+                        filterSort={(optionA, optionB) =>
+                          (optionA?.label ?? "")
+                            .toLowerCase()
+                            .localeCompare((optionB?.label ?? "").toLowerCase())
+                        }
+                        filterOption={(inputValue, option) =>
+                          option.label
+                            .toLowerCase()
+                            .includes(inputValue.toLowerCase())
+                        }
+                        // defaultValue="RWF"
+                        options={[
+                          ...serviceCategories,
+                          { description: "Others" },
+                        ].map((s) => {
+                          return {
+                            value: s.description,
+                            label: s.description,
+                          };
+                        })}
+                      ></Select>
+                    </Form.Item>
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-10 mb-1">
+                <div>
+                  <div className="mb-3">
+                    <label> Request title</label>
+                  </div>
+                  <div>
+                    <Form.Item
+                      name="title"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Request title is required",
+                        },
+                      ]}
+                    >
+                      <Input
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="How would you name your request?"
+                        className="w-full h-11"
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+                <div className="col-span-2">
+                  <div className="mb-3">
+                    <label>Description</label>
+                  </div>
+                  <div>
+                    <Form.Item
+                      name="description"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Description is required",
+                        },
+                      ]}
+                    >
+                      <Input.TextArea
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="Briefly describe your request"
+                        showCount
+                        maxLength={100}
+                        rows={4}
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-3">
+                <div>
+                  <div className="mb-3">
+                    <label>Is this a budgeted request?</label>
+                  </div>
+                  <div>
+                    <Form.Item
+                      name="budgeted"
+                      valuePropName="checked"
+                      // wrapperCol={{ offset: 8, span: 16 }}
+                    >
+                      <Radio.Group
+                        onChange={(e) => {
+                          setBudgeted(e.target.value);
+                          if (e.target.value === false) setBudgetLine(null);
+                        }}
+                        value={budgeted}
+                      >
+                        <Radio value={true} className="mr-3">
+                          <span className="ml-2 text-[15px]">Yes</span>
+                        </Radio>
+                        <Radio value={false} className="mx-3">
+                          <span className="ml-2 text-[15px]">No</span>
+                        </Radio>
+                      </Radio.Group>
+                    </Form.Item>
+                  </div>
+                </div>
+                {budgeted && (
+                  <div>
+                    <div className="mb-3">
+                      <label>Budget Line</label>
+                    </div>
+                    <div>
+                      <Form.Item
+                        name="budgetLine"
+                        rules={[
+                          {
+                            required: budgeted,
+                            message: "Budget Line is required",
+                          },
+                        ]}
+                      >
+                        <Select
+                          // defaultValue={budgetLine}
+                          placeholder="Select service category"
+                          showSearch
+                          size="large"
+                          onChange={(value, option) => {
+                            setBudgetLine(value);
+                          }}
+                          // filterSort={(optionA, optionB) =>
+                          //   (optionA?.label ?? "")
+                          //     .toLowerCase()
+                          //     .localeCompare(
+                          //       (optionB?.label ?? "").toLowerCase()
+                          //     )
+                          // }
+                          filterOption={(inputValue, option) => {
+                            return option.label
+                              .toLowerCase()
+                              .includes(inputValue.toLowerCase());
+                          }}
+                          options={budgetLines.map((s) => {
+                            return {
+                              label: s.description.toUpperCase(),
+                              options: s.budgetlines.map((sub) => {
+                                return {
+                                  label: sub.description,
+                                  value: sub._id,
+                                  title: sub.description,
+                                };
+                              }),
+                            };
+                          })}
+                        ></Select>
+                      </Form.Item>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="flex justify-between items-center">
+                <h3 className="my-5 font-bold text-[15px]">Request specifications</h3>
+                {values[0]?.currency && <h4 className="my-5 font-bold text-[14px]">Total: {values[0]?.currency + ' ' + totalAmount.toLocaleString()}</h4>}
+              </div>
+              <ItemsTable
+                setDataSource={setValues}
+                dataSource={values}
+                fileList={fileList}
+                setFileList={_setFileList}
+                files={files}
+                setFiles={_setFiles}
+              />
+            </Form>
+          </div>
+          <div className="flex justify-end gap-5 xl:-mt-7 md:-mt-5 -mt-3">
+            <button className="bg-white rounded-lg px-8 py-3 border border-[#0065DD]">
+              <small className="py-0 text-[15px] text-[#0065DD]">Cancel</small>
+            </button>
+            <button className="bg-[#0065DD] rounded-lg px-8 py-3 border-none cursor-pointer" onClick={async () => {
+                await form.validateFields();
+                if (values && values[0]) {
+                  let invalidValues = values?.filter(
+                    (v) =>
+                      v?.title == "" ||
+                      v?.quantity == "" ||
+                      v?.estimatedUnitCost === ""
+                  );
+                  if (invalidValues?.length == 0) {
+                    setConfirmLoading(true);
+                    handleUpload(files);
+                  }
+                } else {
+                  messageApi.error("Please add atleast one item!");
                 }
-              } else {
-                messageApi.error("Please add atleast one item!");
-              }
-            }}>
-            <small className="py-5 text-[15px] text-white">
-              Submit for Approval
-            </small>
-          </button>
+              }}>
+              <small className="py-5 text-[15px] text-white">
+                Submit for Approval
+              </small>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
