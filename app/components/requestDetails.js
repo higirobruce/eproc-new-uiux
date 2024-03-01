@@ -3124,7 +3124,7 @@ const RequestDetails = ({
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col rounded bg-white px-5 shadow">
+        {/* <div className="flex flex-col rounded bg-white px-5 shadow">
           <Typography.Title level={5} className="pb-4">
             Workflow tracker
           </Typography.Title>
@@ -3230,7 +3230,7 @@ const RequestDetails = ({
               },
             ]}
           />
-        </div>
+        </div> */}
         <div className="bg-white rounded px-4 pt-2 shadow">
           <div className="pt-3">
             {/* Sourcing Method */}
@@ -3353,9 +3353,9 @@ const RequestDetails = ({
                           </Form.Item>
                         </div>
                         <div>
-                          <div className="flex flex-row items-center space-x-1">
-                            <div className="flex flex-row space-x-1 items-center">
-                              <Form.Item>
+                          <div className="flex flex-col w-full">
+                            <div className="flex flex-row space-x-1 items-center w-full mt-4">
+                              <Form.Item className="w-full my-2">
                                 <Button
                                   icon={<FileDoneOutlined />}
                                   type="primary"
@@ -3366,15 +3366,15 @@ const RequestDetails = ({
                                     !vendor ||
                                     !attachSelected
                                   }
-                                  className="space-x-0 pt-1 pb-3 gap-2 px-2 mx-1"
+                                  className="space-x-0 pt-1 pb-3 gap-2 px-2 mx-1 w-full"
                                 >
                                   Create Contract
                                 </Button>
                               </Form.Item>
                             </div>
 
-                            <div className="flex flex-row space-x-1 items-center">
-                              <Form.Item>
+                            <div className="flex flex-row space-x-1 items-center w-full mb-3">
+                              <Form.Item className="w-full my-2">
                                 <Button
                                   icon={<FileDoneOutlined />}
                                   type="primary"
@@ -3386,7 +3386,7 @@ const RequestDetails = ({
                                     !vendor ||
                                     !attachSelected
                                   }
-                                  className="space-x-0 pt-1 pb-3 gap-2 px-2 mx-1"
+                                  className="space-x-0 pt-1 pb-3 gap-2 px-2 mx-1 w-full"
                                 >
                                   Create PO
                                 </Button>
