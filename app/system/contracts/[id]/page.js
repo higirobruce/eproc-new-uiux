@@ -20,6 +20,7 @@ import { encode } from "base-64";
 import html2pdf from "html2pdf.js";
 import ReactDOMServer from "react-dom/server";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/app/context/UserContext";
 let modules = {
   toolbar: [
     [{ header: [1, 2, false] }],
@@ -78,7 +79,8 @@ async function getContractDetails(id, router) {
 }
 
 export default function page({ params }) {
-  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+  const { user, login, logout } = useUser();
+  // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
   let token = typeof window !== 'undefined' && localStorage.getItem("token");
   let [contract, setContract] = useState({});
   let router = useRouter();

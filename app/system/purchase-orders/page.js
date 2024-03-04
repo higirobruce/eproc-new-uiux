@@ -46,12 +46,14 @@ import { LuUser, LuHash } from "react-icons/lu";
 import { BiEnvelope } from "react-icons/bi";
 import { IoCheckmarkOutline } from "react-icons/io5";
 import { RiForbidLine } from "react-icons/ri";
+import { useUser } from "@/app/context/UserContext";
 // import MyPdfViewer from "../common/pdfViewer";
 
 export default function PurchaseOrders() {
-  let user = JSON.parse(
-    typeof window !== "undefined" && localStorage.getItem("user")
-  );
+  const { user, login, logout } = useUser();
+  // let user = JSON.parse(
+  //   typeof window !== "undefined" && localStorage.getItem("user")
+  // );
   let token = typeof window !== "undefined" && localStorage.getItem("token");
   let router = useRouter();
   const [dataLoaded, setDataLoaded] = useState(false);

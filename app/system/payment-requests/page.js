@@ -36,6 +36,7 @@ import { encode } from "base-64";
 import { motion } from "framer-motion";
 import PaymentRequestsTable from "@/app/components/paymentRequestsTable";
 import { FiSearch } from "react-icons/fi";
+import { useUser } from "@/app/context/UserContext";
 
 export default function UserRequests() {
   let router = useRouter();
@@ -44,7 +45,8 @@ export default function UserRequests() {
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
-  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+  const { user, login, logout } = useUser();
+  // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
   let [dataset, setDataset] = useState([]);
   let [tempDataset, setTempDataset] = useState([]);
   let [updatingId, setUpdatingId] = useState("");

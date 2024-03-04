@@ -50,6 +50,7 @@ import {
 } from "@heroicons/react/24/outline";
 import UploadPaymentReq from "@/app/components/uploadPaymentReq";
 import UpdatePaymentReqDoc from "@/app/components/updatePaymentReqDoc";
+import { useUser } from "@/app/context/UserContext";
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
@@ -228,7 +229,8 @@ async function getFile(path) {
 }
 
 export default function PaymentRequest({ params }) {
-  let user = JSON.parse(localStorage.getItem("user"));
+  const { user, login, logout } = useUser();
+  // let user = JSON.parse(localStorage.getItem("user"));
   let token = localStorage.getItem("token");
   let [paymentRequest, setPaymentRequest] = useState(null);
   let router = useRouter();

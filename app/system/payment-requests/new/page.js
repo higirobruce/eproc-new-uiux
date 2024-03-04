@@ -17,6 +17,7 @@ import { ArrowLeftOutlined, SaveOutlined } from "@ant-design/icons";
 import UploadPaymentReq from "@/app/components/uploadPaymentReq";
 import { MdAccountBalance } from "react-icons/md";
 import { FaMobileAlt } from "react-icons/fa";
+import { useUser } from "@/app/context/UserContext";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
@@ -45,7 +46,8 @@ async function getApprovers() {
 }
 
 export default function NewPaymentRequest() {
-  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+  const { user, login, logout } = useUser();
+  // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
   let token = typeof window !== 'undefined' && localStorage.getItem("token");
   let [po, setPo] = useState(null);
   let router = useRouter();

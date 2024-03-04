@@ -50,9 +50,11 @@ import {
 } from "@ant-design/icons";
 import moment from "moment";
 import { motion } from "framer-motion";
+import { useUser } from "@/app/context/UserContext";
 
 export default function Vendors() {
-  let user = JSON.parse(localStorage.getItem("user"));
+  const { user, login, logout } = useUser();
+  // let user = JSON.parse(localStorage.getItem("user"));
   let token = localStorage.getItem("token");
   const [passwordForm] = Form.useForm();
   const [dataLoaded, setDataLoaded] = useState(false);

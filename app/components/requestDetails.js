@@ -83,6 +83,7 @@ import { IoMdCheckboxOutline } from "react-icons/io";
 import { MdFileCopy, MdAttachFile } from "react-icons/md";
 import { BiPurchaseTagAlt } from "react-icons/bi";
 import { TbTruckDelivery } from "react-icons/tb";
+import { useUser } from "../context/UserContext";
 
 let modules = {
   toolbar: [
@@ -383,7 +384,8 @@ const RequestDetails = ({
   const [openWithdraw, setOpenWithdraw] = useState(false);
   let [reason, setReason] = useState("");
   const [messageApi, contextHolder] = message.useMessage();
-  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+  const { user, login, logout } = useUser();
+  // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
   let token = typeof window !== 'undefined' && localStorage.getItem("token");
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
@@ -785,7 +787,7 @@ const RequestDetails = ({
   }
 
   function submitTenderData(values) {
-    let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+    // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
     let tData = {
       createdBy: user._id,
       items: data?.items,

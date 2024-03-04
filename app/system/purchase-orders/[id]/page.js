@@ -30,6 +30,7 @@ import html2pdf from "html2pdf.js";
 import ReactDOMServer from "react-dom/server";
 import { useRouter } from "next/navigation";
 import { content } from "@/app/utils/requestContent";
+import { useUser } from "@/app/context/UserContext";
 
 let modules = {
   toolbar: [
@@ -91,7 +92,8 @@ async function getPODetails(id, router) {
 }
 
 export default function page({ params }) {
-  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+  const { user, login, logout } = useUser();
+  // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
   let router = useRouter();
   let [messageApi, contextHolder] = message.useMessage();
   let token = typeof window !== 'undefined' && localStorage.getItem("token");

@@ -34,9 +34,11 @@ import UsersRequestsTable from "../../components/userRequestsTable";
 import { useRouter } from "next/navigation";
 import { encode } from "base-64";
 import { motion } from "framer-motion";
+import { useUser } from "@/app/context/UserContext";
 
 export default function UserRequests() {
   let router = useRouter();
+  const { user, login, logout } = useUser();
   const [serviceCategories, setServiceCategories] = useState([]);
   let [serviceCategory, setServiceCategory] = useState("");
   let [budgetLines, setBudgetLines] = useState([]);
@@ -45,7 +47,7 @@ export default function UserRequests() {
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
-  let user = JSON.parse(localStorage.getItem("user"));
+  // let user = JSON.parse(localStorage.getItem("user"));
   let [dataset, setDataset] = useState([]);
   let [tempDataset, setTempDataset] = useState([]);
   let [updatingId, setUpdatingId] = useState("");
@@ -227,9 +229,7 @@ export default function UserRequests() {
       let filtered = _dataSet.filter((d) => {
         return (
           d?.number.toString().indexOf(searchText) > -1 ||
-          d?.title
-            .toLowerCase()
-            .indexOf(searchText.toLowerCase()) > -1 ||
+          d?.title.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
           d?.createdBy?.firstName
             .toLowerCase()
             .indexOf(searchText.toLowerCase()) > -1 ||
@@ -288,7 +288,6 @@ export default function UserRequests() {
   const save = (_fileList) => {
     if (values && values[0]) {
       setConfirmLoading(true);
-      let user = JSON.parse(localStorage.getItem("user"));
       let _values = [...values];
       _values.map((v, index) => {
         v.paths = _fileList[index];
@@ -668,9 +667,8 @@ export default function UserRequests() {
     request,
     reqAttachmentDocId
   ) {
-
-    console.log(B1Data)
-    return true
+    console.log(B1Data);
+    return true;
     // return fetch(`${url}/purchaseOrders/`, {
     //   method: "POST",
     //   headers: {
@@ -1091,7 +1089,10 @@ export default function UserRequests() {
                               .includes(inputValue.toLowerCase())
                           }
                           // defaultValue="RWF"
-                          options={[...serviceCategories, {description: 'Others'}].map((s) => {
+                          options={[
+                            ...serviceCategories,
+                            { description: "Others" },
+                          ].map((s) => {
                             return {
                               value: s.description,
                               label: s.description,

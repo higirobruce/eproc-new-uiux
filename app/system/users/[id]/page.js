@@ -33,6 +33,7 @@ import { motion } from "framer-motion";
 import { LuUser } from "react-icons/lu";
 import { PiBagSimpleBold } from "react-icons/pi";
 import { MdOutlineAlternateEmail, MdPhoneAndroid } from "react-icons/md";
+import { useUser } from "@/app/context/UserContext";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
@@ -62,7 +63,8 @@ async function getUserDetails(id, router) {
 }
 
 export default function page({ params }) {
-  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+  const { user, login, logout } = useUser();
+  // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
   let token = typeof window !== 'undefined' && localStorage.getItem('token');
   let router = useRouter();
   const [dataLoaded, setDataLoaded] = useState(false);

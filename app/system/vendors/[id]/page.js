@@ -56,6 +56,7 @@ import {
   MdHomeWork,
 } from "react-icons/md";
 import { FaFirefoxBrowser } from "react-icons/fa6";
+import { useUser } from "@/app/context/UserContext";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
@@ -87,7 +88,8 @@ async function getVendorDetails(id, router) {
 }
 
 export default function page({ params }) {
-  let user = JSON.parse(typeof window !== "undefined" && localStorage.getItem("user"));
+  const { user, login, logout } = useUser();
+  // let user = JSON.parse(typeof window !== "undefined" && localStorage.getItem("user"));
   let token = typeof window !== "undefined" && localStorage.getItem("token");
   let router = useRouter();
   const [passwordForm] = Form.useForm();

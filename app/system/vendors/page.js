@@ -51,9 +51,11 @@ import {
 import moment from "moment";
 import { motion } from "framer-motion";
 import { FiSearch } from 'react-icons/fi'
+import { useUser } from "@/app/context/UserContext";
 
 export default function Vendors() {
-  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+  const { user, login, logout } = useUser();
+  // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
   let token = typeof window !== 'undefined' && localStorage.getItem("token");
   const [passwordForm] = Form.useForm();
   const [dataLoaded, setDataLoaded] = useState(false);

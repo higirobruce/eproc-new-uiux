@@ -20,6 +20,8 @@ import {
 } from "antd";
 import Image from "next/image";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
+import * as jose from "jose";
+import { useUser } from "../context/UserContext";
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -58,7 +60,11 @@ const residences = [
   },
 ];
 
+let SALT =
+  process.env.NEXT_PUBLIC_TOKEN_SALT || "968d8b95-72cd-4470-b13e-1017138d32cf";
+
 const LoginForm = ({ goTo }) => {
+  const { user, login, logout } = useUser();
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
@@ -89,22 +95,27 @@ const LoginForm = ({ goTo }) => {
       }),
     })
       .then((res) => res.json())
-      .then((res) => {
-        if (res.allowed) {
-          if (res.user.status === "approved") {
+      .then(async (res) => {
+        const secret = new TextEncoder().encode(SALT);
+        const jwt = res.token;
+        const { payload, protectedHeader } = await jose.jwtVerify(jwt, secret);
+
+        if (payload.allowed) {
+          if (payload.userObj.status === "approved") {
             messageApi.open({
               type: "success",
               content: "Success!!",
             });
-            localStorage.setItem("user", JSON.stringify(res.user));
+            login(payload.userObj);
+            // localStorage.setItem("user", JSON.stringify(payload.userObj));
             localStorage.setItem("token", res?.token);
             goTo
               ? router.push(`${goTo}`)
               : router.push(
                   `${
-                    res.user?.userType === "VENDOR"
+                    payload.userObj?.userType === "VENDOR"
                       ? "/system/tenders"
-                      : "/system/requests"
+                      : "/system/dashboard"
                   }`
                 );
             setSubmitting(false);
@@ -184,9 +195,9 @@ const LoginForm = ({ goTo }) => {
   const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
   useEffect(() => {
-    let sessionExpired = searchParams.get('sessionExpired')
-    if(sessionExpired==true || sessionExpired==='true'){
-      messageApi.info('Session has expired! Please login again!')
+    let sessionExpired = searchParams.get("sessionExpired");
+    if (sessionExpired == true || sessionExpired === "true") {
+      messageApi.info("Session has expired! Please login again!");
     }
     setLoaded(true);
   }, []);
@@ -300,7 +311,10 @@ const LoginForm = ({ goTo }) => {
                     ]}
                     hasFeedback
                   >
-                    <Input.Password placeholder="* * * * * * * *" className="h-11 my-3" />
+                    <Input.Password
+                      placeholder="* * * * * * * *"
+                      className="h-11 my-3"
+                    />
                   </Form.Item>
                 </div>
 
@@ -315,17 +329,22 @@ const LoginForm = ({ goTo }) => {
                       >
                         Forgot Password?
                       </Button>
-                      <Button htmlType="submit" className="bg-[#0065DD] pt-1 px-10 text-white h-10 font-semibold">
+                      <Button
+                        htmlType="submit"
+                        className="bg-[#0065DD] pt-1 px-10 text-white h-10 font-semibold"
+                      >
                         Log in
                       </Button>
-
                     </div>
                   )}
                 </Form.Item>
               </Form>
 
               <div className="flex flex-row space-x-2 self-center mt-10">
-                <Typography.Link className="underline" onClick={() => router.push("/auth/signup")}>
+                <Typography.Link
+                  className="underline"
+                  onClick={() => router.push("/auth/signup")}
+                >
                   Join as new user ?
                 </Typography.Link>
               </div>
