@@ -1206,7 +1206,7 @@ export default function page() {
       .then((res) => res.json())
       .then((res) => {
         res.avgRate = user.avgRate;
-        localStorage.setItem("user", JSON.stringify(res));
+        login(res);
         login(res);
         setRowData(res);
         // refresh();
@@ -1235,7 +1235,7 @@ export default function page() {
       .then((res) => res.json())
       .then((res) => {
         res.avgRate = user.avgRate;
-        localStorage.setItem("user", JSON.stringify(res));
+        login(res);
         login(res);
         setRowData(res);
         // refresh();

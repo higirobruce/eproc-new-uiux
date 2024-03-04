@@ -174,7 +174,7 @@ const LoginForm = ({ goTo }) => {
           type: "success",
           content: "Success!!",
         });
-        localStorage.setItem("user", JSON.stringify(res));
+        login(res)
         setSubmitting(false);
         setForgotPassword(false);
       })
