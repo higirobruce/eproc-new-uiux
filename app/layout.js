@@ -37,9 +37,11 @@ const myFont = localFont({
 });
 
 export const metadata = {
-  title: "Irembo Eprocurement",
-  description: "Solution to the procurement process automation.",
-};
+
+  title: 'Irembo Eprocurement',
+  description: 'Solution to the procurement process automation.',
+  image: '/favicon.ico'
+}
 
 export default function RootLayout({ children }) {
   return (

@@ -90,6 +90,7 @@ async function getVendorDetails(id, router) {
 export default function page({ params }) {
   const { user, login, logout } = useUser();
   // let user = JSON.parse(typeof window !== "undefined" && localStorage.getItem("user"));
+
   let token = typeof window !== "undefined" && localStorage.getItem("token");
   let router = useRouter();
   const [passwordForm] = Form.useForm();
@@ -430,7 +431,7 @@ export default function page({ params }) {
   console.log("Row Data ", rowData);
 
   return (
-    <div className="payment-request flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-screen pb-1 mb-32 overflow-y-auto">
+    <div className="payment-request flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-[calc(100vh-40px)] pb-1 overflow-y-auto">
       {contextHolder}
       <div className="grid md:grid-cols-3 gap-5 mb-16">
         <div className="flex flex-col space-y-5">
@@ -472,6 +473,74 @@ export default function page({ params }) {
                 </h6>
               </div>
             </div>
+          </div>
+          <div>
+            {updatingId !== rowData?._id && (
+              <div className="flex gap-x-3 px-1">
+                {rowData?.status === "pending-approval" && (
+                  <span>
+                    <Popconfirm
+                      title="Approve vendor"
+                      description="Are you sure?"
+                      okText="Yes"
+                      cancelText="No"
+                      onConfirm={() => approveUser(rowData?._id)}
+                    >
+                      <div className="flex flex-row items-center justify-center text-sm shadow rounded px-7 py-2 cursor-pointer bg-[#28C762] text-white">
+                        Approve
+                      </div>
+                    </Popconfirm>
+                  </span>
+                )}
+
+                {rowData?.status === "rejected" && (
+                  <span>
+                    <Popconfirm
+                      title="Approve vendor"
+                      description="Are you sure to activate this vendor?"
+                      okText="Yes"
+                      cancelText="No"
+                      onConfirm={() => approveUser(rowData?._id)}
+                    >
+                      <div className="flex flex-row items-center justify-center text-sm shadow rounded px-7 py-2 cursor-pointer bg-[#28C762] text-white">
+                        Approve
+                      </div>
+                    </Popconfirm>
+                  </span>
+                )}
+
+                {rowData?.status === "approved" && (
+                  <span>
+                    <Popconfirm
+                      title="Reject vendor"
+                      description="Are you sure?"
+                      okText="Yes"
+                      cancelText="No"
+                      onConfirm={() => declineUser(rowData?._id)}
+                    >
+                      <div className="flex flex-row items-center justify-center text-sm px-7 py-2 rounded cursor-pointer bg-[#EF4444] text-white">
+                        Reject
+                      </div>
+                    </Popconfirm>
+                  </span>
+                )}
+                {rowData?.status === "banned" && (
+                  <span>
+                    <Popconfirm
+                      title="Acivate vendor"
+                      description="Are you sure?"
+                      okText="Yes"
+                      cancelText="No"
+                      onConfirm={() => activateVendor(rowData?._id)}
+                    >
+                      <div className="flex flex-row items-center justify-center text-sm ring-1 ring-green-400 rounded px-2 py-1 cursor-pointer bg-green-200">
+                        Activate
+                      </div>
+                    </Popconfirm>
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         </div>
         <div className="col-span-2 flex flex-col space-y-3 pr-5">
@@ -922,7 +991,9 @@ export default function page({ params }) {
                       setEditVendor(false);
                       updateVendor();
                     }}
-                  >Update Vendor</Button>
+                  >
+                    Update Vendor
+                  </Button>
                 </div>
               </div>
             </>
@@ -930,8 +1001,21 @@ export default function page({ params }) {
             <></>
           ) : (
             <div className="bg-white rounded-lg pb-4 px-8">
-              <h5 className="text-[#263238] text-[18px]">Password Change</h5>
-              <div>
+              <div className="flex items-center justify-between">
+                <h5 className="text-[#263238] text-[18px]">Password Change</h5>
+                <Button
+                  icon={<SaveOutlined />}
+                  danger
+                  type="primary"
+                  size="large"
+                  onClick={() => {
+                    updatePassword();
+                  }}
+                >
+                  Update Vendor Password
+                </Button>
+              </div>
+              {/* <div>
                 <div className="pb-3 text-[13px] text-[#344767]">
                   Current Password
                 </div>
@@ -962,7 +1046,7 @@ export default function page({ params }) {
                     />
                   </Form.Item>
                 </div>
-              </div>
+              </div> */}
             </div>
           )}
         </div>
