@@ -48,10 +48,7 @@ import UploadRDCerts from "@/app/components/uploadRDBCerts";
 import UploadVatCerts from "@/app/components/uploadVatCerts";
 import { v4 } from "uuid";
 import { LuUser } from "react-icons/lu";
-import {
-  MdOutlineAlternateEmail,
-  MdPhoneAndroid
-} from "react-icons/md";
+import { MdOutlineAlternateEmail, MdPhoneAndroid } from "react-icons/md";
 import { useUser } from "@/app/context/UserContext";
 
 export default function page() {
@@ -64,7 +61,7 @@ export default function page() {
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
   // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   let [dataset, setDataset] = useState([]);
   let [updatingId, setUpdatingId] = useState("");
   let [row, setRow] = useState(null);
@@ -160,48 +157,50 @@ export default function page() {
     return (
       <div className="request mr-6 bg-white rounded-lg h-[calc(100vh-160px)] mb-10 px-5 pb-2 overflow-y-auto">
         {contextHolder}
-          <div className="grid md:grid-cols-3 gap-5 mb-16">
-            <div className="flex flex-col space-y-5">
-              <div className="bg-white rounded-lg shadow px-5 pb-7">
-                <h5 className="text-[17px] text-[#263238]">General Information</h5>
-                <div className="flex flex-col gap-y-4">
-                  <small className="text-[13px] text-[#ADB6BF]">ABOUT</small>
-                  <div className="flex items-center gap-x-5 my-2">
-                    <LuUser className="text-[#ADB6BF]" />
-                    <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
-                      {user?.firstName} {user?.lastName}
-                    </h6>
-                    <Tag color="cyan">
-                      {user?.title ? user?.title : user?.number}
-                    </Tag>
-                  </div>
-                  <div className="flex items-center gap-x-5 my-2">
-                    <MdOutlineAlternateEmail className="text-[#ADB6BF]" />
-                    <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
-                      {user?.email}
-                    </h6>
-                  </div>
-                  <div className="flex items-center gap-x-5 my-2">
-                    <MdPhoneAndroid className="text-[#ADB6BF]" />
-                    <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
-                      {user?.telephone}
-                    </h6>
-                  </div>
-                  <div className="flex items-center gap-x-5 my-2">
-                    <MdOutlineAlternateEmail className="text-[#ADB6BF]" />
-                    <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
-                      {user?.department?.description}
-                    </h6>
-                  </div>
+        <div className="grid md:grid-cols-3 gap-5 mb-16">
+          <div className="flex flex-col space-y-5">
+            <div className="bg-white rounded-lg shadow px-5 pb-7">
+              <h5 className="text-[17px] text-[#263238]">
+                General Information
+              </h5>
+              <div className="flex flex-col gap-y-4">
+                <small className="text-[13px] text-[#ADB6BF]">ABOUT</small>
+                <div className="flex items-center gap-x-5 my-2">
+                  <LuUser className="text-[#ADB6BF]" />
+                  <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
+                    {user?.firstName} {user?.lastName}
+                  </h6>
+                  <Tag color="cyan">
+                    {user?.title ? user?.title : user?.number}
+                  </Tag>
+                </div>
+                <div className="flex items-center gap-x-5 my-2">
+                  <MdOutlineAlternateEmail className="text-[#ADB6BF]" />
+                  <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
+                    {user?.email}
+                  </h6>
+                </div>
+                <div className="flex items-center gap-x-5 my-2">
+                  <MdPhoneAndroid className="text-[#ADB6BF]" />
+                  <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
+                    {user?.telephone}
+                  </h6>
+                </div>
+                <div className="flex items-center gap-x-5 my-2">
+                  <MdOutlineAlternateEmail className="text-[#ADB6BF]" />
+                  <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
+                    {user?.department?.description}
+                  </h6>
                 </div>
               </div>
             </div>
-            {/* Data */}
-            
-            {/* Transactions */}
-            {user?.userType !== "VENDOR" && (
-              <div className="col-span-2 flex flex-col space-y-5 px-5">
-                <div className="bg-white py-3 px-3 rounded my-1">
+          </div>
+          {/* Data */}
+
+          {/* Transactions */}
+          {user?.userType !== "VENDOR" && (
+            <div className="col-span-2 flex flex-col space-y-5 px-5">
+              <div className="bg-white py-3 px-3 rounded my-1">
                 <div className="flex items-center gap-x-14 px-7 bg-[#F5F5F5]">
                   <button
                     className={`bg-transparent py-3 my-3 ${
@@ -262,9 +261,7 @@ export default function page() {
                     canCreateBids={user?.permissions?.canCreateBids}
                     canEditBids={user?.permissions?.canEditBids}
                     canViewBids={user?.permissions?.canViewBids}
-                    canApproveContracts={
-                      user?.permissions?.canApproveContracts
-                    }
+                    canApproveContracts={user?.permissions?.canApproveContracts}
                     canCreateContracts={user?.permissions?.canCreateContracts}
                     canEditContracts={user?.permissions?.canEditContracts}
                     canViewContracts={user?.permissions?.canViewContracts}
@@ -288,9 +285,7 @@ export default function page() {
                     canCreateUsers={user?.permissions?.canCreateUsers}
                     canEditUsers={user?.permissions?.canEditUsers}
                     canViewUsers={user?.permissions?.canViewUsers}
-                    canApproveDashboard={
-                      user?.permissions?.canApproveDashboard
-                    }
+                    canApproveDashboard={user?.permissions?.canApproveDashboard}
                     canCreateDashboard={user?.permissions?.canCreateDashboard}
                     canEditDashboard={user?.permissions?.canEditDashboard}
                     canViewDashboard={user?.permissions?.canViewDashboard}
@@ -304,167 +299,188 @@ export default function page() {
               ) : (
                 <>
                   <div className="flex flex-col space-y-5">
-
-                  {/* Reset password */}
-                  <div className="bg-white ring-1 ring-gray-100 rounded shadow px-5 pt-5">
-                    <div className="text-xl font-semibold mb-5 flex flex-row justify-between items-center">
-                      <div className="pb-3 text-[13px] text-[#344767]">Reset password</div>
-                    </div>
-                    <Form
-                      // {...formItemLayout}
-                      form={form}
-                      name="register"
-                      onFinish={onFinish}
-                      scrollToFirstError
-                      style={{ width: "100%" }}
-                    >
-                      <div>
-                        <div className="text-[13px] text-[#344767]">Current password</div>
-                        <Form.Item
-                          name="currentPassword"
-                          // label="Password"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please input your current password!",
-                            },
-                          ]}
-                          hasFeedback
-                        >
-                          <Input.Password placeholder="Current Password" className="h-11 mt-3" />
-                        </Form.Item>
+                    {/* Reset password */}
+                    <div className="bg-white ring-1 ring-gray-100 rounded shadow px-5 pt-5">
+                      <div className="text-xl font-semibold mb-5 flex flex-row justify-between items-center">
+                        <div className="pb-3 text-[13px] text-[#344767]">
+                          Reset password
+                        </div>
                       </div>
-
-                      <div>
-                        <div className="text-[13px] text-[#344767]">New password</div>
-                        <Form.Item
-                          name="newPassword"
-                          // label="Password"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please input your new password!",
-                            },
-                            {
-                              pattern: new RegExp("([0-9]\\d*)+"),
-                              message: "Please input at least one digit",
-                            },
-                            {
-                              pattern: new RegExp("([a-zA-Z]\\s*)+"),
-                              message:
-                                "Password should have both small and capital letters",
-                            },
-                            {
-                              pattern: new RegExp(regexPatternSpecialCh, "g"),
-                              message: "Password should have a special character",
-                            },
-                            {
-                              pattern: new RegExp("(.{8,})"),
-                              message: "Password should have atleast 8 characters",
-                            },
-                          ]}
-                          hasFeedback
-                        >
-                          <Input.Password placeholder="Your New Password" className="h-11 mt-3" />
-                        </Form.Item>
-                      </div>
-
-                      <div>
-                        <div className="text-[13px] text-[#344767]">Confirm new password</div>
-                        <Form.Item
-                          name="confirmPassword"
-                          // label="Password"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please confirm your password!",
-                            },
-                            ({ getFieldValue }) => ({
-                              validator(_, value) {
-                                if (
-                                  !value ||
-                                  getFieldValue("newPassword") === value
-                                ) {
-                                  return Promise.resolve();
-                                }
-                                return Promise.reject(
-                                  new Error(
-                                    "The two passwords that you entered do not match!"
-                                  )
-                                );
-                              },
-                            }),
-                          ]}
-                          hasFeedback
-                        >
-                          <Input.Password placeholder="Your Confirm Password" className="h-11 mt-3" />
-                        </Form.Item>
-                      </div>
-
-                      <Form.Item className="m-0">
-                        {submitting ? (
-                          <Spin indicator={antIcon} />
-                        ) : (
-                          <div className="flex flex-row items-center justify-between mt-3">
-                            <Button type="primary" size="large" danger htmlType="submit">
-                              Update my password
-                            </Button>
+                      <Form
+                        // {...formItemLayout}
+                        form={form}
+                        name="register"
+                        onFinish={onFinish}
+                        scrollToFirstError
+                        style={{ width: "100%" }}
+                      >
+                        <div>
+                          <div className="text-[13px] text-[#344767]">
+                            Current password
                           </div>
-                        )}
-                      </Form.Item>
-                    </Form>
+                          <Form.Item
+                            name="currentPassword"
+                            // label="Password"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Please input your current password!",
+                              },
+                            ]}
+                            hasFeedback
+                          >
+                            <Input.Password
+                              placeholder="Current Password"
+                              className="h-11 mt-3"
+                            />
+                          </Form.Item>
+                        </div>
+
+                        <div>
+                          <div className="text-[13px] text-[#344767]">
+                            New password
+                          </div>
+                          <Form.Item
+                            name="newPassword"
+                            // label="Password"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Please input your new password!",
+                              },
+                              {
+                                pattern: new RegExp("([0-9]\\d*)+"),
+                                message: "Please input at least one digit",
+                              },
+                              {
+                                pattern: new RegExp("([a-zA-Z]\\s*)+"),
+                                message:
+                                  "Password should have both small and capital letters",
+                              },
+                              {
+                                pattern: new RegExp(regexPatternSpecialCh, "g"),
+                                message:
+                                  "Password should have a special character",
+                              },
+                              {
+                                pattern: new RegExp("(.{8,})"),
+                                message:
+                                  "Password should have atleast 8 characters",
+                              },
+                            ]}
+                            hasFeedback
+                          >
+                            <Input.Password
+                              placeholder="Your New Password"
+                              className="h-11 mt-3"
+                            />
+                          </Form.Item>
+                        </div>
+
+                        <div>
+                          <div className="text-[13px] text-[#344767]">
+                            Confirm new password
+                          </div>
+                          <Form.Item
+                            name="confirmPassword"
+                            // label="Password"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Please confirm your password!",
+                              },
+                              ({ getFieldValue }) => ({
+                                validator(_, value) {
+                                  if (
+                                    !value ||
+                                    getFieldValue("newPassword") === value
+                                  ) {
+                                    return Promise.resolve();
+                                  }
+                                  return Promise.reject(
+                                    new Error(
+                                      "The two passwords that you entered do not match!"
+                                    )
+                                  );
+                                },
+                              }),
+                            ]}
+                            hasFeedback
+                          >
+                            <Input.Password
+                              placeholder="Your Confirm Password"
+                              className="h-11 mt-3"
+                            />
+                          </Form.Item>
+                        </div>
+
+                        <Form.Item className="m-0">
+                          {submitting ? (
+                            <Spin indicator={antIcon} />
+                          ) : (
+                            <div className="flex flex-row items-center justify-between mt-3">
+                              <Button
+                                type="primary"
+                                size="large"
+                                danger
+                                htmlType="submit"
+                              >
+                                Update my password
+                              </Button>
+                            </div>
+                          )}
+                        </Form.Item>
+                      </Form>
+                    </div>
                   </div>
-                </div>
                 </>
               )}
 
-                {segment === "Requests History" && (
-                  <div className="p-3">
-                    {usersRequests?.map((request) => {
-                      return (
-                        <div
-                          key={request?._id}
-                          className="grid grid-cols-4 ring-1 ring-gray-200 rounded my-3 p-3 text-gray-700"
-                        >
-                          <div>
-                            <div className="flex-row  flex items-center">
-                              <div>
-                                <FileTextOutlined className="h-4 w-4" />
-                              </div>{" "}
-                              <div>{request?.number}</div>
-                            </div>
-                            <div>{request?.title}</div>
-                            <div>{request?.description}</div>
-                          </div>
-                          <div>
-                            <div className="text-gray-500">Status</div>
+              {segment === "Requests History" && (
+                <div className="p-3">
+                  {usersRequests?.map((request) => {
+                    return (
+                      <div
+                        key={request?._id}
+                        className="grid grid-cols-4 ring-1 ring-gray-200 rounded my-3 p-3 text-gray-700"
+                      >
+                        <div>
+                          <div className="flex-row  flex items-center">
                             <div>
-                              <Tag color="gold">{request.status}</Tag>
-                            </div>
+                              <FileTextOutlined className="h-4 w-4" />
+                            </div>{" "}
+                            <div>{request?.number}</div>
                           </div>
-                          <div>{`Due ${moment(
-                            request?.dueDate
-                          ).fromNow()}`}</div>
-                          <div>
-                            {request?.budgeted ? (
-                              <div>
-                                <Tag color="green">BUDGETED</Tag>
-                              </div>
-                            ) : (
-                              <div>
-                                <Tag color="magenta">NOT BUDGETED</Tag>
-                              </div>
-                            )}
-                          </div>
-                          <div></div>
+                          <div>{request?.title}</div>
+                          <div>{request?.description}</div>
                         </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+                        <div>
+                          <div className="text-gray-500">Status</div>
+                          <div>
+                            <Tag color="gold">{request.status}</Tag>
+                          </div>
+                        </div>
+                        <div>{`Due ${moment(request?.dueDate).fromNow()}`}</div>
+                        <div>
+                          {request?.budgeted ? (
+                            <div>
+                              <Tag color="green">BUDGETED</Tag>
+                            </div>
+                          ) : (
+                            <div>
+                              <Tag color="magenta">NOT BUDGETED</Tag>
+                            </div>
+                          )}
+                        </div>
+                        <div></div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     );
   }
@@ -1191,7 +1207,7 @@ export default function page() {
       .then((res) => {
         res.avgRate = user.avgRate;
         localStorage.setItem("user", JSON.stringify(res));
-        user = res;
+        login(res);
         setRowData(res);
         // refresh();
       })
@@ -1220,7 +1236,7 @@ export default function page() {
       .then((res) => {
         res.avgRate = user.avgRate;
         localStorage.setItem("user", JSON.stringify(res));
-        user = res;
+        login(res);
         setRowData(res);
         // refresh();
       })
@@ -1232,5 +1248,9 @@ export default function page() {
       });
   }
 
-  return <div className="payment-request mr-6 rounded-lg h-[calc(100vh-115px)] pb-10 px-5 overflow-y-auto">{user?.userType === "VENDOR" ? buildVendor() : buildUser()}</div>;
+  return (
+    <div className="payment-request mr-6 rounded-lg h-[calc(100vh-115px)] pb-10 px-5 overflow-y-auto">
+      {user?.userType === "VENDOR" ? buildVendor() : buildUser()}
+    </div>
+  );
 }
