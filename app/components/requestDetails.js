@@ -374,6 +374,7 @@ const RequestDetails = ({
   handleUpload,
 }) => {
   const [form] = Form.useForm();
+  let [confirmLoading, setConfirmLoading] = useState(false);
   const [size, setSize] = useState("small");
   const [currentCode, setCurrentCode] = useState(-1);
   let [deadLine, setDeadLine] = useState(null);
@@ -381,6 +382,7 @@ const RequestDetails = ({
   const [openConfirmDeliv, setOpenConfirmDeliv] = useState([]);
   const [openApprove, setOpenApprove] = useState(false);
   const [openWithdraw, setOpenWithdraw] = useState(false);
+  const [openUpdate, setOpenUpdate] = useState(false);
   let [reason, setReason] = useState("");
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -1414,6 +1416,10 @@ const RequestDetails = ({
   ) {
     // let [op, setOp] = useState(false);
     let _deliverdQty = po?.items[index]?.deliveredQty || 0;
+    const disable = (po?.status !== "started" ||
+    deliveredQties[index] > qty ||
+    (data?.createdBy?._id !== user?._id &&
+      !user?.permissions.canApproveAsPM))
     return (
       <div>
         {
@@ -1489,19 +1495,14 @@ const RequestDetails = ({
                   >
                     <Button
                       size="middle"
-                      className="border-none bg-[#00CE82] text-[#FFF] rounded-lg"
+                      className={`border-none ${disable ? `bg-[#9a9b9b]` : `bg-[#00CE82]`} text-[#FFF] rounded-lg`}
                       icon={<CheckOutlined />}
                       onClick={() => {
                         let _openConfirmDeliv = [...openConfirmDeliv];
                         _openConfirmDeliv[index] = true;
                         setOpenConfirmDeliv(_openConfirmDeliv);
                       }}
-                      disabled={
-                        po?.status !== "started" ||
-                        deliveredQties[index] > qty ||
-                        (data?.createdBy?._id !== user?._id &&
-                          !user?.permissions.canApproveAsPM)
-                      }
+                      disabled={disable}
                     >
                       Confirm
                     </Button>
@@ -2575,7 +2576,7 @@ const RequestDetails = ({
       <div className="md:col-span-4">
         <div className="flex flex-col ring-1 ring-gray-200 pl-5 pr-8 rounded-lg bg-white mb-4 border-0">
           {data && (
-            <div>
+            <Form form={form}>
               <div className="flex items-center justify-between ml-3 mb-2">
                 <h4>Request Details</h4>
                 <Tag
@@ -2602,9 +2603,15 @@ const RequestDetails = ({
                     <label className="text-[#6A757B]">Request Title</label>
                     <div className="text-red-500">*</div>
                   </div>
-                  <Form.Item name="requestTitle">
+                  <Form.Item name="title"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Request Title is required",
+                    },
+                  ]}>
                     <Input
-                      defaultValue={data.title}
+                      // defaultValue={data.title}
                       value={data.title}
                       onChange={({ target }) => {
                         let r = { ...data };
@@ -2650,29 +2657,40 @@ const RequestDetails = ({
               </div>
               <div className="grid lg:grid-cols-3 gap-5 ml-3">
                 <div>
+
                   <label className="text-[#6A757B]">Service category:</label>
-                  <Select
-                    // mode="multiple"
-                    // allowClear
-                    className="mt-3 w-full"
-                    size="large"
-                    defaultValue={data?.serviceCategory}
-                    placeholder="Please select"
-                    onChange={(value) => {
-                      let r = { ...data };
-                      r.serviceCategory = value;
-                      handleUpdateRequest(r);
-                    }}
-                    disabled={disable}
+                  <Form.Item
+                    name="ServiceCategory"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Service Category is required",
+                      },
+                    ]}
                   >
-                    {servCategories?.map((s) => {
-                      return (
-                        <Select.Option key={s._id} value={s.description}>
-                          {s.description}
-                        </Select.Option>
-                      );
-                    })}
-                  </Select>
+                    <Select
+                      // mode="multiple"
+                      // allowClear
+                      className="mt-3 w-full"
+                      size="large"
+                      value={data?.serviceCategory}
+                      placeholder="Please select"
+                      onChange={(value) => {
+                        let r = { ...data };
+                        r.serviceCategory = value;
+                        handleUpdateRequest(r);
+                      }}
+                      disabled={disable}
+                    >
+                      {servCategories?.map((s) => {
+                        return (
+                          <Select.Option key={s._id} value={s.description}>
+                            {s.description}
+                          </Select.Option>
+                        );
+                      })}
+                    </Select>
+                  </Form.Item>
                 </div>
                 <div className="flex flex-col col-span-2">
                   <label className="text-[#6A757B]">Description:</label>
@@ -2686,7 +2704,7 @@ const RequestDetails = ({
                     ]}
                   >
                     <Input.TextArea
-                      defaultValue={data.description}
+                      value={data.description}
                       className={`w-full mt-3 text-red-500`}
                       onChange={({ target }) => {
                         let r = { ...data };
@@ -2734,7 +2752,6 @@ const RequestDetails = ({
                 {data.budgeted && (
                   <div>
                     <label className="text-[#6A757B]">Budgeted Line:</label>
-                    {console.log("Data ", data)}
                     <div className="text-xs text-gray-400">
                       <Select
                         // defaultValue={budgetLine}
@@ -2742,7 +2759,7 @@ const RequestDetails = ({
                         size="large"
                         placeholder="Select service category"
                         showSearch
-                        defaultValue={data?.budgetLine?._id}
+                        value={data?.budgetLine?._id}
                         disabled={disable}
                         onChange={(value, option) => {
                           let r = { ...data };
@@ -2790,11 +2807,11 @@ const RequestDetails = ({
                   >
                     <DatePicker
                       className="mt-3 h-11 w-full"
-                      defaultValue={dayjs(data?.dueDate)}
+                      // defaultValue={dayjs(data?.dueDate)}
                       disabledDate={(current) =>
                         current.isBefore(dayjs().subtract(1, "day"))
                       }
-                      // value={moment(data?.dueDate)}
+                      value={dayjs(data?.dueDate)}
                       onChange={(v, dstr) => {
                         let _d = data;
                         _d.dueDate = dstr;
@@ -2847,17 +2864,46 @@ const RequestDetails = ({
                       Withdraw request
                     </Button>
                   </Popconfirm>
-                  <button
-                    className="bg-[#0065DD] rounded-lg px-5 py-2 border-none cursor-pointer"
-                    onClick={handleUpload}
+                  <Popconfirm
+                    title="Are you sure?"
+                    open={openUpdate}
+                    icon={<QuestionCircleOutlined style={{ color: "red" }} />}
+                    onConfirm={() => {
+                      handleUpload()
+                    }}
+                    // okButtonProps={{
+                    //   loading: confirmRejectLoading,
+                    // }}
+                    onCancel={() => setOpenUpdate(false)}
                   >
-                    <small className="py-5 text-[15px] text-white">
-                      Update
-                    </small>
-                  </button>
+                    <button
+                      className="bg-[#0065DD] rounded-lg px-5 py-2 border-none cursor-pointer"
+                      onClick={async () => {
+                        await form.validateFields();
+                        if (values && values[0]) {
+                          let invalidValues = values?.filter(
+                            (v) =>
+                              v?.title == "" ||
+                              v?.quantity == "" ||
+                              v?.estimatedUnitCost === ""
+                          );
+                          if (invalidValues?.length == 0) {
+                            setConfirmLoading(true);
+                            setOpenUpdate(true)
+                          }
+                        } else {
+                          messageApi.error("Please add atleast one item!");
+                        }
+                      }}
+                    >
+                      <small className="py-5 text-[15px] text-white">
+                        Update
+                      </small>
+                    </button>
+                  </Popconfirm>
                 </div>
               )}
-            </div>
+            </Form>
           )}
           {createPOMOdal()}
           {previewAttachmentModal()}
@@ -3126,7 +3172,7 @@ const RequestDetails = ({
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        {/* <div className="flex flex-col rounded bg-white px-5 shadow">
+        <div className="flex flex-col rounded bg-white px-5 shadow">
           <Typography.Title level={5} className="pb-4">
             Workflow tracker
           </Typography.Title>
@@ -3140,7 +3186,7 @@ const RequestDetails = ({
                       Purchase Requisition
                     </h6>
                     <small className="text-[#A3AEB4]">
-                      You can perfom sourcing action here.
+                      Initiate your purchase request
                     </small>
                   </div>
                 ),
@@ -3156,7 +3202,7 @@ const RequestDetails = ({
                       Request Approval
                     </h6>
                     <small className="text-[#A3AEB4]">
-                      You can perfom sourcing action here.
+                      Review the submitted request
                     </small>
                   </div>
                 ),
@@ -3179,7 +3225,7 @@ const RequestDetails = ({
                       Tendering
                     </h6>
                     <small className="text-[#A3AEB4]">
-                      You can perfom sourcing action here.
+                      Find qualified vendors
                     </small>
                   </div>
                 ),
@@ -3194,7 +3240,7 @@ const RequestDetails = ({
                       Contracting
                     </h6>
                     <small className="text-[#A3AEB4]">
-                      You can perfom sourcing action here.
+                      Choose the best vendor for your needs
                     </small>
                   </div>
                 ),
@@ -3207,7 +3253,7 @@ const RequestDetails = ({
                       Purchase Order
                     </h6>
                     <small className="text-[#A3AEB4]">
-                      You can perfom sourcing action here.
+                      Order the needed items
                     </small>
                   </div>
                 ),
@@ -3221,7 +3267,7 @@ const RequestDetails = ({
                       Delivery
                     </h6>
                     <small className="text-[#A3AEB4]">
-                      You can perfom sourcing action here.
+                      Track the delivery of your items
                     </small>
                   </div>
                 ),
@@ -3232,7 +3278,7 @@ const RequestDetails = ({
               },
             ]}
           />
-        </div> */}
+        </div>
         <div className="bg-white rounded px-4 pt-2 shadow">
           <div className="pt-3">
             {/* Sourcing Method */}
