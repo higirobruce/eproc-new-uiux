@@ -62,7 +62,7 @@ export default function SystemLayout({ children }) {
 
   let pathName = usePathname();
   useEffect(() => {
-    setLoggedInUser(localStorage.getItem("user"));
+    setLoggedInUser(user);
     // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
     setToken(localStorage.getItem("token"));
     if (user?.userType !== "VENDOR") setScreen("dashboard");
@@ -87,7 +87,7 @@ export default function SystemLayout({ children }) {
     //         <div className="hidden md:flex ">
     //           <Layout.Sider width={200}>
     //             <SideMenu
-    //               user={JSON.parse(loggedInUser)}
+    //               user={loggedInUser}
     //               className="h-screen fixed top-0"
     //             />
     //           </Layout.Sider>
@@ -147,23 +147,26 @@ export default function SystemLayout({ children }) {
               <div className="mt-12">
                 {loggedInUser && (
                   <SideMenu
-                    user={JSON.parse(loggedInUser)}
+                    user={loggedInUser}
                     className="h-screen fixed top-0"
                   />
                 )}
               </div>
             </div>
-            {(JSON.parse(loggedInUser)?.userType !== "VENDOR" && JSON.parse(loggedInUser)?.permissions?.canViewUsers) && <div className="mb-10 mr-7">
-              <a
-                href="/system/users"
-                className="flex items-center bg-[#F2F4FD] w-[calc(100%-30px)] px-5 py-4 cursor-pointer rounded-lg border-0 gap-3 no-underline"
-              >
-                <UserGroupIcon className="w-5 h-5 text-[#1677FF]" />
-                <small className="font-semibold text-[13px] text-[#1677FF]">
-                  User Management
-                </small>
-              </a>
-            </div>}
+            {loggedInUser?.userType !== "VENDOR" &&
+              loggedInUser?.permissions?.canViewUsers && (
+                <div className="mb-10 mr-7">
+                  <a
+                    href="/system/users"
+                    className="flex items-center bg-[#F2F4FD] w-[calc(100%-30px)] px-5 py-4 cursor-pointer rounded-lg border-0 gap-3 no-underline"
+                  >
+                    <UserGroupIcon className="w-5 h-5 text-[#1677FF]" />
+                    <small className="font-semibold text-[13px] text-[#1677FF]">
+                      User Management
+                    </small>
+                  </a>
+                </div>
+              )}
           </div>
         </div>
         <div className="w-full h-screen">
