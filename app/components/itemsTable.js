@@ -27,7 +27,7 @@ let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
 
 const EditableContext = React.createContext(null);
 
-const EditableRow = ({ index, rowForm, ...props }) => {
+const EditableRow = ({ index, ...props }) => {
   const [form] = Form.useForm();
   return (
     <Form form={form} component={false}>
@@ -76,6 +76,8 @@ const EditableCell = ({
     }
   };
   let childNode = children;
+
+
 
   if (editable) {
     childNode = editing ? (
@@ -314,14 +316,18 @@ const ItemsTable = ({
   };
 
   const handleSave = (row) => {
+    
     const newData = [...dataSource];
     const index = newData.findIndex((item) => row.key === item.key);
     const item = newData[index];
+    console.log('Row ', row);
+    console.log('Item ', item)
     newData.splice(index, 1, {
       ...item,
       ...row,
     });
     setDataSource(newData);
+    console.log('New Data ', newData)
   };
   const components = {
     body: {
@@ -329,6 +335,8 @@ const ItemsTable = ({
       cell: EditableCell,
     },
   };
+
+  console.log('Default Columns ', defaultColumns)
 
   const columns = defaultColumns.map((col) => {
     if (!col.editable) {

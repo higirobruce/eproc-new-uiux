@@ -452,7 +452,7 @@ export default function page({ params }) {
         });
         loadData();
         setLoadingRowData(false);
-        router.push('/system/requests')
+        // router.push('/system/requests')
       })
       .catch((err) => {
         setLoadingRowData(false);

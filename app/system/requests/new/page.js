@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 export default function NewRequest() {
   let router = useRouter();
   const [open, setOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState("");
   let [confirmLoading, setConfirmLoading] = useState(false);
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
@@ -554,7 +555,11 @@ export default function NewRequest() {
               </div>
               <div className="flex justify-between items-center">
                 <h3 className="my-5 font-bold text-[15px]">Request specifications</h3>
-                {values[0]?.currency && <h4 className="my-5 font-bold text-[14px]">Total: {values[0]?.currency + ' ' + totalAmount.toLocaleString()}</h4>}
+                {/* 
+                  Total Currency needs to be worked on in the future
+                    
+                  {values[0]?.currency && <h4 className="my-5 font-bold text-[14px]">Total: {values[0]?.currency + ' ' + totalAmount.toLocaleString()}</h4>} 
+                */}
               </div>
               <ItemsTable
                 setDataSource={setValues}
@@ -567,10 +572,10 @@ export default function NewRequest() {
             </Form>
           </div>
           <div className="flex justify-end gap-5 xl:-mt-7 md:-mt-5 -mt-3">
-            <button className="bg-white rounded-lg px-8 py-3 border border-[#0065DD]">
+            <button onClick={() => router.push('/system/requests')} className="cursor-pointer bg-white rounded-lg px-6 py-2 border border-[#0065DD]">
               <small className="py-0 text-[15px] text-[#0065DD]">Cancel</small>
             </button>
-            <button className="bg-[#0065DD] rounded-lg px-8 py-3 border-none cursor-pointer" onClick={async () => {
+            <button className="bg-[#0065DD] rounded-lg px-6 py-2 border-none cursor-pointer" onClick={async () => {
                 await form.validateFields();
                 if (values && values[0]) {
                   let invalidValues = values?.filter(
