@@ -35,15 +35,17 @@ import { useRouter } from "next/navigation";
 import { encode } from "base-64";
 import { motion } from "framer-motion";
 import PaymentRequestsTable from "@/app/components/paymentRequestsTable";
+import { useUser } from "@/app/context/UserContext";
 
 export default function UserRequests() {
   let router = useRouter();
+  const { user, login, logout } = useUser();
   const [dataLoaded, setDataLoaded] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
-  let user = JSON.parse(localStorage.getItem("user"));
+  // let user = JSON.parse(localStorage.getItem("user"));
   let [dataset, setDataset] = useState([]);
   let [tempDataset, setTempDataset] = useState([]);
   let [updatingId, setUpdatingId] = useState("");

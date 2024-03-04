@@ -6,15 +6,17 @@ import ItemsTable from "../../../components/itemsTable";
 import moment from "moment/moment";
 import { encode } from "base-64";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/app/context/UserContext";
 
 export default function NewRequest() {
   let router = useRouter();
+  const { user, login, logout } = useUser();
   const [open, setOpen] = useState(false);
   let [confirmLoading, setConfirmLoading] = useState(false);
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
-  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+  // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
   const [messageApi, contextHolder] = message.useMessage();
   const [serviceCategories, setServiceCategories] = useState([]);
   let [serviceCategory, setServiceCategory] = useState("");
@@ -166,7 +168,6 @@ export default function NewRequest() {
   const save = (_fileList) => {
     if (values && values[0]) {
       setConfirmLoading(true);
-      let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
       let _values = [...values];
       _values.map((v, index) => {
         v.paths = _fileList[index];

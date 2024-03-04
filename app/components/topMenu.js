@@ -14,16 +14,19 @@ import {
 import { Menu } from "antd";
 import {useRouter} from "next/navigation";
 import Image from "next/image";
+import { useUser } from "../context/UserContext";
 
 const TopMenu = ({ setScreen, screen, handleLogout }) => {
   const [current, setCurrent] = useState(screen);
   const [items, setItems] = useState([]);
+  const { user, login, logout } = useUser();
   let router = useRouter()
 
   useEffect(() => {}, [screen]);
 
   useEffect(() => {
-    let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+
+    // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
     let _items = [];
     _items = [
       {
@@ -62,7 +65,7 @@ const TopMenu = ({ setScreen, screen, handleLogout }) => {
     setItems(_items);
   }, []);
 
-  const logout = () => {
+  const _logout = () => {
     handleLogout(true);
     localStorage.removeItem("user");
     router.push("/auth")
@@ -70,7 +73,7 @@ const TopMenu = ({ setScreen, screen, handleLogout }) => {
   };
   const onClick = (e) => {
     if (e.key === "logout") {
-      logout();
+      _logout();
     } else {
       router.push(`/${e.key}`)
       // setScreen(e.key);

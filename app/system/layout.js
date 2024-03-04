@@ -17,9 +17,11 @@ import Image from "next/image";
 import UserImage from "@/public/favicon.png";
 import { Dropdown } from "antd";
 import Logo from "@/public/Logo.png";
+import { useUser } from "../context/UserContext";
 
 export default function SystemLayout({ children }) {
-  let user = JSON.parse(typeof window !== 'undefined' && localStorage?.getItem("user"));
+  // let user = JSON.parse(typeof window !== 'undefined' && localStorage?.getItem("user"));
+  const { user, login, logout } = useUser();
   let [screen, setScreen] = useState("");
   let [loggedInUser, setLoggedInUser] = useState(null);
   let [loggingOut, setLoggingOut] = useState(false);
@@ -61,7 +63,7 @@ export default function SystemLayout({ children }) {
   let pathName = usePathname();
   useEffect(() => {
     setLoggedInUser(localStorage.getItem("user"));
-    let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+    // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
     setToken(localStorage.getItem("token"));
     if (user?.userType !== "VENDOR") setScreen("dashboard");
     else setScreen("tenders");

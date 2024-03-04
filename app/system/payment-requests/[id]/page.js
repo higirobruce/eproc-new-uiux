@@ -57,6 +57,7 @@ import { MdApproval, MdOutlinePayments } from "react-icons/md";
 import { RiForbidLine, RiArrowDropDownLine } from "react-icons/ri";
 import { MdAccountBalance } from "react-icons/md";
 import { FaMobileAlt } from "react-icons/fa";
+import { useUser } from "@/app/context/UserContext";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let fend_url = process.env.NEXT_PUBLIC_FTEND_URL;
@@ -237,9 +238,10 @@ async function getFile(path) {
 }
 
 export default function PaymentRequest({ params }) {
-  let user = JSON.parse(
-    typeof window !== "undefined" && localStorage.getItem("user")
-  );
+  const { user, login, logout } = useUser();
+  // let user = JSON.parse(
+  //   typeof window !== "undefined" && localStorage.getItem("user")
+  // );
   let token = typeof window !== "undefined" && localStorage.getItem("token");
   let [paymentRequest, setPaymentRequest] = useState(null);
   let router = useRouter();

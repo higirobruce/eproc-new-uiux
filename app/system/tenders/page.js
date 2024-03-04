@@ -29,9 +29,11 @@ import TendersTable from "../../components/tendersTable";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { FiSearch } from "react-icons/fi";
+import { useUser } from "@/app/context/UserContext";
 
 export default function Tenders() {
-  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+  const { user, login, logout } = useUser();
+  // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
   let router = useRouter()
   let token = typeof window !== 'undefined' && localStorage.getItem("token");
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -188,7 +190,6 @@ export default function Tenders() {
   const save = () => {
     console.log("Received values of form:", values);
     setConfirmLoading(true);
-    let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
 
     fetch(`${url}/tenders/`, {
       method: "POST",

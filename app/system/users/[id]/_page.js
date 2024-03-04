@@ -30,6 +30,7 @@ import PermissionsTable from "../../../components/permissionsTable";
 import { useRouter } from "next/navigation";
 import { encode } from "base-64";
 import { motion } from "framer-motion";
+import { useUser } from "@/app/context/UserContext";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
@@ -59,7 +60,8 @@ async function getUserDetails(id, router) {
 }
 
 export default function page({ params }) {
-  let user = JSON.parse(localStorage.getItem("user"));
+  const { user, login, logout } = useUser();
+  // let user = JSON.parse(localStorage.getItem("user"));
   let token = localStorage.getItem('token');
   let router = useRouter();
   const [dataLoaded, setDataLoaded] = useState(false);

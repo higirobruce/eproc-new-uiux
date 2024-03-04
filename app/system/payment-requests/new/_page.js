@@ -15,6 +15,7 @@ import {
 } from "antd";
 import { ArrowLeftOutlined, SaveOutlined } from "@ant-design/icons";
 import UploadPaymentReq from "@/app/components/uploadPaymentReq";
+import { useUser } from "@/app/context/UserContext";
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
@@ -42,7 +43,8 @@ async function getApprovers() {
 }
 
 export default function NewPaymentRequest() {
-  let user = JSON.parse(localStorage.getItem("user"));
+  const { user, login, logout } = useUser();
+  // let user = JSON.parse(localStorage.getItem("user"));
   let token = localStorage.getItem("token");
   let [po, setPo] = useState(null);
   let router = useRouter();

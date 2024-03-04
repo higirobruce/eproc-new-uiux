@@ -28,9 +28,11 @@ import TenderDetails from "../../components/tenderDetails";
 import TendersTable from "../../components/tendersTable";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/app/context/UserContext";
 
 export default function Tenders() {
-  let user = JSON.parse(localStorage.getItem("user"));
+  const { user, login, logout } = useUser();
+  // let user = JSON.parse(localStorage.getItem("user"));
   let router = useRouter()
   let token = localStorage.getItem("token");
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -187,7 +189,6 @@ export default function Tenders() {
   const save = () => {
     console.log("Received values of form:", values);
     setConfirmLoading(true);
-    let user = JSON.parse(localStorage.getItem("user"));
 
     fetch(`${url}/tenders/`, {
       method: "POST",

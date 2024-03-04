@@ -56,9 +56,11 @@ import PermissionsTable from "../../components/permissionsTable";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { FiSearch } from 'react-icons/fi'
+import { useUser } from "@/app/context/UserContext";
 
 export default function Users() {
-  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+  const { user, login, logout } = useUser();
+  // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
   let router = useRouter()
   let token = typeof window !== 'undefined' && localStorage.getItem("token");
   const [dataLoaded, setDataLoaded] = useState(false);

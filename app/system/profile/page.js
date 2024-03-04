@@ -52,16 +52,18 @@ import {
   MdOutlineAlternateEmail,
   MdPhoneAndroid
 } from "react-icons/md";
+import { useUser } from "@/app/context/UserContext";
 
 export default function page() {
   let router = useRouter();
+  const { user, login, logout } = useUser();
   const [form] = Form.useForm();
   const [dataLoaded, setDataLoaded] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
-  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+  // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
   let token = typeof window !== 'undefined' && localStorage.getItem("token");
   let [dataset, setDataset] = useState([]);
   let [updatingId, setUpdatingId] = useState("");

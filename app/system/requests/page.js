@@ -35,8 +35,10 @@ import { useRouter } from "next/navigation";
 import { encode } from "base-64";
 import { motion } from "framer-motion";
 import { FiSearch } from "react-icons/fi";
+import { useUser } from "@/app/context/UserContext";
 
 export default function UserRequests() {
+  const { user, login, logout } = useUser();
   let router = useRouter();
   const [serviceCategories, setServiceCategories] = useState([]);
   let [serviceCategory, setServiceCategory] = useState("");
@@ -46,7 +48,7 @@ export default function UserRequests() {
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
-  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+  // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
   let [dataset, setDataset] = useState([]);
   let [tempDataset, setTempDataset] = useState([]);
   let [updatingId, setUpdatingId] = useState("");
@@ -83,7 +85,7 @@ export default function UserRequests() {
   const [currentUser, setCurrentUser] = useState("");
   const [sourcingMethod, setSourcingMethod] = useState("");
   let [files, setFiles] = useState([]);
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
 
   useEffect(() => {
     // loadRequests()
@@ -228,9 +230,7 @@ export default function UserRequests() {
       let filtered = _dataSet.filter((d) => {
         return (
           d?.number.toString().indexOf(searchText) > -1 ||
-          d?.title
-            .toLowerCase()
-            .indexOf(searchText.toLowerCase()) > -1 ||
+          d?.title.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
           d?.createdBy?.firstName
             .toLowerCase()
             .indexOf(searchText.toLowerCase()) > -1 ||
@@ -289,7 +289,6 @@ export default function UserRequests() {
   const save = (_fileList) => {
     if (values && values[0]) {
       setConfirmLoading(true);
-      let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
       let _values = [...values];
       _values.map((v, index) => {
         v.paths = _fileList[index];
@@ -669,9 +668,8 @@ export default function UserRequests() {
     request,
     reqAttachmentDocId
   ) {
-
-    console.log(B1Data)
-    return true
+    console.log(B1Data);
+    return true;
     // return fetch(`${url}/purchaseOrders/`, {
     //   method: "POST",
     //   headers: {
@@ -951,7 +949,7 @@ export default function UserRequests() {
               onClick={() => {
                 form.resetFields();
 
-                router.push('/system/requests/new')
+                router.push("/system/requests/new");
               }}
             >
               New request
@@ -984,7 +982,6 @@ export default function UserRequests() {
                 onClick={() => refresh()}
               ></Button>
             </div>
-
           </div>
           {/* <RequestStats totalRequests={dataset?.length}/> */}
           <div className="request mr-6 bg-white h-[calc(100vh-165px)] rounded-lg mb-10 px-5 overflow-y-auto">
@@ -1003,7 +1000,9 @@ export default function UserRequests() {
                           getMyPendingRequest(e.target.checked);
                         }}
                       />
-                      <div className="text-[13px] text-[#344767]">Awaiting my approval</div>
+                      <div className="text-[13px] text-[#344767]">
+                        Awaiting my approval
+                      </div>
                     </div>
                     <div className="flex flex-row items-center space-x-1">
                       <Checkbox
@@ -1013,7 +1012,9 @@ export default function UserRequests() {
                           setOnlyMine(e.target.checked);
                         }}
                       />
-                      <div className="text-[13px] text-[#344767]">My requests</div>
+                      <div className="text-[13px] text-[#344767]">
+                        My requests
+                      </div>
                     </div>
                   </div>
                 )}
@@ -1173,7 +1174,10 @@ export default function UserRequests() {
                               .includes(inputValue.toLowerCase())
                           }
                           // defaultValue="RWF"
-                          options={[...serviceCategories, {description: 'Others'}].map((s) => {
+                          options={[
+                            ...serviceCategories,
+                            { description: "Others" },
+                          ].map((s) => {
                             return {
                               value: s.description,
                               label: s.description,

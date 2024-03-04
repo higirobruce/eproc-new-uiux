@@ -22,6 +22,7 @@ import { reject } from "lodash";
 import { MdAccountBalance } from "react-icons/md";
 import { FaMobileAlt } from "react-icons/fa";
 import Link from 'next/link';
+import { useUser } from "@/app/context/UserContext";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
@@ -102,7 +103,8 @@ async function getPoPaidRequests(id, router) {
 }
 
 export default function NewPaymentRequest({ params }) {
-  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+  const { user, login, logout } = useUser();
+  // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
   let token = typeof window !== 'undefined' && localStorage.getItem("token");
   let [po, setPo] = useState(null);
   let router = useRouter();

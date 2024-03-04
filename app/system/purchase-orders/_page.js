@@ -37,10 +37,12 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { encode } from "base-64";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/app/context/UserContext";
 // import MyPdfViewer from "../common/pdfViewer";
 
 export default function PurchaseOrders() {
-  let user = JSON.parse(localStorage.getItem("user"));
+  const { user, login, logout } = useUser();
+  // let user = JSON.parse(localStorage.getItem("user"));
   let token = localStorage.getItem("token");
   let router = useRouter();
   const [dataLoaded, setDataLoaded] = useState(false);

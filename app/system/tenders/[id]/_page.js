@@ -45,7 +45,8 @@ async function getTenderDetails(id, router) {
 
 export default function page({ params }) {
   let router = useRouter();
-  let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+  const { user, login, logout } = useUser();
+  // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
   let token = typeof window !== 'undefined' && localStorage.getItem("token");
 
   const [messageApi, contextHolder] = message.useMessage();
