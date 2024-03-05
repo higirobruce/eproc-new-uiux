@@ -9,18 +9,15 @@ import {
   Select,
   Table,
   Tooltip,
-  Typography
+  Typography,
 } from "antd";
-import {
-  PaperClipIcon,
-  RectangleStackIcon
-} from "@heroicons/react/24/outline";
+import { PaperClipIcon, RectangleStackIcon } from "@heroicons/react/24/outline";
 import moment from "moment";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { v4 } from "uuid";
 import UploadTORs from "./uploadTORs";
 import { FaPlus } from "react-icons/fa6";
-import Link from 'next/link';
+import Link from "next/link";
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
@@ -76,8 +73,6 @@ const EditableCell = ({
     }
   };
   let childNode = children;
-
-
 
   if (editable) {
     childNode = editing ? (
@@ -138,7 +133,7 @@ const ItemsTable = ({
   setFiles,
   editingRequest,
   status,
-  disable
+  disable,
 }) => {
   const [count, setCount] = useState(dataSource?.length + 1);
   const [rowForm] = Form.useForm();
@@ -168,11 +163,7 @@ const ItemsTable = ({
       width: "15%",
       editable: !disable,
       render: (_, item) => {
-        return (
-          <div>
-            {item.estimatedUnitCost.toLocaleString()}
-          </div>
-        );
+        return <div>{item.estimatedUnitCost.toLocaleString()}</div>;
       },
     },
     {
@@ -245,41 +236,7 @@ const ItemsTable = ({
                   iconOnly={false}
                 />
               )}
-              <div className="flex flex-col m-2">
-                {record?.paths?.map((p, i) => {
-                  return (
-                    <div key={p}>
-                      {p && (
-                        <Link
-                          href={`${url}/file/termsOfReference/${p}`}
-                          target="_blank"
-                        >
-                          <Typography.Link
-                            className="flex flex-row items-center space-x-2"
-                            // onClick={() => {
-                            //   setPreviewAttachment(!previewAttachment);
-                            //   setAttachmentId(p);
-                            // }}
-                          >
-                            <div>supporting doc{i + 1} </div>{" "}
-                            <div>
-                              <PaperClipIcon className="h-4 w-4" />
-                            </div>
-                          </Typography.Link>
-                        </Link>
-                      )}
-                    </div>
-                  );
-                })}
-                {/* {(!record?.paths || record?.paths?.length < 1) && (
-                  <div className="items-center justify-center flex flex-col">
-                    <div>
-                      <RectangleStackIcon className="h-5 w-5 text-gray-200" />
-                    </div>
-                    <div className="text-xs text-gray-400">No docs found</div>
-                  </div>
-                )} */}
-              </div>
+              
             </div>
           )
         );
@@ -289,8 +246,7 @@ const ItemsTable = ({
       title: "Action",
       dataIndex: "operation",
       render: (_, record) =>
-        dataSource?.length >= 1 &&
-        (!disable) ? (
+        dataSource?.length >= 1 && !disable ? (
           <Popconfirm
             title="Are you sure?"
             onConfirm={() => handleDelete(record.key)}
@@ -302,8 +258,10 @@ const ItemsTable = ({
   ];
 
   const handleAdd = () => {
+    let c = dataSource?.length;
+
     const newData = {
-      key: count,
+      key: c+1 ,
       title: ``,
       quantity: "",
       estimatedUnitCost: "",
@@ -312,22 +270,18 @@ const ItemsTable = ({
     };
 
     setDataSource([...dataSource, newData]);
-    setCount(count + 1);
+    setCount(c + 1);
   };
 
   const handleSave = (row) => {
-    
     const newData = [...dataSource];
     const index = newData.findIndex((item) => row.key === item.key);
     const item = newData[index];
-    console.log('Row ', row);
-    console.log('Item ', item)
     newData.splice(index, 1, {
       ...item,
       ...row,
     });
     setDataSource(newData);
-    console.log('New Data ', newData)
   };
   const components = {
     body: {
@@ -336,7 +290,7 @@ const ItemsTable = ({
     },
   };
 
-  console.log('Default Columns ', defaultColumns)
+  console.log("Default Columns ", defaultColumns);
 
   const columns = defaultColumns.map((col) => {
     if (!col.editable) {
@@ -350,7 +304,6 @@ const ItemsTable = ({
         dataIndex: col.dataIndex,
         title: col.title,
         handleSave,
-        status,
       }),
     };
   });
@@ -365,12 +318,9 @@ const ItemsTable = ({
           dataSource={dataSource}
           columns={columns}
           size="small"
-          pagination={false}
-          status={status}
-          disable={disable}
         />
       </div>
-      {(!disable)&& (
+      {!disable && (
         <Button
           onClick={handleAdd}
           className="flex self-start items-center gap-1 border-0 bg-[#EAF1FC] text-[#0065DD] mt-3"
