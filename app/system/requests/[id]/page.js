@@ -19,7 +19,7 @@ let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
 
 async function geRequestDetails(id, router, messageApi) {
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const res = await fetch(`${url}/requests/${id}`, {
     headers: {
       Authorization: "Basic " + `${encode(`${apiUsername}:${apiPassword}`)}`,
@@ -72,7 +72,7 @@ export default function page({ params }) {
   const [editRequest, setEditRequest] = useState(false);
   const [sourcingMethod, setSourcingMethod] = useState("");
 
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   let [rowData, setRowData] = useState(null);
   let [filePaths, setFilePaths] = useState([]);
   let [fileList, setFileList] = useState([]);
@@ -100,6 +100,7 @@ export default function page({ params }) {
           let p = new File([blob], name, { uid });
           p.uid = uid;
           p.exists = exists;
+          p.url = _url;
           return p;
         });
         let ps = paths
@@ -136,12 +137,8 @@ export default function page({ params }) {
         await Promise.all(itemFiles).then((values) => values)
         // await Promise.all(items).then((values) => values)
       );
-      setFileList(
-        await Promise.all(itemFiles).then((values) => values)
-      );
-      setFiles(
-        await Promise.all(itemFiles).then((values) => values)
-      );
+      setFileList(await Promise.all(itemFiles).then((values) => values));
+      setFiles(await Promise.all(itemFiles).then((values) => values));
       setRowData(res);
     });
   }
@@ -306,11 +303,10 @@ export default function page({ params }) {
     })
       .then((res) => getResultFromServer(res))
       .then((res1) => {
-        console.log(res1.error)
+        console.log(res1.error);
         if (res1.error || res1.code) {
-
-          let response = res1.error || res1.code
-          console.log(res1.error || res1.code)
+          let response = res1.error || res1.code;
+          console.log(res1.error || res1.code);
           messageApi.open({
             type: "error",
             content: response?.message?.value,
@@ -516,10 +512,7 @@ export default function page({ params }) {
 
               console.log(_filenames);
 
-             
               _files[rowIndex][fileIndex] = _filenames[0];
-
-              
             })
             .catch((err) => {
               console.log(err);

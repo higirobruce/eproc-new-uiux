@@ -388,7 +388,7 @@ const RequestDetails = ({
 
   const { user, login, logout } = useUser();
   // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
 
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
@@ -790,7 +790,6 @@ const RequestDetails = ({
   }
 
   function submitTenderData(values) {
-
     // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
 
     let tData = {
@@ -1416,10 +1415,10 @@ const RequestDetails = ({
   ) {
     // let [op, setOp] = useState(false);
     let _deliverdQty = po?.items[index]?.deliveredQty || 0;
-    const disable = (po?.status !== "started" ||
-    deliveredQties[index] > qty ||
-    (data?.createdBy?._id !== user?._id &&
-      !user?.permissions.canApproveAsPM))
+    const disable =
+      po?.status !== "started" ||
+      deliveredQties[index] > qty ||
+      (data?.createdBy?._id !== user?._id && !user?.permissions.canApproveAsPM);
     return (
       <div>
         {
@@ -1495,7 +1494,9 @@ const RequestDetails = ({
                   >
                     <Button
                       size="middle"
-                      className={`border-none ${disable ? `bg-[#9a9b9b]` : `bg-[#00CE82]`} text-[#FFF] rounded-lg`}
+                      className={`border-none ${
+                        disable ? `bg-[#9a9b9b]` : `bg-[#00CE82]`
+                      } text-[#FFF] rounded-lg`}
                       icon={<CheckOutlined />}
                       onClick={() => {
                         let _openConfirmDeliv = [...openConfirmDeliv];
@@ -2563,7 +2564,8 @@ const RequestDetails = ({
       });
   }
 
-  const disable = ((data?.level1Approver?._id === user?._id ||
+  const disable =
+    ((data?.level1Approver?._id === user?._id ||
       data?.createdBy?._id === user?._id) &&
       data?.status.startsWith("approved")) ||
     data?.status === "withdrawn" ||
@@ -2603,16 +2605,19 @@ const RequestDetails = ({
                     <label className="text-[#6A757B]">Request Title</label>
                     <div className="text-red-500">*</div>
                   </div>
-                  <Form.Item name="title"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Request Title is required",
-                    },
-                  ]}>
+                  <Form.Item
+                    initialValue={data?.title}
+                    name="title"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Request Title is required",
+                      },
+                    ]}
+                  >
                     <Input
                       // defaultValue={data.title}
-                      value={data.title}
+                      value={data?.title}
                       onChange={({ target }) => {
                         let r = { ...data };
                         r.title = target.value;
@@ -2657,9 +2662,9 @@ const RequestDetails = ({
               </div>
               <div className="grid lg:grid-cols-3 gap-5 ml-3">
                 <div>
-
                   <label className="text-[#6A757B]">Service category:</label>
                   <Form.Item
+                    initialValue={data?.serviceCategory}
                     name="ServiceCategory"
                     rules={[
                       {
@@ -2695,6 +2700,7 @@ const RequestDetails = ({
                 <div className="flex flex-col col-span-2">
                   <label className="text-[#6A757B]">Description:</label>
                   <Form.Item
+                    initialValue={data?.description}
                     name="description"
                     rules={[
                       {
@@ -2726,7 +2732,7 @@ const RequestDetails = ({
                   <div>
                     <Form.Item
                       name="budgeted"
-                      valuePropName="checked"
+                      initialValue={data?.budgeted}
                       // wrapperCol={{ offset: 8, span: 16 }}
                     >
                       <Radio.Group
@@ -2797,6 +2803,7 @@ const RequestDetails = ({
                 <div>
                   <label className="text-[#6A757B]">Due Date:</label>
                   <Form.Item
+                    initialValue={dayjs(data?.dueDate)}
                     name="dueDate"
                     rules={[
                       {
@@ -2836,9 +2843,11 @@ const RequestDetails = ({
                   files={files}
                   setFiles={_setFiles}
                   editingRequest={true}
-                  status={data?.status}
-                  disable={disable ? true : false}
+                  // status={data?.status}
+                  // disable={disable ? true : false}
                 />
+
+
               </div>
               {!disable && (
                 <div className="flex justify-end gap-5 mb-5">
@@ -2869,7 +2878,7 @@ const RequestDetails = ({
                     open={openUpdate}
                     icon={<QuestionCircleOutlined style={{ color: "red" }} />}
                     onConfirm={() => {
-                      handleUpload()
+                      handleUpload();
                     }}
                     // okButtonProps={{
                     //   loading: confirmRejectLoading,
@@ -2880,6 +2889,7 @@ const RequestDetails = ({
                       className="bg-[#0065DD] rounded-lg px-5 py-2 border-none cursor-pointer"
                       onClick={async () => {
                         await form.validateFields();
+                       
                         if (values && values[0]) {
                           let invalidValues = values?.filter(
                             (v) =>
@@ -2889,7 +2899,7 @@ const RequestDetails = ({
                           );
                           if (invalidValues?.length == 0) {
                             setConfirmLoading(true);
-                            setOpenUpdate(true)
+                            setOpenUpdate(true);
                           }
                         } else {
                           messageApi.error("Please add atleast one item!");
