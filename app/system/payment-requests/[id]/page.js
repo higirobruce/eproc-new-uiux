@@ -566,6 +566,8 @@ export default function PaymentRequest({ params }) {
 
   function updateRequest(docIds) {
     // docIds[0] = null;
+    // alert(docIds)
+    setUpdateFiles(false)
     paymentRequest.amount = amount;
     if (
       !docIds.includes(null) &&
@@ -613,7 +615,7 @@ export default function PaymentRequest({ params }) {
       .then((res) => getResultFromServer(res))
       .then((res) => {
         refresh();
-      });
+      })
   }
 
   function approveRequest(approvalStage) {
@@ -1419,6 +1421,7 @@ export default function PaymentRequest({ params }) {
                           <Form.Item
                             name="budgeted"
                             valuePropName="checked"
+                            initialValue={bankPay}
                             // wrapperCol={{ offset: 8, span: 16 }}
                           >
                             <Radio.Group
@@ -1463,6 +1466,7 @@ export default function PaymentRequest({ params }) {
                                 <div>
                                   <Form.Item
                                     name="bankName"
+                                    initialValue={paymentRequest?.paymentDetails?.bankName}
                                     rules={[
                                       {
                                         required: true,
