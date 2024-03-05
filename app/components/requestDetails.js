@@ -84,6 +84,7 @@ import { MdFileCopy, MdAttachFile } from "react-icons/md";
 import { BiPurchaseTagAlt } from "react-icons/bi";
 import { TbTruckDelivery } from "react-icons/tb";
 import { useUser } from "../context/UserContext";
+import { useRouter } from 'next/navigation';
 
 let modules = {
   toolbar: [
@@ -374,6 +375,7 @@ const RequestDetails = ({
   handleUpload,
 }) => {
   const [form] = Form.useForm();
+  const router = useRouter();
   let [confirmLoading, setConfirmLoading] = useState(false);
   const [size, setSize] = useState("small");
   const [currentCode, setCurrentCode] = useState(-1);
@@ -848,8 +850,14 @@ const RequestDetails = ({
         email: vendor.email,
       },
     ];
-    setSignatories(_signatories);
-    setOpenCreateContract(true);
+
+    router.push({
+      pathname: '/system/contracts/new',
+      query: { data: {name: 'Kevin'} },
+    });
+    
+    // setSignatories(_signatories);
+    // setOpenCreateContract(true);
   }
 
   function getContracts() {
@@ -2602,7 +2610,7 @@ const RequestDetails = ({
               <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-5 ml-3">
                 <div>
                   <div className="flex items-center gap-2">
-                    <label className="text-[#6A757B]">Request Title</label>
+                    <label className="text-[#000000e0] text-[14px]">Request Title</label>
                     <div className="text-red-500">*</div>
                   </div>
                   <Form.Item
@@ -2630,7 +2638,7 @@ const RequestDetails = ({
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <label className="text-[#6A757B]">Request Number</label>
+                    <label className="text-[#000000e0] text-[14px]">Request Number</label>
                     <div className="text-red-500">*</div>
                   </div>
                   <p className="pt-1 text-[17px]">
@@ -2639,7 +2647,7 @@ const RequestDetails = ({
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <label className="text-[#6A757B]">Initiator</label>
+                    <label className="text-[#000000e0] text-[14px]">Initiator</label>
                     <div className="text-red-500">*</div>
                   </div>
                   <p className="pt-1 text-[17px]">
@@ -2652,7 +2660,7 @@ const RequestDetails = ({
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <label className="text-[#6A757B]">Department</label>
+                    <label className="text-[#000000e0] text-[14px]">Department</label>
                     <div className="text-red-500">*</div>
                   </div>
                   <p className="pt-1 text-[17px]">
@@ -2662,7 +2670,8 @@ const RequestDetails = ({
               </div>
               <div className="grid lg:grid-cols-3 gap-5 ml-3">
                 <div>
-                  <label className="text-[#6A757B]">Service category:</label>
+
+                  <label className="text-[#000000e0] text-[14px]">Service category:</label>
                   <Form.Item
                     initialValue={data?.serviceCategory}
                     name="ServiceCategory"
@@ -2698,7 +2707,7 @@ const RequestDetails = ({
                   </Form.Item>
                 </div>
                 <div className="flex flex-col col-span-2">
-                  <label className="text-[#6A757B]">Description:</label>
+                  <label className="text-[#000000e0] text-[14px]">Description:</label>
                   <Form.Item
                     initialValue={data?.description}
                     name="description"
@@ -2728,7 +2737,7 @@ const RequestDetails = ({
               </div>
               <div className="grid lg:grid-cols-3 md:grid-cols-3 gap-5 ml-3">
                 <div>
-                  <label className="text-[#6A757B]">Request Budgeted?</label>
+                  <label className="text-[#000000e0] text-[14px]">Request Budgeted?</label>
                   <div>
                     <Form.Item
                       name="budgeted"
@@ -2757,7 +2766,7 @@ const RequestDetails = ({
                 </div>
                 {data.budgeted && (
                   <div>
-                    <label className="text-[#6A757B]">Budgeted Line:</label>
+                    <label className="text-[#000000e0] text-[14px]">Budgeted Line:</label>
                     <div className="text-xs text-gray-400">
                       <Select
                         // defaultValue={budgetLine}
@@ -2801,7 +2810,7 @@ const RequestDetails = ({
                   </div>
                 )}
                 <div>
-                  <label className="text-[#6A757B]">Due Date:</label>
+                  <label className="text-[#000000e0] text-[14px]">Due Date:</label>
                   <Form.Item
                     initialValue={dayjs(data?.dueDate)}
                     name="dueDate"
@@ -2843,8 +2852,7 @@ const RequestDetails = ({
                   files={files}
                   setFiles={_setFiles}
                   editingRequest={true}
-                  // status={data?.status}
-                  // disable={disable ? true : false}
+                  disable={disable ? true : false}
                 />
 
 
@@ -2879,6 +2887,7 @@ const RequestDetails = ({
                     icon={<QuestionCircleOutlined style={{ color: "red" }} />}
                     onConfirm={() => {
                       handleUpload();
+                      setOpenUpdate(false)
                     }}
                     // okButtonProps={{
                     //   loading: confirmRejectLoading,
