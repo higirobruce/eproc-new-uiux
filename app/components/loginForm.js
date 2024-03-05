@@ -102,20 +102,20 @@ const LoginForm = ({ goTo }) => {
         // const { payload, protectedHeader } = await jose.jwtVerify(jwt, secret);
         const payload = jwt_decode.jwtDecode(jwt);
 
-        if (payload.allowed) {
-          if (payload.userObj.status === "approved") {
+        if (res.allowed) {
+          if (res.user.status === "approved") {
             messageApi.open({
               type: "success",
               content: "Success!!",
             });
-            login(payload.userObj);
+            login(res.user);
             // localStorage.setItem("user", JSON.stringify(payload.userObj));
             localStorage.setItem("token", res?.token);
             goTo
               ? router.push(`${goTo}`)
               : router.push(
                   `${
-                    payload.userObj?.userType === "VENDOR"
+                    res.user?.userType === "VENDOR"
                       ? "/system/tenders"
                       : "/system/dashboard"
                   }`

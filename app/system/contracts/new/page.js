@@ -11,6 +11,7 @@ import dynamic from "next/dynamic";
 import QRCode from "react-qr-code";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
+import { useRouter } from 'next/router';
 
 let modules = {
   toolbar: [
@@ -38,10 +39,17 @@ let formats = [
   "bullet",
   "indent",
   "link",
+  "code"
 ];
 
 export default function page() {
   const [messageApi] = message.useMessage();
+  const router = useRouter();
+  const passedData = router.query.data;
+
+
+  console.log('Pass Data ', passedData)
+
   return (
     <>
       <div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 h-screen mt-6 pb-10 pt-5">
