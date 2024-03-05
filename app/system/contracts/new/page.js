@@ -11,7 +11,7 @@ import dynamic from "next/dynamic";
 import QRCode from "react-qr-code";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 let modules = {
   toolbar: [

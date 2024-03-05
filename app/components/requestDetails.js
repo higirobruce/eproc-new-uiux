@@ -84,7 +84,7 @@ import { MdFileCopy, MdAttachFile } from "react-icons/md";
 import { BiPurchaseTagAlt } from "react-icons/bi";
 import { TbTruckDelivery } from "react-icons/tb";
 import { useUser } from "../context/UserContext";
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 let modules = {
   toolbar: [
@@ -2852,8 +2852,7 @@ const RequestDetails = ({
                   files={files}
                   setFiles={_setFiles}
                   editingRequest={true}
-                  // status={data?.status}
-                  // disable={disable ? true : false}
+                  disable={disable ? true : false}
                 />
 
 
@@ -2888,6 +2887,7 @@ const RequestDetails = ({
                     icon={<QuestionCircleOutlined style={{ color: "red" }} />}
                     onConfirm={() => {
                       handleUpload();
+                      setOpenUpdate(false)
                     }}
                     // okButtonProps={{
                     //   loading: confirmRejectLoading,

@@ -18,6 +18,8 @@ import { v4 } from "uuid";
 import UploadTORs from "./uploadTORs";
 import { FaPlus } from "react-icons/fa6";
 import Link from "next/link";
+import { MdDeleteOutline } from "react-icons/md";
+
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
@@ -42,7 +44,6 @@ const EditableCell = ({
   dataIndex,
   record,
   handleSave,
-  status,
   disable,
   ...restProps
 }) => {
@@ -132,7 +133,6 @@ const ItemsTable = ({
   files,
   setFiles,
   editingRequest,
-  status,
   disable,
 }) => {
   const [count, setCount] = useState(dataSource?.length + 1);
@@ -246,13 +246,19 @@ const ItemsTable = ({
       title: "Action",
       dataIndex: "operation",
       render: (_, record) =>
-        dataSource?.length >= 1 && !disable ? (
-          <Popconfirm
-            title="Are you sure?"
-            onConfirm={() => handleDelete(record.key)}
-          >
-            <a>Delete</a>
-          </Popconfirm>
+        dataSource?.length >= 1 ? (
+          <div>
+            {disable ? (
+              <MdDeleteOutline className={`${disable ? `text-[#b8b5b6] cursor-not-allowed` : `text-[#F5365C]`}`} size={24} />
+            ) : (
+              <Popconfirm
+                title="Are you sure?"
+                onConfirm={() => handleDelete(record.key)}
+              >
+                <a><MdDeleteOutline className={`${disable ? `text-[#b8b5b6] cursor-not-allowed` : `text-[#F5365C]`}`} size={24} /></a>
+              </Popconfirm>
+            )}
+          </div>
         ) : null,
     },
   ];
@@ -261,7 +267,7 @@ const ItemsTable = ({
     let c = dataSource?.length;
 
     const newData = {
-      key: c+1 ,
+      key: c + 1,
       title: ``,
       quantity: "",
       estimatedUnitCost: "",
@@ -289,8 +295,6 @@ const ItemsTable = ({
       cell: EditableCell,
     },
   };
-
-  console.log("Default Columns ", defaultColumns);
 
   const columns = defaultColumns.map((col) => {
     if (!col.editable) {
