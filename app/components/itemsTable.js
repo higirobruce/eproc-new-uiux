@@ -236,7 +236,43 @@ const ItemsTable = ({
                   iconOnly={false}
                 />
               )}
-              
+              {disable &&
+                (record?.paths || record?.paths?.length >= 1 ? (
+                  <div className="flex flex-col m-2">
+                    {record?.paths?.map((p, i) => {
+                      return (
+                        <div key={p}>
+                          {p && (
+                            <Link
+                              href={`${url}/file/termsOfReference/${p}`}
+                              target="_blank"
+                            >
+                              <Typography.Link
+                                className="flex flex-row items-center space-x-2"
+                                // onClick={() => {
+                                //   setPreviewAttachment(!previewAttachment);
+                                //   setAttachmentId(p);
+                                // }}
+                              >
+                                <div>supporting doc{i + 1} </div>{" "}
+                                <div>
+                                  <PaperClipIcon className="h-4 w-4" />
+                                </div>
+                              </Typography.Link>
+                            </Link>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="items-center justify-center flex flex-col">
+                    <div>
+                      <RectangleStackIcon className="h-5 w-5 text-gray-200" />
+                    </div>
+                    <div className="text-xs text-gray-400">No docs found</div>
+                  </div>
+                ))}
             </div>
           )
         );
@@ -249,13 +285,29 @@ const ItemsTable = ({
         dataSource?.length >= 1 ? (
           <div>
             {disable ? (
-              <MdDeleteOutline className={`${disable ? `text-[#b8b5b6] cursor-not-allowed` : `text-[#F5365C]`}`} size={24} />
+              <MdDeleteOutline
+                className={`${
+                  disable
+                    ? `text-[#b8b5b6] cursor-not-allowed`
+                    : `text-[#F5365C]`
+                }`}
+                size={24}
+              />
             ) : (
               <Popconfirm
                 title="Are you sure?"
                 onConfirm={() => handleDelete(record.key)}
               >
-                <a><MdDeleteOutline className={`${disable ? `text-[#b8b5b6] cursor-not-allowed` : `text-[#F5365C]`}`} size={24} /></a>
+                <a>
+                  <MdDeleteOutline
+                    className={`${
+                      disable
+                        ? `text-[#b8b5b6] cursor-not-allowed`
+                        : `text-[#F5365C]`
+                    }`}
+                    size={24}
+                  />
+                </a>
               </Popconfirm>
             )}
           </div>

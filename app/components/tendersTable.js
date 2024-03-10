@@ -27,9 +27,11 @@ const TendersTable = ({
     setEditingKey("");
   };
 
-  // useEffect(() => {
-  //   // console.log(dataSet)
-  // }, [dataSet]);
+  console.log('Data set ', dataSet)
+
+  useEffect(() => {
+    setData(dataSet)
+  }, [dataSet]);
 
   const columns =
     user?.userType !== "VENDOR"
