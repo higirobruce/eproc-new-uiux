@@ -851,13 +851,13 @@ const RequestDetails = ({
       },
     ];
 
-    router.push({
-      pathname: '/system/contracts/new',
-      query: { data: {name: 'Kevin'} },
-    });
+    // router.push({
+    //   pathname: '/system/contracts/new',
+    //   query: { data: {name: 'Kevin'} },
+    // });
     
-    // setSignatories(_signatories);
-    // setOpenCreateContract(true);
+    setSignatories(_signatories);
+    setOpenCreateContract(true);
   }
 
   function getContracts() {

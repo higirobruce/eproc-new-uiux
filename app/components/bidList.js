@@ -159,15 +159,15 @@ const BidList = ({
                   <div>
                     <div
                       className={`px-3 py-1.5 bg-[${
-                        statusClass[item?.status].bgColor
+                        statusClass[item?.status]?.bgColor
                       }] rounded-xl`}
                     >
                       <small
                         className={`text-[${
-                          statusClass[item?.status].color
+                          statusClass[item?.status]?.color
                         }] text-[13px]`}
                       >
-                        {statusClass[item?.status].status}
+                        {statusClass[item?.status]?.status}
                       </small>
                     </div>
                   </div>

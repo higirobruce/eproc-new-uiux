@@ -208,7 +208,7 @@ const SideMenu = ({ setScreen, screen, user }) => {
     }
 
     setItems(_items);
-  }, []);
+  }, [current]);
 
   useEffect(() => {
     setItemsSet(true);

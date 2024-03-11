@@ -45,6 +45,10 @@ let formats = [
 export default function page() {
   const [messageApi] = message.useMessage();
   const router = useRouter();
+  const passedData = router?.query?.data;
+
+
+  console.log('Pass Data ', passedData)
 
   return (
     <>

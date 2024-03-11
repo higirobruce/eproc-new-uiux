@@ -2617,14 +2617,43 @@ const TenderDetails = ({
                       data?.status !== "bidSelected" &&
                       data?.status !== "bidAwarded" && (
                         <div className="absolute left-1">
-                          <Tooltip title="Extend submission deadline">
+                          {data?.invitees?.length < 1 && <Tooltip title="Extend submission deadline">
                             <div
                               onClick={extendSubmissionDadeline}
                               className="p-1 -mt-1.5 rounded ring-1 ring-red-300 shadow-md flex items-center text-red-500 justify-center cursor-pointer active:shadow-sm active:text-red-300"
                             >
                               <CalendarDaysIcon className="h-4 w-4  " />
                             </div>
-                          </Tooltip>
+                          </Tooltip>}
+                        </div>
+                      )}
+
+                      {(user?.permissions?.canEditTenders && extending) && (
+                        <div className="flex flex-row self-end items-center space-x-2">
+                          <div>
+                            <Popconfirm
+                              title="Are you sure?"
+                              onConfirm={() => {
+                                submitExtensionRequest();
+                                // setExtending(false);
+                              }}
+                            >
+                              <div
+                                // onClick={extendSubmissionDadeline}
+                                className="py-2 px-4 rounded bg-[#F2F4FD] flex items-center gap-x-2 text-[#0063CF] justify-center cursor-pointer active:shadow-sm active:text-[#0063CF]"
+                              >
+                                <CheckIcon className="h-4 w-4  " />
+                              </div>
+                            </Popconfirm>
+                          </div>
+                          <div>
+                            <div
+                              onClick={() => setExtending(false)}
+                              className="p-2 rounded ring-1 ring-red-300 shadow-md flex items-center text-red-500 justify-center cursor-pointer active:shadow-sm active:text-red-300"
+                            >
+                              <CloseOutlined className="h-3 w-3h-3  " />
+                            </div>
+                          </div>
                         </div>
                       )}
                   </div>
@@ -2732,19 +2761,19 @@ const TenderDetails = ({
                   data?.status !== "bidSelected" &&
                   data?.status !== "bidAwarded" && (
                     <div className="absolute left-2 mt-7">
-                      <Tooltip title="Extend submission deadline">
+                      {data?.invitees?.length < 1 && <Tooltip title="Extend submission deadline">
                         <div
                           onClick={extendSubmissionDadeline}
                           className="p-2 rounded ring-1 ring-red-300 shadow-md flex items-center text-red-500 justify-center cursor-pointer active:shadow-sm active:text-red-300"
                         >
                           <CalendarDaysIcon className="h-4 w-4  " />
                         </div>
-                      </Tooltip>
+                      </Tooltip>}
                     </div>
                   )}
               </div>
 
-              {(user?.permissions?.canEditTenders && extending) && (
+              {(user?.permissions?.canEditTenders && extending && deadLine && data?.invitees?.length < 1) && (
                 <div className="flex flex-row self-end items-center space-x-2">
                   <div>
                     <Popconfirm
