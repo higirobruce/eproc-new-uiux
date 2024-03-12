@@ -578,244 +578,229 @@ export default function page({ params }) {
               </button>
             </div>
           </div>
-          {tab == 0 ? (
+          {(tab == 0 && rowData)? (
             <>
               <div className="my-1 bg-white rounded-xl px-8 pt-1 pb-5">
                 <h5 className="text-[#263238] text-[18px]">Basic Info</h5>
                 <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 items-center gap-x-5">
-                  {rowData?.title && (
-                    <div>
-                      <div className="pb-3 text-[13px] text-[#344767]">
-                        Title
-                      </div>
-                      <Form.Item name={""}>
-                        <Input
-                          defaultValue={rowData?.title}
-                          value={rowData?.title || "MD"}
-                          placeholder="Your Title"
-                          className="h-11 my-3"
-                          onChange={(e) => {
-                            let r = { ...rowData };
-                            r.title = e;
-                            setRowData(r);
-                          }}
-                        />
-                      </Form.Item>
+                  <div>
+                    <div className="pb-3 text-[13px] text-[#344767]">
+                      Title
                     </div>
-                  )}
-                  {rowData?.contactPersonNames && (
-                    <div>
-                      <div className="pb-3 text-[13px] text-[#344767]">
-                        First Name
-                      </div>
-                      <Form.Item name={""}>
-                        <Input
-                          defaultValue={
-                            rowData?.contactPersonNames.split(" ")[0]
-                          }
-                          value={rowData?.contactPersonNames.split(" ")[0]}
-                          placeholder="Your First Name"
-                          className="h-11 my-3"
-                        />
-                      </Form.Item>
+                    <Form.Item initialValue={rowData?.title} name={"title"}>
+                      <Input
+                        value={rowData?.title}
+                        defaultValue={rowData?.title}
+                        placeholder="Your Title"
+                        className="h-11 my-3"
+                        onChange={(e) => {
+                          let r = { ...rowData };
+                          r.title = e.target.value;
+                          setRowData(r);
+                        }}
+                      />
+                    </Form.Item>
+                  </div>
+                  <div className="col-span-2">
+                    <div className="pb-3 text-[13px] text-[#344767]">
+                      Full Name
                     </div>
-                  )}
-                  {rowData?.contactPersonNames && (
-                    <div>
-                      <div className="pb-3 text-[13px] text-[#344767]">
-                        Last Name
-                      </div>
-                      <Form.Item name={""}>
-                        <Input
-                          defaultValue={
-                            rowData?.contactPersonNames.split(" ")[1]
-                          }
-                          value={rowData?.contactPersonNames.split(" ")[1]}
-                          placeholder="Your Last Name"
-                          className="h-11 my-3"
-                        />
-                      </Form.Item>
+                    <Form.Item initialValue={rowData?.contactPersonNames} name={"contactPersonNames"}>
+                      <Input
+                        defaultValue={rowData?.contactPersonNames}
+                        value={rowData?.contactPersonNames}
+                        placeholder="Your Full Name"
+                        className="h-11 my-3"
+                        onChange={(e) => {
+                          let r = { ...rowData };
+                          r.contactPersonNames = e.target.value;
+                          setRowData(r);
+                        }}
+                      />
+                    </Form.Item>
+                  </div>
+                  {/* <div>
+                    <div className="pb-3 text-[13px] text-[#344767]">
+                      Last Name
                     </div>
-                  )}
-                  {rowData?.telephone && (
-                    <div>
-                      <div className="pb-3 text-[13px] text-[#344767]">
-                        Phone Number
-                      </div>
-                      <Form.Item name={""}>
-                        <Input
-                          placeholder="Your Phone Number"
-                          defaultValue={rowData?.telephone}
-                          value={rowData?.telephone}
-                          className="h-11 my-3"
-                          onChange={(e) => {
-                            let r = { ...rowData };
-                            r.telephone = e;
-                            setRowData(r);
-                          }}
-                        />
-                      </Form.Item>
+                    <Form.Item initialValue={rowData?.contactPersonNames?.split(" ")[1]} name={""}>
+                      <Input
+                        defaultValue={rowData?.contactPersonNames?.split(" ")[1]}
+                        value={rowData?.contactPersonNames?.split(" ")[1]}
+                        placeholder="Your Last Name"
+                        className="h-11 my-3"
+                        onChange={(e) => {
+                          let r = { ...rowData };
+                          r.contactPersonNames.split(" ")[1] = e.target.value;
+                          setRowData(r);
+                        }}
+                      />
+                    </Form.Item>
+                  </div> */}
+                  <div>
+                    <div className="pb-3 text-[13px] text-[#344767]">
+                      Phone Number
                     </div>
-                  )}
-                  {rowData?.email && (
-                    <div>
-                      <div className="pb-3 text-[13px] text-[#344767]">
-                        Email
-                      </div>
-                      <Form.Item name={""}>
-                        <Input
-                          placeholder="Your Email"
-                          defaultValue={rowData?.email}
-                          value={rowData?.email}
-                          className="h-11 my-3"
-                          onChange={(e) => {
-                            let r = { ...rowData };
-                            r.email = e;
-                            setRowData(r);
-                          }}
-                        />
-                      </Form.Item>
+                    <Form.Item initialValue={rowData?.telephone} name={"telephone"}>
+                      <Input
+                        placeholder="Your Phone Number"
+                        defaultValue={rowData?.telephone}
+                        value={rowData?.telephone}
+                        className="h-11 my-3"
+                        onChange={(e) => {
+                          let r = { ...rowData };
+                          r.telephone = e.target.value;
+                          setRowData(r);
+                        }}
+                      />
+                    </Form.Item>
+                  </div>
+                  <div>
+                    <div className="pb-3 text-[13px] text-[#344767]">
+                      Email
                     </div>
-                  )}
+                    <Form.Item initialValue={rowData?.email} name={"email"}>
+                      <Input
+                        placeholder="Your Email"
+                        defaultValue={rowData?.email}
+                        value={rowData?.email}
+                        className="h-11 my-3"
+                        onChange={(e) => {
+                          let r = { ...rowData };
+                          r.email = e.target.value;
+                          setRowData(r);
+                        }}
+                      />
+                    </Form.Item>
+                  </div>
                 </div>
               </div>
               <div className="my-1 bg-white rounded-xl px-8 pt-1 pb-5">
                 <h5 className="text-[#263238] text-[18px]">Other Info</h5>
                 <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 items-center gap-x-5">
-                  {rowData?.tin && (
-                    <div>
-                      <div className="pb-3 text-[13px] text-[#344767]">TIN</div>
-                      <Form.Item name={""}>
-                        <Input
-                          defaultValue={rowData?.tin}
-                          value={rowData?.tin}
-                          placeholder="Your TIN"
-                          className="h-11 my-3"
-                          onChange={(e) => {
-                            let r = { ...rowData };
-                            r.tin = e;
-                            setRowData(r);
-                          }}
-                        />
-                      </Form.Item>
-                    </div>
-                  )}
-                  {rowData?.hqAddress && (
-                    <div>
-                      <div className="pb-3 text-[13px] text-[#344767]">
-                        HQ Address
-                      </div>
-                      <Form.Item name={""}>
-                        <Input
-                          defaultValue={rowData?.hqAddress}
-                          value={rowData?.hqAddress}
-                          placeholder="Your HQ Adress"
-                          className="h-11 my-3"
-                          onChange={(e) => {
-                            let r = { ...rowData };
-                            r.hqAddress = e;
-                            setRowData(r);
-                          }}
-                        />
-                      </Form.Item>
-                    </div>
-                  )}
-                  {rowData?.experienceDurationInYears && (
-                    <div>
-                      <div className="pb-3 text-[13px] text-[#344767]">
-                        Years of Experience
-                      </div>
-                      <Form.Item name={""}>
-                        <Input
-                          defaultValue={rowData?.experienceDurationInYears}
-                          value={rowData?.experienceDurationInYears}
-                          placeholder="Your Experience"
-                          className="h-11 my-3"
-                          onChange={(e) => {
-                            let r = { ...rowData };
-                            r.experienceDurationInYears = e;
-                            setRowData(r);
-                          }}
-                        />
-                      </Form.Item>
-                    </div>
-                  )}
-                  {rowData?.country && (
-                    <div>
-                      <div className="pb-3 text-[13px] text-[#344767]">
-                        Country
-                      </div>
-                      <Form.Item name={""}>
-                        <Input
-                          defaultValue={rowData?.country}
-                          value={rowData?.country}
-                          placeholder="Your Country"
-                          className="h-11 my-3"
-                          onChange={(e) => {
-                            let r = { ...rowData };
-                            r.country = e;
-                            setRowData(r);
-                          }}
-                        />
-                      </Form.Item>
-                    </div>
-                  )}
-                </div>
-                <div className="grid md:grid-cols-2 grid-cols-1 gap-x-5">
-                  {rowData?.webSite && (
-                    <div>
-                      <div className="pb-3 text-[13px] text-[#344767]">
-                        Website
-                      </div>
-                      <Form.Item name={""}>
-                        <Input
-                          defaultValue={rowData?.webSite}
-                          value={rowData?.webSite}
-                          placeholder="Your Website"
-                          className="h-10 my-3"
-                          onChange={(e) => {
-                            let r = { ...rowData };
-                            r.website = e;
-                            setRowData(r);
-                          }}
-                        />
-                      </Form.Item>
-                    </div>
-                  )}
-                  {rowData?.services && (
-                    <div>
-                      <div className="pb-3 text-[13px] text-[#344767]">
-                        Area(s) of Experience
-                      </div>
-                      <Select
-                        mode="multiple"
-                        allowClear
-                        size="large"
-                        defaultValue={rowData?.services?.map((s) => {
-                          return s;
-                        })}
-                        style={{ width: "100%" }}
-                        placeholder="Please select"
-                        onChange={(value) => {
+                  <div>
+                    <label className="pb-3 text-[13px] text-[#344767]">TIN</label>
+                    <Form.Item initialValue={rowData?.tin} name={"tin"}>
+                      <Input
+                        defaultValue={rowData?.tin}
+                        value={rowData?.tin}
+                        placeholder="Your TIN"
+                        className="h-11 my-3"
+                        onChange={(e) => {
                           let r = { ...rowData };
-                          r.services = value;
+                          r.tin = e.target.value;
                           setRowData(r);
                         }}
-                        className="mt-3"
-                      >
-                        {servCategories?.map((s) => {
-                          return (
-                            <Select.Option key={s._id} value={s.description}>
-                              {s.description}
-                            </Select.Option>
-                          );
-                        })}
-                      </Select>
-                      {/* <Form.Item name={""}>
-                      <Input placeholder="Your Area(s)" className="h-11 my-3" />
-                    </Form.Item> */}
-                    </div>
-                  )}
+                      />
+                    </Form.Item>
+                  </div>
+                  <div>
+                    <label className="pb-3 text-[13px] text-[#344767]">
+                      HQ Address
+                    </label>
+                    <Form.Item initialValue={rowData?.hqAddress} name={"hqAddress"}>
+                      <Input
+                        defaultValue={rowData?.hqAddress}
+                        value={rowData?.hqAddress}
+                        placeholder="Your HQ Adress"
+                        className="h-11 my-3"
+                        onChange={(e) => {
+                          let r = { ...rowData };
+                          r.hqAddress = e.target.value;
+                          setRowData(r);
+                        }}
+                      />
+                    </Form.Item>
+                  </div>
+                  <div>
+                    <label className="pb-3 text-[13px] text-[#344767]">
+                      Years of Experience
+                    </label>
+                    <Form.Item initialValue={rowData?.experienceDurationInYears} name={"experienceDurationInYears"}>
+                      <Input
+                        defaultValue={rowData?.experienceDurationInYears}
+                        value={rowData?.experienceDurationInYears}
+                        placeholder="Your Experience"
+                        className="h-11 my-3"
+                        onChange={(e) => {
+                          let r = { ...rowData };
+                          r.experienceDurationInYears = e.target.value;
+                          setRowData(r);
+                        }}
+                      />
+                    </Form.Item>
+                  </div>
+                  <div>
+                    <label className="pb-3 text-[13px] text-[#344767]">
+                      Country
+                    </label>
+                    <Form.Item initialValue={rowData?.country} name={"country"}>
+                      <Input
+                        defaultValue={rowData?.country}
+                        value={rowData?.country}
+                        placeholder="Your Country"
+                        className="h-11 my-3"
+                        onChange={(e) => {
+                          let r = { ...rowData };
+                          r.country = e.target.value;
+                          setRowData(r);
+                        }}
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+                <div className="grid md:grid-cols-2 grid-cols-1 gap-x-5">
+                  <div>
+                    <label className="pb-3 text-[13px] text-[#344767]">
+                      Website
+                    </label>
+                    <Form.Item initialValue={rowData?.webSite} name={"webSite"}>
+                      <Input
+                        defaultValue={rowData?.webSite}
+                        value={rowData?.webSite}
+                        placeholder="Your Website"
+                        className="h-10 my-3"
+                        onChange={(e) => {
+                          let r = { ...rowData };
+                          r.website = e.target.value;
+                          setRowData(r);
+                        }}
+                      />
+                    </Form.Item>
+                  </div>
+                  <div>
+                    <label className="pb-3 text-[13px] text-[#344767]">
+                      Area(s) of Experience
+                    </label>
+                    <Select
+                      mode="multiple"
+                      allowClear
+                      size="large"
+                      defaultValue={rowData?.services?.map((s) => {
+                        return s;
+                      })}
+                      style={{ width: "100%" }}
+                      placeholder="Please select"
+                      onChange={(value) => {
+                        let r = { ...rowData };
+                        r.services = value;
+                        setRowData(r);
+                      }}
+                      value={rowData?.services?._id}
+                      className="mt-3"
+                    >
+                      {servCategories?.map((s) => {
+                        return (
+                          <Select.Option key={s._id} value={s.description}>
+                            {s.description}
+                          </Select.Option>
+                        );
+                      })}
+                    </Select>
+                    {/* <Form.Item name={""}>
+                    <Input placeholder="Your Area(s)" className="h-11 my-3" />
+                  </Form.Item> */}
+                  </div>
                 </div>
                 <h5 className="text-[#263238] text-[18px]">Uploads</h5>
                 <div className="grid lg:grid-cols-2 items-center gap-x-5 -my-1">

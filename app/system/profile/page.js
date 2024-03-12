@@ -155,7 +155,7 @@ export default function page() {
 
   function buildUser() {
     return (
-      <div className="request mr-6 bg-white rounded-lg h-[calc(100vh-160px)] mb-10 px-5 pb-2 overflow-y-auto">
+      <div className="payment-request mr-6 rounded-lg h-[calc(100vh-160px)] mb-10 px-5 pb-2 overflow-y-auto">
         {contextHolder}
         <div className="grid md:grid-cols-3 gap-5 mb-16">
           <div className="flex flex-col space-y-5">
