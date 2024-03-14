@@ -506,7 +506,7 @@ export default function page({ params }) {
         icon={<PrinterOutlined />}
         className="self-end"
       ></Button> */}
-      <div className="space-y-10 px-20 py-5 overflow-x-scroll bg-white mx-11 my-10 shadow-md">
+      <div className="request space-y-10 px-20 overflow-auto h-[calc(100vh-165px)] bg-white mr-6 py-10 shadow-md">
         <div className="flex flex-row justify-between items-center">
           <Typography.Title level={4} className="flex flex-row items-center">
             PURCHASE ORDER #{po?.number}{" "} <span className=" ml-2 text-blue-600"><PrinterOutlined onClick={() => generatePDF()} /></span>
