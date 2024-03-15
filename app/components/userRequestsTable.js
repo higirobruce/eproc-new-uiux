@@ -184,7 +184,7 @@ const UsersRequestsTable = ({
     {
       title: "Req Number",
       // dataIndex: "number",
-      sorter: (a, b) => a?.number > b?.number,
+      sorter: (a, b) => b?.number - a?.number,
       render: (_, record) => (
         <>
           <div
@@ -206,7 +206,7 @@ const UsersRequestsTable = ({
     {
       title: "Title",
       dataIndex: "title",
-      sorter: (a, b) => a?.title > a?.title,
+      sorter: (a, b) => b?.title - a?.title,
       // sorter: (a,b)=>moment(a.dueDate).isAfter(moment(b.dueDate)),
       render: (_, record) => (
         <>
@@ -222,8 +222,8 @@ const UsersRequestsTable = ({
       title: "Initiator",
       key: "initiator",
       sorter: (a, b) =>
-        a?.createdBy?.department?.description >
-        b?.createdBy?.department?.description,
+        b?.createdBy?.department?.description -
+        a?.createdBy?.department?.description,
       render: (_, record) => (
         <>
           <Typography.Text className="capitalize text-[14px] text-[#8392AB]">{record?.createdBy?.firstName.toLowerCase()}</Typography.Text>
@@ -234,8 +234,8 @@ const UsersRequestsTable = ({
       title: "Department",
       key: "department",
       sorter: (a, b) =>
-        a?.createdBy?.department?.description >
-        b?.createdBy?.department?.description,
+        b?.createdBy?.department?.description -
+        a?.createdBy?.department?.description,
       render: (_, record) => (
         <>
           <Typography.Text className="capitalize text-[14px] text-[#8392AB]">

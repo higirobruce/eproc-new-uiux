@@ -107,7 +107,7 @@ export default function page() {
     loadPurchaseOrders()
       .then((res) => getResultFromServer(res))
       .then((res) => {
-        setPurchaseOrders(res);
+        setPurchaseOrders(res?.data);
       })
       .catch((err) => {
         messageApi.open({
