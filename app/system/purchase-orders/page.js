@@ -26,6 +26,7 @@ import {
   Row,
   Input,
   Col,
+  Pagination
 } from "antd";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
@@ -70,6 +71,9 @@ export default function PurchaseOrders() {
   const [messageApi, contextHolder] = message.useMessage();
   const [activeIndex, setActiveIndex] = useState("");
   const contentHeight = useRef();
+  const [pageSize, setPageSize] = useState(5);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0)
   const items = [
     {
       key: "1",
@@ -136,6 +140,29 @@ export default function PurchaseOrders() {
   const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
+    setDataLoaded(false)
+    fetch(`${url}/purchaseOrders?pagesize=${pageSize}&page=${currentPage}`, {
+      method: "GET",
+      headers: {
+        Authorization:
+          "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => getResultFromServer(res))
+      .then((res) => {
+        setPOs(res?.data);
+        setTempPOs(res?.data);
+        setTotalPages(res?.totalPages)
+        setDataLoaded(true)
+      })
+      .catch((err) => {
+        setDataLoaded(true);
+      });
+  }, [currentPage, pageSize])
+
+  useEffect(() => {
     refresh();
   }, []);
 
@@ -186,7 +213,7 @@ export default function PurchaseOrders() {
           setDataLoaded(true);
         });
     } else {
-      fetch(`${url}/purchaseOrders/`, {
+      fetch(`${url}/purchaseOrders?pagesize=${pageSize}&page=${currentPage}`, {
         method: "GET",
         headers: {
           Authorization:
@@ -197,8 +224,9 @@ export default function PurchaseOrders() {
       })
         .then((res) => getResultFromServer(res))
         .then((res) => {
-          setPOs(res);
-          setTempPOs(res);
+          setPOs(res?.data);
+          setTempPOs(res?.data);
+          setTotalPages(res?.totalPages)
           setDataLoaded(true);
         })
         .catch((err) => {
@@ -1064,6 +1092,18 @@ export default function PurchaseOrders() {
                   </div>
                 );
               })}
+              {console.log('Total Pages',totalPages )}
+              <div>
+              <Pagination
+                defaultCurrent={currentPage}
+                onChange={(page, pageSize) => {
+                  setCurrentPage(page);
+                  setPageSize(pageSize);
+                }}
+                pageSize={pageSize}
+                total={totalPages}
+              />
+              </div>
           </div>
         </div>
       ) : (

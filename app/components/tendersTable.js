@@ -39,7 +39,7 @@ const TendersTable = ({
           {
             title: "Tender Number",
             dataIndex: "number",
-            sorter: (a, b) => b > a,
+            sorter: (a, b) => b?.number > a?.number,
             render: (_, record) => (
               <>
                 <div
@@ -59,7 +59,7 @@ const TendersTable = ({
           {
             title: "Request reference",
             key: "request",
-            sorter: (a, b) => b > a,
+            sorter: (a, b) => b?.request > a?.request,
             render: (_, record) => (
               <>
                 <div
