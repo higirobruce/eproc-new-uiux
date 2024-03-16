@@ -195,7 +195,7 @@ const PaymentRequestsTable = ({
             <div>
               <FileTextOutlined className="text-xs" />
             </div>
-            <div>{record?.number}</div>
+            <div className="capitalize text-[14px] text-[#1677FF]">{record?.number}</div>
           </div>
         </>
       ),
@@ -223,10 +223,10 @@ const PaymentRequestsTable = ({
                 <div>
                   <FileTextOutlined className="text-xs" />
                 </div>
-                <div className="capitalize text-[12px]">{record?.purchaseOrder?.number}</div>
+                <div className="capitalize text-[14px] text-[#1677FF]">{record?.purchaseOrder?.number}</div>
               </div>
             ) : (
-              <div className="text-xs self-end">N/A</div>
+              <div className="text-[14px] self-end">N/A</div>
             )}
           </div>
         </>
@@ -242,7 +242,7 @@ const PaymentRequestsTable = ({
       render: (_, record) => (
         <>
           <div className={record?.number === selectedRow ? "font-bold" : ""}>
-            <Typography.Text style={{ width: 150 }} className="capitalize text-[12px] text-[#8392AB]" ellipsis={true}>
+            <Typography.Text style={{ width: 150 }} className="capitalize text-[14px] text-[#8392AB]" ellipsis={true}>
               {record?.title}
             </Typography.Text>
           </div>
@@ -256,7 +256,7 @@ const PaymentRequestsTable = ({
         a?.createdBy?.firstName?.localeCompare(b?.createdBy?.firstName),
       render: (_, record) => (
         <>
-          <Typography.Text className="capitalize text-[12px] text-[#8392AB]">
+          <Typography.Text className="capitalize text-[14px] text-[#8392AB]">
             {record?.createdBy?.userType !== "VENDOR"
               ? record?.createdBy?.firstName
               : record?.createdBy?.companyName}
@@ -272,7 +272,7 @@ const PaymentRequestsTable = ({
       render: (_, record) => (
         <>
           <Row className="felx flex-row items-center justify-between">
-            <Typography.Text className="capitalize text-[12px] text-[#8392AB]">
+            <Typography.Text className="capitalize text-[14px] text-[#8392AB]">
               {record?.amount?.toLocaleString()} {record?.currency}
             </Typography.Text>
           </Row>
@@ -313,14 +313,7 @@ const PaymentRequestsTable = ({
     {
       title: "Internal/External",
       key: "category",
-      sorter: (a, b) =>
-        getHighLevelStatus(
-          a?.category?.charAt(0).toUpperCase() + a?.category?.slice(1)
-        ).localeCompare(
-          getHighLevelStatus(
-            b?.category?.charAt(0).toUpperCase() + b?.category?.slice(1)
-          )
-        ),
+      
       render: (_, record) => (
         <div className="mt-2 text-left font-semibold text-[11px]">
           <small className="bg-[#F1F3FF] rounded-3xl text-[#1677FF] px-4 py-1.5">{record?.category == "internal" ? 'INTERNAL' : 'EXTERNAL'}</small>

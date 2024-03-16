@@ -174,6 +174,7 @@ const UsersRequestsTable = ({
     else if (status === "Approved (pm)" || status === "Pending PROC") return "geekblue";
     else if (status === "approved (hod)" || status === "Pending FIN") return "blue";
     else if (status === "Declined" || status === "Withdrawn") return "red";
+    else return "red"
   };
 
   useEffect(() => {
@@ -255,17 +256,17 @@ const UsersRequestsTable = ({
       ),
     },
 
-    {
-      title: "Budgeted?",
-      key: "budgeted",
-      sorter: (a, b) => a?.budgeted > b?.budgeted,
-      render: (_, record) => (
-        <>
-          {record.budgeted && <IoMdCheckmarkCircleOutline size={18} className="text-[#01AF65]" />}
-          {!record.budgeted && <IoMdCloseCircleOutline size={18} className="text-[#F5365C]" />}
-        </>
-      ),
-    },
+    // {
+    //   title: "Budgeted?",
+    //   key: "budgeted",
+    //   sorter: (a, b) => a?.budgeted > b?.budgeted,
+    //   render: (_, record) => (
+    //     <>
+    //       {record.budgeted && <IoMdCheckmarkCircleOutline size={18} className="text-[#01AF65]" />}
+    //       {!record.budgeted && <IoMdCloseCircleOutline size={18} className="text-[#F5365C]" />}
+    //     </>
+    //   ),
+    // },
     {
       title: "Due date",
       key: "dueDate",
@@ -287,16 +288,19 @@ const UsersRequestsTable = ({
       sorter: (a, b) => a?.status > b?.status,
       render: (_, record) => (
         <>
-        <div className={`bg-${getTagColor(
+        <div className={`${`bg-${getTagColor(
               getHighLevelStatus(
                 record?.status.charAt(0).toUpperCase() + record?.status.slice(1)
               )
-            )}-500/10 rounded`}>
-          <span className={`text-${getTagColor(
+            )}-500/10`} rounded`}>
+              {console.log('High Level ',getHighLevelStatus(
+                record?.status.charAt(0).toUpperCase() + record?.status.slice(1)
+              ))}
+          <span className={`${`text-${getTagColor(
               getHighLevelStatus(
                 record?.status.charAt(0).toUpperCase() + record?.status.slice(1)
               )
-            )}-500 text-[13px]`}>
+            )}-500`} text-[13px]`}>
             {getHighLevelStatus(
               record?.status.charAt(0).toUpperCase() + record?.status.slice(1)
             )}

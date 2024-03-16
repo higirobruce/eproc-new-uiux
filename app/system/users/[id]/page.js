@@ -54,7 +54,7 @@ async function getUserDetails(id, router) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       router.push("/auth");
-    } 
+    }
     // This will activate the closest `error.js` Error Boundary
     // console.log(id);
     return null;
@@ -67,7 +67,7 @@ async function getUserDetails(id, router) {
 export default function page({ params }) {
   const { user, login, logout } = useUser();
   // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
-  let token = typeof window !== 'undefined' && localStorage.getItem('token');
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   let router = useRouter();
   const [dataLoaded, setDataLoaded] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
@@ -84,7 +84,6 @@ export default function page({ params }) {
   let [dpts, setDpts] = useState([]);
   let [servCategories, setServCategories] = useState([]);
   const [tab, setTab] = useState(0);
-
 
   const [form] = Form.useForm();
   const [passwordForm] = Form.useForm();
@@ -110,7 +109,6 @@ export default function page({ params }) {
       .then((res) => res.json())
       .then((res) => {
         setDpts(res);
-        
       })
       .catch((err) => {
         messageApi.open({
@@ -348,7 +346,8 @@ export default function page({ params }) {
     let viewPermissionLable = "canView" + module;
 
     newUser.permissions[permissionLable] = canCreate;
-    if(module!=='PaymentRequests') newUser.permissions[editPermissionLable] = canCreate;
+    if (module !== "PaymentRequests")
+      newUser.permissions[editPermissionLable] = canCreate;
     newUser.permissions[viewPermissionLable] = canCreate;
 
     fetch(`${url}/users/${row?._id}`, {
@@ -493,9 +492,7 @@ export default function page({ params }) {
   }
 
   return (
-    <div
-      className="payment-request flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-screen pb-1 mb-32 overflow-y-auto"
-    >
+    <div className="payment-request flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-screen pb-1 mb-32 overflow-y-auto">
       {contextHolder}
       <div className="flex flex-col space-y-5">
         {/* <div className="flex flex-row justify-between">
@@ -544,33 +541,41 @@ export default function page({ params }) {
           {/* Data */}
           <div className="flex flex-col space-y-5">
             <div className="bg-white rounded-lg shadow px-5 pb-7">
-              <h5 className="text-[17px] text-[#263238]">General Information</h5>
+              <h5 className="text-[17px] text-[#263238]">
+                General Information
+              </h5>
               <div className="flex flex-col gap-y-4">
                 <small className="text-[13px] text-[#ADB6BF]">ABOUT</small>
                 <div className="flex items-center gap-x-5 my-2">
-                  <LuUser  className="text-[#ADB6BF]" />
-                  <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">{row?.firstName} {row?.lastName}</h6>
+                  <LuUser className="text-[#ADB6BF]" />
+                  <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
+                    {row?.firstName} {row?.lastName}
+                  </h6>
                 </div>
                 <div className="flex items-center gap-x-5 my-2">
-                  <PiBagSimpleBold  className="text-[#ADB6BF]" />
-                  <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">{row?.department?.description}</h6>
+                  <PiBagSimpleBold className="text-[#ADB6BF]" />
+                  <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
+                    {row?.department?.description}
+                  </h6>
                 </div>
                 <div className="flex items-center gap-x-5">
-                  
                   {/* <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">{row?.firstName} {row?.lastName}</h6> */}
                 </div>
               </div>
               <div className="flex flex-col gap-y-4 mt-5">
                 <small className="text-[13px] text-[#ADB6BF]">CONTACT</small>
                 <div className="flex items-center gap-x-5 my-2">
-                  <MdOutlineAlternateEmail  className="text-[#ADB6BF]" />
-                  <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">{row?.email}</h6>
+                  <MdOutlineAlternateEmail className="text-[#ADB6BF]" />
+                  <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
+                    {row?.email}
+                  </h6>
                 </div>
                 <div className="flex items-center gap-x-5 my-2">
-                <MdPhoneAndroid className="text-[#ADB6BF]" />
-                  <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">{row?.telephone}</h6>
+                  <MdPhoneAndroid className="text-[#ADB6BF]" />
+                  <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
+                    {row?.telephone}
+                  </h6>
                 </div>
-                
               </div>
             </div>
 
@@ -626,7 +631,7 @@ export default function page({ params }) {
                   } text-[14px] cursor-pointer`}
                   onClick={() => setTab(1)}
                 >
-                  Permissions
+                  Module Access
                 </button>
                 <button
                   className={`bg-transparent py-3 my-3 ${
@@ -636,11 +641,21 @@ export default function page({ params }) {
                   } text-[14px] cursor-pointer`}
                   onClick={() => setTab(2)}
                 >
+                  Approval Permissions
+                </button>
+                <button
+                  className={`bg-transparent py-3 my-3 ${
+                    tab == 3
+                      ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238]`
+                      : `border-none text-[#8392AB]`
+                  } text-[14px] cursor-pointer`}
+                  onClick={() => setTab(3)}
+                >
                   Reset Password
                 </button>
               </div>
             </div>
-            {(tab == 0 && row) ? (
+            {tab == 0 && row ? (
               <>
                 <div className="my-1 bg-white rounded-xl px-8 pt-1 pb-7">
                   <h5 className="text-[#263238] text-[18px]">Basic Info</h5>
@@ -649,7 +664,10 @@ export default function page({ params }) {
                       <div className="pb-3 text-[13px] text-[#344767]">
                         First Name
                       </div>
-                      <Form.Item initialValue={row?.firstName} name={"firstName"}>
+                      <Form.Item
+                        initialValue={row?.firstName}
+                        name={"firstName"}
+                      >
                         <Input
                           value={row?.firstName}
                           defaultValue={row?.firstName}
@@ -703,7 +721,10 @@ export default function page({ params }) {
                       <div className="pb-3 text-[13px] text-[#344767]">
                         Phone
                       </div>
-                      <Form.Item initialValue={row?.telephone} name={"telephone"}>
+                      <Form.Item
+                        initialValue={row?.telephone}
+                        name={"telephone"}
+                      >
                         <Input
                           value={row?.telephone}
                           defaultValue={row?.telephone}
@@ -750,7 +771,7 @@ export default function page({ params }) {
                     <Button
                       icon={<SaveOutlined />}
                       type="primary"
-                      size="large"
+                      size="middle"
                       onClick={() => {
                         updateUser();
                       }}
@@ -760,128 +781,172 @@ export default function page({ params }) {
                   </div>
                 </div>
               </>
-              ) : tab == 1 ? (
-                <>
-                  <PermissionsTable
-                    canApproveRequests={row?.permissions?.canApproveRequests}
-                    canCreateRequests={row?.permissions?.canCreateRequests}
-                    canEditRequests={row?.permissions?.canEditRequests}
-                    canViewRequests={row?.permissions?.canViewRequests}
-                    canApprovePaymentRequests={row?.permissions?.canApprovePaymentRequests}
-                    canCreatePaymentRequests={row?.permissions?.canCreatePaymentRequests}
-                    canEditPaymentRequests={row?.permissions?.canEditPaymentRequests}
-                    canViewPaymentRequests={row?.permissions?.canViewPaymentRequests}
-                    canApproveTenders={row?.permissions?.canApproveTenders}
-                    canCreateTenders={row?.permissions?.canCreateTenders}
-                    canEditTenders={row?.permissions?.canEditTenders}
-                    canViewTenders={row?.permissions?.canViewTenders}
-                    canApproveBids={row?.permissions?.canApproveBids}
-                    canCreateBids={row?.permissions?.canCreateBids}
-                    canEditBids={row?.permissions?.canEditBids}
-                    canViewBids={row?.permissions?.canViewBids}
-                    canApproveContracts={row?.permissions?.canApproveContracts}
-                    canCreateContracts={row?.permissions?.canCreateContracts}
-                    canEditContracts={row?.permissions?.canEditContracts}
-                    canViewContracts={row?.permissions?.canViewContracts}
-                    canApprovePurchaseOrders={
-                      row?.permissions?.canApprovePurchaseOrders
-                    }
-                    canCreatePurchaseOrders={
-                      row?.permissions?.canCreatePurchaseOrders
-                    }
-                    canEditPurchaseOrders={
-                      row?.permissions?.canEditPurchaseOrders
-                    }
-                    canViewPurchaseOrders={
-                      row?.permissions?.canViewPurchaseOrders
-                    }
-                    canApproveVendors={row?.permissions?.canApproveVendors}
-                    canCreateVendors={row?.permissions?.canCreateVendors}
-                    canEditVendors={row?.permissions?.canEditVendors}
-                    canViewVendors={row?.permissions?.canViewVendors}
-                    canApproveUsers={row?.permissions?.canApproveUsers}
-                    canCreateUsers={row?.permissions?.canCreateUsers}
-                    canEditUsers={row?.permissions?.canEditUsers}
-                    canViewUsers={row?.permissions?.canViewUsers}
-                    canApproveDashboard={row?.permissions?.canApproveDashboard}
-                    canCreateDashboard={row?.permissions?.canCreateDashboard}
-                    canEditDashboard={row?.permissions?.canEditDashboard}
-                    canViewDashboard={row?.permissions?.canViewDashboard}
-                    handleSetCanView={setCanView}
-                    handleSetCanCreated={setCanCreated}
-                    handleSetCanEdit={setCanEdit}
-                    handleSetCanApprove={setCanApprove}
-                  />
-                  <div className="bg-white rounded-3xl px-5 pb-10">
-                    <div className="text-md font-semibold my-5 flex flex-row justify-between items-center">
-                      <div>Approval permissions</div>
-                    </div>
-                    {(row && row?.permissions) && (
-                      <Form className="w-full">
-                        <Form.Item
-                          name="canApproveAsHod"
-                        >
-                          <div className="flex w-full items-center justify-between">
-                            <div>
-                              <h6 className="text-[13px] text-[#707C95] my-2">Can approve as a Head of department</h6>
-                              <small className="text-[12px] text-[#95A1B3]">Perfom more action on request on this user</small>
-                            </div>
-                            <div className="permission">
-                              <Switch checked={row?.permissions?.canApproveAsHod} onChange={(checked) => {setCanApproveAsHod(checked)}} />
-                            </div>
-                            
-                          </div>
-                        </Form.Item>
-                        <Form.Item
-                          name="canApproveAsHof"
-                        >
-                          <div className="flex w-full items-center justify-between">
-                            <div>
-                              <h6 className="text-[13px] text-[#707C95] my-2">Can approve as a Head of finance</h6>
-                              <small className="text-[12px] text-[#95A1B3]">Perfom more action on request on this user</small>
-                            </div>
-                            <div className="permission">
-                              <Switch checked={row?.permissions?.canApproveAsHof} onChange={(checked) => {setCanApproveAsHof(checked)}} />
-                            </div>
-                          </div>
-                        </Form.Item>
-                        <Form.Item
-                          name="canApproveAsPM"
-                        >
-                          <div className="flex w-full items-center justify-between">
-                            <div>
-                              <h6 className="text-[13px] text-[#707C95] my-2">Can approve as a Procurement manager</h6>
-                              <small className="text-[12px] text-[#95A1B3]">Perfom more action on request on this user</small>
-                            </div>
-                            <div className="permission">
-                              <Switch checked={row?.permissions?.canApproveAsPM} onChange={(checked) => {setCanApproveAsPM(checked)}} />
-                            </div>
-                          </div>
-                        </Form.Item>
+            ) : tab == 1 ? (
+              <>
+                <PermissionsTable
+                  canApproveRequests={row?.permissions?.canApproveRequests}
+                  canCreateRequests={row?.permissions?.canCreateRequests}
+                  canEditRequests={row?.permissions?.canEditRequests}
+                  canViewRequests={row?.permissions?.canViewRequests}
+                  canApprovePaymentRequests={
+                    row?.permissions?.canApprovePaymentRequests
+                  }
+                  canCreatePaymentRequests={
+                    row?.permissions?.canCreatePaymentRequests
+                  }
+                  canEditPaymentRequests={
+                    row?.permissions?.canEditPaymentRequests
+                  }
+                  canViewPaymentRequests={
+                    row?.permissions?.canViewPaymentRequests
+                  }
+                  canApproveTenders={row?.permissions?.canApproveTenders}
+                  canCreateTenders={row?.permissions?.canCreateTenders}
+                  canEditTenders={row?.permissions?.canEditTenders}
+                  canViewTenders={row?.permissions?.canViewTenders}
+                  canApproveBids={row?.permissions?.canApproveBids}
+                  canCreateBids={row?.permissions?.canCreateBids}
+                  canEditBids={row?.permissions?.canEditBids}
+                  canViewBids={row?.permissions?.canViewBids}
+                  canApproveContracts={row?.permissions?.canApproveContracts}
+                  canCreateContracts={row?.permissions?.canCreateContracts}
+                  canEditContracts={row?.permissions?.canEditContracts}
+                  canViewContracts={row?.permissions?.canViewContracts}
+                  canApprovePurchaseOrders={
+                    row?.permissions?.canApprovePurchaseOrders
+                  }
+                  canCreatePurchaseOrders={
+                    row?.permissions?.canCreatePurchaseOrders
+                  }
+                  canEditPurchaseOrders={
+                    row?.permissions?.canEditPurchaseOrders
+                  }
+                  canViewPurchaseOrders={
+                    row?.permissions?.canViewPurchaseOrders
+                  }
+                  canApproveVendors={row?.permissions?.canApproveVendors}
+                  canCreateVendors={row?.permissions?.canCreateVendors}
+                  canEditVendors={row?.permissions?.canEditVendors}
+                  canViewVendors={row?.permissions?.canViewVendors}
+                  canApproveUsers={row?.permissions?.canApproveUsers}
+                  canCreateUsers={row?.permissions?.canCreateUsers}
+                  canEditUsers={row?.permissions?.canEditUsers}
+                  canViewUsers={row?.permissions?.canViewUsers}
+                  canApproveDashboard={row?.permissions?.canApproveDashboard}
+                  canCreateDashboard={row?.permissions?.canCreateDashboard}
+                  canEditDashboard={row?.permissions?.canEditDashboard}
+                  canViewDashboard={row?.permissions?.canViewDashboard}
+                  handleSetCanView={setCanView}
+                  handleSetCanCreated={setCanCreated}
+                  handleSetCanEdit={setCanEdit}
+                  handleSetCanApprove={setCanApprove}
+                />
+              </>
+            ) : tab == 2 ? (
+              <div className="bg-white rounded-3xl px-5 pb-10">
+                <div className="text-md font-semibold my-5 flex flex-row justify-between items-center">
+                  <div>Approval permissions</div>
+                </div>
+                {row && row?.permissions && (
+                  <Form className="w-full">
+                    <Form.Item name="canApproveAsHod">
+                      <div className="flex w-full items-center justify-between">
+                        <div>
+                          <h6 className="text-[13px] text-[#707C95] my-2">
+                            Can approve as a Head of department
+                          </h6>
+                          <small className="text-[12px] text-[#95A1B3]">
+                            Perfom more action on request on this user
+                          </small>
+                        </div>
+                        <div className="permission">
+                          <Switch
+                            checked={row?.permissions?.canApproveAsHod}
+                            onChange={(checked) => {
+                              setCanApproveAsHod(checked);
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </Form.Item>
+                    <Form.Item name="canApproveAsHof">
+                      <div className="flex w-full items-center justify-between">
+                        <div>
+                          <h6 className="text-[13px] text-[#707C95] my-2">
+                            Can approve as a Head of finance
+                          </h6>
+                          <small className="text-[12px] text-[#95A1B3]">
+                            Perfom more action on request on this user
+                          </small>
+                        </div>
+                        <div className="permission">
+                          <Switch
+                            checked={row?.permissions?.canApproveAsHof}
+                            onChange={(checked) => {
+                              setCanApproveAsHof(checked);
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </Form.Item>
+                    <Form.Item name="canApproveAsPM">
+                      <div className="flex w-full items-center justify-between">
+                        <div>
+                          <h6 className="text-[13px] text-[#707C95] my-2">
+                            Can approve as a Procurement manager
+                          </h6>
+                          <small className="text-[12px] text-[#95A1B3]">
+                            Perfom more action on request on this user
+                          </small>
+                        </div>
+                        <div className="permission">
+                          <Switch
+                            checked={row?.permissions?.canApproveAsPM}
+                            onChange={(checked) => {
+                              setCanApproveAsPM(checked);
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </Form.Item>
 
-                        <Form.Item
-                          name="canApproveAsLegal"
-                        >
-                          <div className="permission flex w-full items-center justify-between">
-                            <div>
-                              <h6 className="text-[13px] text-[#707C95] my-2">Can approve as a Legal officer</h6>
-                              <small className="text-[12px] text-[#95A1B3]">Perfom more action on request on this user</small>
-                            </div>
-                            <div className="permission">
-                              <Switch checked={row?.permissions?.canApproveAsLegal} onChange={(checked) => {setCanApproveAsLegal(checked)}} />
-                            </div>
-                          </div>
-                        </Form.Item>
-                      </Form>
-                    )}
-                  </div>
-                </>
-              ) : tab == 2 && (
+                    <Form.Item name="canApproveAsLegal">
+                      <div className="permission flex w-full items-center justify-between">
+                        <div>
+                          <h6 className="text-[13px] text-[#707C95] my-2">
+                            Can approve as a Legal officer
+                          </h6>
+                          <small className="text-[12px] text-[#95A1B3]">
+                            Perfom more action on request on this user
+                          </small>
+                        </div>
+                        <div className="permission">
+                          <Switch
+                            checked={row?.permissions?.canApproveAsLegal}
+                            onChange={(checked) => {
+                              setCanApproveAsLegal(checked);
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </Form.Item>
+                  </Form>
+                )}
+              </div>
+            ) : (
+              tab == 3 && (
                 <div className="bg-white rounded-lg pb-4 px-8">
                   <div className="flex items-center justify-between">
-                    <h5 className="text-[#263238] text-[18px]">Password Change</h5>
-                    <Button type="primary" danger size="large" onClick={() => updatePassword()}>
-                      Update User Password
+                    <h5 className="text-[#263238] text-[18px]">
+                      Password Change
+                    </h5>
+                    <Button
+                      type="primary"
+                      danger
+                      size="middle"
+                      onClick={() => updatePassword()}
+                    >
+                      Reset Password
                     </Button>
                     {/* <Form
                       // {...formItemLayout}
@@ -901,7 +966,8 @@ export default function page({ params }) {
                     </Form> */}
                   </div>
                 </div>
-              )}
+              )
+            )}
           </div>
         </div>
       </div>
