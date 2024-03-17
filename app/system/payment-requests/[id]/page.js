@@ -899,8 +899,10 @@ export default function PaymentRequest({ params }) {
                     </Button>
                   </div> */}
 
-                  <div className="text-lg font-semibold">
-                    Payment request {paymentRequest?.number}
+                  <div className="flex items-start gap-x-5">
+                    <h4 className="text-[21px] text-[#344767] mb-3">
+                      Payment request {paymentRequest?.number}
+                    </h4>
                     <sup className="bg-[#F1F3FF] px-3 py-1 rounded-full mt-2 ml-3 text-[#1677FF] font-semibold">
                       {paymentRequest?.category == "internal"
                         ? "INTERNAL"
@@ -918,12 +920,12 @@ export default function PaymentRequest({ params }) {
                 />
               )} */}
             </div>
-            <div className="flex flex-col pl-5 pr-8">
+            <div className="flex flex-col pr-8">
               {/* Overview */}
               <div className="flex flex-row items-center justify-between mb-5">
-                <Typography.Title level={4} onClick={refresh}>
-                  Overview
-                </Typography.Title>
+                <h5 className="text-[18px] text-[#344767] mb-4">
+                  Request Details
+                </h5>
                 <div className="flex items-center gap-x-4">
                   <div>
                     <Tag
@@ -991,8 +993,8 @@ export default function PaymentRequest({ params }) {
                   <div className="grid md:grid-cols-3 sm:grid-cols-1 gap-6">
                     {/* Request Title */}
                     <div className="flex flex-col space-y-2">
-                      <div className="mb-3">
-                        <label className="text-xs text-gray-400">Title</label>
+                      <div className="mb-2">
+                        <label className="text-[14px] text-[#344767]">Title</label>
                       </div>
                       <div className="">
                           <Form.Item
@@ -1024,8 +1026,8 @@ export default function PaymentRequest({ params }) {
 
                     {/* Request Amount due*/}
                     <div className="flex flex-col  space-y-2 ">
-                      <div className="mb-3">
-                        <label className="text-xs text-gray-400">
+                      <div className="mb-2">
+                        <label className="text-[14px] text-[#344767]">
                           Amount due
                         </label>
                       </div>
@@ -1138,7 +1140,7 @@ export default function PaymentRequest({ params }) {
                     {/* Request Attached Invoice*/}
                     <div className="flex flex-col  space-y-2 ">
                       <div className="flex flex-row items-center space-x-2">
-                        <div className="text-xs text-gray-400">
+                        <div className="text-[14px] text-[#344767] mb-2">
                           Attached Invoice(s)
                         </div>
                         {((user?.permissions?.canApproveAsHod &&
@@ -1246,8 +1248,8 @@ export default function PaymentRequest({ params }) {
                     {/* Budgeted */}
                     {user?.userType !== "VENDOR" && paymentRequest && (
                       <div className="flex flex-col space-y-1 items-start">
-                        <div className="mb-3">
-                          <label className="text-xs text-gray-400">
+                        <div className="mb-2">
+                          <label className="text-[14px] text-[#344767]">
                             Budgeted
                           </label>
                         </div>
@@ -1273,10 +1275,10 @@ export default function PaymentRequest({ params }) {
                                 disabled={!conditions}
                               >
                                 <Radio value={true} className="mr-3">
-                                  <span className="ml-2 text-[18px]">Yes</span>
+                                  <span className="ml-2">Yes</span>
                                 </Radio>
                                 <Radio value={false} className="mx-3">
-                                  <span className="ml-2 text-[18px]">No</span>
+                                  <span className="ml-2">No</span>
                                 </Radio>
                               </Radio.Group>
                             </Form.Item>
@@ -1289,8 +1291,8 @@ export default function PaymentRequest({ params }) {
                     {user?.userType !== "VENDOR" && budgeted && (
                       <div className="flex flex-col space-y-1 items-start">
                         {budgeted && (
-                          <div className="mb-3">
-                            <label className="text-xs text-gray-400">
+                          <div className="mb-2">
+                            <label className="text-[14px] text-[#344767]">
                               Budget Line
                             </label>
                           </div>
@@ -1380,8 +1382,8 @@ export default function PaymentRequest({ params }) {
 
                     {/* Request Comment/addtional note */}
                     <div className="flex flex-col space-y-2">
-                      <div className="mb-3">
-                        <label className="text-xs text-gray-400">Comment</label>
+                      <div className="mb-2">
+                        <label className="text-[14px] text-[#344767]">Comment</label>
                       </div>
                       {paymentRequest && (
                         <div className="">
@@ -1413,7 +1415,7 @@ export default function PaymentRequest({ params }) {
                   </div>
                   {paymentRequest && (
                     <div className="edit-requests mb-10 pt-5 border-4 border-[#203783]">
-                      <h5 className="text-[18px] text-[#344767]">
+                      <h5 className="text-[18px] text-[#344767] mb-4">
                         Payment Details
                       </h5>
                       <div className="bg-[#EFF4F8] px-5 rounded-lg">

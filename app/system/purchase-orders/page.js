@@ -894,8 +894,9 @@ export default function PurchaseOrders() {
                             <small className="text-[10px] text-[#353531]">
                               Vendor
                             </small>
-                            <p className="text-[#344767] font-medium text-[13px] py-0 my-0">
-                              {po?.vendor?.companyName}
+
+                            <p className="text-[#344767] font-medium text-[14px] py-0 my-0">
+                              {!po?.vendor?.companyName ? 'Not Specified' : po?.vendor?.companyName.length > 9 ? po?.vendor?.companyName.slice(0, 8) + '...' : po?.vendor?.companyName}
                             </p>
                           </div>
                         )}
@@ -903,7 +904,7 @@ export default function PurchaseOrders() {
                           <small className="text-[10px] text-[#353531]">
                             Total Value
                           </small>
-                          <p className="text-[#344767] font-medium text-[13px] py-0 my-0">
+                          <p className="text-[#344767] font-medium text-[14px] py-0 my-0">
                             {po?.items?.map((i) => {
                               let lTot = i?.quantity * i?.estimatedUnitCost;
                               t = t + lTot;
@@ -915,28 +916,28 @@ export default function PurchaseOrders() {
                           <small className="text-[10px] text-[#353531]">
                             Created At
                           </small>
-                          <p className="text-[#344767] font-medium text-[13px] py-0 my-0">
+                          <p className="text-[#344767] font-medium text-[14px] py-0 my-0">
                             03 - Mar - 2023
                           </p>
                         </div>
                         {documentFullySigned(po) && (
                           <div>
-                            <div className="bg-[#D2FBD0] rounded-xl text-[#0D4A26] text-[12px] font-medium px-3 py-1">
+                            <div className="bg-[#D2FBD0] rounded-xl text-[#0D4A26] text-[14px] font-medium px-3 py-1">
                               Signed
                             </div>
                           </div>
                         )}
 
                         {!documentFullySigned(po) && (
-                          <div>
-                            <div className="bg-[#F9BB01] rounded-xl text-[#FFF] text-[12px] font-medium px-3 py-1">
-                              {po?.status || "Pending-signature"}
+                          <div className="flex justify-end">
+                            <div className="bg-[#F9BB01] rounded-xl text-[#FFF] text-[14px] font-medium px-3 py-1">
+                              {po?.status?.length > 6 ? po?.status?.slice(0, 5) + '..' : po?.status || "Pending"}
                             </div>
                           </div>
                         )}
 
                         <button
-                          className="bg-[#1677FF] border-none px-3 py-2 rounded-lg text-[11px] font-semibold text-white cursor-pointer"
+                          className="bg-[#1677FF] border-none px-3 py-2 rounded-lg text-[13px] font-semibold text-white cursor-pointer"
                           onClick={() => createPaymentRequest(po)}
                         >
                           Request Payment
@@ -1055,9 +1056,9 @@ export default function PurchaseOrders() {
                                         </span>
                                       </Tooltip>
                                     )}
-                                    <small className="text-[#455A64] text-[13px] font-semibold">
+                                    {/* <small className="text-[#455A64] text-[13px] font-semibold">
                                       {s?.names}
-                                    </small>
+                                    </small> */}
                                     <div className="bg-[#F1F3FF] py-1 px-3 rounded-xl text-[11px] font-medium text-[#353531]">
                                       {s?.title}
                                     </div>
@@ -1092,17 +1093,22 @@ export default function PurchaseOrders() {
                   </div>
                 );
               })}
-              {console.log('Total Pages',totalPages )}
-              <div>
-              <Pagination
-                defaultCurrent={currentPage}
-                onChange={(page, pageSize) => {
-                  setCurrentPage(page);
-                  setPageSize(pageSize);
-                }}
-                pageSize={pageSize}
-                total={totalPages}
-              />
+              <div className="flex w-full justify-end">
+                <Pagination
+                  pageSizeOptions={[5, 10, 20, 30, 50, 75, 100]}
+                  showSizeChanger
+                  defaultCurrent={currentPage}
+                  onShowSizeChange={(page, pageSize) => {
+                    setCurrentPage(page);
+                    setPageSize(pageSize);
+                  }}
+                  onChange={(page, pageSize) => {
+                    setCurrentPage(page);
+                    setPageSize(pageSize);
+                  }}
+                  pageSize={pageSize}
+                  total={totalPages}
+                />
               </div>
           </div>
         </div>

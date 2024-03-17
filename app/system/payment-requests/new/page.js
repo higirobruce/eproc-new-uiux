@@ -256,11 +256,11 @@ export default function NewPaymentRequest() {
         </div>
         <div className="grid lg:grid-cols-3 gap-x-10 mt-5 items-start justify-start h-full">
           <div className="lg:col-span-2">
-            <h5 className="text-[18px] text-[#344767] ml-3 mb-4">
+            <h5 className="text-[18px] text-[#344767] mb-4">
               Request Details
             </h5>
             <div className="gap-1">
-              <div className="flex flex-col p-3">
+              <div className="flex flex-col py-3">
                 <Form
                   className="mt-5"
                   // layout="horizontal"
@@ -674,9 +674,9 @@ export default function NewPaymentRequest() {
               });
             }}
             disabled={submitting}
-            className="flex item-center cursor-pointer border-none text-[16px] text-white gap-x-4 bg-[#0065DD] rounded-lg py-3 px-6"
+            className="flex item-center mr-7 cursor-pointer border-none text-[15px] text-white gap-x-2 bg-[#0065DD] rounded pt-2.5 pb-3 pl-4 pr-5"
           >
-            <SaveOutlined className="font-[19px]" />
+            <SaveOutlined className="font-[17px]" />
             Save
           </button>
         </div>

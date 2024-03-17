@@ -29,6 +29,7 @@ import {
   Spin,
   Row,
   Input,
+  Pagination,
   Col,
 } from "antd";
 import Image from "next/image";
@@ -112,6 +113,9 @@ export default function Contracts() {
   const contentHeight = useRef();
   const [previewAttachment, setPreviewAttachment] = useState(false);
   const [attachmentId, setAttachmentId] = useState("TOR-id.pdf");
+  const [pageSize, setPageSize] = useState(5);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0)
 
   const onMenuClick = (e) => {
     setOpenViewContract(true);
@@ -179,7 +183,7 @@ export default function Contracts() {
 
   useEffect(() => {
     getContracts();
-  }, [searchStatus]);
+  }, [currentPage, pageSize, searchStatus]);
 
   useEffect(() => {
     if (searchText === "") {
@@ -845,7 +849,7 @@ export default function Contracts() {
           setDataLoaded(true);
         });
     } else {
-      fetch(`${url}/contracts/byStatus/${searchStatus}`, {
+      fetch(`${url}/contracts/byStatus/${searchStatus}?pagesize=${pageSize}&page=${currentPage}`, {
         method: "GET",
         headers: {
           Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
@@ -856,10 +860,11 @@ export default function Contracts() {
         .then((res) => getResultFromServer(res))
         .then((res) => {
           let _contracts = user?.permissions?.canApproveAsLegal
-            ? res
-            : res?.filter((r) => r.status !== "draft");
+            ? res?.data
+            : res?.data?.filter((r) => r.status !== "draft");
           setContracts(_contracts);
           setTempContracts(_contracts);
+          setTotalPages(res?.totalPages)
           setDataLoaded(true);
         })
         .catch((err) => {
@@ -1581,7 +1586,7 @@ export default function Contracts() {
                               <small className="text-[10px] text-[#353531]">
                                 Vendor
                               </small>
-                              <p className="text-[#344767] font-medium text-[13px] py-0 my-0">
+                              <p className="text-[#344767] font-medium text-[14px] py-0 my-0">
                                 {contract?.vendor?.companyName}
                               </p>
                             </div>
@@ -1589,26 +1594,28 @@ export default function Contracts() {
                               <small className="text-[10px] text-[#353531]">
                                 Created At
                               </small>
-                              <p className="text-[#344767] font-medium text-[13px] py-0 my-0">
+                              <p className="text-[#344767] font-medium text-[14px] py-0 my-0">
                                 03 - Mar - 2023
                               </p>
                             </div>
                             {(!documentFullySignedInternally(contract) ||
                               !documentFullySigned(contract)) && (
                               <div>
-                                <div className="bg-[#F9BB01] rounded-xl text-[#FFF] text-[12px] font-medium px-3 py-1">
-                                  {contract?.status}
+                                <div className="bg-[#F9BB01] rounded-xl text-[#FFF] text-[14px] font-medium px-3 py-1">
+                                  {contract?.status?.length > 6 ? contract?.status?.slice(0, 5) + '..' : contract?.status || "Pending"}
                                 </div>
                               </div>
                             )}
                             {documentFullySigned(contract) && (
                               <div className="flex flex-col justify-start items-start gap-4">
                                 <div>
-                                  <div className="bg-[#D2FBD0] rounded-xl text-[#0D4A26] text-[12px] font-medium px-3 py-1">
-                                    {contract?.status}
+                                  <div className="bg-[#D2FBD0] rounded-xl text-[#0D4A26] text-[14px] font-medium px-3 py-1">
+                                    {contract?.status?.length > 6 ? contract?.status?.slice(0, 5) + '..' : contract?.status || "Pending"}
                                   </div>
                                 </div>
-                                <Popover
+                                {/* To be implemented as hover to keep card/column alignment */}
+
+                                {/* <Popover
                                   placement="topLeft"
                                   content={`${moment(
                                     contract?.startDate
@@ -1620,7 +1627,7 @@ export default function Contracts() {
                                     Expires in{" "}
                                     {moment(contract?.endDate).fromNow()}
                                   </div>
-                                </Popover>
+                                </Popover> */}
                               </div>
                             )}
                             {user?.userType !== "VENDOR" && (
@@ -1704,7 +1711,7 @@ export default function Contracts() {
                                     className="text-[13px] flex items-center gap-3 no-underline text-[#1677FF]"
                                   >
                                     <FaLink />
-                                    Reference Docs
+                                    Check request
                                   </Link>
                                 )}
                               {contract?.reqAttachmentDocId && (
@@ -1713,7 +1720,7 @@ export default function Contracts() {
                                   className="text-[13px] flex items-center gap-3 no-underline text-[#1677FF]"
                                 >
                                   <IoLink />
-                                  Check request
+                                  Reference Docs
                                 </Link>
                               )}
                             </div>
@@ -1779,9 +1786,9 @@ export default function Contracts() {
                                             </span>
                                           </Tooltip>
                                         )}
-                                        <small className="text-[#455A64] text-[13px] font-semibold">
+                                        {/* <small className="text-[#455A64] text-[13px] font-semibold">
                                           {s?.names}
-                                        </small>
+                                        </small> */}
                                         <div className="bg-[#F1F3FF] py-1 px-3 rounded-xl text-[11px] font-medium text-[#353531]">
                                           {s?.title}
                                         </div>
@@ -1799,6 +1806,23 @@ export default function Contracts() {
                 })}
               </div>
             )}
+            <div className="flex w-full justify-end">
+              <Pagination
+                pageSizeOptions={[5, 10, 20, 30, 50, 75, 100]}
+                showSizeChanger
+                defaultCurrent={currentPage}
+                onShowSizeChange={(page, pageSize) => {
+                  setCurrentPage(page);
+                  setPageSize(pageSize);
+                }}
+                onChange={(page, pageSize) => {
+                  setCurrentPage(page);
+                  setPageSize(pageSize);
+                }}
+                pageSize={pageSize}
+                total={totalPages}
+              />
+            </div>
           </div>
 
           {/* <div class="absolute -bottom-20 right-10 opacity-10">

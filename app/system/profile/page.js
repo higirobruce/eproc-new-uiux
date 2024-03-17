@@ -155,7 +155,7 @@ export default function page() {
 
   function buildUser() {
     return (
-      <div className="payment-request mr-6 rounded-lg h-[calc(100vh-160px)] mb-10 px-5 pb-2 overflow-y-auto">
+      <div className="payment-request rounded-lg h-[calc(100vh-160px)] mb-10 pb-2 overflow-y-auto">
         {contextHolder}
         <div className="grid md:grid-cols-3 gap-5 mb-16">
           <div className="flex flex-col space-y-5">
@@ -174,7 +174,7 @@ export default function page() {
                     {user?.title ? user?.title : user?.number}
                   </Tag>
                 </div>
-                <div className="flex items-center gap-x-5 my-2">
+                <div className="flex items-center gap-x-5 my-2 ">
                   <MdOutlineAlternateEmail className="text-[#ADB6BF]" />
                   <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
                     {user?.email}
@@ -210,9 +210,9 @@ export default function page() {
                     } text-[14px] cursor-pointer`}
                     onClick={() => setTab(0)}
                   >
-                    Account Info
+                    Module Access
                   </button>
-                  {/* <button
+                  <button
                     className={`bg-transparent py-3 my-3 ${
                       tab == 1
                         ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238]`
@@ -220,8 +220,8 @@ export default function page() {
                     } text-[14px] cursor-pointer`}
                     onClick={() => setTab(1)}
                   >
-                    Activities
-                  </button> */}
+                    Approval Permissions
+                  </button>
                   <button
                     className={`bg-transparent py-3 my-3 ${
                       tab == 2
@@ -296,16 +296,107 @@ export default function page() {
                     canNotEdit={true}
                   />
                 </>
+              ) : tab == 1 ? (
+                <div className="bg-white rounded-lg px-5 pb-10">
+                  <h6 className="mb-3 pb-0 text-[15px] text-[#263238]">Approval permissions</h6>
+                  
+                  <Form className="w-full">
+                    <Form.Item name="canApproveAsHod">
+                      <div className="flex w-full items-center justify-between">
+                        <div>
+                          <h6 className="text-[13px] text-[#707C95] my-2">
+                            Can approve as a Head of department
+                          </h6>
+                          <small className="text-[12px] text-[#95A1B3]">
+                            Perfom more action on request on this user
+                          </small>
+                        </div>
+                        <div className="permission">
+                          <Switch
+                            disabled
+                            checked={user?.permissions?.canApproveAsHod}
+                            onChange={(checked) => {
+                              setCanApproveAsHod(checked);
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </Form.Item>
+                    <Form.Item name="canApproveAsHof">
+                      <div className="flex w-full items-center justify-between">
+                        <div>
+                          <h6 className="text-[13px] text-[#707C95] my-2">
+                            Can approve as a Head of finance
+                          </h6>
+                          <small className="text-[12px] text-[#95A1B3]">
+                            Perfom more action on request on this user
+                          </small>
+                        </div>
+                        <div className="permission">
+                          <Switch
+                            disabled
+                            checked={user?.permissions?.canApproveAsHof}
+                            onChange={(checked) => {
+                              setCanApproveAsHof(checked);
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </Form.Item>
+                    <Form.Item name="canApproveAsPM">
+                      <div className="flex w-full items-center justify-between">
+                        <div>
+                          <h6 className="text-[13px] text-[#707C95] my-2">
+                            Can approve as a Procurement manager
+                          </h6>
+                          <small className="text-[12px] text-[#95A1B3]">
+                            Perfom more action on request on this user
+                          </small>
+                        </div>
+                        <div className="permission">
+                          <Switch
+                            disabled
+                            checked={user?.permissions?.canApproveAsPM}
+                            onChange={(checked) => {
+                              setCanApproveAsPM(checked);
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </Form.Item>
+
+                    <Form.Item name="canApproveAsLegal">
+                      <div className="permission flex w-full items-center justify-between">
+                        <div>
+                          <h6 className="text-[13px] text-[#707C95] my-2">
+                            Can approve as a Legal officer
+                          </h6>
+                          <small className="text-[12px] text-[#95A1B3]">
+                            Perfom more action on request on this user
+                          </small>
+                        </div>
+                        <div className="permission">
+                          <Switch
+                            disabled
+                            checked={user?.permissions?.canApproveAsLegal}
+                            onChange={(checked) => {
+                              setCanApproveAsLegal(checked);
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </Form.Item>
+                  </Form>
+                </div>
               ) : (
                 <>
                   <div className="flex flex-col space-y-5">
                     {/* Reset password */}
-                    <div className="bg-white ring-1 ring-gray-100 rounded shadow px-5 pt-5">
-                      <div className="text-xl font-semibold mb-5 flex flex-row justify-between items-center">
-                        <div className="pb-3 text-[13px] text-[#344767]">
-                          Reset password
-                        </div>
+                    <div className="bg-white rounded-lg shadow px-5 pb-5">
+                      <div className="pb-5">
+                        <h6 className="mb-3 pb-0 text-[15px] text-[#263238]">Reset Password</h6>
                       </div>
+                      
                       <Form
                         // {...formItemLayout}
                         form={form}
@@ -418,14 +509,14 @@ export default function page() {
                           {submitting ? (
                             <Spin indicator={antIcon} />
                           ) : (
-                            <div className="flex flex-row items-center justify-between mt-3">
+                            <div className="flex flex-row items-center justify-between my-3">
                               <Button
                                 type="primary"
-                                size="large"
+                                size="middle"
                                 danger
                                 htmlType="submit"
                               >
-                                Update my password
+                                Update Password
                               </Button>
                             </div>
                           )}
@@ -1249,7 +1340,7 @@ export default function page() {
   }
 
   return (
-    <div className="payment-request mr-6 rounded-lg h-[calc(100vh-115px)] pb-10 px-5 overflow-y-auto">
+    <div className="payment-request rounded-lg h-[calc(100vh-115px)] mt-6 pb-10 overflow-y-auto">
       {user?.userType === "VENDOR" ? buildVendor() : buildUser()}
     </div>
   );
