@@ -1845,7 +1845,11 @@ export default function Contracts() {
     let _contract = { ...contract };
     _contract.sections = sections;
     _contract.signatories = signatories;
-    _contract.status = "pending-signature";
+    _contract.status = !previousStatus
+      ? "draft"
+      : previousStatus === "legal-review"
+      ? "pending-signature"
+      : "legal-review";
 
     fetch(`${url}/contracts/${contract?._id}`, {
       method: "PUT",
