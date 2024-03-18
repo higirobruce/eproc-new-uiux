@@ -21,6 +21,7 @@ import Link from "next/link";
 import { MdDeleteOutline } from "react-icons/md";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
+let fendUrl = process.env.NEXT_PUBLIC_FTEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
 
@@ -244,7 +245,8 @@ const ItemsTable = ({
                         <div key={p}>
                           {p && (
                             <Link
-                              href={`${url}/file/termsOfReference/${p}`}
+                              // href={`${url}/file/termsOfReference/${p}`}
+                              href={`${fendUrl}/api?folder=termsOfReference&name=${p}`}
                               target="_blank"
                             >
                               <Typography.Link

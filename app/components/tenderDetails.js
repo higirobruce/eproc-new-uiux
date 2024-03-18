@@ -114,6 +114,7 @@ const TenderDetails = ({
 }) => {
   const [form] = Form.useForm();
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
+  let fendUrl = process.env.NEXT_PUBLIC_FTEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
   let token = typeof window !== "undefined" && localStorage.getItem("token");
@@ -225,7 +226,7 @@ const TenderDetails = ({
                   return (
                     <div key={p}>
                       <Link
-                        href={`${url}/file/termsOfReference/${p}`}
+                        href={`${fendUrl}/api?folder=termsOfReference&name=${p}`}
                         target="_blank"
                       >
                         <Typography.Link className="flex flex-row items-center space-x-2">
@@ -285,7 +286,8 @@ const TenderDetails = ({
                   return (
                     <div key={p}>
                       <Link
-                        href={`${url}/file/termsOfReference/${p}`}
+                        // href={`${url}/file/termsOfReference/${p}`}
+                        href={`${fendUrl}/api?folder=termsOfReference&name=${p}`}
                         target="_blank"
                       >
                         <Typography.Link className="flex flex-row items-center space-x-2">
@@ -2617,45 +2619,47 @@ const TenderDetails = ({
                       data?.status !== "bidSelected" &&
                       data?.status !== "bidAwarded" && (
                         <div className="absolute left-1">
-                          {data?.invitees?.length < 1 && <Tooltip title="Extend submission deadline">
-                            <div
-                              onClick={extendSubmissionDadeline}
-                              className="p-1 -mt-1.5 rounded ring-1 ring-red-300 shadow-md flex items-center text-red-500 justify-center cursor-pointer active:shadow-sm active:text-red-300"
-                            >
-                              <CalendarDaysIcon className="h-4 w-4  " />
-                            </div>
-                          </Tooltip>}
+                          {data?.invitees?.length < 1 && (
+                            <Tooltip title="Extend submission deadline">
+                              <div
+                                onClick={extendSubmissionDadeline}
+                                className="p-1 -mt-1.5 rounded ring-1 ring-red-300 shadow-md flex items-center text-red-500 justify-center cursor-pointer active:shadow-sm active:text-red-300"
+                              >
+                                <CalendarDaysIcon className="h-4 w-4  " />
+                              </div>
+                            </Tooltip>
+                          )}
                         </div>
                       )}
 
-                      {(user?.permissions?.canEditTenders && extending) && (
-                        <div className="flex flex-row self-end items-center space-x-2">
-                          <div>
-                            <Popconfirm
-                              title="Are you sure?"
-                              onConfirm={() => {
-                                submitExtensionRequest();
-                                // setExtending(false);
-                              }}
-                            >
-                              <div
-                                // onClick={extendSubmissionDadeline}
-                                className="py-2 px-4 rounded bg-[#F2F4FD] flex items-center gap-x-2 text-[#0063CF] justify-center cursor-pointer active:shadow-sm active:text-[#0063CF]"
-                              >
-                                <CheckIcon className="h-4 w-4  " />
-                              </div>
-                            </Popconfirm>
-                          </div>
-                          <div>
+                    {user?.permissions?.canEditTenders && extending && (
+                      <div className="flex flex-row self-end items-center space-x-2">
+                        <div>
+                          <Popconfirm
+                            title="Are you sure?"
+                            onConfirm={() => {
+                              submitExtensionRequest();
+                              // setExtending(false);
+                            }}
+                          >
                             <div
-                              onClick={() => setExtending(false)}
-                              className="p-2 rounded ring-1 ring-red-300 shadow-md flex items-center text-red-500 justify-center cursor-pointer active:shadow-sm active:text-red-300"
+                              // onClick={extendSubmissionDadeline}
+                              className="py-2 px-4 rounded bg-[#F2F4FD] flex items-center gap-x-2 text-[#0063CF] justify-center cursor-pointer active:shadow-sm active:text-[#0063CF]"
                             >
-                              <CloseOutlined className="h-3 w-3h-3  " />
+                              <CheckIcon className="h-4 w-4  " />
                             </div>
+                          </Popconfirm>
+                        </div>
+                        <div>
+                          <div
+                            onClick={() => setExtending(false)}
+                            className="p-2 rounded ring-1 ring-red-300 shadow-md flex items-center text-red-500 justify-center cursor-pointer active:shadow-sm active:text-red-300"
+                          >
+                            <CloseOutlined className="h-3 w-3h-3  " />
                           </div>
                         </div>
-                      )}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -2694,7 +2698,8 @@ const TenderDetails = ({
                 </div>
                 <div>
                   <Link
-                    href={`${url}/file/tenderDocs/${data?.docId}.pdf`}
+                    // href={`${url}/file/tenderDocs/${data?.docId}.pdf`}
+                    href={`${fendUrl}/api?folder=tenderDocs&name=${data?.docId}.pdf`}
                     target="_blank"
                   >
                     <Typography.Link>
@@ -2761,47 +2766,52 @@ const TenderDetails = ({
                   data?.status !== "bidSelected" &&
                   data?.status !== "bidAwarded" && (
                     <div className="absolute left-2 mt-7">
-                      {data?.invitees?.length < 1 && <Tooltip title="Extend submission deadline">
-                        <div
-                          onClick={extendSubmissionDadeline}
-                          className="p-2 rounded ring-1 ring-red-300 shadow-md flex items-center text-red-500 justify-center cursor-pointer active:shadow-sm active:text-red-300"
-                        >
-                          <CalendarDaysIcon className="h-4 w-4  " />
-                        </div>
-                      </Tooltip>}
+                      {data?.invitees?.length < 1 && (
+                        <Tooltip title="Extend submission deadline">
+                          <div
+                            onClick={extendSubmissionDadeline}
+                            className="p-2 rounded ring-1 ring-red-300 shadow-md flex items-center text-red-500 justify-center cursor-pointer active:shadow-sm active:text-red-300"
+                          >
+                            <CalendarDaysIcon className="h-4 w-4  " />
+                          </div>
+                        </Tooltip>
+                      )}
                     </div>
                   )}
               </div>
 
-              {(user?.permissions?.canEditTenders && extending && deadLine && data?.invitees?.length < 1) && (
-                <div className="flex flex-row self-end items-center space-x-2">
-                  <div>
-                    <Popconfirm
-                      title="Are you sure?"
-                      onConfirm={() => {
-                        submitExtensionRequest();
-                        // setExtending(false);
-                      }}
-                    >
-                      <div
-                        // onClick={extendSubmissionDadeline}
-                        className="py-2 px-4 rounded bg-[#F2F4FD] flex items-center gap-x-2 text-[#0063CF] justify-center cursor-pointer active:shadow-sm active:text-[#0063CF]"
+              {user?.permissions?.canEditTenders &&
+                extending &&
+                deadLine &&
+                data?.invitees?.length < 1 && (
+                  <div className="flex flex-row self-end items-center space-x-2">
+                    <div>
+                      <Popconfirm
+                        title="Are you sure?"
+                        onConfirm={() => {
+                          submitExtensionRequest();
+                          // setExtending(false);
+                        }}
                       >
-                        <CheckIcon className="h-4 w-4  " />
-                        <small>Extend Deadline</small>
+                        <div
+                          // onClick={extendSubmissionDadeline}
+                          className="py-2 px-4 rounded bg-[#F2F4FD] flex items-center gap-x-2 text-[#0063CF] justify-center cursor-pointer active:shadow-sm active:text-[#0063CF]"
+                        >
+                          <CheckIcon className="h-4 w-4  " />
+                          <small>Extend Deadline</small>
+                        </div>
+                      </Popconfirm>
+                    </div>
+                    <div>
+                      <div
+                        onClick={() => setExtending(false)}
+                        className="p-2 rounded ring-1 ring-red-300 shadow-md flex items-center text-red-500 justify-center cursor-pointer active:shadow-sm active:text-red-300"
+                      >
+                        <CloseOutlined className="h-3 w-3h-3  " />
                       </div>
-                    </Popconfirm>
-                  </div>
-                  <div>
-                    <div
-                      onClick={() => setExtending(false)}
-                      className="p-2 rounded ring-1 ring-red-300 shadow-md flex items-center text-red-500 justify-center cursor-pointer active:shadow-sm active:text-red-300"
-                    >
-                      <CloseOutlined className="h-3 w-3h-3  " />
                     </div>
                   </div>
-                </div>
-              )}
+                )}
 
               {/* {user?.userType !== "VENDOR" && (
               <Tag color="magenta">
@@ -3136,9 +3146,12 @@ const TenderDetails = ({
                           {iBelongToEvaluators() &&
                             !iHaveApprovedEvalReport() &&
                             data?.evaluationReportId && (
-                              <p className="my-4 py-3 text-[15px] text-[#344767] font-semibold">Do you agree with the evalution report recommendations?</p>
-                          )}
-                          
+                              <p className="my-4 py-3 text-[15px] text-[#344767] font-semibold">
+                                Do you agree with the evalution report
+                                recommendations?
+                              </p>
+                            )}
+
                           <div className="flex flex-row space-x-2">
                             {iBelongToEvaluators() &&
                               !iHaveApprovedEvalReport() &&
@@ -3944,7 +3957,11 @@ const TenderDetails = ({
                                   <small className="text-[12px] text-[#8392AB]">
                                     Additional Comments
                                   </small>
-                                  <textarea value={item?.comment} className="border-[#D9D9D9] px-3 py-2.5 rounded-lg text-[12px] text-[#8392AB]" rows={4}></textarea>
+                                  <textarea
+                                    value={item?.comment}
+                                    className="border-[#D9D9D9] px-3 py-2.5 rounded-lg text-[12px] text-[#8392AB]"
+                                    rows={4}
+                                  ></textarea>
                                 </div>
                               </div>
                             </div>
