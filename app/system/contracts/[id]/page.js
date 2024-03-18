@@ -54,7 +54,7 @@ let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
 
 async function getContractDetails(id, router) {
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const res = await fetch(`${url}/contracts/${id}`, {
     headers: {
       Authorization: "Basic " + `${encode(`${apiUsername}:${apiPassword}`)}`,
@@ -81,7 +81,7 @@ async function getContractDetails(id, router) {
 export default function page({ params }) {
   const { user, login, logout } = useUser();
   // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   let [contract, setContract] = useState({});
   let router = useRouter();
 
@@ -921,7 +921,8 @@ export default function page({ params }) {
                 {(user?.email === s?.email || user?.tempEmail === s?.email) &&
                   !s?.signed &&
                   previousSignatorySigned(contract?.signatories, index) &&
-                  contract?.status !== "draft" && (
+                  contract?.status !== "draft" &&
+                  contract?.status !== "legal-review" && (
                     <Popconfirm
                       title="Confirm Contract Signature"
                       onConfirm={() => handleSignContract(s, index)}
@@ -943,7 +944,8 @@ export default function page({ params }) {
                   user?.tempEmail !== s?.email &&
                   !s.signed) ||
                   !previousSignatorySigned(contract?.signatories, index) ||
-                  contract?.status == "draft") && (
+                  contract?.status == "draft" ||
+                  contract?.status === "legal-review") && (
                   <div className="flex flex-row justify-center space-x-5 items-center border-t-2 bg-gray-50 p-5">
                     <Image
                       width={40}
@@ -954,6 +956,8 @@ export default function page({ params }) {
                       {s.signed
                         ? "Signed"
                         : contract?.status === "draft"
+                        ? "Still in drafting phase"
+                        : contract?.status === "legal-review"
                         ? "Waiting for Legal's review"
                         : `Waiting for ${yetToSign[0]?.names}'s signature`}
                     </div>
