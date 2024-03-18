@@ -883,9 +883,10 @@ export default function Contracts() {
       )
         .then((res) => getResultFromServer(res))
         .then((res) => {
-          let _contracts = user?.permissions?.canApproveAsLegal
-            ? res?.data
-            : res?.data?.filter((r) => r.status !== "draft");
+          // let _contracts = user?.permissions?.canApproveAsLegal
+          //   ? res?.data
+          //   : res?.data?.filter((r) => r.status !== "draft");
+          let _contracts = res?.data;
           setContracts(_contracts);
           setTempContracts(_contracts);
           setTotalPages(res?.totalPages);
