@@ -428,8 +428,6 @@ export default function page({ params }) {
       });
   }
 
-  console.log("Row Data ", rowData);
-
   return (
     <div className="payment-request flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-[calc(100vh-40px)] pb-1 overflow-y-auto">
       {contextHolder}
@@ -762,7 +760,7 @@ export default function page({ params }) {
                         className="h-10 my-3"
                         onChange={(e) => {
                           let r = { ...rowData };
-                          r.website = e.target.value;
+                          r.webSite = e.target.value;
                           setRowData(r);
                         }}
                       />
@@ -886,7 +884,7 @@ export default function page({ params }) {
                     )}
                   </div>
                   <div>
-                    {rowData?.rdbCertId && (
+                    {rowData?.vatCertId && (
                       <div>
                         <div className="flex gap-2">
                           <label className="text-[#6A757B] mb-3">
@@ -903,7 +901,7 @@ export default function page({ params }) {
                           </div>
                         </div>
                         <Form.Item
-                          name="rdbRegistraction"
+                          name="vatRegistraction"
                           rules={
                             [
                               // {
@@ -936,7 +934,7 @@ export default function page({ params }) {
 
                     {!rowData?.vatCertId && (
                       <Form.Item
-                        name="rdbRegistraction"
+                        name="vatRegistraction"
                         rules={
                           [
                             // {

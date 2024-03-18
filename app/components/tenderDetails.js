@@ -2983,7 +2983,7 @@ const TenderDetails = ({
   };
 
   return (
-    <div className="flex flex-col p-3 rounded">
+    <div className="flex flex-col p-3 rounded mb-6">
       <contextHolder />
       <div className="flex flex-row justify-between items-start">
         <div className="flex-1">

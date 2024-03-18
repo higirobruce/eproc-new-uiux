@@ -677,7 +677,7 @@ export default function NewPaymentRequest() {
             className="flex item-center mr-7 cursor-pointer border-none text-[15px] text-white gap-x-2 bg-[#0065DD] rounded pt-2.5 pb-3 pl-4 pr-5"
           >
             <SaveOutlined className="font-[17px]" />
-            Save
+            Submit
           </button>
         </div>
       </div>

@@ -881,9 +881,9 @@ export default function PaymentRequest({ params }) {
       className="flex flex-col mr-5 transition-opacity ease-in-out duration-1000 py-5 flex-1 space-y-3 h-screen mb-10"
     >
       {contextHolder}
-      <div className="request-details gap-4 items-start h-screen overflow-y-auto">
-        <div className="grid md:grid-cols-5 gap-1 items-start h-[calc(100%-520px)]">
-          <div className="md:col-span-4 flex flex-col p-5 space-y-5 bg-white h-full pb-5 mb-7 rounded-xl">
+      <div className="request-details gap-4 mb-6 items-start h-[calc(100vh-200px)] overflow-y-auto">
+        <div className="grid md:grid-cols-5 gap-1 items-start">
+          <div className="md:col-span-4 flex flex-col bg-white p-5 space-y-5 pb-5 rounded-xl">
             <div className="flex flex-row justify-between items-center">
               <div className="flex flex-row justify-between items-center">
                 <div className="flex flex-row space-x-10 items-center">

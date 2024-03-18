@@ -255,7 +255,7 @@ function buildTenderForm(
         </div>
       </div>
       <div className="flex flex-row space-x-1 items-center">
-        <Form.Item>
+        <Form.Item className="w-full">
           <Button
             icon={<FileDoneOutlined />}
             type="primary"
@@ -264,7 +264,7 @@ function buildTenderForm(
             disabled={
               !user?.permissions?.canCreateTenders || !tenderDocSelected
             }
-            className="mt-4"
+            className="w-full"
           >
             Publish Tender
           </Button>
@@ -336,6 +336,7 @@ function buildPOForm(
         <Button
           // size="small"
           type="primary"
+          className="w-full"
           icon={<FileDoneOutlined />}
           onClick={submitPOData}
           disabled={
@@ -2581,10 +2582,10 @@ const RequestDetails = ({
     data?.status === "approved (pm)";
 
   return (
-    <div className="request-details grid md:grid-cols-5 gap-4 items-start h-screen overflow-y-auto">
+    <div className="request-details grid md:grid-cols-5 gap-4 items-start h-screen mb-2 overflow-y-auto">
       {contextHolder}
       <div className="md:col-span-4">
-        <div className="flex flex-col ring-1 ring-gray-200 pl-5 pr-8 rounded-lg bg-white mb-4 border-0">
+        <div className="flex flex-col ring-1 ring-gray-200 pl-5 pr-8 rounded-lg bg-white border-0">
           {data && (
             <Form form={form}>
               <div className="flex items-center justify-between ml-3 mb-2">
@@ -2929,8 +2930,8 @@ const RequestDetails = ({
           {createContractMOdal()}
         </div>
 
-        <div className="md:col-span-4 flex pb-8 flex-col ring-1 ring-gray-200 px-3 rounded-lg bg-white mb-24">
-          <h4 className="mb-1 text-[17px]">Request Process</h4>
+        <div className="md:col-span-4 flex pb-8 flex-col px-6 rounded-lg bg-white mb-24">
+          <h4 className="mb-1 text-[15px]">Request Process</h4>
           <div className="-my-3.5">
             <button
               className={`cursor-pointer w-full pr-5 flex justify-between items-center bg-transparent border-none ${
@@ -2939,7 +2940,7 @@ const RequestDetails = ({
               onClick={() => handleItemClick("request")}
             >
               <div className="flex flex-col items-start justify-start gap-4">
-                <h6 className="text-[#344767] text-[15px] -mb-1">
+                <h6 className="text-[#344767] font-semibold text-[14px] -mb-1">
                   Request Approval Process
                 </h6>
                 <span className="text-[#8392AB]">
@@ -3002,7 +3003,7 @@ const RequestDetails = ({
               onClick={() => handleItemClick("delivery")}
             >
               <div className="flex flex-col items-start justify-start gap-4">
-                <h6 className="text-[#344767] text-[15px] -mb-1">
+                <h6 className="text-[#344767] text-[14px] font-semibold -mb-1">
                   Delivery Tracking
                 </h6>
                 <span className="text-[#8392AB]">
@@ -3298,211 +3299,213 @@ const RequestDetails = ({
             ]}
           />
         </div>
-        <div className="bg-white rounded px-4 pt-2 shadow">
-          <div className="pt-3">
-            {/* Sourcing Method */}
-            {currentCode !== 3 && (
-              <div className="mb-5">
-                <div className="text-[16px] font-bold">Sourcing Method</div>
-                <div className="mt-4 text-[14px] line text-[#A3AEB4] leading-6">
-                  {(data?.sourcingMethod && (
-                    <Tag>{data?.sourcingMethod}</Tag>
-                  )) ||
-                    "No sourcing method selected at the moment."}
+        <div className="bg-white rounded-lg shadow py-1.5">
+          <div className="request px-4 max-h-[calc(100vh-665px)] overflow-y-auto">
+            <div className="pt-3">
+              {/* Sourcing Method */}
+              {currentCode !== 3 && (
+                <div className="mb-5">
+                  <div className="text-[16px] font-bold">Sourcing Method</div>
+                  <div className="mt-4 text-[14px] line text-[#A3AEB4] leading-6">
+                    {(data?.sourcingMethod && (
+                      <Tag>{data?.sourcingMethod}</Tag>
+                    )) ||
+                      "No sourcing method selected at the moment."}
+                  </div>
                 </div>
-              </div>
-            )}
-            {currentCode === 3 &&
-              (user?.permissions?.canCreateTenders ||
-                user?.permissions?.canCreatePurchaseOrders ||
-                user?.permissions?.canCreateContracts) && (
-                <>
-                  <Form form={form}>
-                    <div className="text-[16px] font-bold">
-                      Sourcing Method Selection
-                    </div>
-                    <div className="mt-5 items-center">
-                      <div className="mb-2">
-                        Please select a sourcing method
+              )}
+              {currentCode === 3 &&
+                (user?.permissions?.canCreateTenders ||
+                  user?.permissions?.canCreatePurchaseOrders ||
+                  user?.permissions?.canCreateContracts) && (
+                  <>
+                    <Form form={form}>
+                      <div className="text-[16px] font-bold">
+                        Sourcing Method Selection
                       </div>
-                      <Form.Item name="refDoc">
-                        <Select
-                          onChange={(value) => setRefDoc(value)}
-                          style={{ width: "100%" }}
-                          defaultValue={false}
-                          options={[
-                            {
-                              value: "From Existing Contract",
-                              label: "Sourcing from Existing Contract",
-                            },
-
-                            {
-                              value: "Direct Contracting",
-                              label: "Direct contracting",
-                            },
-                            {
-                              value: "Tendering",
-                              label: "Tendering",
-                            },
-                          ]}
-                        />
-                      </Form.Item>
-                    </div>
-
-                    {refDoc === "Tendering" &&
-                      buildTenderForm(
-                        setDeadLine,
-                        user,
-                        docId,
-                        submitTenderData,
-                        setTendeDocSelected,
-                        tenderDocSelected
-                      )}
-
-                    {refDoc === "From Existing Contract" &&
-                      buildPOForm(
-                        setSelectedContract,
-                        contracts,
-                        user,
-                        submitPOData,
-                        setVendor,
-                        selectedContract,
-                        documentFullySigned
-                      )}
-
-                    {refDoc === "Direct Contracting" && (
-                      <div>
-                        <div className="items-center">
-                          <div className="mb-2">Select registered vendor</div>
-                          <Form.Item name="vendor">
-                            <Select
-                              onChange={(value, option) => {
-                                setVendor(option?.payload);
-                              }}
-                              style={{ width: "100%" }}
-                              showSearch
-                              filterSort={(optionA, optionB) =>
-                                (optionA?.label ?? "")
-                                  .toLowerCase()
-                                  .localeCompare(
-                                    (optionB?.label ?? "").toLowerCase()
-                                  )
-                              }
-                              filterOption={(inputValue, option) =>
-                                option?.label
-                                  .toLowerCase()
-                                  .includes(inputValue.toLowerCase())
-                              }
-                              options={vendors
-                                ?.filter(
-                                  (v) => v?.vendor?.status === "approved"
-                                )
-                                ?.map((v) => {
-                                  return {
-                                    value: v?.vendor?._id,
-                                    label: v?.vendor?.companyName,
-                                    payload: v?.vendor,
-                                  };
-                                })}
-                            />
-                          </Form.Item>
+                      <div className="mt-5 items-center">
+                        <div className="mb-2">
+                          Please select a sourcing method
                         </div>
-                        <div className="items-center">
-                          <div>
-                            Upload reference document{" "}
-                            <i className="text-xs">(expected in PDF format)</i>
-                          </div>
-                          <Form.Item name="vendor">
-                            <UploadReqAttach
-                              uuid={reqAttachId}
-                              setAttachSelected={setAttachSelected}
-                            />
-                          </Form.Item>
-                        </div>
+                        <Form.Item name="refDoc">
+                          <Select
+                            onChange={(value) => setRefDoc(value)}
+                            style={{ width: "100%" }}
+                            defaultValue={false}
+                            options={[
+                              {
+                                value: "From Existing Contract",
+                                label: "Sourcing from Existing Contract",
+                              },
+
+                              {
+                                value: "Direct Contracting",
+                                label: "Direct contracting",
+                              },
+                              {
+                                value: "Tendering",
+                                label: "Tendering",
+                              },
+                            ]}
+                          />
+                        </Form.Item>
+                      </div>
+
+                      {refDoc === "Tendering" &&
+                        buildTenderForm(
+                          setDeadLine,
+                          user,
+                          docId,
+                          submitTenderData,
+                          setTendeDocSelected,
+                          tenderDocSelected
+                        )}
+
+                      {refDoc === "From Existing Contract" &&
+                        buildPOForm(
+                          setSelectedContract,
+                          contracts,
+                          user,
+                          submitPOData,
+                          setVendor,
+                          selectedContract,
+                          documentFullySigned
+                        )}
+
+                      {refDoc === "Direct Contracting" && (
                         <div>
-                          <div className="flex flex-col w-full">
-                            <div className="flex flex-row space-x-1 items-center w-full mt-4">
-                              <Form.Item className="w-full my-2">
-                                <Button
-                                  icon={<FileDoneOutlined />}
-                                  type="primary"
-                                  htmlType="submit"
-                                  onClick={submitContractData}
-                                  disabled={
-                                    !user?.permissions?.canCreateContracts ||
-                                    !vendor ||
-                                    !attachSelected
-                                  }
-                                  className="space-x-0 pt-1 pb-3 gap-2 px-2 mx-1 w-full"
-                                >
-                                  Create Contract
-                                </Button>
-                              </Form.Item>
+                          <div className="items-center">
+                            <div className="mb-2">Select registered vendor</div>
+                            <Form.Item name="vendor">
+                              <Select
+                                onChange={(value, option) => {
+                                  setVendor(option?.payload);
+                                }}
+                                style={{ width: "100%" }}
+                                showSearch
+                                filterSort={(optionA, optionB) =>
+                                  (optionA?.label ?? "")
+                                    .toLowerCase()
+                                    .localeCompare(
+                                      (optionB?.label ?? "").toLowerCase()
+                                    )
+                                }
+                                filterOption={(inputValue, option) =>
+                                  option?.label
+                                    .toLowerCase()
+                                    .includes(inputValue.toLowerCase())
+                                }
+                                options={vendors
+                                  ?.filter(
+                                    (v) => v?.vendor?.status === "approved"
+                                  )
+                                  ?.map((v) => {
+                                    return {
+                                      value: v?.vendor?._id,
+                                      label: v?.vendor?.companyName,
+                                      payload: v?.vendor,
+                                    };
+                                  })}
+                              />
+                            </Form.Item>
+                          </div>
+                          <div className="items-center">
+                            <div>
+                              Upload reference document{" "}
+                              <i className="text-xs">(expected in PDF format)</i>
                             </div>
+                            <Form.Item name="vendor">
+                              <UploadReqAttach
+                                uuid={reqAttachId}
+                                setAttachSelected={setAttachSelected}
+                              />
+                            </Form.Item>
+                          </div>
+                          <div>
+                            <div className="flex flex-col w-full">
+                              <div className="flex flex-row space-x-1 items-center w-full mt-4">
+                                <Form.Item className="w-full my-2">
+                                  <Button
+                                    icon={<FileDoneOutlined />}
+                                    type="primary"
+                                    htmlType="submit"
+                                    onClick={submitContractData}
+                                    disabled={
+                                      !user?.permissions?.canCreateContracts ||
+                                      !vendor ||
+                                      !attachSelected
+                                    }
+                                    className="space-x-0 pt-1 pb-3 gap-2 px-2 mx-1 w-full"
+                                  >
+                                    Create Contract
+                                  </Button>
+                                </Form.Item>
+                              </div>
 
-                            <div className="flex flex-row space-x-1 items-center w-full mb-3">
-                              <Form.Item className="w-full my-2">
-                                <Button
-                                  icon={<FileDoneOutlined />}
-                                  type="primary"
-                                  htmlType="submit"
-                                  onClick={submitPOData}
-                                  disabled={
-                                    !user?.permissions
-                                      ?.canCreatePurchaseOrders ||
-                                    !vendor ||
-                                    !attachSelected
-                                  }
-                                  className="space-x-0 pt-1 pb-3 gap-2 px-2 mx-1 w-full"
-                                >
-                                  Create PO
-                                </Button>
-                              </Form.Item>
+                              <div className="flex flex-row space-x-1 items-center w-full mb-3">
+                                <Form.Item className="w-full my-2">
+                                  <Button
+                                    icon={<FileDoneOutlined />}
+                                    type="primary"
+                                    htmlType="submit"
+                                    onClick={submitPOData}
+                                    disabled={
+                                      !user?.permissions
+                                        ?.canCreatePurchaseOrders ||
+                                      !vendor ||
+                                      !attachSelected
+                                    }
+                                    className="space-x-0 pt-1 pb-3 gap-2 px-2 mx-1 w-full"
+                                  >
+                                    Create PO
+                                  </Button>
+                                </Form.Item>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    )}
-                  </Form>
-                </>
-              )}
+                      )}
+                    </Form>
+                  </>
+                )}
 
-            {tender && data?.sourcingMethod === "Tendering" && (
-              <div className="mb-5">
-                <Typography.Text type="secondary">
-                  Tender reference:{" "}
-                  <Link href={`/system/tenders/${tender?._id}`}>
-                    {tender?.number}
-                  </Link>
-                </Typography.Text>
-              </div>
-            )}
-
-            {contract &&
-              (data?.sourcingMethod === "Direct Contracting" ||
-                data?.sourcingMethod === "From Existing Contract") && (
-                <div className="ml-3">
+              {tender && data?.sourcingMethod === "Tendering" && (
+                <div className="mb-5">
                   <Typography.Text type="secondary">
-                    Contract reference:{" "}
-                    <Link href={`/system/contracts/${contract?._id}`}>
-                      {contract?.number}
+                    Tender reference:{" "}
+                    <Link href={`/system/tenders/${tender?._id}`}>
+                      {tender?.number}
                     </Link>
                   </Typography.Text>
                 </div>
               )}
 
-            {po &&
-              (data?.sourcingMethod === "Direct Contracting" ||
-                data?.sourcingMethod === "From Existing Contract") && (
-                <div className="ml-3">
-                  <Typography.Text type="secondary">
-                    PO reference:{" "}
-                    <Link href={`/system/purchase-orders/${po?._id}`}>
-                      {po?.number}
-                    </Link>
-                  </Typography.Text>
-                </div>
-              )}
+              {contract &&
+                (data?.sourcingMethod === "Direct Contracting" ||
+                  data?.sourcingMethod === "From Existing Contract") && (
+                  <div className="ml-3 mb-5">
+                    <Typography.Text type="secondary">
+                      Contract reference:{" "}
+                      <Link href={`/system/contracts/${contract?._id}`}>
+                        {contract?.number}
+                      </Link>
+                    </Typography.Text>
+                  </div>
+                )}
+
+              {po &&
+                (data?.sourcingMethod === "Direct Contracting" ||
+                  data?.sourcingMethod === "From Existing Contract") && (
+                  <div className="ml-3 mb-5">
+                    <Typography.Text type="secondary">
+                      PO reference:{" "}
+                      <Link href={`/system/purchase-orders/${po?._id}`}>
+                        {po?.number}
+                      </Link>
+                    </Typography.Text>
+                  </div>
+                )}
+            </div>
           </div>
         </div>
       </div>
