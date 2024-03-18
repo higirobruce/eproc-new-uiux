@@ -31,7 +31,7 @@ import { decode as base64_decode, encode as base64_encode } from "base-64";
 import Login from "@/public/login.svg";
 import LoginForm from "./loginForm";
 import Link from "next/link";
-import Logo from '@/public/Logo.png';
+import Logo from "@/public/Logo.png";
 
 const { Option } = Select;
 
@@ -2251,7 +2251,10 @@ const SignupForm = () => {
                         { required: true, message: "Input required" },
                       ]}
                     >
-                      <InputNumber Placeholder="Type TIN" className="h-10 mt-1 w-full" />
+                      <InputNumber
+                        Placeholder="Type TIN"
+                        className="h-10 mt-1 w-full"
+                      />
                     </Form.Item>
                   </div>
                 </div>
@@ -2261,9 +2264,7 @@ const SignupForm = () => {
                       <label className="text-[#6A757B]">HQ Adress</label>
                     </div>
 
-                    <Form.Item
-                      name="hqAddress"
-                    >
+                    <Form.Item name="hqAddress">
                       <Input
                         placeholder="Type full address"
                         className="h-10 mt-1 w-full"
@@ -2275,22 +2276,21 @@ const SignupForm = () => {
                       <label className="text-[#6A757B]">Country</label>
                     </div>
 
-                    <Form.Item
-                      name="country"
-                    >
+                    <Form.Item name="country">
                       <Input
                         placeholder="Type country"
                         className="h-10 mt-1 w-full"
                       />
                     </Form.Item>
                   </div>
-                  
                 </div>
-                
+
                 <div className="grid lg:grid-cols-2 items-center gap-x-5 -my-1">
                   <div>
                     <div className="flex items-center gap-2">
-                      <label className="text-[#6A757B]">Area(s) of expertise</label>
+                      <label className="text-[#6A757B]">
+                        Area(s) of expertise
+                      </label>
                       <div className="text-red-500">*</div>
                     </div>
 
@@ -2332,14 +2332,19 @@ const SignupForm = () => {
                         options={websiteOptions}
                         onChange={onWebsiteChange}
                       >
-                        <Input className="h-10 mt-1 w-full" placeholder="Type in your Website" />
+                        <Input
+                          className="h-10 mt-1 w-full"
+                          placeholder="Type in your Website"
+                        />
                       </AutoComplete>
                     </Form.Item>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-x-5">
                   <div>
-                    <label className="text-[#6A757B]">Experience (in Years)</label>
+                    <label className="text-[#6A757B]">
+                      Experience (in Years)
+                    </label>
                     <Form.Item
                       name="experience"
                       rules={[
@@ -2357,7 +2362,9 @@ const SignupForm = () => {
                 <div className="grid lg:grid-cols-2 items-center gap-x-5 -my-1">
                   <div>
                     <div className="flex gap-2">
-                      <label className="text-[#6A757B] mb-3">Incorporation document</label>
+                      <label className="text-[#6A757B] mb-3">
+                        Incorporation document
+                      </label>
                       <div>
                         <Tooltip
                           placement="top"
@@ -2371,31 +2378,35 @@ const SignupForm = () => {
 
                     <Form.Item
                       name="rdbRegistraction"
-                      rules={[
-                        // {
-                        //   validator: (_, value) =>
-                        //     rdbSelected
-                        //       ? Promise.resolve()
-                        //       : Promise.reject(
-                        //           new Error(
-                        //             "Please attach your incorporation document"
-                        //           )
-                        //         ),
-                        // },
-                      ]}
+                      rules={
+                        [
+                          // {
+                          //   validator: (_, value) =>
+                          //     rdbSelected
+                          //       ? Promise.resolve()
+                          //       : Promise.reject(
+                          //           new Error(
+                          //             "Please attach your incorporation document"
+                          //           )
+                          //         ),
+                          // },
+                        ]
+                      }
                     >
                       <UploadRDCerts
                         uuid={rdbCertId}
                         setSelected={setRDBSelected}
                         setId={setRdbCertId}
                         iconOnly={false}
-                        setStatus={()=>{}}
+                        setStatus={() => {}}
                       />
                     </Form.Item>
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <label className="text-[#6A757B] mb-3">VAT Certificate</label>
+                      <label className="text-[#6A757B] mb-3">
+                        VAT Certificate
+                      </label>
                     </div>
 
                     <Form.Item name="vatCertificate">
@@ -2403,17 +2414,18 @@ const SignupForm = () => {
                         uuid={vatCertId}
                         setId={setVatCertId}
                         setSelected={setVatSelected}
-                        setStatus={()=>{}}
-
+                        setStatus={() => {}}
                       />
                     </Form.Item>
                   </div>
-                </div> 
+                </div>
                 <h3 className="text-[#455A64] mt-1">Account Information</h3>
                 <div className="grid lg:grid-cols-2 items-center gap-x-5 -my-1">
                   <div>
                     <div className="flex items-center gap-2">
-                      <label className="text-[#6A757B]">Contact person Names</label>
+                      <label className="text-[#6A757B]">
+                        Contact person Names
+                      </label>
                       <div className="text-red-500">*</div>
                     </div>
 
@@ -2435,7 +2447,9 @@ const SignupForm = () => {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <label className="text-[#6A757B]">Contact Person Title</label>
+                      <label className="text-[#6A757B]">
+                        Contact Person Title
+                      </label>
                       <div className="text-red-500">*</div>
                     </div>
 
@@ -2498,52 +2512,56 @@ const SignupForm = () => {
                         },
                       ]}
                     >
-                      <Input className="mt-1 w-full" addonBefore={prefixSelector} />
+                      <Input
+                        className="mt-1 w-full"
+                        addonBefore={prefixSelector}
+                      />
                     </Form.Item>
                   </div>
                 </div>
                 <div className="grid lg:grid-cols-2 items-center gap-x-5 -my-1">
                   <div>
-                      <div className="flex flex-row spacex-3">
-                        <label className="text-[#6A757B] text-12px">
+                    <div className="flex flex-row spacex-3">
+                      <label className="text-[#6A757B] text-12px">
                         Password
-                        </label>
-                        <div className="text-red-500">*</div>
-                      </div>
-                      <Form.Item
-                        name="password"
-                        // label="Password"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Input required",
-                          },
-                          {
-                            pattern: new RegExp("([0-9]\\d*)+"),
-                            message: "Please input at least one digit",
-                          },
-                          {
-                            pattern: new RegExp("([a-zA-Z]\\s*)+"),
-                            message:
-                              "Password should have both small and capital letters",
-                          },
-                          {
-                            pattern: new RegExp(regexPatternSpecialCh, "g"),
-                            message:
-                              "Password should have a special character",
-                          },
-                          {
-                            pattern: new RegExp("(.{8,})"),
-                            message:
-                              "Password should have atleast 8 characters",
-                          },
-                        ]}
-                        hasFeedback
-                      >
-                        <Input.Password placeholder="* * * * * * * *"
-                        className="h-10 mt-1 w-full" onChange={(v) => setPassword(v)} />
-                      </Form.Item>
+                      </label>
+                      <div className="text-red-500">*</div>
                     </div>
+                    <Form.Item
+                      name="password"
+                      // label="Password"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Input required",
+                        },
+                        {
+                          pattern: new RegExp("([0-9]\\d*)+"),
+                          message: "Please input at least one digit",
+                        },
+                        {
+                          pattern: new RegExp("([a-zA-Z]\\s*)+"),
+                          message:
+                            "Password should have both small and capital letters",
+                        },
+                        {
+                          pattern: new RegExp(regexPatternSpecialCh, "g"),
+                          message: "Password should have a special character",
+                        },
+                        {
+                          pattern: new RegExp("(.{8,})"),
+                          message: "Password should have atleast 8 characters",
+                        },
+                      ]}
+                      hasFeedback
+                    >
+                      <Input.Password
+                        placeholder="* * * * * * * *"
+                        className="h-10 mt-1 w-full"
+                        onChange={(v) => setPassword(v)}
+                      />
+                    </Form.Item>
+                  </div>
                   <div>
                     <div className="flex flex-row spacex-3">
                       <label className="text-[#6A757B] text-12px">
@@ -2563,10 +2581,7 @@ const SignupForm = () => {
                         },
                         ({ getFieldValue }) => ({
                           validator(_, value) {
-                            if (
-                              !value ||
-                              getFieldValue("password") === value
-                            ) {
+                            if (!value || getFieldValue("password") === value) {
                               return Promise.resolve();
                             }
                             return Promise.reject(
@@ -2578,17 +2593,40 @@ const SignupForm = () => {
                         }),
                       ]}
                     >
-                      <Input.Password placeholder="* * * * * * * *"
-                        className="h-10 mt-1 w-full" />
+                      <Input.Password
+                        placeholder="* * * * * * * *"
+                        className="h-10 mt-1 w-full"
+                      />
                     </Form.Item>
                   </div>
                 </div>
               </div>
+              <Form.Item
+                name="agreement"
+                valuePropName="checked"
+                rules={[
+                  {
+                    validator: (_, value) =>
+                      value
+                        ? Promise.resolve()
+                        : Promise.reject(new Error("Should accept agreement")),
+                  },
+                ]}
+                {...tailFormItemLayout}
+              >
+                <Checkbox>
+                  I have read the <a href="">agreement</a>
+                </Checkbox>
+              </Form.Item>
               <Form.Item className="flex justify-end" {...tailFormItemLayout}>
                 {submitting ? (
                   <Spin indicator={antIcon} />
                 ) : (
-                  <Button className="bg-[#0065DD] border-none px-10 h-10 text-white" type="default" htmlType="submit">
+                  <Button
+                    className="bg-[#0065DD] border-none px-10 h-10 text-white"
+                    type="default"
+                    htmlType="submit"
+                  >
                     Register
                   </Button>
                 )}
