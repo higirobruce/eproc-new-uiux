@@ -94,10 +94,11 @@ export default function Contracts() {
   let router = useRouter();
   const { user, login, logout } = useUser();
   // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const [dataLoaded, setDataLoaded] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
+  let fendUrl = process.env.NEXT_PUBLIC_FTEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
   let [contracts, setContracts] = useState(null);
@@ -115,7 +116,7 @@ export default function Contracts() {
   const [attachmentId, setAttachmentId] = useState("TOR-id.pdf");
   const [pageSize, setPageSize] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0)
+  const [totalPages, setTotalPages] = useState(0);
 
   const onMenuClick = (e) => {
     setOpenViewContract(true);
@@ -849,14 +850,17 @@ export default function Contracts() {
           setDataLoaded(true);
         });
     } else {
-      fetch(`${url}/contracts/byStatus/${searchStatus}?pagesize=${pageSize}&page=${currentPage}`, {
-        method: "GET",
-        headers: {
-          Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
-          token: token,
-          "Content-Type": "application/json",
-        },
-      })
+      fetch(
+        `${url}/contracts/byStatus/${searchStatus}?pagesize=${pageSize}&page=${currentPage}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+            token: token,
+            "Content-Type": "application/json",
+          },
+        }
+      )
         .then((res) => getResultFromServer(res))
         .then((res) => {
           let _contracts = user?.permissions?.canApproveAsLegal
@@ -864,7 +868,7 @@ export default function Contracts() {
             : res?.data?.filter((r) => r.status !== "draft");
           setContracts(_contracts);
           setTempContracts(_contracts);
-          setTotalPages(res?.totalPages)
+          setTotalPages(res?.totalPages);
           setDataLoaded(true);
         })
         .catch((err) => {
@@ -1602,7 +1606,9 @@ export default function Contracts() {
                               !documentFullySigned(contract)) && (
                               <div>
                                 <div className="bg-[#F9BB01] rounded-xl text-[#FFF] text-[14px] font-medium px-3 py-1">
-                                  {contract?.status?.length > 6 ? contract?.status?.slice(0, 5) + '..' : contract?.status || "Pending"}
+                                  {contract?.status?.length > 6
+                                    ? contract?.status?.slice(0, 5) + ".."
+                                    : contract?.status || "Pending"}
                                 </div>
                               </div>
                             )}
@@ -1610,7 +1616,9 @@ export default function Contracts() {
                               <div className="flex flex-col justify-start items-start gap-4">
                                 <div>
                                   <div className="bg-[#D2FBD0] rounded-xl text-[#0D4A26] text-[14px] font-medium px-3 py-1">
-                                    {contract?.status?.length > 6 ? contract?.status?.slice(0, 5) + '..' : contract?.status || "Pending"}
+                                    {contract?.status?.length > 6
+                                      ? contract?.status?.slice(0, 5) + ".."
+                                      : contract?.status || "Pending"}
                                   </div>
                                 </div>
                                 {/* To be implemented as hover to keep card/column alignment */}
@@ -1716,7 +1724,9 @@ export default function Contracts() {
                                 )}
                               {contract?.reqAttachmentDocId && (
                                 <Link
-                                  href={`${url}/file/reqAttachments/${contract?.reqAttachmentDocId}.pdf`}
+                                  // href={`${url}/file/reqAttachments/${contract?.reqAttachmentDocId}.pdf`}
+                                  href={`${fendUrl}/api?folder=reqAttachments&name=${contract?.reqAttachmentDocId}.pdf`}
+                                  target="_blank"
                                   className="text-[13px] flex items-center gap-3 no-underline text-[#1677FF]"
                                 >
                                   <IoLink />
