@@ -170,7 +170,8 @@ body {
 }
 
 .request::-webkit-scrollbar {
-  width: 10px;
+  width: 7px;
+  margin: 10px
 }
 
 /* Track */

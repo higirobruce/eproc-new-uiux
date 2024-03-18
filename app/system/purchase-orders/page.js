@@ -141,30 +141,8 @@ export default function PurchaseOrders() {
   const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
-    setDataLoaded(false);
-    fetch(`${url}/purchaseOrders?pagesize=${pageSize}&page=${currentPage}`, {
-      method: "GET",
-      headers: {
-        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
-        token: token,
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => getResultFromServer(res))
-      .then((res) => {
-        setPOs(res?.data);
-        setTempPOs(res?.data);
-        setTotalPages(res?.totalPages);
-        setDataLoaded(true);
-      })
-      .catch((err) => {
-        setDataLoaded(true);
-      });
-  }, [currentPage, pageSize]);
-
-  useEffect(() => {
-    refresh();
-  }, []);
+    refresh()
+  }, [currentPage, pageSize])
 
   useEffect(() => {
     refresh();
@@ -943,7 +921,8 @@ export default function PurchaseOrders() {
                         )}
 
                         <button
-                          className="bg-[#1677FF] border-none px-3 py-2 rounded-lg text-[13px] font-semibold text-white cursor-pointer"
+                          disabled={!documentFullySigned(po)}
+                          className={`${!documentFullySigned(po) ? `bg-gray-50 text-gray-400` : `bg-[#1677FF] text-white cursor-pointer`} border-none px-3 py-2 rounded-lg text-[13px] font-semibold`}
                           onClick={() => createPaymentRequest(po)}
                         >
                           Request Payment

@@ -18,6 +18,7 @@ import {
   PhoneOutlined,
   SaveOutlined,
   UserOutlined,
+  QuestionCircleOutlined
 } from "@ant-design/icons";
 import { EnvelopeIcon, UserIcon, UsersIcon } from "@heroicons/react/24/outline";
 import {
@@ -37,6 +38,7 @@ import {
   Switch,
   Tag,
   Typography,
+  Tooltip
 } from "antd";
 import moment from "moment-timezone";
 import React, { useEffect, useState } from "react";
@@ -48,7 +50,13 @@ import UploadRDCerts from "@/app/components/uploadRDBCerts";
 import UploadVatCerts from "@/app/components/uploadVatCerts";
 import { v4 } from "uuid";
 import { LuUser } from "react-icons/lu";
-import { MdOutlineAlternateEmail, MdPhoneAndroid } from "react-icons/md";
+import {
+  MdOutlineAlternateEmail,
+  MdHomeWork,
+  MdPhoneAndroid,
+} from "react-icons/md";
+import { PiBagSimpleBold } from "react-icons/pi";
+import { FaFirefoxBrowser } from "react-icons/fa6";
 import { useUser } from "@/app/context/UserContext";
 
 export default function page() {
@@ -298,8 +306,10 @@ export default function page() {
                 </>
               ) : tab == 1 ? (
                 <div className="bg-white rounded-lg px-5 pb-10">
-                  <h6 className="mb-3 pb-0 text-[15px] text-[#263238]">Approval permissions</h6>
-                  
+                  <h6 className="mb-3 pb-0 text-[15px] text-[#263238]">
+                    Approval permissions
+                  </h6>
+
                   <Form className="w-full">
                     <Form.Item name="canApproveAsHod">
                       <div className="flex w-full items-center justify-between">
@@ -394,9 +404,11 @@ export default function page() {
                     {/* Reset password */}
                     <div className="bg-white rounded-lg shadow px-5 pb-5">
                       <div className="pb-5">
-                        <h6 className="mb-3 pb-0 text-[15px] text-[#263238]">Reset Password</h6>
+                        <h6 className="mb-3 pb-0 text-[15px] text-[#263238]">
+                          Reset Password
+                        </h6>
                       </div>
-                      
+
                       <Form
                         // {...formItemLayout}
                         form={form}
@@ -578,124 +590,115 @@ export default function page() {
 
   function buildVendor() {
     return (
-      <div className="flex flex-col  transition-opacity ease-in-out duration-1000 px-10 py-5 flex-1 space-y-3 h-full mb-3">
+      <div className="payment-request rounded-lg h-[calc(100vh-160px)] mb-10 pb-2 overflow-y-auto">
         {contextHolder}
-        <div className="flex flex-col space-y-5">
-          <div className="flex flex-row justify-between">
-            <div className="flex flex-row items-center space-x-2">
-              {/* <div>
-                <Button
-                  icon={<ArrowLeftOutlined />}
-                  type="primary"
-                  onClick={() => {
-                    setRowData(null);
-                    setSegment("Bids");
-                  }}
-                >
-                  Back to vendors
-                </Button>
-              </div> */}
-
-              {editVendor && (
-                <div>
-                  <Button
-                    icon={<SaveOutlined />}
-                    type="primary"
-                    onClick={() => {
-                      setEditVendor(false);
-                      updateVendor();
-                    }}
-                  />
+        <div className="grid md:grid-cols-3 gap-5 mb-16">
+          <div className="flex flex-col space-y-5">
+            <div className="bg-white rounded-lg shadow px-5 pb-7">
+              <h5 className="text-[17px] text-[#263238]">
+                General Information
+              </h5>
+              <div className="flex flex-col gap-y-4">
+                <small className="text-[13px] text-[#ADB6BF]">ABOUT</small>
+                <div className="flex items-center gap-x-5 my-2">
+                  <LuUser className="text-[#ADB6BF]" />
+                  <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
+                    {user?.contactPersonNames}
+                  </h6>
                 </div>
-              )}
-            </div>
-            {user?.permissions?.canEditVendors && (
-              <div>
-                <Switch
-                  checkedChildren={<EditOutlined />}
-                  unCheckedChildren={<EyeOutlined />}
-                  defaultChecked={editVendor}
-                  checked={editVendor}
-                  onChange={(checked) => {
-                    setEditVendor(checked);
-                  }}
-                />
+                <div className="flex items-center gap-x-5 my-2">
+                  <MdHomeWork className="text-[#ADB6BF]" />
+                  <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
+                    {user?.companyName}
+                  </h6>
+                </div>
+                <div className="flex items-center gap-x-5 my-2">
+                  <FaFirefoxBrowser className="text-[#ADB6BF]" />
+                  <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
+                    {user?.webSite}
+                  </h6>
+                </div>
               </div>
-            )}
-          </div>
+              <div className="flex flex-col gap-y-4 mt-5">
+                <small className="text-[13px] text-[#ADB6BF]">CONTACT</small>
+                <div className="flex items-center gap-x-5 my-2">
+                  <MdOutlineAlternateEmail className="text-[#ADB6BF]" />
+                  <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
+                    {user?.email}
+                  </h6>
+                </div>
+                <div className="flex items-center gap-x-5 my-2">
+                  <MdPhoneAndroid className="text-[#ADB6BF]" />
+                  <h6 className="text-[15px] font-medium text-[#344767] m-0 p-0">
+                    {user?.telephone}
+                  </h6>
+                </div>
+              </div>
+            </div>
+            <div>
+              {updatingId !== user?._id && (
+                <div className="flex gap-x-3 px-1">
+                  {user?.status === "pending-approval" && (
+                    <span>
+                      <Popconfirm
+                        title="Approve vendor"
+                        description="Are you sure?"
+                        okText="Yes"
+                        cancelText="No"
+                        onConfirm={() => approveUser(user?._id)}
+                      >
+                        <div className="flex flex-row items-center justify-center text-sm shadow rounded px-7 py-2 cursor-pointer bg-[#28C762] text-white">
+                          Approve
+                        </div>
+                      </Popconfirm>
+                    </span>
+                  )}
 
-          <div className="grid md:grid-cols-3 gap-5">
-            {/* Data */}
-            <div className="flex flex-col space-y-5">
-              <div className="bg-white ring-1 ring-gray-100 rounded shadow p-5">
-                <div className="text-xl font-semibold mb-5 flex flex-row justify-between items-center">
-                  <div>General Information</div>
+                  {user?.status === "declined" && (
+                    <span>
+                      <Popconfirm
+                        title="Activate vendor"
+                        description="Are you sure to activate this vendor?"
+                        okText="Yes"
+                        cancelText="No"
+                        onConfirm={() => activateVendor(rowData._id)}
+                      >
+                        <div className="flex flex-row items-center justify-center text-sm ring-1 ring-green-400 rounded px-2 py-1 cursor-pointer bg-green-200">
+                          Activate
+                        </div>
+                      </Popconfirm>
+                    </span>
+                  )}
 
-                  {updatingId !== user?._id && (
-                    <div>
-                      {user?.status === "pending-approval" && (
-                        <span>
-                          <Popconfirm
-                            title="Approve vendor"
-                            description="Are you sure to approve this vendor?"
-                            okText="Yes"
-                            cancelText="No"
-                            onConfirm={() => approveUser(rowData._id)}
-                          >
-                            <div className="flex flex-row items-center justify-center text-sm ring-1 ring-green-400 rounded px-2 py-1 cursor-pointer bg-green-200">
-                              Approve
-                            </div>
-                          </Popconfirm>
-                        </span>
-                      )}
-
-                      {user?.status === "declined" && (
-                        <span>
-                          <Popconfirm
-                            title="Activate vendor"
-                            description="Are you sure to activate this vendor?"
-                            okText="Yes"
-                            cancelText="No"
-                            onConfirm={() => activateVendor(rowData._id)}
-                          >
-                            <div className="flex flex-row items-center justify-center text-sm ring-1 ring-green-400 rounded px-2 py-1 cursor-pointer bg-green-200">
-                              Activate
-                            </div>
-                          </Popconfirm>
-                        </span>
-                      )}
-
-                      {user?.status === "approved" && (
-                        <span>
-                          <Popconfirm
-                            title="Deactive vendor"
-                            description="Are you sure to deactivate this vendor?"
-                            okText="Yes"
-                            cancelText="No"
-                            onConfirm={() => banVendor(rowData._id)}
-                          >
-                            <div className="flex flex-row items-center justify-center text-sm ring-1 ring-red-400 rounded px-2 py-1 cursor-pointer bg-red-200">
-                              Deactivate
-                            </div>
-                          </Popconfirm>
-                        </span>
-                      )}
-                      {user?.status === "banned" && (
-                        <span>
-                          <Popconfirm
-                            title="Acivate vendor"
-                            description="Are you sure to activate this vendor?"
-                            okText="Yes"
-                            cancelText="No"
-                            onConfirm={() => activateVendor(rowData._id)}
-                          >
-                            <div className="flex flex-row items-center justify-center text-sm ring-1 ring-green-400 rounded px-2 py-1 cursor-pointer bg-green-200">
-                              Activate
-                            </div>
-                          </Popconfirm>
-                        </span>
-                      )}
-                    </div>
+                  {user?.status === "approved" && (
+                    <span>
+                      <Popconfirm
+                        title="Deactive vendor"
+                        description="Are you sure to deactivate this vendor?"
+                        okText="Yes"
+                        cancelText="No"
+                        onConfirm={() => banVendor(rowData._id)}
+                      >
+                        <div className="flex flex-row items-center justify-center text-sm ring-1 ring-red-400 rounded px-2 py-1 cursor-pointer bg-red-200">
+                          Deactivate
+                        </div>
+                      </Popconfirm>
+                    </span>
+                  )}
+                  {user?.status === "banned" && (
+                    <span>
+                      <Popconfirm
+                        title="Acivate vendor"
+                        description="Are you sure to activate this vendor?"
+                        okText="Yes"
+                        cancelText="No"
+                        onConfirm={() => activateVendor(rowData._id)}
+                      >
+                        <div className="flex flex-row items-center justify-center text-sm ring-1 ring-green-400 rounded px-2 py-1 cursor-pointer bg-green-200">
+                          Activate
+                        </div>
+                      </Popconfirm>
+                    </span>
                   )}
                   {updatingId === user?._id && (
                     <Spin
@@ -706,160 +709,227 @@ export default function page() {
                     />
                   )}
                 </div>
-
-                <div className="flex flex-col space-y-2">
-                  <div className="flex flex-row items-center space-x-10">
-                    <UserOutlined className="text-gray-400" />
-                    <div className="text-sm flex flex-row items-center space-x-2">
-                      <Typography.Text
-                        editable={
-                          editVendor && {
-                            onChange: (e) => {
-                              let r = { ...rowData };
-                              r.contactPersonNames = e;
-                              setRowData(r);
-                            },
-                            text: user?.contactPersonNames,
-                          }
-                        }
-                      >
-                        {user?.contactPersonNames}
-                      </Typography.Text>{" "}
-                      {!editVendor && (
-                        <div>
-                          <Tag color="cyan">{user?.title}</Tag>
-                        </div>
-                      )}
-                      {editVendor && (
-                        <Typography.Text
-                          editable={
-                            editVendor && {
-                              onChange: (e) => {
-                                let r = { ...rowData };
-                                r.title = e;
-                                setRowData(r);
-                              },
-                              text: user?.title,
-                            }
-                          }
-                        >
-                          {user?.title}
-                        </Typography.Text>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex flex-row items-center space-x-10">
-                    <MailOutlined className="text-gray-400" />
-                    <Typography.Text
-                      editable={
-                        editVendor && {
-                          onChange: (e) => {
-                            let r = { ...rowData };
-                            r.email = e;
-                            setRowData(r);
-                          },
-                          text: user?.email,
-                        }
-                      }
-                      className="text-sm"
-                    >
-                      {user?.email}{" "}
-                    </Typography.Text>
-                  </div>
-
-                  <div className="flex flex-row items-center space-x-10">
-                    <BankOutlined className="text-gray-400" />
-                    <Typography.Text
-                      editable={
-                        editVendor && {
-                          onChange: (e) => {
-                            let r = { ...rowData };
-                            r.tin = e;
-                            setRowData(r);
-                          },
-                          text: user?.tin,
-                        }
-                      }
-                      className="text-sm "
-                    >
-                      {user?.tin}{" "}
-                    </Typography.Text>
-                  </div>
-
-                  <div className="flex flex-row items-center space-x-10">
-                    <PhoneOutlined className="text-gray-400" />
-                    <Typography.Text
-                      editable={
-                        editVendor && {
-                          onChange: (e) => {
-                            let r = { ...rowData };
-                            r.telephone = e;
-                            setRowData(r);
-                          },
-                          text: user?.telephone,
-                        }
-                      }
-                      className="text-sm "
-                    >
-                      {user?.telephone}{" "}
-                    </Typography.Text>
-                  </div>
-                  <div className="flex flex-row items-center space-x-10">
-                    <GlobalOutlined className="text-gray-400" />
-                    <div className="text-sm ">
-                      <Typography.Link
-                        editable={
-                          editVendor && {
-                            onChange: (e) => {
-                              let r = { ...rowData };
-                              r.website = e;
-                              setRowData(r);
-                            },
-                            text: user?.webSite,
-                          }
-                        }
-                      >
-                        {user?.webSite}{" "}
-                      </Typography.Link>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-row items-center space-x-10">
-                    <IdcardOutlined className="text-gray-400" />
-                    <Typography.Text
-                      editable={
-                        editVendor && {
-                          onChange: (e) => {
-                            let r = { ...rowData };
-                            r.passportNid = e;
-                            setRowData(r);
-                          },
-                          text: user?.passportNid,
-                        }
-                      }
-                      className="text-sm "
-                    >
-                      {user?.passportNid}
-                    </Typography.Text>
-                  </div>
-
-                  <div className="flex flex-row items-center space-x-10">
-                    <GiftOutlined className="text-gray-400" />
-                    {!editVendor && (
-                      <div className="grid grid-cols-1 gap-2">
-                        {user?.services?.map((s) => {
-                          return (
-                            <div key={s}>
-                              <Tag>{s}</Tag>
-                            </div>
-                          );
-                        })}
+              )}
+            </div>
+          </div>
+          <div className="col-span-2 flex flex-col space-y-3 pr-5">
+            <div className="bg-white py-3 px-3 rounded my-1">
+              <div className="flex items-center gap-x-14 px-7 bg-[#F5F5F5]">
+                <button
+                  className={`bg-transparent py-3 my-3 ${
+                    tab == 0
+                      ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238]`
+                      : `border-none text-[#8392AB]`
+                  } text-[14px] cursor-pointer`}
+                  onClick={() => setTab(0)}
+                >
+                  Account Info
+                </button>
+                {/* <button
+                className={`bg-transparent py-3 my-3 ${
+                  tab == 1
+                    ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238]`
+                    : `border-none text-[#8392AB]`
+                } text-[14px] cursor-pointer`}
+                onClick={() => setTab(1)}
+              >
+                Activities
+              </button> */}
+                <button
+                  className={`bg-transparent py-3 my-3 ${
+                    tab == 2
+                      ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238]`
+                      : `border-none text-[#8392AB]`
+                  } text-[14px] cursor-pointer`}
+                  onClick={() => setTab(2)}
+                >
+                  Reset Password
+                </button>
+              </div>
+            </div>
+            {tab == 0 && user ? (
+              <>
+                <div className="my-1 bg-white rounded-xl px-8 pt-1 pb-5">
+                  <h5 className="text-[#263238] text-[18px]">Basic Info</h5>
+                  <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 items-center gap-x-5">
+                    <div>
+                      <div className="pb-3 text-[13px] text-[#344767]">
+                        Title
                       </div>
-                    )}
-                    {editVendor && (
+                      <Form.Item initialValue={user?.title} name={"title"}>
+                        <Input
+                          value={user?.title}
+                          defaultValue={user?.title}
+                          placeholder="Your Title"
+                          className="h-11 my-3"
+                          onChange={(e) => {
+                            let r = { ...rowData };
+                            r.title = e.target.value;
+                            setRowData(r);
+                          }}
+                        />
+                      </Form.Item>
+                    </div>
+                    <div className="col-span-2">
+                      <div className="pb-3 text-[13px] text-[#344767]">
+                        Full Name
+                      </div>
+                      <Form.Item
+                        initialValue={user?.contactPersonNames}
+                        name={"contactPersonNames"}
+                      >
+                        <Input
+                          defaultValue={user?.contactPersonNames}
+                          value={user?.contactPersonNames}
+                          placeholder="Your Full Name"
+                          className="h-11 my-3"
+                          onChange={(e) => {
+                            let r = { ...rowData };
+                            r.contactPersonNames = e.target.value;
+                            setRowData(r);
+                          }}
+                        />
+                      </Form.Item>
+                    </div>
+                    <div>
+                      <div className="pb-3 text-[13px] text-[#344767]">
+                        Phone Number
+                      </div>
+                      <Form.Item initialValue={user?.telephone} name={"telephone"}>
+                        <Input
+                          placeholder="Your Phone Number"
+                          defaultValue={user?.telephone}
+                          value={user?.telephone}
+                          className="h-11 my-3"
+                          onChange={(e) => {
+                            let r = { ...rowData };
+                            r.telephone = e.target.value;
+                            setRowData(r);
+                          }}
+                        />
+                      </Form.Item>
+                    </div>
+                    <div>
+                      <div className="pb-3 text-[13px] text-[#344767]">
+                        Email
+                      </div>
+                      <Form.Item initialValue={user?.email} name={"email"}>
+                        <Input
+                          placeholder="Your Email"
+                          defaultValue={user?.email}
+                          value={user?.email}
+                          className="h-11 my-3"
+                          onChange={(e) => {
+                            let r = { ...rowData };
+                            r.email = e.target.value;
+                            setRowData(r);
+                          }}
+                        />
+                      </Form.Item>
+                    </div>
+                  </div>
+                </div>
+                <div className="my-1 bg-white rounded-xl px-8 pt-1 pb-5">
+                  <h5 className="text-[#263238] text-[18px]">Other Info</h5>
+                  <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 items-center gap-x-5">
+                    <div>
+                      <label className="pb-3 text-[13px] text-[#344767]">TIN</label>
+                      <Form.Item initialValue={user?.tin} name={"tin"}>
+                        <Input
+                          defaultValue={user?.tin}
+                          value={user?.tin}
+                          placeholder="Your TIN"
+                          className="h-11 my-3"
+                          onChange={(e) => {
+                            let r = { ...rowData };
+                            r.tin = e.target.value;
+                            setRowData(r);
+                          }}
+                        />
+                      </Form.Item>
+                    </div>
+                    <div>
+                      <label className="pb-3 text-[13px] text-[#344767]">
+                        HQ Address
+                      </label>
+                      <Form.Item initialValue={user?.hqAddress} name={"hqAddress"}>
+                        <Input
+                          defaultValue={user?.hqAddress}
+                          value={user?.hqAddress}
+                          placeholder="Your HQ Adress"
+                          className="h-11 my-3"
+                          onChange={(e) => {
+                            let r = { ...rowData };
+                            r.hqAddress = e.target.value;
+                            setRowData(r);
+                          }}
+                        />
+                      </Form.Item>
+                    </div>
+                    <div>
+                      <label className="pb-3 text-[13px] text-[#344767]">
+                        Years of Experience
+                      </label>
+                      <Form.Item initialValue={user?.experienceDurationInYears} name={"experienceDurationInYears"}>
+                        <Input
+                          defaultValue={user?.experienceDurationInYears}
+                          value={user?.experienceDurationInYears}
+                          placeholder="Your Experience"
+                          className="h-11 my-3"
+                          onChange={(e) => {
+                            let r = { ...rowData };
+                            r.experienceDurationInYears = e.target.value;
+                            setRowData(r);
+                          }}
+                        />
+                      </Form.Item>
+                    </div>
+                    <div>
+                      <label className="pb-3 text-[13px] text-[#344767]">
+                        Country
+                      </label>
+                      <Form.Item initialValue={user?.passportNid} name={"passportNid"}>
+                        <Input
+                          defaultValue={user?.passportNid}
+                          value={user?.passportNid}
+                          placeholder="Your Country"
+                          className="h-11 my-3"
+                          onChange={(e) => {
+                            let r = { ...rowData };
+                            r.passportNid = e.target.value;
+                            setRowData(r);
+                          }}
+                        />
+                      </Form.Item>
+                    </div>
+                  </div>
+                  <div className="grid md:grid-cols-2 grid-cols-1 gap-x-5">
+                    <div>
+                      <label className="pb-3 text-[13px] text-[#344767]">
+                        Website
+                      </label>
+                      <Form.Item initialValue={user?.webSite} name={"webSite"}>
+                        <Input
+                          defaultValue={user?.webSite}
+                          value={user?.webSite}
+                          placeholder="Your Website"
+                          className="h-10 my-3"
+                          onChange={(e) => {
+                            let r = { ...rowData };
+                            r.website = e.target.value;
+                            setRowData(r);
+                          }}
+                        />
+                      </Form.Item>
+                    </div>
+                    <div>
+                      <label className="pb-3 text-[13px] text-[#344767]">
+                        Area(s) of Experience
+                      </label>
                       <Select
                         mode="multiple"
                         allowClear
+                        size="large"
                         defaultValue={user?.services?.map((s) => {
                           return s;
                         })}
@@ -870,6 +940,8 @@ export default function page() {
                           r.services = value;
                           setRowData(r);
                         }}
+                        value={user?.services?._id}
+                        className="mt-3"
                       >
                         {servCategories?.map((s) => {
                           return (
@@ -879,385 +951,325 @@ export default function page() {
                           );
                         })}
                       </Select>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white ring-1 ring-gray-100 rounded shadow p-5">
-                <div className="text-xl font-semibold mb-5 flex flex-row justify-between items-center">
-                  <div>Address Information</div>
-                </div>
-                <div className="flex flex-col space-y-2">
-                  <div className="flex flex-row items-center space-x-10">
-                    <CompassOutlined className="text-gray-400" />
-                    <div className="text-sm flex flex-row space-x-1">
-                      <div>
-                        <Typography.Text
-                          editable={
-                            editVendor && {
-                              onChange: (e) => {
-                                let r = { ...rowData };
-                                r.hqAddress = e;
-                                setRowData(r);
-                              },
-                              tooltip: "Edit Hq Address",
-                              text: user?.hqAddress,
-                            }
-                          }
-                        >
-                          {user?.hqAddress}{" "}
-                        </Typography.Text>
-                      </div>
-                      <div>
-                        <Typography.Text
-                          editable={
-                            editVendor && {
-                              onChange: (e) => {
-                                let r = { ...rowData };
-                                r.country = e;
-                                setRowData(r);
-                              },
-                              text: user?.country,
-                              tooltip: "Edit Country",
-                            }
-                          }
-                        >
-                          {user?.country}
-                        </Typography.Text>
-                      </div>
+                      {/* <Form.Item name={""}>
+                      <Input placeholder="Your Area(s)" className="h-11 my-3" />
+                    </Form.Item> */}
                     </div>
                   </div>
-                </div>
-              </div>
-
-              {/* Attachements */}
-              {/* <div className="bg-white ring-1 ring-gray-100 rounded shadow p-5">
-                <div className="text-xl font-semibold mb-5 flex flex-row justify-between items-center">
-                  <div>Attachements</div>
-                </div>
-                <div className="flex flex-col space-y-2">
-                  <div className="flex flex-row items-center space-x-10">
-                    <PaperClipOutlined className="text-gray-400" />
-                    {user?.rdbCertId && (
-                      <Link
-                        href={`${url}/file/rdbCerts/${user?.rdbCertId}.pdf`}
-                        target="_blank"
-                      >
-                        <Typography.Link>
-                          Full RDB registration{" "}
-                        </Typography.Link>
-                      </Link>
-                    )}
-                    {!user?.rdbCertId && (
-                      <Typography.Link>
-                        Full RDB registration not available
-                      </Typography.Link>
-                    )}
-                  </div>
-
-                  <div className="flex flex-row items-center space-x-10">
-                    <PaperClipOutlined className="text-gray-400" />
-                    {user?.vatCertId && (
-                      <Link
-                        href={`${url}/file/vatCerts/${user?.vatCertId}.pdf`}
-                        target="_blank"
-                      >
-                        <Typography.Link>VAT certificate</Typography.Link>
-                      </Link>
-                    )}
-                    {!user?.vatCertId && (
-                      <Typography.Link>
-                        VAT certificate not available
-                      </Typography.Link>
-                    )}
-                  </div>
-                </div>
-              </div> */}
-
-              {/* Attachements */}
-              <div className="bg-white ring-1 ring-gray-100 rounded shadow p-5">
-                <div className="text-xl font-semibold mb-5 flex flex-row justify-between items-center">
-                  <div>Attachements</div>
-                </div>
-                <div className="flex flex-col space-y-2">
-                  <div className="flex flex-row items-center space-x-10">
-                    <PaperClipOutlined className="text-gray-400" />
-                    {user?.rdbCertId && (
-                      <div className="flex flex-row items-center">
-                        <Link
-                          href={`${url}/file/rdbCerts/${user?.rdbCertId}.pdf`}
-                          target="_blank"
-                        >
-                          <Typography.Link>
-                            Incorporation Certificate
-                          </Typography.Link>
-                        </Link>
-
-                        <div className="">
-                          <UploadRDCerts
-                            // label="Incorporation Certificate"
-                            iconOnly={true}
-                            setSelected={setRDBSelected}
-                            setId={setRdbCertId}
-                            uuid={rdbCertId}
-                            setStatus={(status) => {}}
-                            uploadingStatus={fileUploadStatus}
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {!user?.rdbCertId && (
-                      <div className="flex flex-col">
-                        {/* <div>
-                        <Typography.Link>
-                          Incorporation Certificate not found
-                        </Typography.Link>
-                      </div> */}
-                        <div className="">
-                          <UploadRDCerts
-                            label="Incorporation Certificate (missing)"
-                            iconOnly={true}
-                            setSelected={setRDBSelected}
-                            setId={setRdbCertId}
-                            uuid={rdbCertId}
-                            setStatus={(status) => {}}
-                            uploadingStatus={fileUploadStatus}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex flex-row items-center space-x-10">
-                    <PaperClipOutlined className="text-gray-400" />
-                    {user?.vatCertId && (
-                      <div className="flex flex-row items-center">
-                        <Link
-                          href={`${url}/file/vatCerts/${user?.vatCertId}.pdf`}
-                          target="_blank"
-                        >
-                          <Typography.Link>VAT Certificate</Typography.Link>
-                        </Link>
-
-                        <div className="">
-                          <UploadVatCerts
-                            // label="Incorporation Certificate"
-                            iconOnly={true}
-                            setSelected={setVatSelected}
-                            setId={setVatCertId}
-                            uuid={vatCertId}
-                            setStatus={(status) => {}}
-                            uploadingStatus={fileUploadStatus}
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {!user?.vatCertId && (
-                      <div className="flex flex-col">
-                        {/* <div>
-                        <Typography.Link>
-                          Incorporation Certificate not found
-                        </Typography.Link>
-                      </div> */}
-                        <div className="">
-                          <UploadVatCerts
-                            label="VAT Certificate (missing)"
-                            iconOnly={true}
-                            setSelected={setVatSelected}
-                            setId={setVatCertId}
-                            uuid={vatCertId}
-                            setStatus={(status) => {}}
-                            uploadingStatus={fileUploadStatus}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Reset password */}
-              <div className="bg-white ring-1 ring-gray-100 rounded shadow p-5">
-                <div className="text-xl font-semibold mb-5 flex flex-row justify-between items-center">
-                  <div>Reset password</div>
-                </div>
-                <Form
-                  // {...formItemLayout}
-                  form={form}
-                  name="register"
-                  onFinish={onFinish}
-                  scrollToFirstError
-                  style={{ width: "100%" }}
-                >
-                  <div>
-                    <div>Current password</div>
-                    <Form.Item
-                      name="currentPassword"
-                      // label="Password"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please input your current password!",
-                        },
-                      ]}
-                      hasFeedback
-                    >
-                      <Input.Password />
-                    </Form.Item>
-                  </div>
-
-                  <div>
-                    <div>New password</div>
-                    <Form.Item
-                      name="newPassword"
-                      // label="Password"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please input your new password!",
-                        },
-                      ]}
-                      hasFeedback
-                    >
-                      <Input.Password />
-                    </Form.Item>
-                  </div>
-
-                  <div>
-                    <div>Confirm new password</div>
-                    <Form.Item
-                      name="confirmPassword"
-                      // label="Password"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please confirm your password!",
-                        },
-                        ({ getFieldValue }) => ({
-                          validator(_, value) {
-                            if (
-                              !value ||
-                              getFieldValue("newPassword") === value
-                            ) {
-                              return Promise.resolve();
+                  <h5 className="text-[#263238] text-[18px]">Uploads</h5>
+                  <div className="grid lg:grid-cols-2 items-center gap-x-5 -my-1">
+                    <div>
+                      {user?.rdbCertId && (
+                        <div>
+                          <div className="flex gap-2">
+                            <Link
+                              href={`${url}/file/rdbCerts/${user?.rdbCertId}.pdf`}
+                              target="_blank"
+                            >
+                              <label className="text-[#6A757B] mb-3">
+                                Incorporation document
+                              </label>
+                            </Link>
+                            
+                            <div>
+                              <Tooltip
+                                placement="top"
+                                title="Please attach your incorporation document. For businesses registered in Rwanda, please provide your RDB certificate."
+                                arrow={false}
+                              >
+                                <QuestionCircleOutlined />
+                              </Tooltip>
+                            </div>
+                          </div>
+                          <Form.Item
+                            name="rdbRegistraction"
+                            rules={
+                              [
+                                // {
+                                //   validator: (_, value) =>
+                                //     rdbSelected
+                                //       ? Promise.resolve()
+                                //       : Promise.reject(
+                                //           new Error(
+                                //             "Please attach your incorporation document"
+                                //           )
+                                //         ),
+                                // },
+                              ]
                             }
-                            return Promise.reject(
-                              new Error(
-                                "The two passwords that you entered do not match!"
-                              )
-                            );
+                          >
+                            <div className="">
+                              <UploadRDCerts
+                                // label="Incorporation Certificate"
+                                iconOnly={true}
+                                setSelected={setRDBSelected}
+                                setId={setRdbCertId}
+                                uuid={rdbCertId}
+                                setStatus={(status) => {}}
+                                uploadingStatus={fileUploadStatus}
+                              />
+                            </div>
+                          </Form.Item>
+                        </div>
+                        
+                      )}
+
+                      {!user?.rdbCertId && (
+                        <Form.Item
+                          name="rdbRegistraction"
+                          rules={
+                            [
+                              // {
+                              //   validator: (_, value) =>
+                              //     rdbSelected
+                              //       ? Promise.resolve()
+                              //       : Promise.reject(
+                              //           new Error(
+                              //             "Please attach your incorporation document"
+                              //           )
+                              //         ),
+                              // },
+                            ]
+                          }
+                        >
+                          <div className="">
+                            <UploadRDCerts
+                              label="Incorporation Certificate (missing)"
+                              iconOnly={true}
+                              setSelected={setRDBSelected}
+                              setId={setRdbCertId}
+                              uuid={rdbCertId}
+                              setStatus={(status) => {}}
+                              uploadingStatus={fileUploadStatus}
+                            />
+                          </div>
+                        </Form.Item>
+                      )}
+                    </div>
+                    <div>
+                      {user?.vatCertId && (
+                        <div>
+                          <div className="flex gap-2">
+                            <Link
+                              href={`${url}/file/vatCerts/${user?.vatCertId}.pdf`}
+                              target="_blank"
+                            >
+                              <label className="text-[#6A757B] mb-3">
+                                VAT Certificate
+                              </label>
+                            </Link>
+                            <div>
+                              <Tooltip
+                                placement="top"
+                                title="Please attach your vat document. For businesses registered in Rwanda, please provide your RDB certificate."
+                                arrow={false}
+                              >
+                                <QuestionCircleOutlined />
+                              </Tooltip>
+                            </div>
+                          </div>
+                          <Form.Item
+                            name="vatRegistraction"
+                            rules={
+                              [
+                                // {
+                                //   validator: (_, value) =>
+                                //     rdbSelected
+                                //       ? Promise.resolve()
+                                //       : Promise.reject(
+                                //           new Error(
+                                //             "Please attach your incorporation document"
+                                //           )
+                                //         ),
+                                // },
+                              ]
+                            }
+                          >
+                            <div className="">
+                              <UploadVatCerts
+                                // label="Incorporation Certificate"
+                                iconOnly={true}
+                                setSelected={setVatSelected}
+                                setId={setVatCertId}
+                                uuid={vatCertId}
+                                setStatus={(status) => {}}
+                                uploadingStatus={fileUploadStatus}
+                              />
+                            </div>
+                          </Form.Item>
+                        </div>
+                      )}
+
+                      {!user?.vatCertId && (
+                        <Form.Item
+                          name="vatRegistraction"
+                          rules={
+                            [
+                              // {
+                              //   validator: (_, value) =>
+                              //     rdbSelected
+                              //       ? Promise.resolve()
+                              //       : Promise.reject(
+                              //           new Error(
+                              //             "Please attach your incorporation document"
+                              //           )
+                              //         ),
+                              // },
+                            ]
+                          }
+                        >
+                          <div className="">
+                            <UploadVatCerts
+                              label="VAT Certificate (missing)"
+                              iconOnly={true}
+                              setSelected={setVatSelected}
+                              setId={setVatCertId}
+                              uuid={vatCertId}
+                              setStatus={(status) => {}}
+                              uploadingStatus={fileUploadStatus}
+                            />
+                          </div>
+                        </Form.Item>
+                      )}
+                    </div>
+                  </div>
+                  {/* <div className="flex justify-end">
+                    <Button
+                      icon={<SaveOutlined />}
+                      type="primary"
+                      size="large"
+                      onClick={() => {
+                        setEditVendor(false);
+                        updateVendor();
+                      }}
+                    >
+                      Update Vendor
+                    </Button>
+                  </div> */}
+                </div>
+              </>
+            ) : tab == 1 ? (
+              <></>
+            ) : (
+              <div className="flex flex-col space-y-5">
+                {/* Reset password */}
+                <div className="bg-white rounded-lg shadow px-5 pb-5">
+                  <div className="pb-5">
+                    <h6 className="mb-3 pb-0 text-[15px] text-[#263238]">
+                      Reset Password
+                    </h6>
+                  </div>
+
+                  <Form
+                    // {...formItemLayout}
+                    form={form}
+                    name="register"
+                    onFinish={onFinish}
+                    scrollToFirstError
+                    style={{ width: "100%" }}
+                  >
+                    <div>
+                      <div className="text-[13px] text-[#344767]">
+                        Current password
+                      </div>
+                      <Form.Item
+                        name="currentPassword"
+                        // label="Password"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please input your current password!",
                           },
-                        }),
-                      ]}
-                      hasFeedback
-                    >
-                      <Input.Password />
-                    </Form.Item>
-                  </div>
-
-                  <Form.Item>
-                    {submitting ? (
-                      <Spin indicator={antIcon} />
-                    ) : (
-                      <div className="flex flex-row items-center justify-between">
-                        <Button type="primary" danger htmlType="submit">
-                          Update my password
-                        </Button>
-                      </div>
-                    )}
-                  </Form.Item>
-                </Form>
-              </div>
-            </div>
-
-            {/* Transactions */}
-            <div className="col-span-2 flex flex-col space-y-5 bg-white ring-1 ring-gray-100 rounded shadow p-10">
-              <Segmented
-                block
-                size="large"
-                options={["Bids", "Purchase orders"]}
-                onChange={setSegment}
-              />
-              {segment === "Bids" &&
-                vendorsBids?.length > 0 &&
-                vendorsBids.map((bid) => {
-                  return (
-                    <div key={bid?.number}>
-                      <List size="small">
-                        <List.Item>
-                          <List.Item.Meta
-                            //   avatar={<Avatar src={item.picture.large} />}
-                            // title={<a href="#">{bid.number}</a>}
-                            description={
-                              <div className="grid md:grid-cols-5 rounded ring-1 ring-gray-100 p-2 gap-4 shadow">
-                                <div>
-                                  <div className="text-md font-semibold text-gray-800">
-                                    {bid?.number}
-                                  </div>
-
-                                  <div className="text-xs text-gray-600">
-                                    {bid?.createdBy?.companyName}
-                                  </div>
-
-                                  <a href="#">
-                                    <FileTextOutlined />{" "}
-                                  </a>
-                                </div>
-
-                                <div className="">
-                                  <div className="text-xs text-gray-400">
-                                    Title
-                                  </div>
-                                  <div className="text-xs text-gray-600">
-                                    {bid?.tender?.purchaseRequest?.title}
-                                  </div>
-                                </div>
-
-                                <div className="">
-                                  <div className="text-xs text-gray-400">
-                                    Total Price
-                                  </div>
-                                  <div className="text-xs text-gray-600">
-                                    {bid?.price.toLocaleString() +
-                                      " " +
-                                      bid?.currency}
-                                  </div>
-                                </div>
-
-                                <div className="">
-                                  <div className="text-xs text-gray-400">
-                                    Discount
-                                  </div>
-                                  <div className="text-xs text-gray-600">
-                                    {bid?.discount}%
-                                  </div>
-                                </div>
-
-                                <div className="">
-                                  <div className="text-xs text-gray-400">
-                                    Delivery date
-                                  </div>
-                                  <div className="text-xs text-gray-600">
-                                    {moment(bid?.deliveryDate).fromNow()}
-                                  </div>
-                                </div>
-                              </div>
-                            }
-                          />
-                        </List.Item>
-                      </List>
+                        ]}
+                        hasFeedback
+                      >
+                        <Input.Password
+                          placeholder="Current Password"
+                          className="h-11 mt-3"
+                        />
+                      </Form.Item>
                     </div>
-                  );
-                })}
 
-              {segment === "Bids" &&
-                (!vendorsBids || vendorsBids?.length == 0) && <Empty />}
-            </div>
+                    <div>
+                      <div className="text-[13px] text-[#344767]">
+                        New password
+                      </div>
+                      <Form.Item
+                        name="newPassword"
+                        // label="Password"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please input your new password!",
+                          },
+                        ]}
+                        hasFeedback
+                      >
+                        <Input.Password
+                          placeholder="Your New Password"
+                          className="h-11 mt-3"
+                        />
+                      </Form.Item>
+                    </div>
+
+                    <div>
+                      <div className="text-[13px] text-[#344767]">
+                        Confirm new password
+                      </div>
+                      <Form.Item
+                        name="confirmPassword"
+                        // label="Password"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please confirm your password!",
+                          },
+                          ({ getFieldValue }) => ({
+                            validator(_, value) {
+                              if (
+                                !value ||
+                                getFieldValue("newPassword") === value
+                              ) {
+                                return Promise.resolve();
+                              }
+                              return Promise.reject(
+                                new Error(
+                                  "The two passwords that you entered do not match!"
+                                )
+                              );
+                            },
+                          }),
+                        ]}
+                        hasFeedback
+                      >
+                        <Input.Password
+                          placeholder="Your Confirm Password"
+                          className="h-11 mt-3"
+                        />
+                      </Form.Item>
+                    </div>
+
+                    <Form.Item className="m-0">
+                      {submitting ? (
+                        <Spin indicator={antIcon} />
+                      ) : (
+                        <div className="flex flex-row items-center justify-between my-3">
+                          <Button
+                            type="primary"
+                            size="middle"
+                            danger
+                            htmlType="submit"
+                          >
+                            Update Password
+                          </Button>
+                        </div>
+                      )}
+                    </Form.Item>
+                  </Form>
+                </div>
+              </div>
+            )}
           </div>
-          {previewAttachmentModal()}
         </div>
       </div>
     );
@@ -1341,7 +1353,7 @@ export default function page() {
 
   return (
     <div className="payment-request rounded-lg h-[calc(100vh-115px)] mt-6 pb-10 overflow-y-auto">
-      {user?.userType === "VENDOR" ? buildVendor() : buildUser()}
+      {!user ? <h5>Loading ...</h5> : user?.userType === "VENDOR" ? buildVendor() : buildUser()}
     </div>
   );
 }

@@ -363,7 +363,7 @@ export default function page({ params }) {
         type: "tween",
         ease: "circOut",
       }}
-      className="flex flex-col transition-opacity ease-in-out duration-1000 py-5 flex-1 space-y-3 h-screen pb-10 mr-6"
+      className="flex flex-col transition-opacity ease-in-out duration-1000 py-5 flex-1 space-y-3 h-screen mb-6 pb-10 mr-6"
     >
       {contextHolder}
       {/* <div className="flex flex-row items-center">
