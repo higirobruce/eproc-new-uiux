@@ -2062,54 +2062,164 @@ const RequestDetails = ({
         title="New Contract"
         centered
         open={openCreateContract}
-        onOk={() => {
-          if (!signatories || signatories?.length < 2) {
-            messageApi.open({
-              type: "error",
-              content:
-                "Contract can not be submitted. Please specify at least 2 signatories!",
-            });
-          } else if (
-            signatories?.filter((s) => {
-              return !s?.onBehalfOf || !s?.title || !s?.names || !s?.email;
-            })?.length >= 1
-          ) {
-            messageApi.open({
-              type: "error",
-              content:
-                "Contract can not be submitted. Please fill in the relevant signatories' details!",
-            });
-          } else if (
-            signatories?.filter((s) => {
-              return !s?.onBehalfOf.includes("Irembo");
-            })?.length < 1
-          ) {
-            messageApi.open({
-              type: "error",
-              content:
-                "Contract can not be submitted. Please supply the Vendor's information!",
-            });
-          } else if (!contractStartDate || !contractEndDate) {
-            messageApi.open({
-              type: "error",
-              content:
-                "Contract can not be submitted. Please set start and end dates!",
-            });
-          } else {
-            handleCreateContract(
-              vendor?._id,
-              null,
-              user?._id,
-              sections,
-              contractStartDate,
-              contractEndDate,
-              signatories,
-              refDoc === "Direct Contracting" ? reqAttachId : ""
-            );
-            setOpenCreateContract(false);
-          }
-        }}
-        okText="Submit for review"
+        // onOk={() => {
+        //   if (!signatories || signatories?.length < 2) {
+        //     messageApi.open({
+        //       type: "error",
+        //       content:
+        //         "Contract can not be submitted. Please specify at least 2 signatories!",
+        //     });
+        //   } else if (
+        //     signatories?.filter((s) => {
+        //       return !s?.onBehalfOf || !s?.title || !s?.names || !s?.email;
+        //     })?.length >= 1
+        //   ) {
+        //     messageApi.open({
+        //       type: "error",
+        //       content:
+        //         "Contract can not be submitted. Please fill in the relevant signatories' details!",
+        //     });
+        //   } else if (
+        //     signatories?.filter((s) => {
+        //       return !s?.onBehalfOf.includes("Irembo");
+        //     })?.length < 1
+        //   ) {
+        //     messageApi.open({
+        //       type: "error",
+        //       content:
+        //         "Contract can not be submitted. Please supply the Vendor's information!",
+        //     });
+        //   } else if (!contractStartDate || !contractEndDate) {
+        //     messageApi.open({
+        //       type: "error",
+        //       content:
+        //         "Contract can not be submitted. Please set start and end dates!",
+        //     });
+        //   } else {
+        //     handleCreateContract(
+        //       vendor?._id,
+        //       null,
+        //       user?._id,
+        //       sections,
+        //       contractStartDate,
+        //       contractEndDate,
+        //       signatories,
+        //       refDoc === "Direct Contracting" ? reqAttachId : ""
+        //     );
+        //     setOpenCreateContract(false);
+        //   }
+        // }}
+        footer={[
+          <Button
+            key="2"
+            onClick={() => {
+              if (!signatories || signatories?.length < 2) {
+                messageApi.open({
+                  type: "error",
+                  content:
+                    "Contract can not be submitted. Please specify at least 2 signatories!",
+                });
+              } else if (
+                signatories?.filter((s) => {
+                  return !s?.onBehalfOf || !s?.title || !s?.names || !s?.email;
+                })?.length >= 1
+              ) {
+                messageApi.open({
+                  type: "error",
+                  content:
+                    "Contract can not be submitted. Please fill in the relevant signatories' details!",
+                });
+              } else if (
+                signatories?.filter((s) => {
+                  return !s?.onBehalfOf.includes("Irembo");
+                })?.length < 1
+              ) {
+                messageApi.open({
+                  type: "error",
+                  content:
+                    "Contract can not be submitted. Please supply the Vendor's information!",
+                });
+              } else if (!contractStartDate || !contractEndDate) {
+                messageApi.open({
+                  type: "error",
+                  content:
+                    "Contract can not be submitted. Please set start and end dates!",
+                });
+              } else {
+                handleCreateContract(
+                  vendor?._id,
+                  null,
+                  user?._id,
+                  sections,
+                  contractStartDate,
+                  contractEndDate,
+                  signatories,
+                  refDoc === "Direct Contracting" ? reqAttachId : "",
+                  "draft"
+                );
+                setOpenCreateContract(false);
+              }
+            }}
+          >
+            Save draft
+          </Button>,
+          <Popconfirm
+            title="Are you sure?"
+            onConfirm={() => {
+              if (!signatories || signatories?.length < 2) {
+                messageApi.open({
+                  type: "error",
+                  content:
+                    "Contract can not be submitted. Please specify at least 2 signatories!",
+                });
+              } else if (
+                signatories?.filter((s) => {
+                  return !s?.onBehalfOf || !s?.title || !s?.names || !s?.email;
+                })?.length >= 1
+              ) {
+                messageApi.open({
+                  type: "error",
+                  content:
+                    "Contract can not be submitted. Please fill in the relevant signatories' details!",
+                });
+              } else if (
+                signatories?.filter((s) => {
+                  return !s?.onBehalfOf.includes("Irembo");
+                })?.length < 1
+              ) {
+                messageApi.open({
+                  type: "error",
+                  content:
+                    "Contract can not be submitted. Please supply the Vendor's information!",
+                });
+              } else if (!contractStartDate || !contractEndDate) {
+                messageApi.open({
+                  type: "error",
+                  content:
+                    "Contract can not be submitted. Please set start and end dates!",
+                });
+              } else {
+                handleCreateContract(
+                  vendor?._id,
+                  null,
+                  user?._id,
+                  sections,
+                  contractStartDate,
+                  contractEndDate,
+                  signatories,
+                  refDoc === "Direct Contracting" ? reqAttachId : "",
+                  "legal-review"
+                );
+                setOpenCreateContract(false);
+              }
+            }}
+          >
+            <Button key="3" type="primary">
+              Submit for review
+            </Button>
+          </Popconfirm>,
+        ]}
+        // okText="Submit for review"
         onCancel={() => setOpenCreateContract(false)}
         width={"80%"}
         bodyStyle={{ maxHeight: "700px", overflow: "scroll" }}

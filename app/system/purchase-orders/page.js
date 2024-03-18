@@ -26,7 +26,7 @@ import {
   Row,
   Input,
   Col,
-  Pagination
+  Pagination,
 } from "antd";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
@@ -59,6 +59,7 @@ export default function PurchaseOrders() {
   let router = useRouter();
   const [dataLoaded, setDataLoaded] = useState(false);
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
+  let fendUrl = process.env.NEXT_PUBLIC_FTEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
   let [pOs, setPOs] = useState(null);
@@ -73,7 +74,7 @@ export default function PurchaseOrders() {
   const contentHeight = useRef();
   const [pageSize, setPageSize] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0)
+  const [totalPages, setTotalPages] = useState(0);
   const items = [
     {
       key: "1",
@@ -203,7 +204,7 @@ export default function PurchaseOrders() {
         .then((res) => {
           setPOs(res?.data);
           setTempPOs(res?.data);
-          setTotalPages(res?.totalPages)
+          setTotalPages(res?.totalPages);
           setDataLoaded(true);
         })
         .catch((err) => {
@@ -873,7 +874,11 @@ export default function PurchaseOrders() {
                             </small>
 
                             <p className="text-[#344767] font-medium text-[14px] py-0 my-0">
-                              {!po?.vendor?.companyName ? 'Not Specified' : po?.vendor?.companyName.length > 9 ? po?.vendor?.companyName.slice(0, 8) + '...' : po?.vendor?.companyName}
+                              {!po?.vendor?.companyName
+                                ? "Not Specified"
+                                : po?.vendor?.companyName.length > 9
+                                ? po?.vendor?.companyName.slice(0, 8) + "..."
+                                : po?.vendor?.companyName}
                             </p>
                           </div>
                         )}
@@ -908,7 +913,9 @@ export default function PurchaseOrders() {
                         {!documentFullySigned(po) && (
                           <div className="flex justify-end">
                             <div className="bg-[#F9BB01] rounded-xl text-[#FFF] text-[14px] font-medium px-3 py-1">
-                              {po?.status?.length > 6 ? po?.status?.slice(0, 5) + '..' : po?.status || "Pending"}
+                              {po?.status?.length > 6
+                                ? po?.status?.slice(0, 5) + ".."
+                                : po?.status || "Pending"}
                             </div>
                           </div>
                         )}
@@ -966,7 +973,8 @@ export default function PurchaseOrders() {
                             )}
                           {po?.reqAttachmentDocId && (
                             <Link
-                              href={`${url}/file/reqAttachments/${po?.reqAttachmentDocId}.pdf`}
+                              href={`${fendUrl}/api?folder=reqAttachments&name=${po?.reqAttachmentDocId}.pdf`}
+                              target="_blank"
                               className="text-[13px] flex items-center gap-3 no-underline text-[#1677FF]"
                             >
                               <IoLink />
@@ -1071,23 +1079,23 @@ export default function PurchaseOrders() {
                   </div>
                 );
               })}
-              <div className="flex w-full justify-end">
-                <Pagination
-                  pageSizeOptions={[5, 10, 20, 30, 50, 75, 100]}
-                  showSizeChanger
-                  defaultCurrent={currentPage}
-                  onShowSizeChange={(page, pageSize) => {
-                    setCurrentPage(page);
-                    setPageSize(pageSize);
-                  }}
-                  onChange={(page, pageSize) => {
-                    setCurrentPage(page);
-                    setPageSize(pageSize);
-                  }}
-                  pageSize={pageSize}
-                  total={totalPages}
-                />
-              </div>
+            <div className="flex w-full justify-end">
+              <Pagination
+                pageSizeOptions={[5, 10, 20, 30, 50, 75, 100]}
+                showSizeChanger
+                defaultCurrent={currentPage}
+                onShowSizeChange={(page, pageSize) => {
+                  setCurrentPage(page);
+                  setPageSize(pageSize);
+                }}
+                onChange={(page, pageSize) => {
+                  setCurrentPage(page);
+                  setPageSize(pageSize);
+                }}
+                pageSize={pageSize}
+                total={totalPages}
+              />
+            </div>
           </div>
         </div>
       ) : (

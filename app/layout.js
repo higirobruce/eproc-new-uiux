@@ -40,7 +40,13 @@ export const metadata = {
 
   title: 'Irembo Eprocurement',
   description: 'Solution to the procurement process automation.',
-  image: '/favicon.ico'
+  // image: '/favicon.ico',
+  icons:[{
+    media: "(prefers-color-scheme: light)",
+    url: "/favicon.png",
+    href: "/favicon.png",
+  },
+  ]
 }
 
 export default function RootLayout({ children }) {

@@ -21,7 +21,7 @@ import { resolve } from "styled-jsx/css";
 import { reject } from "lodash";
 import { MdAccountBalance } from "react-icons/md";
 import { FaMobileAlt } from "react-icons/fa";
-import Link from 'next/link';
+import Link from "next/link";
 import { useUser } from "@/app/context/UserContext";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
@@ -29,7 +29,7 @@ let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
 
 async function getPoDetails(id, router) {
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const res = await fetch(`${url}/purchaseOrders/${id}`, {
     headers: {
       Authorization: "Basic " + `${encode(`${apiUsername}:${apiPassword}`)}`,
@@ -53,7 +53,7 @@ async function getPoDetails(id, router) {
 }
 
 async function getPoPaymentProgress(id, router) {
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const res = await fetch(`${url}/purchaseOrders/paymentProgress/${id}`, {
     method: "GET",
     headers: {
@@ -78,7 +78,7 @@ async function getPoPaymentProgress(id, router) {
 }
 
 async function getPoPaidRequests(id, router) {
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const res = await fetch(`${url}/purchaseOrders/paymentsDone/${id}`, {
     method: "GET",
     headers: {
@@ -105,7 +105,7 @@ async function getPoPaidRequests(id, router) {
 export default function NewPaymentRequest({ params }) {
   const { user, login, logout } = useUser();
   // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   let [po, setPo] = useState(null);
   let router = useRouter();
   let [form] = Form.useForm();
@@ -319,7 +319,10 @@ export default function NewPaymentRequest({ params }) {
                     <div>
                       {/* Title */}
                       <div>
-                        <div className="text-[14px] text-[#344767] mb-2"> Request title</div>
+                        <div className="text-[14px] text-[#344767] mb-2">
+                          {" "}
+                          Request title
+                        </div>
                         <div>
                           <Form.Item
                             name="title"
@@ -342,7 +345,9 @@ export default function NewPaymentRequest({ params }) {
 
                       {/* Description */}
                       <div>
-                        <div className="text-[14px] text-[#344767] mb-2">Comment/additional note</div>
+                        <div className="text-[14px] text-[#344767] mb-2">
+                          Comment/additional note
+                        </div>
                         <div>
                           <Form.Item
                             name="description"
@@ -382,13 +387,29 @@ export default function NewPaymentRequest({ params }) {
                               },
                               {
                                 validator(rule, value) {
+                                  // return new Promise((resolve, reject) => {
+                                  //   if (
+                                  //     (poVal > -1 &&
+                                  //       value >
+                                  //         getPoTotalVal()?.grossTotal -
+                                  //           totalPaymentVal -
+                                  //           value) ||
+                                  //     (poVal == -1 &&
+                                  //       value > getPoTotalVal()?.grossTotal)
+                                  //   ) {
+                                  //     reject(
+                                  //       "Requested amount should not exceed the PO Value!"
+                                  //     );
+                                  //   } else {
+                                  //     resolve();
+                                  //   }
+                                  // });
                                   return new Promise((resolve, reject) => {
                                     if (
                                       (poVal > -1 &&
                                         value >
                                           getPoTotalVal()?.grossTotal -
-                                            totalPaymentVal -
-                                            value) ||
+                                            totalPaymentVal) ||
                                       (poVal == -1 &&
                                         value > getPoTotalVal()?.grossTotal)
                                     ) {
@@ -465,7 +486,9 @@ export default function NewPaymentRequest({ params }) {
                         </Form.Item>
                       </div>
                       <div>
-                        <div className="text-[14px] text-[#344767] mb-2">Invoice attachement(s)</div>
+                        <div className="text-[14px] text-[#344767] mb-2">
+                          Invoice attachement(s)
+                        </div>
                         <UploadPaymentReq files={files} setFiles={setFiles} />
                       </div>
                     </div>
@@ -475,7 +498,9 @@ export default function NewPaymentRequest({ params }) {
                       <div>
                         {/* Budgeted */}
                         <div>
-                          <div className="text-[14px] text-[#344767] mb-2">Budgeted?</div>
+                          <div className="text-[14px] text-[#344767] mb-2">
+                            Budgeted?
+                          </div>
                           <div className="font-semibold">
                             {po?.request?.budgeted ? "Yes" : "No"}
                           </div>
@@ -493,7 +518,9 @@ export default function NewPaymentRequest({ params }) {
                           // </Form.Item>
 
                           <div className="mt-10">
-                            <div className="text-[14px] text-[#344767] mb-2">Budget Line</div>
+                            <div className="text-[14px] text-[#344767] mb-2">
+                              Budget Line
+                            </div>
                             <div className="font-semibold">
                               {po?.request?.budgetLine?.description}
                             </div>
@@ -511,7 +538,6 @@ export default function NewPaymentRequest({ params }) {
                   </div>
 
                   <div className="flex flex-col space-y-6 my-5">
-                    
                     <div className="w-full flex justify-between text-gray-700">
                       <div>Related PO {po?.number} (Total Value): </div>
                       <div className="font-semibold text-[13px]">
@@ -554,7 +580,9 @@ export default function NewPaymentRequest({ params }) {
           </div>
           <div>
             <div className="mr-5 lg:col-span-1 bg-[#EFF4F8] pb-8 pt-3 px-10">
-              <h5 className="text-[18px] text-[#344767] mb-7">Payment Details</h5>
+              <h5 className="text-[18px] text-[#344767] mb-7">
+                Payment Details
+              </h5>
               <div className="flex items-center">
                 <Form.Item
                   name="bankPay"
@@ -571,7 +599,10 @@ export default function NewPaymentRequest({ params }) {
                   >
                     <div className="flex gap-x-10">
                       <div className="my-1 border-t-2 border-x-2 border-[#BFC5C5]">
-                        <Radio value={true} className="flex gap-x-1 items-center">
+                        <Radio
+                          value={true}
+                          className="flex gap-x-1 items-center"
+                        >
                           <MdAccountBalance /> &nbsp;<span>Bank Info</span>
                         </Radio>
                       </div>
@@ -710,10 +741,19 @@ export default function NewPaymentRequest({ params }) {
                 </>
               )}
             </div>
-            <h5 className="text-[16px] text-[#344767] pt-5">Related Document</h5>
+            <h5 className="text-[16px] text-[#344767] pt-5">
+              Related Document
+            </h5>
             <div className="flex items-center gap-x-2">
-              <small className="text-[134x] text-[#344767]">Purchase Order:</small>
-              <Link className="text-[#1677FF] text-[14px]" href={'/system/purchase-orders/' + po?.number}>{po?.number}</Link>
+              <small className="text-[134x] text-[#344767]">
+                Purchase Order:
+              </small>
+              <Link
+                className="text-[#1677FF] text-[14px]"
+                href={"/system/purchase-orders/" + po?.number}
+              >
+                {po?.number}
+              </Link>
             </div>
           </div>
         </div>

@@ -507,7 +507,8 @@ export default function page({ params }) {
                   </span>
                 )}
 
-                {rowData?.status === "approved" && (
+                {(rowData?.status === "approved" ||
+                  rowData?.status === "pending-approval") && (
                   <span>
                     <Popconfirm
                       title="Reject vendor"
@@ -576,15 +577,13 @@ export default function page({ params }) {
               </button>
             </div>
           </div>
-          {(tab == 0 && rowData)? (
+          {tab == 0 && rowData ? (
             <>
               <div className="my-1 bg-white rounded-xl px-8 pt-1 pb-5">
                 <h5 className="text-[#263238] text-[18px]">Basic Info</h5>
                 <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 items-center gap-x-5">
                   <div>
-                    <div className="pb-3 text-[13px] text-[#344767]">
-                      Title
-                    </div>
+                    <div className="pb-3 text-[13px] text-[#344767]">Title</div>
                     <Form.Item initialValue={rowData?.title} name={"title"}>
                       <Input
                         value={rowData?.title}
@@ -603,7 +602,10 @@ export default function page({ params }) {
                     <div className="pb-3 text-[13px] text-[#344767]">
                       Full Name
                     </div>
-                    <Form.Item initialValue={rowData?.contactPersonNames} name={"contactPersonNames"}>
+                    <Form.Item
+                      initialValue={rowData?.contactPersonNames}
+                      name={"contactPersonNames"}
+                    >
                       <Input
                         defaultValue={rowData?.contactPersonNames}
                         value={rowData?.contactPersonNames}
@@ -639,7 +641,10 @@ export default function page({ params }) {
                     <div className="pb-3 text-[13px] text-[#344767]">
                       Phone Number
                     </div>
-                    <Form.Item initialValue={rowData?.telephone} name={"telephone"}>
+                    <Form.Item
+                      initialValue={rowData?.telephone}
+                      name={"telephone"}
+                    >
                       <Input
                         placeholder="Your Phone Number"
                         defaultValue={rowData?.telephone}
@@ -654,9 +659,7 @@ export default function page({ params }) {
                     </Form.Item>
                   </div>
                   <div>
-                    <div className="pb-3 text-[13px] text-[#344767]">
-                      Email
-                    </div>
+                    <div className="pb-3 text-[13px] text-[#344767]">Email</div>
                     <Form.Item initialValue={rowData?.email} name={"email"}>
                       <Input
                         placeholder="Your Email"
@@ -677,7 +680,9 @@ export default function page({ params }) {
                 <h5 className="text-[#263238] text-[18px]">Other Info</h5>
                 <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 items-center gap-x-5">
                   <div>
-                    <label className="pb-3 text-[13px] text-[#344767]">TIN</label>
+                    <label className="pb-3 text-[13px] text-[#344767]">
+                      TIN
+                    </label>
                     <Form.Item initialValue={rowData?.tin} name={"tin"}>
                       <Input
                         defaultValue={rowData?.tin}
@@ -696,7 +701,10 @@ export default function page({ params }) {
                     <label className="pb-3 text-[13px] text-[#344767]">
                       HQ Address
                     </label>
-                    <Form.Item initialValue={rowData?.hqAddress} name={"hqAddress"}>
+                    <Form.Item
+                      initialValue={rowData?.hqAddress}
+                      name={"hqAddress"}
+                    >
                       <Input
                         defaultValue={rowData?.hqAddress}
                         value={rowData?.hqAddress}
@@ -714,7 +722,10 @@ export default function page({ params }) {
                     <label className="pb-3 text-[13px] text-[#344767]">
                       Years of Experience
                     </label>
-                    <Form.Item initialValue={rowData?.experienceDurationInYears} name={"experienceDurationInYears"}>
+                    <Form.Item
+                      initialValue={rowData?.experienceDurationInYears}
+                      name={"experienceDurationInYears"}
+                    >
                       <Input
                         defaultValue={rowData?.experienceDurationInYears}
                         value={rowData?.experienceDurationInYears}
