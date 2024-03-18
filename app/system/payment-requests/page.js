@@ -183,18 +183,47 @@ export default function UserRequests() {
 
   const getMyPendingRequest = (value) => {
     setMyPendingRequest(value);
+    console.log(tempDataset);
+    let filtered = [];
     if (value) {
-      const statusFilter = tempDataset.filter((item) =>
-        user?.permissions?.canApproveAsHof
-          ? item.status == "approved (hod)"
-          : user?.permissions?.canApproveAsHod
-          ? user._id == item?.approver?._id &&
-            (item?.status == "pending-review" ||
-              item?.status == "reviewed")
-          : true
+      const forHod = tempDataset.filter(
+        (item) =>
+          (item?.status == "pending-approval" || item?.status == "reviewed") &&
+          item?.approver?._id == user?._id
       );
 
-      setTempDataset(statusFilter);
+      const forHof = tempDataset.filter(
+        (item) => item.status == "approved (hod)"
+      );
+
+      const forHod_Hof = tempDataset.filter(
+        (item) =>
+          item.status == "approved (hod)" ||
+          ((item?.status == "pending-approval" || item?.status == "reviewed") &&
+            item?.approver?._id == user?._id)
+      );
+
+      user?.permissions?.canApproveAsHod &&
+        !user?.permissions?.canApproveAsHof &&
+        setTempDataset(forHod);
+      user?.permissions?.canApproveAsHof &&
+        !user?.permissions?.canApproveAsHod &&
+        setTempDataset(forHof);
+      user?.permissions?.canApproveAsHof &&
+        user?.permissions?.canApproveAsHod &&
+        setTempDataset(forHod_Hof);
+
+      // const statusFilter = tempDataset.filter((item) =>
+      //   user?.permissions?.canApproveAsHod
+      //     ? (item?.status == "pending-approval" ||
+      //         item?.status == "reviewed") &&
+      //       item?.approver?._id == user?._id
+      //     : user?.permissions?.canApproveAsHof
+      //     ? item.status == "approved (hod)"
+      //     : true
+      // );
+
+      // setTempDataset(forHof);
     } else {
       refresh();
     }
