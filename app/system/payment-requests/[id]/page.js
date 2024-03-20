@@ -1094,6 +1094,11 @@ export default function PaymentRequest({ params }) {
                                           );
                                         },
                                       },
+                                      {
+                                        value: "GBP",
+                                        label: "GBP",
+                                        key: "GBP",
+                                      },
                                     ]}
                                   >
                                     <Select

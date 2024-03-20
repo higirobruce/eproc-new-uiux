@@ -474,6 +474,11 @@ export default function NewPaymentRequest({ params }) {
                                           label: "EUR",
                                           key: "EUR",
                                         },
+                                        {
+                                          value: "GBP",
+                                          label: "GBP",
+                                          key: "GBP",
+                                        },
                                       ]}
                                     ></Select>
                                   )}
