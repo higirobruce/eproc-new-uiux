@@ -2214,9 +2214,13 @@ export default function Contracts() {
                                   user?.userType == "VENDOR" ||
                                   moment(contract?.endDate).isBefore(moment())
                                 }
-                                className={`${(!documentFullySigned(contract) ||
+                                className={`${
+                                  !documentFullySigned(contract) ||
                                   user?.userType == "VENDOR" ||
-                                  moment(contract?.endDate).isBefore(moment())) ? `bg-gray-50 text-gray-400` : `cursor-pointer bg-[#1677FF] text-white `} border-none px-3 py-2 rounded-lg text-[11px] font-semibold text-white`}
+                                  moment(contract?.endDate).isBefore(moment())
+                                    ? `bg-gray-50 text-gray-400`
+                                    : `cursor-pointer bg-[#1677FF] text-white `
+                                } border-none px-3 py-2 rounded-lg text-[11px] font-semibold text-white`}
                                 onClick={() => {
                                   setContract(contract);
                                   let _signatories = [
@@ -2328,7 +2332,7 @@ export default function Contracts() {
                                   <BiEnvelope className="text-[#8392AB]" />
                                   {/* {po?.vendor?.companyEmail} */}
                                   <small className="text-[#455A64] text-[13px] font-medium">
-                                    {contract?.vendor?.companyEmail || "-"}
+                                    {contract?.vendor?.email || "-"}
                                   </small>
                                 </div>
                               </div>
