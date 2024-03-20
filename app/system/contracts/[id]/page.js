@@ -553,6 +553,7 @@ export default function page({ params }) {
 
   const generatePDF = () => {
     // const element = document.getElementById("pdf-content");
+    
     const printElement = ReactDOMServer.renderToString(content());
     html2pdf()
       .set({
