@@ -41,8 +41,6 @@ import dynamic from "next/dynamic";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
 import { encode } from "base-64";
-import html2pdf from "html2pdf.js";
-import ReactDOMServer from "react-dom/server";
 import ItemsTable from "../../components/itemsTableB1";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
@@ -1338,14 +1336,14 @@ export default function Contracts() {
         bodyStyle={{ maxHeight: "700px", overflow: "scroll" }}
       >
         <div className="space-y-10 px-20 py-5 overflow-x-scroll">
-          <div className="flex w-full justify-end">
+          {/* <div className="flex w-full justify-end">
             <Button
               type="primary"
               onClick={() => generatePDF()}
               icon={<PrinterOutlined />}
               className="self-end"
             ></Button>
-          </div>
+          </div> */}
           {/* Header */}
           <div className="flex flex-row justify-between items-center">
             <Typography.Title level={4} className="flex flex-row items-center">
@@ -2411,28 +2409,7 @@ export default function Contracts() {
     );
   };
 
-  const generatePDF = () => {
-    // const element = document.getElementById("pdf-content");
-    const printElement = ReactDOMServer.renderToString(content());
-    html2pdf()
-      .set({
-        // pagebreak: { mode: "avoid-all", before: "#page2el" },
-        // margin:[22,10, 15, 21],
-        // filename: "Contract.pdf",
-        // image: { type: "jpeg", quality: 0.98 },
-        // html2canvas: { scale: 2, letterRendering: true },
-        // jsPDF: { unit: "pt", format: "letter", orientation: "portrait" },
-
-        margin: [22, 10, 15, 10], //top, left, buttom, right
-        filename: "Contract.pdf",
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, letterRendering: true },
-        jsPDF: { unit: "mm", format: "A4", orientation: "portrait" },
-        pagebreak: { mode: ["avoid-all", "css", "legacy"] },
-      })
-      .from(printElement)
-      .save();
-  };
+  
 
   return (
     <>
