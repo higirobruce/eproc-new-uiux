@@ -231,7 +231,6 @@ export default function page({ params }) {
             let r = res.filter((d) => {
               return d._id === id;
             });
-            console.log(r);
             setRowData(r[0]);
             setLoadingRowData(false);
           })

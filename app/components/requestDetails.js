@@ -2649,7 +2649,6 @@ const RequestDetails = ({
       }
     });
 
-    console.log("Haaaaaa", reqItems);
     // rowData.items = reqItems;
 
     fetch(`${url}/requests/${rowData?._id}`, {

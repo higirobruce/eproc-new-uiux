@@ -27,8 +27,6 @@ const TendersTable = ({
     setEditingKey("");
   };
 
-  console.log('Data set ', dataSet)
-
   useEffect(() => {
     setData(dataSet)
   }, [dataSet]);

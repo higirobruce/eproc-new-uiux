@@ -84,12 +84,6 @@ function UploadTORs({
       // const index = files[uuid]?.indexOf(file?.uid);
      
       const allFiles = [...files];
-
-      console.log("Removing", uuid)
-      console.log(
-        "Remaining files",
-        allFiles[uuid]?.filter((f) => f?.uid !== file?.uid)
-      );
       const newFileList = allFiles[uuid]?.filter(
         (f) => f?.uid !== file?.uid
       );
@@ -131,8 +125,6 @@ function UploadTORs({
         if (f) {
           f.push(file);
         } else _f.push([file]);
-
-        console.log('My Files', _f)
         setFiles(_f);
 
         // return isPDF || Upload.LIST_IGNORE;

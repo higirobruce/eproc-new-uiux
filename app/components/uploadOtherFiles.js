@@ -12,8 +12,6 @@ function UploadOtherFiles({
   files,
   setFiles,
 }) {
-
-  console.log(files)
   const [messageApi, contextHolder] = message.useMessage();
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;

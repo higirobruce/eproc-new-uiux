@@ -187,7 +187,6 @@ export default function Tenders() {
   }, [searchStatus]);
 
   const save = () => {
-    console.log("Received values of form:", values);
     setConfirmLoading(true);
 
     fetch(`${url}/tenders/`, {

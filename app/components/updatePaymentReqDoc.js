@@ -56,7 +56,6 @@ function UpdatePaymentReqDoc({
       // setFiles(_files);
     },
     beforeUpload: (file) => {
-      console.log("Fillleee", file.name);
 
       // let isPDF = file.type == "application/pdf";
       // if (!isPDF) {
