@@ -567,7 +567,7 @@ export default function PaymentRequest({ params }) {
   function updateRequest(docIds) {
     // docIds[0] = null;
     // alert(docIds)
-    setUpdateFiles(false)
+    setUpdateFiles(false);
     paymentRequest.amount = amount;
     if (
       !docIds.includes(null) &&
@@ -615,7 +615,7 @@ export default function PaymentRequest({ params }) {
       .then((res) => getResultFromServer(res))
       .then((res) => {
         refresh();
-      })
+      });
   }
 
   function approveRequest(approvalStage) {
@@ -987,41 +987,44 @@ export default function PaymentRequest({ params }) {
                     currency: currency,
                     bankName: paymentRequest?.paymentDetails?.bankName,
                     accountName: paymentRequest?.paymentDetails?.accountName,
-                    accountNumber: paymentRequest?.paymentDetails?.accountNumber,
+                    accountNumber:
+                      paymentRequest?.paymentDetails?.accountNumber,
                   }}
                 >
                   <div className="grid md:grid-cols-3 sm:grid-cols-1 gap-6">
                     {/* Request Title */}
                     <div className="flex flex-col space-y-2">
                       <div className="mb-2">
-                        <label className="text-[14px] text-[#344767]">Title</label>
+                        <label className="text-[14px] text-[#344767]">
+                          Title
+                        </label>
                       </div>
                       <div className="">
-                          <Form.Item
-                            name="title"
-                            rules={[
-                              {
-                                required: true,
-                                message: "Title is required",
-                              },
-                            ]}
-                            initialValue={paymentRequest?.title}
-                          >
-                            <Input
-                              // size="small"
+                        <Form.Item
+                          name="title"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Title is required",
+                            },
+                          ]}
+                          initialValue={paymentRequest?.title}
+                        >
+                          <Input
+                            // size="small"
 
-                              className="h-11 text-xs"
-                              // placeholder={paymentRequest?.title}
-                              // defaultValue={paymentRequest?.title}
-                              value={paymentRequest?.title}
-                              onChange={(e) => {
-                                let _p = { ...paymentRequest };
-                                _p.title = e.target.value;
-                                setPaymentRequest(_p);
-                              }}
-                            />
-                          </Form.Item>
-                        </div>
+                            className="h-11 text-xs"
+                            // placeholder={paymentRequest?.title}
+                            // defaultValue={paymentRequest?.title}
+                            value={paymentRequest?.title}
+                            onChange={(e) => {
+                              let _p = { ...paymentRequest };
+                              _p.title = e.target.value;
+                              setPaymentRequest(_p);
+                            }}
+                          />
+                        </Form.Item>
+                      </div>
                     </div>
 
                     {/* Request Amount due*/}
@@ -1032,108 +1035,108 @@ export default function PaymentRequest({ params }) {
                         </label>
                       </div>
                       <div className="">
-                          <Form.Item>
-                            <Form.Item
-                              name="amount"
-                              noStyle
-                              rules={[
-                                {
-                                  required: true,
-                                  message: "Amount is required",
-                                },
-                                {
-                                  validator(rule, value) {
-                                    return new Promise((resolve, reject) => {
-                                      if (
-                                        ((poVal > -1 &&
+                        <Form.Item>
+                          <Form.Item
+                            name="amount"
+                            noStyle
+                            rules={[
+                              {
+                                required: true,
+                                message: "Amount is required",
+                              },
+                              {
+                                validator(rule, value) {
+                                  return new Promise((resolve, reject) => {
+                                    if (
+                                      ((poVal > -1 &&
+                                        value >
+                                          getPoTotalVal()?.grossTotal -
+                                            totalPaymentVal +
+                                            paymentRequest?.amount) ||
+                                        (poVal == -1 &&
                                           value >
-                                            getPoTotalVal()?.grossTotal -
-                                              totalPaymentVal +
-                                              paymentRequest?.amount) ||
-                                          (poVal == -1 &&
-                                            value >
-                                              getPoTotalVal()?.grossTotal)) &&
-                                        paymentRequest?.category === "external"
-                                      ) {
-                                        reject(
-                                          "Requested amount should not exceed the PO Value!"
-                                        );
-                                      } else {
-                                        resolve();
-                                      }
-                                    });
-                                  },
+                                            getPoTotalVal()?.grossTotal)) &&
+                                      paymentRequest?.category === "external"
+                                    ) {
+                                      reject(
+                                        "Requested amount should not exceed the PO Value!"
+                                      );
+                                    } else {
+                                      resolve();
+                                    }
+                                  });
                                 },
-                              ]}
-                              initialValue={paymentRequest.amount}
-                            >
-                              <InputNumber
-                                className="h-10 w-full pt-1.5"
-                                addonBefore={
-                                  <Form.Item
-                                    noStyle
-                                    name="currencyEd"
-                                    initialValue={currency}
-                                    rules={[
-                                      {
-                                        validator(rule, value) {
-                                          return new Promise(
-                                            (resolve, reject) => {
-                                              if (
-                                                value !== currency &&
-                                                paymentRequest?.category ===
-                                                  "external"
-                                              ) {
-                                                reject(
-                                                  "The currency can not differ from the PO currency!"
-                                                );
-                                              } else {
-                                                resolve();
-                                              }
+                              },
+                            ]}
+                            initialValue={paymentRequest.amount}
+                          >
+                            <InputNumber
+                              className="h-10 w-full pt-1.5"
+                              addonBefore={
+                                <Form.Item
+                                  noStyle
+                                  name="currencyEd"
+                                  initialValue={currency}
+                                  rules={[
+                                    {
+                                      validator(rule, value) {
+                                        return new Promise(
+                                          (resolve, reject) => {
+                                            if (
+                                              value !== currency &&
+                                              paymentRequest?.category ===
+                                                "external"
+                                            ) {
+                                              reject(
+                                                "The currency can not differ from the PO currency!"
+                                              );
+                                            } else {
+                                              resolve();
                                             }
-                                          );
-                                        },
+                                          }
+                                        );
+                                      },
+                                    },
+                                  ]}
+                                >
+                                  <Select
+                                    onChange={(value) =>
+                                      (paymentRequest.currency = value)
+                                    }
+                                    size="large"
+                                    value={paymentRequest.currency}
+                                    options={[
+                                      {
+                                        value: "RWF",
+                                        label: "RWF",
+                                        key: "RWF",
+                                      },
+                                      {
+                                        value: "USD",
+                                        label: "USD",
+                                        key: "USD",
+                                      },
+                                      {
+                                        value: "EUR",
+                                        label: "EUR",
+                                        key: "EUR",
                                       },
                                     ]}
-                                  >
-                                    <Select
-                                      onChange={(value) =>
-                                        (paymentRequest.currency = value)
-                                      }
-                                      size="large"
-                                      value={paymentRequest.currency}
-                                      options={[
-                                        {
-                                          value: "RWF",
-                                          label: "RWF",
-                                          key: "RWF",
-                                        },
-                                        {
-                                          value: "USD",
-                                          label: "USD",
-                                          key: "USD",
-                                        },
-                                        {
-                                          value: "EUR",
-                                          label: "EUR",
-                                          key: "EUR",
-                                        },
-                                      ]}
-                                      disabled={!conditions}
-                                    ></Select>
-                                  </Form.Item>
-                                }
-                                // defaultValue={paymentRequest.amount}
-                                value={paymentRequest.amount}
-                                onChange={(e) => {
-                                  setAmount(e);
-                                  // paymentRequest.amount = e;
-                                }}
-                                disabled={!conditions}
-                              />
-                            </Form.Item>
+                                    disabled={!conditions}
+                                  ></Select>
+                                </Form.Item>
+                              }
+                              // defaultValue={paymentRequest.amount}
+                              value={paymentRequest.amount}
+                              onChange={(e) => {
+                                setAmount(e);
+                                // paymentRequest.amount = e;
+                              }}
+                              disabled={!conditions}
+                            />
                           </Form.Item>
-                        </div>
+                        </Form.Item>
+                      </div>
                     </div>
 
                     {/* Request Attached Invoice*/}
@@ -1383,7 +1386,9 @@ export default function PaymentRequest({ params }) {
                     {/* Request Comment/addtional note */}
                     <div className="flex flex-col space-y-2">
                       <div className="mb-2">
-                        <label className="text-[14px] text-[#344767]">Comment</label>
+                        <label className="text-[14px] text-[#344767]">
+                          Comment
+                        </label>
                       </div>
                       {paymentRequest && (
                         <div className="">
@@ -1468,10 +1473,14 @@ export default function PaymentRequest({ params }) {
                                 <div>
                                   <Form.Item
                                     name="bankName"
-                                    initialValue={paymentRequest?.paymentDetails?.bankName}
+                                    initialValue={
+                                      paymentRequest?.paymentDetails?.bankName
+                                    }
                                     rules={[
                                       {
-                                        required: true,
+                                        required:
+                                          paymentRequest?.category ==
+                                          "external",
                                         message:
                                           "Request Bank name is required",
                                       },
@@ -1508,7 +1517,9 @@ export default function PaymentRequest({ params }) {
                                     name="accountName"
                                     rules={[
                                       {
-                                        required: true,
+                                        required:
+                                          paymentRequest?.category ==
+                                          "external",
                                         message:
                                           "Request account name is required",
                                       },
@@ -1542,7 +1553,9 @@ export default function PaymentRequest({ params }) {
                                     name="accountNumber"
                                     rules={[
                                       {
-                                        required: true,
+                                        required:
+                                          paymentRequest?.category ==
+                                          "external",
                                         message:
                                           "Request account number is required",
                                       },
@@ -1579,7 +1592,9 @@ export default function PaymentRequest({ params }) {
                                     name="phoneName"
                                     rules={[
                                       {
-                                        required: true,
+                                        required:
+                                          paymentRequest?.category ==
+                                          "external",
                                         message:
                                           "Request Phone name is required",
                                       },
@@ -1616,7 +1631,9 @@ export default function PaymentRequest({ params }) {
                                     name="phoneNumber"
                                     rules={[
                                       {
-                                        required: true,
+                                        required:
+                                          paymentRequest?.category ==
+                                          "external",
                                         message:
                                           "Request Phone number required",
                                       },
