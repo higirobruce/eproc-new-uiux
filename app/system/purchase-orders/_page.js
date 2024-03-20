@@ -675,7 +675,6 @@ export default function PurchaseOrders() {
       localStorage.removeItem("user");
       router.push(`/auth?goTo=/system/purchase-orders/&sessionExpired=true`);
     } else {
-      console.log("hereeeee");
       return res.json();
     }
   }

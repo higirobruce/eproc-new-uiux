@@ -668,7 +668,6 @@ export default function UserRequests() {
     request,
     reqAttachmentDocId
   ) {
-    console.log(B1Data);
     return true;
     // return fetch(`${url}/purchaseOrders/`, {
     //   method: "POST",

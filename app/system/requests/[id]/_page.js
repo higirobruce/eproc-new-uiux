@@ -19,6 +19,7 @@ let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
 
 async function geRequestDetails(id, router, messageApi) {
+  
   let token = localStorage.getItem("token");
   const res = await fetch(`${url}/requests/${id}`, {
     headers: {
@@ -49,7 +50,6 @@ export async function fileExists(filepath) {
     .then((res) => {
       // alert(filepath);
       if (res === true || res == "true") {
-        console.log("Exists: ", res);
         return true;
       } else {
         return false;
@@ -79,6 +79,7 @@ export default function page({ params }) {
   let [files, setFiles] = useState([]);
 
   useEffect(() => {
+    alert('fiddded')
     loadData();
   }, []);
 
@@ -131,11 +132,6 @@ export default function page({ params }) {
         return ps;
         // return paths;
       });
-      console.log(
-        "Item Files",
-        await Promise.all(itemFiles).then((values) => values)
-        // await Promise.all(items).then((values) => values)
-      );
       setFileList(
         await Promise.all(itemFiles).then((values) => values)
       );
@@ -430,7 +426,6 @@ export default function page({ params }) {
       }
     });
 
-    console.log("Haaaaaa", reqItems);
     // rowData.items = reqItems;
 
     fetch(`${url}/requests/${rowData?._id}`, {
@@ -464,7 +459,6 @@ export default function page({ params }) {
   }
 
   useEffect(() => {
-    console.log("Files chaaaaanged", files);
   }, [files]);
 
   const handleUpload = () => {
@@ -474,7 +468,6 @@ export default function page({ params }) {
     let _files = [...files];
 
     let _f = __filePaths.filter((f) => f.length > 0);
-    console.log("Uploading files", _f);
 
     let i = 0;
     let _totalFilesInitial = rowData?.items?.map((item) => {
@@ -491,8 +484,6 @@ export default function page({ params }) {
         filesPerRow?.map((rowFile, fileIndex) => {
           const formData = new FormData();
           formData.append("files[]", rowFile);
-
-          console.log("Row File", rowFile);
           // You can use any AJAX library you like
           fetch(`${url}/uploads/termsOfReference/`, {
             method: "POST",
@@ -508,10 +499,6 @@ export default function page({ params }) {
               let _filenames = savedFiles?.map((f) => {
                 return f?.filename;
               });
-
-              console.log(_filenames);
-
-             
               _files[rowIndex][fileIndex] = _filenames[0];
 
               

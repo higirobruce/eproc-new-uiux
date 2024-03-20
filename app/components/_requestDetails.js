@@ -3112,7 +3112,6 @@ const RequestDetails = ({
                           <div className="text-lg font-bold">
                             Delivery progress
                           </div>
-                          {console.log("Data ", data)}
                           <Button
                             type="primary"
                             disabled={

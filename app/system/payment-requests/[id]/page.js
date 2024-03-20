@@ -322,7 +322,6 @@ export default function PaymentRequest({ params }) {
             // type:'pdf'
           });
 
-          console.log(newFile);
           _files.push(newFile);
           setFiles(_files);
         });
@@ -401,7 +400,6 @@ export default function PaymentRequest({ params }) {
   }, [po]);
 
   useEffect(() => {
-    console.log(files);
   }, [files]);
 
   function getPoTotalVal() {
@@ -740,7 +738,6 @@ export default function PaymentRequest({ params }) {
     })
       .then((res) => getResultFromServer(res))
       .then((res) => {
-        console.log("Resseseses", res);
         if (res?.error) {
           // paymentRequest.status = "approved";
           message.error(res?.message, 10);

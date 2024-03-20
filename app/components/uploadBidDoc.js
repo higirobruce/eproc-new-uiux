@@ -52,7 +52,6 @@ function UploadBidDoc({ label, uuid, setSelected, iconOnly }) {
     },
     listType: "document",
     previewFile(file) {
-      console.log("Your upload file:", file);
       // Your process logic. Here we just mock to the same file
       return fetch(`${url}/users/`, {
         method: "GET",
