@@ -42,9 +42,13 @@ import {
   LockOpenIcon,
   PaperClipIcon,
 } from "@heroicons/react/24/solid";
+
 import dynamic from "next/dynamic";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
+import { encode } from "base-64";
+import html2pdf from "html2pdf.js";
+import ReactDOMServer from "react-dom/server";
 // import MyPdfViewer from "../common/pdfViewer";
 import ItemsTable from "../../components/itemsTableB1";
 import { XMarkIcon } from "@heroicons/react/24/outline";
@@ -61,8 +65,6 @@ import { RiForbidLine } from "react-icons/ri";
 import { FaLink } from "react-icons/fa6";
 import { IoLink } from "react-icons/io5";
 import { useUser } from "@/app/context/UserContext";
-import html2pdf from "html2pdf.js";
-import ReactDOMServer from "react-dom/server";
 
 let modules = {
   toolbar: [
