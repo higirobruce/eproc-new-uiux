@@ -85,6 +85,7 @@ import { BiPurchaseTagAlt } from "react-icons/bi";
 import { TbTruckDelivery } from "react-icons/tb";
 import { useUser } from "../context/UserContext";
 import { useRouter } from 'next/navigation';
+import {motion} from 'framer-motion';
 
 let modules = {
   toolbar: [
@@ -439,8 +440,10 @@ const RequestDetails = ({
   const [deliveredQties, setDeliveredQties] = useState([]);
   const [tenderDocSelected, setTendeDocSelected] = useState(false);
   const [attachSelected, setAttachSelected] = useState(false);
+  const [approvalShow, setApprovalShow] = useState(true);
   const [activeIndex, setActiveIndex] = useState("");
   const contentHeight = useRef();
+  const scrollRef = useRef();
 
   const showPopconfirm = () => {
     setOpen(true);
@@ -627,6 +630,15 @@ const RequestDetails = ({
   }, [data]);
 
   useEffect(() => {}, [edit]);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: 'smooth',
+      block: 'start',
+      inline: 'start'
+    });
+    }
+  }, [data]);
 
   useEffect(() => {
     let t = 0;
@@ -2620,7 +2632,8 @@ const RequestDetails = ({
   }
 
   const handleItemClick = (value) => {
-    setActiveIndex((prevIndex) => (prevIndex === value ? "" : value));
+    setActiveIndex((prevIndex) => ((value && (prevIndex == "" && approvalShow)) ? "" : (value && (prevIndex == "" && !approvalShow)) ? value : prevIndex === value ? "" : value));
+    setApprovalShow(false)
   };
 
   function updateRequest(_files) {
@@ -2690,6 +2703,22 @@ const RequestDetails = ({
     data?.status === "withdrawn" ||
     data?.status === "approved" ||
     data?.status === "approved (pm)";
+
+  const bounceVariants = {
+    initial: {
+      opacity: 0,
+      y: 100,
+    },
+    animate: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: "spring",
+        damping: 3,
+        stiffness: 40,
+      },
+    },
+  };
 
   return (
     <div className="request-details grid md:grid-cols-5 gap-4 items-start h-screen mb-2 overflow-y-auto">
@@ -3039,9 +3068,9 @@ const RequestDetails = ({
           {previewAttachmentModal()}
           {createContractMOdal()}
         </div>
-
         <div className="md:col-span-4 flex pb-8 flex-col px-6 rounded-lg bg-white mb-24">
-          <h4 className="mb-1 text-[15px]">Request Process</h4>
+          <Divider />
+          <h4 className="mb-1 text-[15px] mt-0 pt-0">Request Process</h4>
           <div className="-my-3.5">
             <button
               className={`cursor-pointer w-full pr-5 flex justify-between items-center bg-transparent border-none ${
@@ -3059,8 +3088,9 @@ const RequestDetails = ({
                 </span>
               </div>
               <RiArrowDropDownLine
-                className={`text-[36px] text-[#344767] arrow ${
-                  activeIndex == "request" ? "active" : ""
+                size={34}
+                className={`text-[48px] text-[#344767] arrow ${
+                  (activeIndex == "request" || (data && approvalShow)) ? "active" : ""
                 }`}
               />
             </button>
@@ -3068,7 +3098,7 @@ const RequestDetails = ({
               ref={contentHeight}
               className="answer-container"
               style={
-                activeIndex == "request"
+                (activeIndex == "request" || (data && approvalShow))
                   ? { display: "block" }
                   : { display: "none" }
               }
@@ -3105,7 +3135,7 @@ const RequestDetails = ({
               </div>
             </div>
           </div>
-          <div className="my-0">
+          <div ref={scrollRef} className="my-0">
             <button
               className={`w-full pr-5 flex justify-between items-center bg-transparent cursor-pointer border-none ${
                 activeIndex == "delivery" ? "active" : ""
@@ -3122,7 +3152,8 @@ const RequestDetails = ({
                 </span>
               </div>
               <RiArrowDropDownLine
-                className={`text-[36px] text-[#344767] arrow ${
+                size={34}
+                className={`text-[48px] text-[#344767] arrow ${
                   activeIndex == "delivery" ? "active" : ""
                 }`}
               />
@@ -3409,9 +3440,19 @@ const RequestDetails = ({
             ]}
           />
         </div>
-        <div className="bg-white rounded-lg shadow py-1.5">
-          <div className="request px-4 max-h-[calc(100vh-665px)] overflow-y-auto">
-            <div className="pt-3">
+        {currentCode == 3 && <motion.div 
+          variants={bounceVariants}
+          initial="initial"
+          animate="animate"
+          className="bg-white rounded shadow py-1.5"
+        >
+          <div
+            className="request px-4 max-h-[calc(100vh-665px)] overflow-y-auto"
+          >
+            <div 
+              // Transition duration
+              className="pt-3"
+            >
               {/* Sourcing Method */}
               {currentCode !== 3 && (
                 <div className="mb-5">
@@ -3440,7 +3481,7 @@ const RequestDetails = ({
                         <Form.Item name="refDoc">
                           <Select
                             onChange={(value) => setRefDoc(value)}
-                            style={{ width: "100%" }}
+                            style={{ width: "100%", borderRadius: '6px', outline: refDoc ? "" : "1.8px solid #4297FF" }}
                             defaultValue={false}
                             options={[
                               {
@@ -3617,7 +3658,7 @@ const RequestDetails = ({
                 )}
             </div>
           </div>
-        </div>
+        </motion.div>}
       </div>
     </div>
   );

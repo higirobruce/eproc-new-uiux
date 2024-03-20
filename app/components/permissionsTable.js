@@ -121,6 +121,7 @@ function PermissionsTable({
       create: canCreateRequests,
       edit: canEditRequests,
       approve: canApproveRequests,
+      placeholder: "Initiate the purchase requisition process"
     },
     {
       key: "2",
@@ -130,6 +131,7 @@ function PermissionsTable({
       create: canCreatePaymentRequests,
       edit: canEditPaymentRequests,
       approve: canApprovePaymentRequests,
+      placeholder: "Request for payment for services rendered or items purchased"
     },
     {
       key: "3",
@@ -139,6 +141,7 @@ function PermissionsTable({
       create: canCreateTenders,
       edit: canEditTenders,
       approve: canApproveTenders,
+      placeholder: "Issue and track tender notices to find qualified vendors"
     },
     {
       key: "4",
@@ -148,6 +151,7 @@ function PermissionsTable({
       create: canCreateBids,
       edit: canEditBids,
       approve: canApproveBids,
+      placeholder: "Review expression of interest from vendors"
     },
     {
       key: "5",
@@ -157,6 +161,7 @@ function PermissionsTable({
       create: canCreateContracts,
       edit: canEditContracts,
       approve: canApproveContracts,
+      placeholder: "Manage the contracting process for selected vendors"
     },
     {
       key: "6",
@@ -166,6 +171,7 @@ function PermissionsTable({
       create: canCreatePurchaseOrders,
       edit: canEditPurchaseOrders,
       approve: canApprovePurchaseOrders,
+      placeholder: "Place your orders for items and services needed"
     },
     {
       key: "7",
@@ -175,6 +181,7 @@ function PermissionsTable({
       create: canCreateVendors,
       edit: canEditVendors,
       approve: canApproveVendors,
+      placeholder: "Manage vendor profile data and access permissions"
     },
     {
       key: "8",
@@ -184,6 +191,7 @@ function PermissionsTable({
       create: canCreateUsers,
       edit: canEditUsers,
       approve: canApproveUsers,
+      placeholder: "Onboard internal users, manage their profile data and access permissions"
     },
     {
       key: "9",
@@ -193,6 +201,7 @@ function PermissionsTable({
       create: canCreateDashboard,
       edit: canEditDashboard,
       approve: canApproveDashboard,
+      placeholder: "View aggregated data and reports on the procurement process"
     },
   ];
 
@@ -205,7 +214,7 @@ function PermissionsTable({
       {/* {(pathname != '/system/profile' || !pathname.startsWith('/system/users')) && <h5 className="text-[25px] text-[#FFF] my-0">Overview</h5>} */}
       <div className={`bg-white ${pathname != '/system/profile' ? 'rounded-3xl' : 'rounded-lg'} px-5 pb-10`}>
         <h6 className="mb-3 pb-0 text-[15px] text-[#263238]">Module access permissions</h6>
-        <small className="text-[#95A1B3] text-[14px]">Choose how you want permissions granted to any specific internal user with this permission settings</small>
+        <small className="text-[#95A1B3] text-[14px]">Control user access to specific modules within the application. Define who can view, edit, or manage each module to maintain security and streamline workflow.</small>
         <div className="grid grid-cols-2 md:pr-10 border-b-2 border-x-0 border-t-0 border-red-500">
           <h6 className="text-[13px] text-[#707C95]">Module</h6>
           <div className="flex items-center justify-between">
@@ -218,8 +227,8 @@ function PermissionsTable({
         {data && data.map((item, key) => (
           <div className="grid grid-cols-2 md:pr-10 border-b-2 border-x-0 border-t-0 border-red-500">
             <div className="my-2">
-              <h6 className="text-[13px] text-[#707C95] my-2">{item.module}</h6>
-              <small className="text-[12px] text-[#95A1B3]">Perfom more action on request on this user</small>
+              <h6 className="text-[13px] text-[#707C95] my-2">{item.module == 'Requests' ? 'Purchase Requests' : item.module}</h6>
+              <small className="text-[12px] text-[#95A1B3]">{item.placeholder}</small>
             </div>
             <div className="flex items-center justify-between">
               <div className="text-[13px] text-[#707C95] permission my-5">

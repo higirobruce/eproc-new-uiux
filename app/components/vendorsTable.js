@@ -51,7 +51,7 @@ const VendorsTable = ({
       title: "Company Name",
       // dataIndex: "vendor.number",
       sorter: (a, b) =>
-        a.vendor?.companyName.localeCompare(b.vendor?.companyName),
+      b.vendor?.companyName.localeCompare(a.vendor?.companyName),
       render: (_, record) => (
         <>
           <div
@@ -72,7 +72,7 @@ const VendorsTable = ({
     {
       title: "TIN",
       // dataIndex: "tin",
-      sorter: (a, b) => a.vendor?.tin > b.vendor?.tin,
+      sorter: (a, b) => b.vendor?.tin - a.vendor?.tin,
       render: (_, record) => (
         <>
           <div className="cursor-pointer space-x-1 flex flex-row items-center">
@@ -87,7 +87,7 @@ const VendorsTable = ({
     {
       title: "Contact person email",
       dataIndex: "email",
-      sorter: (a, b) => a.vendor?.email > b.vendor?.email,
+      sorter: (a, b) => b.vendor?.email - a.vendor?.email,
       render: (_, record) => (
         <>
           <div className="cursor-pointer space-x-1 flex flex-row items-center">
@@ -102,7 +102,7 @@ const VendorsTable = ({
     {
       title: "Phone",
       dataIndex: "telephone",
-      sorter: (a, b) => a.vendor?.telephone > b.vendor?.telephone,
+      sorter: (a, b) => b.vendor?.telephone - a.vendor?.telephone,
       render: (_, record) => (
         <>
           <div className="cursor-pointer space-x-1 flex flex-row items-center">
@@ -117,11 +117,11 @@ const VendorsTable = ({
     {
       title: "Status",
       key: "action",
-      sorter: (a, b) => a.vendor?.status > b.vendor?.status,
+      sorter: (a, b) => b.vendor?.status - a.vendor?.status,
       render: (_, record) => (
         <>
           <div className={`rounded`}>
-            <span className={`bg-${getTagColor(record?.vendor?.status)}-500/20 text-${getTagColor(record?.vendor?.status)}-500 text-[10px]`}>
+            <span className={`bg-${getTagColor(record?.vendor?.status)}-500/20 text-${getTagColor(record?.vendor?.status)}-500 text-[14px]`}>
               {record?.vendor?.status}
             </span>
           </div>

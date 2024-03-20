@@ -368,7 +368,18 @@ const ItemsTable = ({
 
   return (
     <>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 request-empty">
+        <div className="flex w-full justify-between items-center">
+          {!disable ? (
+            <Button
+              onClick={handleAdd}
+              className="flex self-start items-center gap-1 border-0 bg-[#EAF1FC] text-[#0065DD] mb-1"
+            >
+              <FaPlus />
+              Row
+            </Button>
+          ) : <div className="mb-1" />}
+        </div>
         <Table
           components={components}
           rowClassName={() => "editable-row"}
@@ -376,17 +387,9 @@ const ItemsTable = ({
           dataSource={dataSource}
           columns={columns}
           size="small"
+          pagination={false}
         />
       </div>
-      {!disable && (
-        <Button
-          onClick={handleAdd}
-          className="flex self-start items-center gap-1 border-0 bg-[#EAF1FC] text-[#0065DD] mt-3"
-        >
-          <FaPlus />
-          Row
-        </Button>
-      )}
     </>
   );
 };
