@@ -55,14 +55,14 @@ import {
 import PermissionsTable from "../../components/permissionsTable";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { FiSearch } from 'react-icons/fi'
+import { FiSearch } from "react-icons/fi";
 import { useUser } from "@/app/context/UserContext";
 
 export default function Users() {
   const { user, login, logout } = useUser();
   // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
-  let router = useRouter()
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let router = useRouter();
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const [dataLoaded, setDataLoaded] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
@@ -732,7 +732,9 @@ export default function Users() {
           </div>
           <div className="request mr-6 bg-white rounded-lg h-[calc(100vh-160px)] mb-10 px-5 pb-2 overflow-y-auto">
             <div className="flex justify-between items-center mb-5">
-              <h4 className="text-[19px] text-[#344767]">Internal Users List</h4>
+              <h4 className="text-[19px] text-[#344767]">
+                Internal Users List
+              </h4>
               <div className="flex items-center rounded-lg bg-[#F5F7FA] p-1.5">
                 <FiSearch size={18} className="text-[#E4E4E4] ml-2" />
                 <Input
@@ -1211,7 +1213,10 @@ export default function Users() {
                         },
                       ]}
                     >
-                      <Input className="h-11 mt-3" placeholder="Enter First name" />
+                      <Input
+                        className="h-11 mt-3"
+                        placeholder="Enter First name"
+                      />
                     </Form.Item>
                   </div>
                   <div>
@@ -1228,7 +1233,10 @@ export default function Users() {
                         },
                       ]}
                     >
-                      <Input className="h-11 mt-3" placeholder="Enter Last name" />
+                      <Input
+                        className="h-11 mt-3"
+                        placeholder="Enter Last name"
+                      />
                     </Form.Item>
                   </div>
                 </div>
@@ -1236,7 +1244,7 @@ export default function Users() {
                 <div className="grid grid-cols-2 gap-5">
                   <div>
                     <div className="flex flex-row spacex-3">
-                      Phone number 
+                      Phone number
                       {/* <div className="text-red-500">*</div> */}
                     </div>
                     <Form.Item
@@ -1315,7 +1323,25 @@ export default function Users() {
                         </Tooltip>
                       </div>
                     </div>
-                    <Form.Item name="permissions">
+                    <Form.Item
+                      name="permissions"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Input required",
+                        },
+                      ]}
+                      initialValue={[
+                        {
+                          value: "canViewRequests",
+                          label: "View Purchase requests",
+                        },
+                        {
+                          value: "canCreateRequests",
+                          label: "Create Purchase requests",
+                        },
+                      ]}
+                    >
                       <Select
                         mode="multiple"
                         allowClear
