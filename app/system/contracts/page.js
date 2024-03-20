@@ -52,7 +52,6 @@ import ReactDOMServer from "react-dom/server";
 // import MyPdfViewer from "../common/pdfViewer";
 import ItemsTable from "../../components/itemsTableB1";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { encode } from "base-64";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
