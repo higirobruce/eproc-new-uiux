@@ -24,7 +24,7 @@ let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
 
 async function getApprovers() {
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const res = await fetch(`${url}/users/level1Approvers`, {
     method: "GET",
     headers: {
@@ -48,7 +48,7 @@ async function getApprovers() {
 export default function NewPaymentRequest() {
   const { user, login, logout } = useUser();
   // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   let [po, setPo] = useState(null);
   let router = useRouter();
   let [form] = Form.useForm();
@@ -256,9 +256,7 @@ export default function NewPaymentRequest() {
         </div>
         <div className="grid lg:grid-cols-3 gap-x-10 mt-5 items-start justify-start h-full">
           <div className="lg:col-span-2">
-            <h5 className="text-[18px] text-[#344767] mb-4">
-              Request Details
-            </h5>
+            <h5 className="text-[18px] text-[#344767] mb-4">Request Details</h5>
             <div className="gap-1">
               <div className="flex flex-col py-3">
                 <Form
@@ -550,12 +548,12 @@ export default function NewPaymentRequest() {
                   <div>
                     <Form.Item
                       name="bankName"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Request Bank name is required",
-                        },
-                      ]}
+                      // rules={[
+                      //   {
+                      //     required: true,
+                      //     message: "Request Bank name is required",
+                      //   },
+                      // ]}
                     >
                       <Input
                         value={bankName}
@@ -573,12 +571,12 @@ export default function NewPaymentRequest() {
                   <div>
                     <Form.Item
                       name="accountName"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Request account name is required",
-                        },
-                      ]}
+                      // rules={[
+                      //   {
+                      //     required: true,
+                      //     message: "Request account name is required",
+                      //   },
+                      // ]}
                     >
                       <Input
                         value={accountName}
@@ -596,12 +594,12 @@ export default function NewPaymentRequest() {
                   <div>
                     <Form.Item
                       name="accountNumber"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Request account number is required",
-                        },
-                      ]}
+                      // rules={[
+                      //   {
+                      //     required: true,
+                      //     message: "Request account number is required",
+                      //   },
+                      // ]}
                     >
                       <Input
                         value={accountNumber}
@@ -622,12 +620,12 @@ export default function NewPaymentRequest() {
                   <div>
                     <Form.Item
                       name="phoneName"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Request Phone name is required",
-                        },
-                      ]}
+                      // rules={[
+                      //   {
+                      //     required: true,
+                      //     message: "Request Phone name is required",
+                      //   },
+                      // ]}
                     >
                       <Input
                         value={phoneName}
@@ -645,12 +643,12 @@ export default function NewPaymentRequest() {
                   <div>
                     <Form.Item
                       name="phoneNumber"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Request Phone number required",
-                        },
-                      ]}
+                      // rules={[
+                      //   {
+                      //     required: true,
+                      //     message: "Request Phone number required",
+                      //   },
+                      // ]}
                     >
                       <Input
                         value={phoneNumber}
