@@ -2154,8 +2154,7 @@ const RequestDetails = ({
                   contractStartDate,
                   contractEndDate,
                   signatories,
-                  refDoc === "Direct Contracting" ? reqAttachId : "",
-                  "draft"
+                  refDoc === "Direct Contracting" ? reqAttachId : ""
                 );
                 setOpenCreateContract(false);
               }
