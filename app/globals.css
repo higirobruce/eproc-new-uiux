@@ -244,3 +244,7 @@ body {
 .ant-input {
   padding: 8px 11px !important;
 }
+
+.request-empty, .ant-empty-normal {
+  margin-block: 10px !important;
+}

@@ -318,7 +318,7 @@ export default function page() {
                             Can approve as a Head of department
                           </h6>
                           <small className="text-[12px] text-[#95A1B3]">
-                            Perfom more action on request on this user
+                            Allows user to review submitted department request and make approval decision
                           </small>
                         </div>
                         <div className="permission">
@@ -339,7 +339,7 @@ export default function page() {
                             Can approve as a Head of finance
                           </h6>
                           <small className="text-[12px] text-[#95A1B3]">
-                            Perfom more action on request on this user
+                            Allows user to manage financial compliance and approve requests previously endorsed by Heads of Departments.
                           </small>
                         </div>
                         <div className="permission">
@@ -360,7 +360,7 @@ export default function page() {
                             Can approve as a Procurement manager
                           </h6>
                           <small className="text-[12px] text-[#95A1B3]">
-                            Perfom more action on request on this user
+                            Provides oversight of this tool and allows user to manage sourcing process
                           </small>
                         </div>
                         <div className="permission">
@@ -382,7 +382,7 @@ export default function page() {
                             Can approve as a Legal officer
                           </h6>
                           <small className="text-[12px] text-[#95A1B3]">
-                            Perfom more action on request on this user
+                            Allows user to review, update and submit contracts for signature
                           </small>
                         </div>
                         <div className="permission">

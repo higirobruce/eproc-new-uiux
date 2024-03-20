@@ -845,7 +845,8 @@ export default function page({ params }) {
             ) : tab == 2 ? (
               <div className="bg-white rounded-3xl px-5 pb-10">
                 <div className="text-md font-semibold my-5 flex flex-row justify-between items-center">
-                  <div>Approval permissions</div>
+                  <h6 className="mb-3 pb-0 text-[15px] text-[#263238]">Approval permissions</h6>
+                  <small className="text-[#95A1B3] text-[14px]">Configure and manage approval workflows by defining who can approve requests, documents or actions within the application. Assign approval rights to ensure efficient and secure processing of tasks.</small>
                 </div>
                 {row && row?.permissions && (
                   <Form className="w-full">
@@ -856,7 +857,7 @@ export default function page({ params }) {
                             Can approve as a Head of department
                           </h6>
                           <small className="text-[12px] text-[#95A1B3]">
-                            Perfom more action on request on this user
+                            Allows user to review submitted department request and make approval decision
                           </small>
                         </div>
                         <div className="permission">
@@ -876,7 +877,7 @@ export default function page({ params }) {
                             Can approve as a Head of finance
                           </h6>
                           <small className="text-[12px] text-[#95A1B3]">
-                            Perfom more action on request on this user
+                            Allows user to manage financial compliance and approve requests previously endorsed by Heads of Departments.
                           </small>
                         </div>
                         <div className="permission">
@@ -896,7 +897,7 @@ export default function page({ params }) {
                             Can approve as a Procurement manager
                           </h6>
                           <small className="text-[12px] text-[#95A1B3]">
-                            Perfom more action on request on this user
+                            Provides oversight of this tool and allows user to manage sourcing process
                           </small>
                         </div>
                         <div className="permission">
@@ -917,7 +918,7 @@ export default function page({ params }) {
                             Can approve as a Legal officer
                           </h6>
                           <small className="text-[12px] text-[#95A1B3]">
-                            Perfom more action on request on this user
+                            Allows user to review, update and submit contracts for signature
                           </small>
                         </div>
                         <div className="permission">

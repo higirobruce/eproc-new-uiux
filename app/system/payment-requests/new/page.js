@@ -269,9 +269,9 @@ export default function NewPaymentRequest() {
                     {/* Form grid 1 */}
                     {/* Title */}
                     <div>
-                      <div className="text-[14px] text-[#344767] mb-2">
-                        {" "}
-                        Request title
+                      <div className="flex items-center gap-2">
+                        <label className="text-[#000000e0] text-[14px]">Request Title</label>
+                        <div className="text-red-500">*</div>
                       </div>
                       <div>
                         <Form.Item
@@ -294,8 +294,9 @@ export default function NewPaymentRequest() {
                     </div>
 
                     <div className="flex flex-col">
-                      <div className="text-[14px] text-[#344767] mb-2">
-                        Level 1 approver
+                      <div className="flex items-center gap-2">
+                        <label className="text-[#000000e0] text-[14px]">Level 1 approver</label>
+                        <div className="text-red-500">*</div>
                       </div>
                       <Form.Item
                         // label="Select level 1 approver"
@@ -332,8 +333,9 @@ export default function NewPaymentRequest() {
 
                     {/* Description */}
                     <div>
-                      <div className="text-[14px] text-[#344767] mb-2">
-                        Comment/additional note
+                      <div className="flex items-center gap-2">
+                        <label className="text-[#000000e0] text-[14px]">Comment/additional note</label>
+                        <div className="text-red-500">*</div>
                       </div>
                       <div>
                         <Form.Item
@@ -357,8 +359,9 @@ export default function NewPaymentRequest() {
                       </div>
                     </div>
                     <div className="flex flex-col">
-                      <div className="text-[14px] text-[#344767] mb-2">
-                        Amount due
+                      <div className="flex items-center gap-2">
+                        <label className="text-[#000000e0] text-[14px]">Amount due</label>
+                        <div className="text-red-500">*</div>
                       </div>
                       <Form.Item>
                         <Form.Item
@@ -411,8 +414,9 @@ export default function NewPaymentRequest() {
                     </div>
 
                     <div>
-                      <div className="text-[14px] text-[#344767] mb-2">
-                        Budgeted?
+                      <div className="flex items-center gap-2">
+                        <label className="text-[#000000e0] text-[14px]">Budgeted?</label>
+                        <div className="text-red-500">*</div>
                       </div>
                       <div>
                         <Form.Item
@@ -454,8 +458,9 @@ export default function NewPaymentRequest() {
                         // </Form.Item>
 
                         <div>
-                          <div className="text-[14px] text-[#344767] mb-2">
-                            Budget Line
+                          <div className="flex items-center gap-2">
+                            <label className="text-[#000000e0] text-[14px]">Budget Line</label>
+                            <div className="text-red-500">*</div>
                           </div>
                           <div>
                             <Form.Item
@@ -547,18 +552,19 @@ export default function NewPaymentRequest() {
             {bankPay ? (
               <>
                 <div>
-                  <div className="text-[14px] text-[#344767] mb-2">
-                    Bank Name
+                  <div className="flex items-center gap-2">
+                    <label className="text-[#344767] text-[14px] mb-2">Bank Name</label>
+                    <div className="text-red-500">*</div>
                   </div>
                   <div>
                     <Form.Item
                       name="bankName"
-                      // rules={[
-                      //   {
-                      //     required: true,
-                      //     message: "Request Bank name is required",
-                      //   },
-                      // ]}
+                      rules={bankPay && [
+                        {
+                          required: true,
+                          message: "Request Bank name is required",
+                        },
+                      ]}
                     >
                       <Input
                         value={bankName}
@@ -570,18 +576,19 @@ export default function NewPaymentRequest() {
                   </div>
                 </div>
                 <div>
-                  <div className="text-[14px] text-[#344767] mb-2">
-                    Account Name
+                  <div className="flex items-center gap-2">
+                    <label className="text-[#344767] text-[14px] mb-2">Account Name</label>
+                    <div className="text-red-500">*</div>
                   </div>
                   <div>
                     <Form.Item
                       name="accountName"
-                      // rules={[
-                      //   {
-                      //     required: true,
-                      //     message: "Request account name is required",
-                      //   },
-                      // ]}
+                      rules={bankPay && [
+                        {
+                          required: true,
+                          message: "Request account name is required",
+                        },
+                      ]}
                     >
                       <Input
                         value={accountName}
@@ -593,18 +600,19 @@ export default function NewPaymentRequest() {
                   </div>
                 </div>
                 <div>
-                  <div className="text-[14px] text-[#344767] mb-2">
-                    Account Number
+                  <div className="flex items-center gap-2">
+                    <label className="text-[#344767] text-[14px] mb-2">Account Number</label>
+                    <div className="text-red-500">*</div>
                   </div>
                   <div>
                     <Form.Item
                       name="accountNumber"
-                      // rules={[
-                      //   {
-                      //     required: true,
-                      //     message: "Request account number is required",
-                      //   },
-                      // ]}
+                      rules={bankPay && [
+                        {
+                          required: true,
+                          message: "Request account number is required",
+                        },
+                      ]}
                     >
                       <Input
                         value={accountNumber}
@@ -619,18 +627,19 @@ export default function NewPaymentRequest() {
             ) : (
               <>
                 <div>
-                  <div className="text-[14px] text-[#344767] mb-2">
-                    Phone Name
+                  <div className="flex items-center gap-2">
+                    <label className="text-[#344767] text-[14px] mb-2">Phone Name</label>
+                    <div className="text-red-500">*</div>
                   </div>
                   <div>
                     <Form.Item
                       name="phoneName"
-                      // rules={[
-                      //   {
-                      //     required: true,
-                      //     message: "Request Phone name is required",
-                      //   },
-                      // ]}
+                      rules={!bankPay && [
+                        {
+                          required: true,
+                          message: "Request Phone name is required",
+                        },
+                      ]}
                     >
                       <Input
                         value={phoneName}
@@ -642,18 +651,19 @@ export default function NewPaymentRequest() {
                   </div>
                 </div>
                 <div>
-                  <div className="text-[14px] text-[#344767] mb-2">
-                    Phone Number
+                  <div className="flex items-center gap-2">
+                    <label className="text-[#344767] text-[14px]">Phone Number</label>
+                    <div className="text-red-500">*</div>
                   </div>
                   <div>
                     <Form.Item
                       name="phoneNumber"
-                      // rules={[
-                      //   {
-                      //     required: true,
-                      //     message: "Request Phone number required",
-                      //   },
-                      // ]}
+                      rules={!bankPay && [
+                        {
+                          required: true,
+                          message: "Request Phone number required",
+                        },
+                      ]}
                     >
                       <Input
                         value={phoneNumber}
