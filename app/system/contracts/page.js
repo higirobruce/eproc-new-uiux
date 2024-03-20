@@ -37,23 +37,15 @@ import React, { useEffect, useRef, useState } from "react";
 import parse from "html-react-parser";
 import * as _ from "lodash";
 import moment from "moment-timezone";
-import {
-  LockClosedIcon,
-  LockOpenIcon,
-  PaperClipIcon,
-} from "@heroicons/react/24/solid";
-
 import dynamic from "next/dynamic";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
 import { encode } from "base-64";
 import html2pdf from "html2pdf.js";
 import ReactDOMServer from "react-dom/server";
-// import MyPdfViewer from "../common/pdfViewer";
 import ItemsTable from "../../components/itemsTableB1";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { FiSearch } from "react-icons/fi";
 import { RiArrowDropDownLine } from "react-icons/ri";
