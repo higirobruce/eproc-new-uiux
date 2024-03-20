@@ -229,7 +229,6 @@ export default function Contracts() {
     })
       .then((res) => getResultFromServer(res))
       .then((res1) => {
-        console.log(res1);
         if (res1.error) {
           messageApi.error(
             res1?.error?.message?.value

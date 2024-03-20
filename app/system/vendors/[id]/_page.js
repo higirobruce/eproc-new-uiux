@@ -185,7 +185,6 @@ export default function page({ params }) {
 
   function approveUser(id) {
     setUpdatingId(id);
-    console.log(id);
     fetch(`${url}/users/approve/${id}`, {
       method: "POST",
       headers: {
@@ -265,8 +264,6 @@ export default function page({ params }) {
         var index = _.findIndex(_data, { _id: id });
         let elindex = _data[index];
         elindex.status = res?.status;
-
-        console.log(_data[index]);
         // Replace item at index using native splice
         _data.splice(index, 1, elindex);
 

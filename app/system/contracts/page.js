@@ -37,20 +37,15 @@ import React, { useEffect, useRef, useState } from "react";
 import parse from "html-react-parser";
 import * as _ from "lodash";
 import moment from "moment-timezone";
-import {
-  LockClosedIcon,
-  LockOpenIcon,
-  PaperClipIcon,
-} from "@heroicons/react/24/solid";
 import dynamic from "next/dynamic";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
-// import MyPdfViewer from "../common/pdfViewer";
+import { encode } from "base-64";
+import html2pdf from "html2pdf.js";
+import ReactDOMServer from "react-dom/server";
 import ItemsTable from "../../components/itemsTableB1";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { encode } from "base-64";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { FiSearch } from "react-icons/fi";
 import { RiArrowDropDownLine } from "react-icons/ri";
@@ -243,7 +238,6 @@ export default function Contracts() {
     })
       .then((res) => getResultFromServer(res))
       .then((res1) => {
-        console.log(res1);
         if (res1.error) {
           messageApi.error(
             res1?.error?.message?.value
@@ -647,201 +641,179 @@ export default function Contracts() {
 
             {/* Signatories */}
             <div className="grid grid-cols-3 gap-5">
-              {contract?.signatories?.map((s, index) => {
-                let yetToSign = contract?.signatories?.filter((notS) => {
-                  return !notS.signed;
-                });
+              {signatories.map((s, index) => {
                 return (
                   <div
-                    key={s?.email}
-                    className="flex flex-col ring-1 ring-gray-300 rounded pt-5 space-y-3 justify-between"
+                    key={index}
+                    className="flex flex-col ring-1 ring-gray-300 rounded py-5"
                   >
-                    <div className="px-5 flex flex-col space-y-3">
-                      <div className="flex flex-col">
-                        <Typography.Text type="secondary">
-                          <div className="text-xs">On Behalf of</div>
-                        </Typography.Text>
-                        <Typography.Text
-                          strong
-                          editable={
-                            editContract &&
-                            contract?.status === "draft" && {
+                    <div className="flex flex-row items-start justify-between">
+                      <div className="flex flex-col space-y-3 px-5">
+                        <div className="flex flex-col space-y-1">
+                          <Typography.Text type="secondary">
+                            <div className="text-xs">On Behalf of</div>
+                          </Typography.Text>
+                          <Typography.Text
+                            editable={{
                               text: s.onBehalfOf,
                               onChange: (e) => {
-                                let _signatories = [...contract?.signatories];
+                                let _signatories = [...signatories];
                                 _signatories[index].onBehalfOf = e;
                                 setSignatories(_signatories);
                               },
-                            }
-                          }
-                        >
-                          {s.onBehalfOf}
-                        </Typography.Text>
-                      </div>
+                            }}
+                          >
+                            {s.onBehalfOf}
+                          </Typography.Text>
+                        </div>
 
-                      <div className="flex flex-col">
-                        <Typography.Text type="secondary">
-                          <div className="text-xs">Representative Title</div>
-                        </Typography.Text>
-                        <Typography.Text
-                          strong
-                          editable={
-                            editContract &&
-                            contract?.status === "draft" && {
+                        <div className="flex flex-col space-y-1">
+                          <Typography.Text type="secondary">
+                            <div className="text-xs">Representative Title</div>
+                          </Typography.Text>
+                          <Typography.Text
+                            editable={{
                               text: s.title,
                               onChange: (e) => {
-                                let _signatories = [...contract?.signatories];
+                                let _signatories = [...signatories];
                                 _signatories[index].title = e;
                                 setSignatories(_signatories);
                               },
-                            }
-                          }
-                        >
-                          {s.title}
-                        </Typography.Text>
-                      </div>
+                            }}
+                          >
+                            {s.title}
+                          </Typography.Text>
+                        </div>
 
-                      <div className="flex flex-col">
-                        <Typography.Text type="secondary">
-                          <div className="text-xs">Company Representative</div>
-                        </Typography.Text>
-                        <Typography.Text
-                          strong
-                          editable={
-                            editContract &&
-                            contract?.status === "draft" && {
+                        <div className="flex flex-col space-y-1">
+                          <Typography.Text type="secondary">
+                            <div className="text-xs">
+                              Company Representative
+                            </div>
+                          </Typography.Text>
+                          <Typography.Text
+                            editable={{
                               text: s.names,
                               onChange: (e) => {
-                                let _signatories = [...contract?.signatories];
+                                let _signatories = [...signatories];
                                 _signatories[index].names = e;
                                 setSignatories(_signatories);
                               },
-                            }
-                          }
-                        >
-                          {s.names}
-                        </Typography.Text>
-                      </div>
+                            }}
+                          >
+                            {s.names}
+                          </Typography.Text>
+                        </div>
 
-                      <div className="flex flex-col">
-                        <Typography.Text type="secondary">
-                          <div className="text-xs">Email</div>
-                        </Typography.Text>
-                        <Typography.Text
-                          strong
-                          editable={
-                            editContract &&
-                            contract?.status === "draft" && {
+                        <div className="flex flex-col space-y-1">
+                          <Typography.Text type="secondary">
+                            <div className="text-xs">Email</div>
+                          </Typography.Text>
+                          <Typography.Text
+                            editable={{
                               text: s.email,
                               onChange: (e) => {
-                                let _signatories = [...contract?.signatories];
+                                let _signatories = [...signatories];
                                 _signatories[index].email = e;
                                 setSignatories(_signatories);
                               },
-                            }
-                          }
-                        >
-                          {s.email}
-                        </Typography.Text>
+                            }}
+                          >
+                            {s.email}
+                          </Typography.Text>
+                        </div>
                       </div>
-
-                      {s.signed && (
-                        <>
-                          {!signing && (
-                            <div className="flex flex-col">
-                              <Typography.Text type="secondary">
-                                <div className="text-xs">IP address</div>
-                              </Typography.Text>
-                              <Typography.Text strong>
-                                {s?.ipAddress}
-                              </Typography.Text>
-                            </div>
-                          )}
-                          {signing && (
-                            <Spin
-                              indicator={
-                                <LoadingOutlined
-                                  className="text-gray-500"
-                                  style={{ fontSize: 20 }}
-                                  spin
-                                />
-                              }
-                            />
-                          )}
-                        </>
-                      )}
+                      <div
+                        onClick={() => {
+                          let _signatories = [...signatories];
+                          _signatories.splice(index, 1);
+                          setSignatories(_signatories);
+                        }}
+                      >
+                        <XMarkIcon className="h-3 px-5 cursor-pointer" />
+                      </div>
                     </div>
-                    {s?.signed && (
-                      <div className="flex flex-row justify-center space-x-10 items-center border-t-2 bg-blue-50 p-5">
-                        <Image
-                          width={40}
-                          height={40}
-                          src="/icons/icons8-signature-80.png"
-                        />
-
-                        <div className="text-blue-500 flex flex-col">
-                          <div className="text-lg">Signed digitally</div>
-                          <div>
-                            {moment(s.signedAt).format("DD MMM YYYY")} at
-                          </div>
-                          <div>
-                            {moment(s.signedAt)
-                              .tz("Africa/Kigali")
-                              .format("h:mm a z")}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {(user?.email === s?.email ||
-                      user?.tempEmail === s?.email) &&
-                      !s?.signed &&
-                      previousSignatorySigned(contract?.signatories, index) &&
-                      contract?.status !== "draft" &&
-                      contract?.status !== "legal-review" && (
-                        <Popconfirm
-                          title="Confirm Contract Signature"
-                          onConfirm={() => handleSignContract(s, index)}
-                        >
-                          <div className="flex flex-row justify-center space-x-5 items-center border-t-2 bg-blue-50 p-5 cursor-pointer hover:opacity-75">
-                            <Image
-                              width={40}
-                              height={40}
-                              src="/icons/icons8-signature-80.png"
-                            />
-                            <div className="text-blue-400 text-lg">
-                              It is your turn, sign with one click
-                            </div>
-                          </div>
-                        </Popconfirm>
-                      )}
-
-                    {((user?.email !== s?.email &&
-                      user?.tempEmail !== s?.email &&
-                      !s.signed) ||
-                      !previousSignatorySigned(contract?.signatories, index) ||
-                      contract?.status == "draft" ||
-                      contract?.status === "legal-review") && (
-                      <div className="flex flex-row justify-center space-x-5 items-center border-t-2 bg-gray-50 p-5">
-                        <Image
-                          width={40}
-                          height={40}
-                          src="/icons/icons8-signature-80-2.png"
-                        />
-                        <div className="text-gray-400 text-lg">
-                          {s.signed
-                            ? "Signed"
-                            : contract?.status === "draft"
-                            ? "Still in drafting phase"
-                            : contract?.status === "legal-review"
-                            ? "Waiting for Legal's review"
-                            : `Waiting for ${yetToSign[0]?.names}'s signature`}
-                        </div>
-                      </div>
-                    )}
                   </div>
                 );
               })}
+              {/* New Signatory */}
+              <div className="flex flex-col ring-1 ring-gray-300 rounded py-5 space-y-3 items-center justify-center  hover:bg-gray-50">
+                <Image
+                  src="/icons/icons8-signature-80.png"
+                  width={40}
+                  height={40}
+                />
+                <div
+                  className="cursor-pointer underline hover:text-blue-600"
+                  onClick={() => {
+                    let signs = [...signatories];
+                    let newSignatory = { onBehalfOf: "Irembo Ltd" };
+                    // signs?.length < 2
+                    //   ?
+                    //   : {
+                    //       onBehalfOf: vendor?.companyName,
+                    //       title: vendor?.title,
+                    //       names: vendor?.contactPersonNames,
+                    //       email: vendor?.email,
+                    //     };
+                    let nSignatories = signs.length;
+                    let lastSignatory = signs[nSignatories - 1];
+                    let lastIsIrembo =
+                      lastSignatory?.onBehalfOf === "Irembo Ltd";
+                    if (lastIsIrembo) signs.push(newSignatory);
+                    else {
+                      signs.splice(lastSignatory - 1, 0, newSignatory);
+                    }
+                    // signs.push(newSignatory);
+                    setSignatories(signs);
+                  }}
+                >
+                  Add intenal Signatory
+                </div>
+                <div
+                  className="cursor-pointer underline"
+                  onClick={() => {
+                    let signs = [...signatories];
+                    let newSignatory = {
+                      onBehalfOf: contract?.vendor?.companyName,
+                      title: contract?.vendor?.title,
+                      names: contract?.vendor?.contactPersonNames,
+                      email: contract?.vendor?.email,
+                    };
+
+                    signs.push(newSignatory);
+                    setSignatories(signs);
+                  }}
+                >
+                  Add external Signatory
+                </div>
+              </div>
+              {/* New Signatory */}
+              {/* <div
+                onClick={() => {
+                  let signs = [...signatories];
+                  let newSignatory =
+                    signs?.length <= 1
+                      ? { onBehalfOf: "Irembo Ltd" }
+                      : {
+                          onBehalfOf: contract?.vendor?.companyName,
+                          title: contract?.vendor?.title,
+                          names: contract?.vendor?.contactPersonNames,
+                          email: contract?.vendor?.email,
+                        };
+
+                  signs.push(newSignatory);
+                  setSignatories(signs);
+                }}
+                className="flex flex-col ring-1 ring-gray-300 rounded pt-5 space-y-3 items-center justify-center cursor-pointer hover:bg-gray-50"
+              >
+                <Image
+                  src="/icons/icons8-signature-80.png"
+                  width={40}
+                  height={40}
+                />
+                <div>Add new Signatory</div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -1366,6 +1338,14 @@ export default function Contracts() {
         bodyStyle={{ maxHeight: "700px", overflow: "scroll" }}
       >
         <div className="space-y-10 px-20 py-5 overflow-x-scroll">
+          <div className="flex w-full justify-end">
+            <Button
+              type="primary"
+              onClick={() => generatePDF()}
+              icon={<PrinterOutlined />}
+              className="self-end"
+            ></Button>
+          </div>
           {/* Header */}
           <div className="flex flex-row justify-between items-center">
             <Typography.Title level={4} className="flex flex-row items-center">
@@ -2060,6 +2040,400 @@ export default function Contracts() {
     setActiveIndex((prevIndex) => (prevIndex === value ? "" : value));
   };
 
+  const content = () => {
+    return (
+      <div className="space-y-5 p-3 overflow-x-scroll bg-white mx-11 my-10 shadow-md">
+        {/* Header */}
+        <div className="flex flex-row justify-between items-center">
+          <Typography.Title level={4} className="flex flex-row items-center">
+            <div>
+              CONTRACTOR #{contract?.number}{" "}
+              <div>
+                <Popover
+                  placement="topLeft"
+                  content={`${moment(contract?.startDate).format(
+                    "YYYY-MMM-DD"
+                  )} - ${moment(contract?.endDate).format("YYYY-MMM-DD")}`}
+                >
+                  <div className="text-xs font-thin text-gray-500">
+                    Expires {moment(contract?.endDate).fromNow()}
+                  </div>
+                </Popover>
+              </div>
+            </div>
+          </Typography.Title>
+          {/* {contract?.status === "draft" &&
+        user?.permissions?.canEditContracts && (
+          <Switch
+            checkedChildren={<EditOutlined />}
+            unCheckedChildren={<EyeOutlined />}
+            defaultChecked={editContract}
+            onChange={(checked) => setEditContract(checked)}
+          />
+        )} */}
+        </div>
+        {/* Parties */}
+        <div className="flex flex-row justify-between space-x-5">
+          <div className="flex flex-col space-y-3">
+            <div className="flex flex-col">
+              <Typography.Text type="secondary">
+                <div className="text-xs">Company Name</div>
+              </Typography.Text>
+              <Typography.Text strong>Irembo ltd</Typography.Text>
+            </div>
+
+            <div className="flex flex-col">
+              <Typography.Text type="secondary">
+                <div className="text-xs">Company Address</div>
+              </Typography.Text>
+              <Typography.Text strong>
+                Irembo Campass Nyarutarama KG 9 Ave
+              </Typography.Text>
+            </div>
+
+            <div className="flex flex-col">
+              <Typography.Text type="secondary">
+                <div className="text-xs">Company TIN no.</div>
+              </Typography.Text>
+              <Typography.Text strong>102911562</Typography.Text>
+            </div>
+
+            <div className="flex flex-col">
+              <Typography.Text type="secondary">
+                <div className="text-xs">Hereinafter refferd to as</div>
+              </Typography.Text>
+              <Typography.Text strong>Sender</Typography.Text>
+            </div>
+          </div>
+
+          <div className="flex flex-col space-y-3">
+            <div className="flex flex-col self-end">
+              <Typography.Text type="secondary">
+                <div className="text-xs">Company Name</div>
+              </Typography.Text>
+              <Typography.Text strong>
+                {contract?.vendor?.companyName}
+              </Typography.Text>
+            </div>
+
+            <div className="flex flex-col">
+              <Typography.Text type="secondary">
+                <div className="text-xs">Company Address</div>
+              </Typography.Text>
+              <Typography.Text strong>
+                {contract?.vendor?.hqAddress}-{contract?.vendor?.country}
+              </Typography.Text>
+            </div>
+            <div className="flex flex-col">
+              <Typography.Text type="secondary">
+                <div className="text-xs">Company TIN no.</div>
+              </Typography.Text>
+              <Typography.Text strong>{contract?.vendor?.tin}</Typography.Text>
+            </div>
+            <div className="flex flex-col">
+              <Typography.Text type="secondary">
+                <div className="text-xs">Hereinafter refferd to as</div>
+              </Typography.Text>
+              <Typography.Text strong>Receiver</Typography.Text>
+            </div>
+          </div>
+        </div>
+        {/* Details */}
+        <div className="flex flex-col space-y-5 text-sm">
+          <Typography.Title level={3}>Details</Typography.Title>
+          <div>
+            {contract?.sections?.map((s, index) => {
+              let section = contract?.sections[index]
+                ? contract?.sections[index]
+                : { title: "", body: "" };
+              let _sections = [...contract?.sections];
+              return (
+                <>
+                  <div className="flex flex-row justify-between items-center">
+                    <Typography.Title
+                      level={4}
+                      editable={
+                        editContract &&
+                        contract?.status === "draft" && {
+                          onChange: (e) => {
+                            section.title = e;
+                            _sections[index]
+                              ? (_sections[index] = section)
+                              : _sections.push(section);
+                          },
+                          text: s.title,
+                        }
+                      }
+                    >
+                      {s.title}
+                    </Typography.Title>
+                    {editContract && contract?.status === "draft" && (
+                      <Popconfirm
+                        onConfirm={() => {
+                          let _sections = [...sections];
+                          _sections.splice(index, 1);
+                        }}
+                        title="You can not undo this!"
+                      >
+                        <div>
+                          <CloseCircleOutlined className="h-3 text-red-400 cursor-pointer" />
+                        </div>
+                      </Popconfirm>
+                    )}
+                  </div>
+                  {(!editContract || contract?.status !== "draft") && (
+                    <div>{parse(s?.body)}</div>
+                  )}
+                  {editContract && contract?.status === "draft" && (
+                    <ReactQuill
+                      theme="snow"
+                      modules={modules}
+                      formats={formats}
+                      value={s.body}
+                      onChange={(value) => {
+                        section.body = value;
+                        _sections[index]
+                          ? (_sections[index] = section)
+                          : _sections.push(section);
+                      }}
+                    />
+                  )}
+                </>
+              );
+            })}
+          </div>
+          {/* {editContract && contract?.status === "draft" && (
+            <Button
+              icon={<PlusOutlined />}
+              onClick={() => {
+                let _sections = [...sections];
+                _sections.push({
+                  title: `Set section ${contract?.sections?.length + 1} Title`,
+                  body: "",
+                });
+                setSections(_sections);
+              }}
+            >
+              Add section
+            </Button>
+          )} */}
+        </div>
+        {/* Signatories */}
+        <div className="grid grid-cols-2 gap-5" id="page2el">
+          {contract?.signatories?.map((s, index) => {
+            let yetToSign = contract?.signatories?.filter((notS) => {
+              return !notS.signed;
+            });
+            return (
+              <div
+                key={s?.email}
+                className="flex flex-col ring-1 ring-gray-300 rounded pt-5 space-y-3 justify-between text-xs font-thin"
+              >
+                <div className="flex flex-col space-y-3">
+                  <div className="flex flex-col">
+                    <Typography.Text type="secondary">
+                      <div className="text-xs">On Behalf of</div>
+                    </Typography.Text>
+                    <Typography.Text
+                      strong
+                      editable={
+                        editContract &&
+                        contract?.status === "draft" && {
+                          text: s.onBehalfOf,
+                          onChange: (e) => {
+                            let _signatories = [...contract?.signatories];
+                            _signatories[index].onBehalfOf = e;
+                            setSignatories(_signatories);
+                          },
+                        }
+                      }
+                    >
+                      {s.onBehalfOf}
+                    </Typography.Text>
+                  </div>
+
+                  <div className="flex flex-col">
+                    <Typography.Text type="secondary">
+                      <div className="text-xs">Representative Title</div>
+                    </Typography.Text>
+                    <Typography.Text
+                      strong
+                      editable={
+                        editContract &&
+                        contract?.status === "draft" && {
+                          text: s.title,
+                          onChange: (e) => {
+                            let _signatories = [...contract?.signatories];
+                            _signatories[index].title = e;
+                            setSignatories(_signatories);
+                          },
+                        }
+                      }
+                    >
+                      {s.title}
+                    </Typography.Text>
+                  </div>
+
+                  <div className="flex flex-col">
+                    <Typography.Text type="secondary">
+                      <div className="text-xs">Company Representative</div>
+                    </Typography.Text>
+                    <Typography.Text
+                      strong
+                      editable={
+                        editContract &&
+                        contract?.status === "draft" && {
+                          text: s.names,
+                          onChange: (e) => {
+                            let _signatories = [...contract?.signatories];
+                            _signatories[index].names = e;
+                            setSignatories(_signatories);
+                          },
+                        }
+                      }
+                    >
+                      {s.names}
+                    </Typography.Text>
+                  </div>
+
+                  <div className="flex flex-col">
+                    <Typography.Text type="secondary">
+                      <div className="text-xs">Email</div>
+                    </Typography.Text>
+                    <Typography.Text
+                      strong
+                      editable={
+                        editContract &&
+                        contract?.status === "draft" && {
+                          text: s.email,
+                          onChange: (e) => {
+                            let _signatories = [...contract?.signatories];
+                            _signatories[index].email = e;
+                            setSignatories(_signatories);
+                          },
+                        }
+                      }
+                    >
+                      {s.email}
+                    </Typography.Text>
+                  </div>
+
+                  {s.signed && (
+                    <>
+                      {!signing && (
+                        <div className="flex flex-col">
+                          <Typography.Text type="secondary">
+                            <div className="text-xs">IP address</div>
+                          </Typography.Text>
+                          <Typography.Text strong>
+                            {s?.ipAddress}
+                          </Typography.Text>
+                        </div>
+                      )}
+                      {signing && (
+                        <Spin
+                          indicator={
+                            <LoadingOutlined
+                              className="text-gray-500"
+                              style={{ fontSize: 20 }}
+                              spin
+                            />
+                          }
+                        />
+                      )}
+                    </>
+                  )}
+                </div>
+                {s?.signed && (
+                  <div className="flex flex-row space-x-10 border-t-2">
+                    {/* <Image
+                      width={20}
+                      height={20}
+                      src="/icons/icons8-signature-80.png"
+                    /> */}
+
+                    <div className="text-blue-500 flex flex-col ">
+                      <div className="">Signed digitally</div>
+                      <div>
+                        {moment(s.signedAt).format("DD MMM YYYY")} at{" "}
+                        {moment(s.signedAt)
+                          .tz("Africa/Kigali")
+                          .format("h:mm a z")}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {(user?.email === s?.email || user?.tempEmail === s?.email) &&
+                  !s?.signed &&
+                  previousSignatorySigned(contract?.signatories, index) && (
+                    <Popconfirm
+                      title="Confirm Contract Signature"
+                      onConfirm={() => handleSignContract(s, index)}
+                    >
+                      <div className="flex flex-row space-x-5 border-t-2 cursor-pointer hover:opacity-75">
+                        {/* <Image
+                          width={20}
+                          height={20}
+                          src="/icons/icons8-signature-80.png"
+                        /> */}
+                        <div className="text-blue-400 text-sm">
+                          It is your turn, sign with one click
+                        </div>
+                      </div>
+                    </Popconfirm>
+                  )}
+
+                {((user?.email !== s?.email &&
+                  user?.tempEmail !== s?.email &&
+                  !s.signed) ||
+                  !previousSignatorySigned(contract?.signatories, index)) && (
+                  <div className="flex flex-row space-x-5 border-t-2 ">
+                    {/* <Image
+                      width={20}
+                      height={20}
+                      src="/icons/icons8-signature-80-2.png"
+                    /> */}
+                    <div className="text-gray-400 text-lg">
+                      {s.signed
+                        ? "Signed"
+                        : contract?.status === "draft"
+                        ? "Waiting for Legal's review"
+                        : `Waiting for ${yetToSign[0]?.names}'s signature`}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  const generatePDF = () => {
+    // const element = document.getElementById("pdf-content");
+    const printElement = ReactDOMServer.renderToString(content());
+    html2pdf()
+      .set({
+        // pagebreak: { mode: "avoid-all", before: "#page2el" },
+        // margin:[22,10, 15, 21],
+        // filename: "Contract.pdf",
+        // image: { type: "jpeg", quality: 0.98 },
+        // html2canvas: { scale: 2, letterRendering: true },
+        // jsPDF: { unit: "pt", format: "letter", orientation: "portrait" },
+
+        margin: [22, 10, 15, 10], //top, left, buttom, right
+        filename: "Contract.pdf",
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, letterRendering: true },
+        jsPDF: { unit: "mm", format: "A4", orientation: "portrait" },
+        pagebreak: { mode: ["avoid-all", "css", "legacy"] },
+      })
+      .from(printElement)
+      .save();
+  };
+
   return (
     <>
       {contextHolder}
@@ -2214,9 +2588,13 @@ export default function Contracts() {
                                   user?.userType == "VENDOR" ||
                                   moment(contract?.endDate).isBefore(moment())
                                 }
-                                className={`${(!documentFullySigned(contract) ||
+                                className={`${
+                                  !documentFullySigned(contract) ||
                                   user?.userType == "VENDOR" ||
-                                  moment(contract?.endDate).isBefore(moment())) ? `bg-gray-50 text-gray-400` : `cursor-pointer bg-[#1677FF] text-white `} border-none px-3 py-2 rounded-lg text-[11px] font-semibold text-white`}
+                                  moment(contract?.endDate).isBefore(moment())
+                                    ? `bg-gray-50 text-gray-400`
+                                    : `cursor-pointer bg-[#1677FF] text-white `
+                                } border-none px-3 py-2 rounded-lg text-[11px] font-semibold text-white`}
                                 onClick={() => {
                                   setContract(contract);
                                   let _signatories = [
@@ -2328,7 +2706,7 @@ export default function Contracts() {
                                   <BiEnvelope className="text-[#8392AB]" />
                                   {/* {po?.vendor?.companyEmail} */}
                                   <small className="text-[#455A64] text-[13px] font-medium">
-                                    {contract?.vendor?.companyEmail || "-"}
+                                    {contract?.vendor?.email || "-"}
                                   </small>
                                 </div>
                               </div>

@@ -47,9 +47,6 @@ export default function page() {
   const router = useRouter();
   const passedData = router?.query?.data;
 
-
-  console.log('Pass Data ', passedData)
-
   return (
     <>
       <div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 h-screen mt-6 pb-10 pt-5">

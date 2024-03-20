@@ -868,7 +868,7 @@ const RequestDetails = ({
     //   pathname: '/system/contracts/new',
     //   query: { data: {name: 'Kevin'} },
     // });
-    
+
     setSignatories(_signatories);
     setOpenCreateContract(true);
   }
@@ -2166,8 +2166,7 @@ const RequestDetails = ({
                   contractStartDate,
                   contractEndDate,
                   signatories,
-                  refDoc === "Direct Contracting" ? reqAttachId : "",
-                  "draft"
+                  refDoc === "Direct Contracting" ? reqAttachId : ""
                 );
                 setOpenCreateContract(false);
               }
@@ -2663,7 +2662,6 @@ const RequestDetails = ({
       }
     });
 
-    console.log("Haaaaaa", reqItems);
     // rowData.items = reqItems;
 
     fetch(`${url}/requests/${rowData?._id}`, {
@@ -2750,7 +2748,9 @@ const RequestDetails = ({
               <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-5 ml-3">
                 <div>
                   <div className="flex items-center gap-2">
-                    <label className="text-[#000000e0] text-[14px]">Request Title</label>
+                    <label className="text-[#000000e0] text-[14px]">
+                      Request Title
+                    </label>
                     <div className="text-red-500">*</div>
                   </div>
                   <Form.Item
@@ -2778,7 +2778,9 @@ const RequestDetails = ({
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <label className="text-[#000000e0] text-[14px]">Request Number</label>
+                    <label className="text-[#000000e0] text-[14px]">
+                      Request Number
+                    </label>
                     <div className="text-red-500">*</div>
                   </div>
                   <p className="pt-1 text-[17px]">
@@ -2787,7 +2789,9 @@ const RequestDetails = ({
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <label className="text-[#000000e0] text-[14px]">Initiator</label>
+                    <label className="text-[#000000e0] text-[14px]">
+                      Initiator
+                    </label>
                     <div className="text-red-500">*</div>
                   </div>
                   <p className="pt-1 text-[17px]">
@@ -2800,7 +2804,9 @@ const RequestDetails = ({
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <label className="text-[#000000e0] text-[14px]">Department</label>
+                    <label className="text-[#000000e0] text-[14px]">
+                      Department
+                    </label>
                     <div className="text-red-500">*</div>
                   </div>
                   <p className="pt-1 text-[17px]">
@@ -2810,8 +2816,9 @@ const RequestDetails = ({
               </div>
               <div className="grid lg:grid-cols-3 gap-5 ml-3">
                 <div>
-
-                  <label className="text-[#000000e0] text-[14px]">Service category:</label>
+                  <label className="text-[#000000e0] text-[14px]">
+                    Service category:
+                  </label>
                   <Form.Item
                     initialValue={data?.serviceCategory}
                     name="ServiceCategory"
@@ -2847,7 +2854,9 @@ const RequestDetails = ({
                   </Form.Item>
                 </div>
                 <div className="flex flex-col col-span-2">
-                  <label className="text-[#000000e0] text-[14px]">Description:</label>
+                  <label className="text-[#000000e0] text-[14px]">
+                    Description:
+                  </label>
                   <Form.Item
                     initialValue={data?.description}
                     name="description"
@@ -2877,7 +2886,9 @@ const RequestDetails = ({
               </div>
               <div className="grid lg:grid-cols-3 md:grid-cols-3 gap-5 ml-3">
                 <div>
-                  <label className="text-[#000000e0] text-[14px]">Request Budgeted?</label>
+                  <label className="text-[#000000e0] text-[14px]">
+                    Request Budgeted?
+                  </label>
                   <div>
                     <Form.Item
                       name="budgeted"
@@ -2906,7 +2917,9 @@ const RequestDetails = ({
                 </div>
                 {data.budgeted && (
                   <div>
-                    <label className="text-[#000000e0] text-[14px]">Budgeted Line:</label>
+                    <label className="text-[#000000e0] text-[14px]">
+                      Budgeted Line:
+                    </label>
                     <div className="text-xs text-gray-400">
                       <Select
                         // defaultValue={budgetLine}
@@ -2950,7 +2963,9 @@ const RequestDetails = ({
                   </div>
                 )}
                 <div>
-                  <label className="text-[#000000e0] text-[14px]">Due Date:</label>
+                  <label className="text-[#000000e0] text-[14px]">
+                    Due Date:
+                  </label>
                   <Form.Item
                     initialValue={dayjs(data?.dueDate)}
                     name="dueDate"
@@ -2994,40 +3009,41 @@ const RequestDetails = ({
                   editingRequest={true}
                   disable={disable ? true : false}
                 />
-
-
               </div>
               {!disable && (
                 <div className="flex justify-end gap-5 mb-5">
-                  <Popconfirm
-                    title="Are you sure?"
-                    open={openWithdraw}
-                    icon={<QuestionCircleOutlined style={{ color: "red" }} />}
-                    onConfirm={() => {
-                      changeStatus(5);
-                      setOpenWithdraw(false);
-                    }}
-                    // okButtonProps={{
-                    //   loading: confirmRejectLoading,
-                    // }}
-                    onCancel={() => setOpenWithdraw(false)}
-                  >
-                    <Button
-                      type="primary"
-                      danger
-                      onClick={() => setOpenWithdraw(true)}
-                      className="rounded-lg px-5 pt-0.5s pb-6 bg-[#F5365C] border-none"
+                  {data?.createdBy?._id === user?._id && (
+                    <Popconfirm
+                      title="Are you sure?"
+                      open={openWithdraw}
+                      icon={<QuestionCircleOutlined style={{ color: "red" }} />}
+                      onConfirm={() => {
+                        changeStatus(5);
+                        setOpenWithdraw(false);
+                      }}
+                      // okButtonProps={{
+                      //   loading: confirmRejectLoading,
+                      // }}
+                      onCancel={() => setOpenWithdraw(false)}
                     >
-                      Withdraw request
-                    </Button>
-                  </Popconfirm>
+                      <Button
+                        type="primary"
+                        danger
+                        onClick={() => setOpenWithdraw(true)}
+                        className="rounded-lg px-5 pt-0.5s pb-6 bg-[#F5365C] border-none"
+                      >
+                        Withdraw request
+                      </Button>
+                    </Popconfirm>
+                  )}
+
                   <Popconfirm
                     title="Are you sure?"
                     open={openUpdate}
                     icon={<QuestionCircleOutlined style={{ color: "red" }} />}
                     onConfirm={() => {
                       handleUpload();
-                      setOpenUpdate(false)
+                      setOpenUpdate(false);
                     }}
                     // okButtonProps={{
                     //   loading: confirmRejectLoading,
@@ -3038,7 +3054,7 @@ const RequestDetails = ({
                       className="bg-[#0065DD] rounded-lg px-5 py-2 border-none cursor-pointer"
                       onClick={async () => {
                         await form.validateFields();
-                       
+
                         if (values && values[0]) {
                           let invalidValues = values?.filter(
                             (v) =>
@@ -3563,7 +3579,9 @@ const RequestDetails = ({
                           <div className="items-center">
                             <div>
                               Upload reference document{" "}
-                              <i className="text-xs">(expected in PDF format)</i>
+                              <i className="text-xs">
+                                (expected in PDF format)
+                              </i>
                             </div>
                             <Form.Item name="vendor">
                               <UploadReqAttach
