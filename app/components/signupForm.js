@@ -32,6 +32,7 @@ import Login from "@/public/login.svg";
 import LoginForm from "./loginForm";
 import Link from "next/link";
 import Logo from "@/public/Logo.png";
+import * as _ from "lodash";
 
 const { Option } = Select;
 
@@ -1492,6 +1493,7 @@ let countries = [
 
 const SignupForm = () => {
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
+  let fendUrl = process.env.NEXT_PUBLIC_FTEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
   let [token, setToken] = useState(null);
@@ -1503,6 +1505,7 @@ const SignupForm = () => {
   let [type, setType] = useState("VENDOR");
   let [dpts, setDpts] = useState([]);
   let [servCategories, setServCategories] = useState([]);
+  let [otherAreaOfExpertise, setOtherAreaOfExpertise] = useState(false);
 
   const [form] = Form.useForm();
   const [rdbCertId, setRdbCertId] = useState(null);
@@ -1512,10 +1515,17 @@ const SignupForm = () => {
   const [password, setPassword] = useState("");
   const regexPatternSpecialCh = "[!@#$%^&*()\\-_=+[\\]{};:'\"\\\\|,.<>/?]";
   const searchParams = useSearchParams();
-  console.log(searchParams.get("goTo"));
 
   const onFinish = (values) => {
     setSubmitting(true);
+    let services = values.services;
+    let updatedServices = services.map((s) => {
+      let s2 = s;
+      if (s == "Other") {
+        s2 = `Other - ${values.otherAreaOfExpertise}`;
+      }
+      return s2;
+    });
 
     fetch(`${url}/users`, {
       method: "POST",
@@ -1613,6 +1623,10 @@ const SignupForm = () => {
     })
       .then((res) => res.json())
       .then((res) => {
+        res.push({
+          _id: "other",
+          description: "Other",
+        });
         setServCategories(res);
       })
       .catch((err) => {
@@ -2285,15 +2299,12 @@ const SignupForm = () => {
                   </div>
                 </div>
 
-                <div className="grid lg:grid-cols-2 items-center gap-x-5 -my-1">
+                <div className="grid grid-cols-2 gap-x-5">
                   <div>
-                    <div className="flex items-center gap-2">
-                      <label className="text-[#6A757B]">
-                        Area(s) of expertise
-                      </label>
+                    <div className="flex flex-row spacex-3">
+                      Area(s) of expertise
                       <div className="text-red-500">*</div>
                     </div>
-
                     <Form.Item
                       name="services"
                       rules={[
@@ -2305,11 +2316,18 @@ const SignupForm = () => {
                     >
                       <Select
                         mode="multiple"
-                        size="large"
                         allowClear
+                        size="large"
                         // style={{width:'100%'}}
+                        onChange={(value) => {
+                          if (_.includes(value, "Other")) {
+                            setOtherAreaOfExpertise(true);
+                            console.log(value);
+                          } else {
+                            setOtherAreaOfExpertise(false);
+                          }
+                        }}
                         placeholder="Please select"
-                        className="mt-1"
                       >
                         {servCategories?.map((s) => {
                           return (
@@ -2321,26 +2339,6 @@ const SignupForm = () => {
                       </Select>
                     </Form.Item>
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <label className="text-[#6A757B]">Website</label>
-                      <div className="text-red-500">*</div>
-                    </div>
-
-                    <Form.Item name="website">
-                      <AutoComplete
-                        options={websiteOptions}
-                        onChange={onWebsiteChange}
-                      >
-                        <Input
-                          className="h-10 mt-1 w-full"
-                          placeholder="Type in your Website"
-                        />
-                      </AutoComplete>
-                    </Form.Item>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-x-5">
                   <div>
                     <label className="text-[#6A757B]">
                       Experience (in Years)
@@ -2358,6 +2356,39 @@ const SignupForm = () => {
                     </Form.Item>
                   </div>
                 </div>
+
+                <div className="grid grid-cols-2 gap-x-5">
+                  {otherAreaOfExpertise && (
+                    <div>
+                      <div className="flex flex-row spacex-3">
+                        Specify your “Other” Area of Expertise
+                        <div className="text-red-500">*</div>
+                        <div>
+                          <Tooltip
+                            placement="top"
+                            title="100 characters max."
+                            arrow={false}
+                          >
+                            <QuestionCircleOutlined />
+                          </Tooltip>
+                        </div>
+                      </div>
+
+                      <Form.Item
+                        name="otherAreaOfExpertise"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Input required",
+                          },
+                        ]}
+                      >
+                        <Input style={{ width: "100%" }} />
+                      </Form.Item>
+                    </div>
+                  )}
+                </div>
+
                 <h3 className="text-[#455A64] -mt-1">Supporting Documents</h3>
                 <div className="grid lg:grid-cols-2 items-center gap-x-5 -my-1">
                   <div>
@@ -2615,7 +2646,13 @@ const SignupForm = () => {
                 {...tailFormItemLayout}
               >
                 <Checkbox>
-                  I have read the <a href="">agreement</a>
+                  I have read the{" "}
+                  <a
+                    href={`${fendUrl}/api/?folder=termsAndConditions&name=tcs.pdf`}
+                    target="_blank"
+                  >
+                    agreement
+                  </a>
                 </Checkbox>
               </Form.Item>
               <Form.Item className="flex justify-end" {...tailFormItemLayout}>
