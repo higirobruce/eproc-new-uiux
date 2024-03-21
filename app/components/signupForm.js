@@ -1492,6 +1492,7 @@ let countries = [
 
 const SignupForm = () => {
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
+  let fendUrl = process.env.NEXT_PUBLIC_FTEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
   let [token, setToken] = useState(null);
@@ -2615,7 +2616,11 @@ const SignupForm = () => {
                 {...tailFormItemLayout}
               >
                 <Checkbox>
-                  I have read the <a href="">agreement</a>
+                  I have read the{" "}
+                  <a
+                    href={`${fendUrl}/api/?folder=termsAndConditions&name=tcs.pdf`}
+                    target="_blank"
+                  >agreement</a>
                 </Checkbox>
               </Form.Item>
               <Form.Item className="flex justify-end" {...tailFormItemLayout}>
