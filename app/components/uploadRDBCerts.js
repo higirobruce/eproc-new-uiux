@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { LoadingOutlined, UploadOutlined } from "@ant-design/icons";
 import { Button, Spin, Upload, message } from "antd";
+import { decode as base64_decode, encode as base64_encode } from "base-64";
 
 function UploadRDCerts({
   label,
@@ -16,7 +17,7 @@ function UploadRDCerts({
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
 
   let [loading, setLoading] = useState(false);
   const props = {
@@ -46,7 +47,7 @@ function UploadRDCerts({
     },
     action: `${url}/uploads/rdbCerts?id=${uuid}`,
     headers: {
-      Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+      Authorization: "Basic " + base64_encode(`${apiUsername}:${apiPassword}`),
       token: token,
       "Content-Type": "application/json",
     },
@@ -59,7 +60,7 @@ function UploadRDCerts({
         body: file,
         headers: {
           Authorization:
-            "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+            "Basic " + base64_encode(`${apiUsername}:${apiPassword}`),
           "Content-Type": "application/json",
         },
       })

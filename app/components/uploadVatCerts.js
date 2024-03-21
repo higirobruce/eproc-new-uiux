@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { LoadingOutlined, UploadOutlined } from "@ant-design/icons";
 import { Button, Spin, Upload, message } from "antd";
+import { decode as base64_decode, encode as base64_encode } from "base-64";
 
 function UploadVatCerts({
   label,
@@ -45,7 +46,7 @@ function UploadVatCerts({
     },
     action: `${url}/uploads/vatCerts?id=${uuid}`,
     headers: {
-      Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+      Authorization: "Basic " + base64_encode(`${apiUsername}:${apiPassword}`),
       token: token,
       "Content-Type": "application/json",
     },
@@ -57,7 +58,7 @@ function UploadVatCerts({
         body: file,
         headers: {
           Authorization:
-            "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+            "Basic " + base64_encode(`${apiUsername}:${apiPassword}`),
           "Content-Type": "application/json",
         },
       })
