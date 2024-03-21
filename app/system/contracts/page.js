@@ -39,6 +39,9 @@ import * as _ from "lodash";
 import moment from "moment-timezone";
 import dynamic from "next/dynamic";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+const PrintPDF = dynamic(() => import("@/app/components/printPDF"), {
+  srr: false,
+});
 import "react-quill/dist/quill.snow.css";
 import { encode } from "base-64";
 import ItemsTable from "../../components/itemsTableB1";
@@ -1336,14 +1339,7 @@ export default function Contracts() {
         bodyStyle={{ maxHeight: "700px", overflow: "scroll" }}
       >
         <div className="space-y-10 px-20 py-5 overflow-x-scroll">
-          {/* <div className="flex w-full justify-end">
-            <Button
-              type="primary"
-              onClick={() => generatePDF()}
-              icon={<PrinterOutlined />}
-              className="self-end"
-            ></Button>
-          </div> */}
+          <PrintPDF content={content} />
           {/* Header */}
           <div className="flex flex-row justify-between items-center">
             <Typography.Title level={4} className="flex flex-row items-center">
@@ -2408,8 +2404,6 @@ export default function Contracts() {
       </div>
     );
   };
-
-  
 
   return (
     <>
