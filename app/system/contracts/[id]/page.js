@@ -247,7 +247,7 @@ export default function page({ params }) {
           </div>
 
           <div className="flex flex-col space-y-3">
-            <div className="flex flex-col self-end">
+            <div className="flex flex-col">
               <Typography.Text type="secondary">
                 <div className="text-xs">Company Name</div>
               </Typography.Text>
