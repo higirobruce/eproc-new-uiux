@@ -2653,6 +2653,7 @@ const SignupForm = () => {
                   >
                     agreement
                   </a>
+
                 </Checkbox>
               </Form.Item>
               <Form.Item className="flex justify-end" {...tailFormItemLayout}>
