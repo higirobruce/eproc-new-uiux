@@ -309,7 +309,7 @@ export default function page() {
                   <h6 className="mb-3 pb-0 text-[15px] text-[#263238]">
                     Approval permissions
                   </h6>
-
+                  <small className="text-[#95A1B3] text-[14px]">Configure and manage approval workflows by defining who can approve requests, documents or actions within the application. Assign approval rights to ensure efficient and secure processing of tasks.</small>
                   <Form className="w-full">
                     <Form.Item name="canApproveAsHod">
                       <div className="flex w-full items-center justify-between">

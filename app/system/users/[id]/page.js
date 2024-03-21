@@ -657,9 +657,9 @@ export default function page({ params }) {
             </div>
             {tab == 0 && row ? (
               <>
-                <div className="my-1 bg-white rounded-xl px-8 pt-1 pb-7">
-                  <h5 className="text-[#263238] text-[18px]">Basic Info</h5>
-                  <div className="grid lg:grid-cols-2 md:grid-cols-2 grid-cols-1 items-center gap-x-5">
+                <div className="mb-1 bg-white rounded-xl px-5 pb-7">
+                <h6 className="mb-3 pb-0 text-[15px] text-[#263238]">Basic Info</h6>
+                  <div className="grid lg:grid-cols-2 md:grid-cols-2 grid-cols-1 items-center gap-x-5 mt-7">
                     <div>
                       <div className="pb-3 text-[13px] text-[#344767]">
                         First Name
@@ -843,13 +843,11 @@ export default function page({ params }) {
                 />
               </>
             ) : tab == 2 ? (
-              <div className="bg-white rounded-3xl px-5 pb-10">
-                <div className="text-md font-semibold my-5 flex flex-row justify-between items-center">
-                  <h6 className="mb-3 pb-0 text-[15px] text-[#263238]">Approval permissions</h6>
-                  <small className="text-[#95A1B3] text-[14px]">Configure and manage approval workflows by defining who can approve requests, documents or actions within the application. Assign approval rights to ensure efficient and secure processing of tasks.</small>
-                </div>
+              <div className="bg-white rounded-lg px-5 pb-10">
+                <h6 className="mb-3 pb-0 text-[15px] text-[#263238]">Approval permissions</h6>
+                <small className="text-[#95A1B3] text-[14px]">Configure and manage approval workflows by defining who can approve requests, documents or actions within the application. Assign approval rights to ensure efficient and secure processing of tasks.</small>
                 {row && row?.permissions && (
-                  <Form className="w-full">
+                  <Form className="w-full mt-3">
                     <Form.Item name="canApproveAsHod">
                       <div className="flex w-full items-center justify-between">
                         <div>
@@ -936,15 +934,16 @@ export default function page({ params }) {
               </div>
             ) : (
               tab == 3 && (
-                <div className="bg-white rounded-lg pb-4 px-8">
-                  <div className="flex items-center justify-between">
-                    <h5 className="text-[#263238] text-[18px]">
+                <div className="bg-white rounded-lg pb-4 px-5">
+                  <div className="flex justify-between">
+                    <h6 className="mb-3 pb-0 text-[15px] text-[#263238]">
                       Password Change
-                    </h5>
+                    </h6>
                     <Button
                       type="primary"
                       danger
                       size="middle"
+                      className="mt-6"
                       onClick={() => updatePassword()}
                     >
                       Reset Password

@@ -70,7 +70,7 @@ export default function PurchaseOrders() {
   let [startingDelivery, setStartingDelivery] = useState(false);
   let [readyToSign, setReadyToSign] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
-  const [activeIndex, setActiveIndex] = useState("");
+  const [activeIndex, setActiveIndex] = useState(-1);
   const contentHeight = useRef();
   const [pageSize, setPageSize] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
@@ -910,12 +910,18 @@ export default function PurchaseOrders() {
                         )}
 
                         {!documentFullySigned(po) && (
-                          <div className="flex justify-end">
-                            <div className="bg-[#F9BB01] rounded-xl text-[#FFF] text-[14px] font-medium px-3 py-1">
-                              {po?.status?.length > 6
-                                ? po?.status?.slice(0, 5) + ".."
-                                : po?.status || "Pending"}
-                            </div>
+                          <div>
+                            <Tooltip
+                              placement="top"
+                              title={po?.status}
+                            >
+                              {/* <IoCheckmarkOutline className="text-[#00CE82]" /> */}
+                              <div className="bg-[#F9BB01] capitalize rounded-xl text-[#FFF] text-[14px] font-medium px-3 py-1">
+                                {po?.status?.length > 6
+                                  ? (po?.status?.slice(0, 5) + "..").toString()
+                                  : po?.status || "Pending"}
+                              </div>
+                            </Tooltip>
                           </div>
                         )}
 

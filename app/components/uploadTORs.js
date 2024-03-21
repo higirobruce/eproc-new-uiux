@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { LoadingOutlined, UploadOutlined } from "@ant-design/icons";
-import { Button, Upload, message } from "antd";
+import { Button, Upload, Tooltip, message } from "antd";
 
 function UploadTORs({
   label,
@@ -182,7 +182,12 @@ function UploadTORs({
           </div>
         )}
         {!iconOnly && (
-          <Button icon={<UploadOutlined />}>{label ? label : "Upload"}</Button>
+          <Tooltip 
+            placement="top"
+            title={`Total file size 12 Mbs with a format: PDF, Docx`}
+          >
+            <Button icon={<UploadOutlined />}>{label ? label : "Upload"}</Button>
+          </Tooltip>
         )}
       </Upload>
     </>

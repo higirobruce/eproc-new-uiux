@@ -1,14 +1,14 @@
 import "./globals.css";
-import { Inter } from "next/font/google";
+import { Roboto } from "next/font/google";
 import localFont from "next/font/local";
 import { UserProvider } from "./context/UserContext";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Roboto({ weight: ['400', '100', '300', '500', '700'], subsets: ["latin"] });
 
 const myFont = localFont({
   src: [
     {
-      path: "./fonts/RobotoFlex-Regular.ttf",
+      path: "./fonts/Los Andes - Lota Grotesque Alt 1 Regular.otf",
       weight: "300",
       style: "normal",
     },

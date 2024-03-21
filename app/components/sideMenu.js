@@ -245,7 +245,7 @@ const SideMenu = ({ setScreen, screen, user }) => {
                   {item.icon}
                   {/* <PieChartOutlined size={28} className="text-[#1677FF]" /> */}
                   <span
-                    className={`text-[17px] ${
+                    className={`text-[15px] ${
                       current == item.key ? `text-[#1677FF]` : `text-[#95A1B3]`
                     }`}
                   >

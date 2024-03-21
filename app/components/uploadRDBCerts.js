@@ -87,7 +87,12 @@ function UploadRDCerts({
           </div>
         )}
         {!iconOnly && (
-          <Button icon={<UploadOutlined />}>{label ? label : "Upload"}</Button>
+          <Tooltip 
+            placement="top"
+            title={`Total file size 12 Mbs with a format: PDF, Docx`}
+          >
+            <Button icon={<UploadOutlined />}>{label ? label : "Upload"}</Button>
+          </Tooltip>
         )}
       </Upload>
     </>

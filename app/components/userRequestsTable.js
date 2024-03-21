@@ -300,7 +300,7 @@ const UsersRequestsTable = ({
               getHighLevelStatus(
                 record?.status.charAt(0).toUpperCase() + record?.status.slice(1)
               )
-            )}-500`} text-[13px]`}>
+            )}-500`} text-[12.5px]`}>
             {getHighLevelStatus(
               record?.status.charAt(0).toUpperCase() + record?.status.slice(1)
             )}

@@ -9,14 +9,24 @@
   box-shadow: none !important;
 }
 
+@font-face {
+  font-family: 'CustomFont';
+  src: url('/app/fonts/Los\ Andes\ -\ Lota\ Grotesque\ Alt\ 1\ Regular.otf') format('truetype');
+}
+
 html {
   padding: 0 !important;
   margin: 0 !important;
 }
 
 body {
+  font-family: 'CustomFont', sans-serif !important;
   padding: 0 !important;
   margin: 0 !important;
+}
+
+.ant-typography, .ant-btn, .ant-input, .ant-select, .ant-checkbox, .ant-radio, .ant-tag {
+  font-family: 'CustomFont', sans-serif !important;
 }
 
 .ant-dropdown-menu {

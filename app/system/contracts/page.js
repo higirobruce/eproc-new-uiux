@@ -104,7 +104,7 @@ export default function Contracts() {
   let [openViewContract, setOpenViewContract] = useState(false);
   let [startingDelivery, setStartingDelivery] = useState(false);
   const [editContract, setEditContract] = useState(false);
-  const [activeIndex, setActiveIndex] = useState("");
+  const [activeIndex, setActiveIndex] = useState(-1);
   const contentHeight = useRef();
   const [previewAttachment, setPreviewAttachment] = useState(false);
   const [attachmentId, setAttachmentId] = useState("TOR-id.pdf");
@@ -2031,7 +2031,7 @@ export default function Contracts() {
   }
 
   const handleItemClick = (value) => {
-    setActiveIndex((prevIndex) => (prevIndex === value ? "" : value));
+    setActiveIndex((prevIndex) => (prevIndex === value ? -1 : value));
   };
 
   const content = () => {
@@ -2519,21 +2519,33 @@ export default function Contracts() {
                             {(!documentFullySignedInternally(contract) ||
                               !documentFullySigned(contract)) && (
                               <div>
-                                <div className="bg-[#F9BB01] rounded-xl text-[#FFF] text-[14px] font-medium px-3 py-1">
-                                  {contract?.status?.length > 6
-                                    ? contract?.status?.slice(0, 5) + ".."
-                                    : contract?.status || "Pending"}
-                                </div>
+                                <Tooltip
+                                  placement="top"
+                                  title={contract?.status}
+                                >
+                                  {/* <IoCheckmarkOutline className="text-[#00CE82]" /> */}
+                                  <div className="bg-[#F9BB01] capitalize rounded-xl text-[#FFF] text-[14px] font-medium px-3 py-1">
+                                    {contract?.status?.length > 6
+                                      ? (contract?.status?.slice(0, 5) + "..").toString()
+                                      : contract?.status || "Pending"}
+                                  </div>
+                                </Tooltip>
                               </div>
                             )}
                             {documentFullySigned(contract) && (
                               <div className="flex flex-col justify-start items-start gap-4">
                                 <div>
-                                  <div className="bg-[#D2FBD0] rounded-xl text-[#0D4A26] text-[14px] font-medium px-3 py-1">
-                                    {contract?.status?.length > 6
-                                      ? contract?.status?.slice(0, 5) + ".."
-                                      : contract?.status || "Pending"}
-                                  </div>
+                                  <Tooltip
+                                    placement="top"
+                                    title={contract?.status}
+                                  >
+                                    {/* <IoCheckmarkOutline className="text-[#00CE82]" /> */}
+                                    <div className="bg-[#D2FBD0] capitalize rounded-xl text-[#0D4A26] text-[14px] font-medium px-3 py-1">
+                                      {contract?.status?.length > 6
+                                        ? (contract?.status?.slice(0, 5) + "..").toString()
+                                        : contract?.status || "Pending"}
+                                    </div>
+                                  </Tooltip>
                                 </div>
                                 {/* To be implemented as hover to keep card/column alignment */}
 
