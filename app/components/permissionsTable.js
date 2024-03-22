@@ -212,7 +212,7 @@ function PermissionsTable({
   return (
     <div className="flex flex-col gap-5">
       {/* {(pathname != '/system/profile' || !pathname.startsWith('/system/users')) && <h5 className="text-[25px] text-[#FFF] my-0">Overview</h5>} */}
-      <div className={`bg-white ${pathname != '/system/profile' ? 'rounded-3xl' : 'rounded-lg'} px-5 pb-10`}>
+      <div className={`bg-white ${pathname != '/system/profile' ? 'rounded-lg' : 'rounded-lg'} px-5 pb-10`}>
         <h6 className="mb-3 pb-0 text-[15px] text-[#263238]">Module access permissions</h6>
         <small className="text-[#95A1B3] text-[14px]">Control user access to specific modules within the application. Define who can view, edit, or manage each module to maintain security and streamline workflow.</small>
         <div className="grid grid-cols-2 md:pr-10 border-b-2 border-x-0 border-t-0 border-red-500">

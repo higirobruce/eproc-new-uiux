@@ -172,7 +172,7 @@ export default function SystemLayout({ children }) {
                         className="flex items-center bg-[#F2F4FD] w-[calc(100%-30px)] px-5 py-4 cursor-pointer rounded-lg border-0 gap-3 no-underline"
                       >
                         <UserGroupIcon className="w-5 h-5 text-[#1677FF]" />
-                        <small className="font-semibold text-[13px] text-[#1677FF]">
+                        <small className="font-medium text-[14.5px] text-[#1677FF]">
                           User Management
                         </small>
                       </a>

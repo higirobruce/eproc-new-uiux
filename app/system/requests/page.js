@@ -35,7 +35,17 @@ import { useRouter } from "next/navigation";
 import { encode } from "base-64";
 import { motion } from "framer-motion";
 import { FiSearch } from "react-icons/fi";
+import { BsFiletypeCsv } from "react-icons/bs";
 import { useUser } from "@/app/context/UserContext";
+import { saveAs } from 'file-saver';
+
+function exportToCSV(data, fileName) {
+  const csvHeader = Object.keys(data[0]).join(',');
+  const csvRows = data.map(obj => Object.values(obj).join(',')).join('\n');
+  const csv = `${csvHeader}\n${csvRows}`;
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  saveAs(blob, fileName);
+}
 
 export default function UserRequests() {
   const { user, login, logout } = useUser();
@@ -852,6 +862,11 @@ export default function UserRequests() {
     }
   }
 
+  const handleExport = (data) => {
+    console.log('Row Data ', data)
+    exportToCSV(data, 'exported_data.csv');
+  };
+
   return !rowData ? (
     <>
       {contextHolder}
@@ -956,6 +971,12 @@ export default function UserRequests() {
               New request
             </Button>
             <div className="flex items-center gap-5">
+              <Button
+                className="bg-white h-8 px-5 text-[13px] font-semibold text-[#0063CF] pt-1.5"
+                icon={<BsFiletypeCsv size={18} className="text-[#00AC47]" />}
+                onClick={() => handleExport(tempDataset)}
+              >
+              </Button>
               <Select
                 // mode="tags"
                 className="text-[14px] text-[#2c6ad6] w-48 rounded-sm"
