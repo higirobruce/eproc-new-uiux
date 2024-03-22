@@ -1,7 +1,7 @@
 'use client'
 import React from "react";
 import { UploadOutlined } from "@ant-design/icons";
-import { Button, Upload, message, UploadFile } from "antd";
+import { Button, Upload, message, UploadFile, Tooltip } from "antd";
 
 function UploadTenderDoc({
   label,
