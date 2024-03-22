@@ -121,8 +121,8 @@ const VendorsTable = ({
       render: (_, record) => (
         <>
           <div className={`rounded`}>
-            <span className={`bg-${getTagColor(record?.vendor?.status)}-500/20 text-${getTagColor(record?.vendor?.status)}-500 text-[14px]`}>
-              {record?.vendor?.status}
+            <span className={`bg-${getTagColor(record?.vendor?.status)}-500/20 text-${getTagColor(record?.vendor?.status)}-500 capitalize text-[14px]`}>
+              {(record?.vendor?.status).toString()}
             </span>
           </div>
         </>

@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { LoadingOutlined, UploadOutlined } from "@ant-design/icons";
-import { Button, Upload, message, UploadFile, Spin } from "antd";
+import { Button, Upload, message, UploadFile, Spin, Tooltip } from "antd";
 
 function UploadBidDoc({ label, uuid, setSelected, iconOnly }) {
   const [messageApi, contextHolder] = message.useMessage();

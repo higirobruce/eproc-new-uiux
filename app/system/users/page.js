@@ -1308,7 +1308,7 @@ export default function Users() {
                         },
                       ]}
                     >
-                      <Input className="h-10 mt-3" placeholder="Enter email" />
+                      <Input className="h-10" placeholder="Enter email" />
                     </Form.Item>
                   </div>
 

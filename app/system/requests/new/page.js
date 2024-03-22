@@ -572,7 +572,7 @@ export default function NewRequest() {
               />
             </Form>
           </div>
-          <div className="flex justify-end gap-5 xl:-mt-7 md:-mt-5 -mt-3">
+          <div className="flex justify-end gap-5 xl:mt-7 md:mt-5 mt-3">
             <button onClick={() => router.push('/system/requests')} className="cursor-pointer bg-white rounded-lg px-6 py-2 border border-[#0065DD]">
               <small className="py-0 text-[15px] text-[#0065DD]">Cancel</small>
             </button>

@@ -3456,7 +3456,7 @@ const RequestDetails = ({
             ]}
           />
         </div>
-        {currentCode == 3 && <motion.div 
+        {(currentCode == 3 || (tender || po || contract)) && <motion.div 
           variants={bounceVariants}
           initial="initial"
           animate="animate"
