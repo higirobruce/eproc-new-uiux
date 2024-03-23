@@ -593,10 +593,7 @@ export default function NewPaymentRequest({ params }) {
             </div>
           </div>
           <div>
-            <Form
-              form={form}
-              
-            >
+            <Form form={form}>
               <div className="mr-5 lg:col-span-1 bg-[#EFF4F8] pb-8 pt-3 px-10">
                 <h5 className="text-[18px] text-[#344767] mb-7">
                   Payment Details
@@ -806,9 +803,17 @@ export default function NewPaymentRequest({ params }) {
         <div className="flex w-full justify-end items-end self-end">
           <button
             onClick={() => {
+              if (files?.length <= 0)
+                message.error("Please provid atlease one supporting document!");
               form.validateFields().then(() => {
-                setSubmitting(true);
-                handleUpload();
+                if (files?.length <= 0)
+                  message.error(
+                    "Please provid atlease one supporting document!"
+                  );
+                else {
+                  setSubmitting(true);
+                  handleUpload();
+                }
               });
             }}
             disabled={submitting}
