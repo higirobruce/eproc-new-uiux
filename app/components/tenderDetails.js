@@ -68,7 +68,9 @@ import { IoCheckmarkOutline } from "react-icons/io5";
 import { RiArrowDropDownLine, RiForbidLine } from "react-icons/ri";
 import { MdOutlineAccountBalance } from "react-icons/md";
 import { LuHash, LuUser } from "react-icons/lu";
-import PrintPDF from "./printPDF";
+const PrintPDF = dynamic(() => import("@/app/components/printPDF"), {
+  srr: false,
+});
 // import MyPdfViewer from "./pdfViewer";
 // import { PDFDownloadLink } from "@react-pdf/renderer";
 // import MyDocument from "./MyDocument";
