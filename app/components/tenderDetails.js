@@ -3999,9 +3999,10 @@ const TenderDetails = ({
                                     </div>
                                     <div className="flex items-center gap-3">
                                       <small className="text-[#455A64] text-[13px] font-medium">
-                                        {item?.deliveryTimeFrame +
-                                          " " +
-                                          item?.deliveryTimeFrameDuration ||
+                                        {(item?.deliveryTimeFrame &&
+                                          item?.deliveryTimeFrame +
+                                            " " +
+                                            item?.deliveryTimeFrameDuration) ||
                                           moment(item?.deliveryDate).fromNow()}
                                       </small>
                                       <div className="bg-[#F1F3FF] py-1 px-3 rounded-xl text-[11px] font-medium text-[#353531]">
