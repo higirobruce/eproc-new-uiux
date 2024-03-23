@@ -825,18 +825,23 @@ export default function Contracts() {
   function getContracts() {
     setDataLoaded(false);
     if (user?.userType === "VENDOR") {
-      fetch(`${url}/contracts/byVendorId/${user?._id}/${searchStatus}`, {
-        method: "GET",
-        headers: {
-          Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
-          token: token,
-          "Content-Type": "application/json",
-        },
-      })
+      fetch(
+        `${url}/contracts/byVendorId/${user?._id}/${searchStatus}?pagesize=${pageSize}&page=${currentPage}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+            token: token,
+            "Content-Type": "application/json",
+          },
+        }
+      )
         .then((res) => getResultFromServer(res))
         .then((res) => {
-          setContracts(res);
-          setTempContracts(res);
+          let _contracts = res?.data;
+          setContracts(_contracts);
+          setTempContracts(_contracts);
+          setTotalPages(res?.totalPages);
           setDataLoaded(true);
         })
         .catch((err) => {
