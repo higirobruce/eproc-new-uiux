@@ -139,7 +139,7 @@ export default function Contracts() {
   }, [assets]);
 
   useEffect(() => {
-    setItems(contract?.request.items);
+    setItems(contract?.request?.items);
     let t = 0;
     let tax = 0;
     items?.map((i) => {
