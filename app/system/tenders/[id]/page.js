@@ -214,6 +214,7 @@ export default function page({ params }) {
 
   function sendInvitation(tenderUpdate) {
     setLoadingRowData(true);
+
     fetch(`${url}/tenders/${tenderUpdate?._id}`, {
       method: "PUT",
       headers: {
@@ -255,47 +256,60 @@ export default function page({ params }) {
       });
   }
 
-  function sendEvalApproval(tenderUpdate, invitees) {
-    setLoadingRowData(true);
-    tenderUpdate.invitees = invitees;
+  function sendEvalApproval(tenderUpdate, invitees, choice) {
+    getTenderDetails(params?.id, router).then((res) => {
+      setRowData(res);
+      let _invitees = res?.invitees;
 
-    fetch(`${url}/tenders/${tenderUpdate?._id}`, {
-      method: "PUT",
-      headers: {
-        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
-        token: token,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        newTender: tenderUpdate,
-      }),
-    })
-      .then((res) => getResultFromServer(res))
-      .then((res) => {
-        loadTenders()
-          .then((res) => getResultFromServer(res))
-          .then((res) => {
-            let r = res.filter((d) => {
-              return d._id === tenderUpdate?._id;
-            });
-            setRowData(r[0]);
-            setLoadingRowData(false);
-          })
-          .catch((err) => {
-            setLoadingRowData(false);
-            messageApi.open({
-              type: "error",
-              content: "Something happened! Please try again.",
-            });
-          });
-      })
-      .catch((err) => {
-        setLoadingRowData(false);
-        messageApi.open({
-          type: "error",
-          content: "Something happened! Please try again.",
-        });
+      let _inv = _invitees?.map((i) => {
+        if (i?.approver === user?.email) {
+          i.approved = choice;
+        }
+        return i;
       });
+
+      setLoadingRowData(true);
+      tenderUpdate.invitees = _inv;
+
+      fetch(`${url}/tenders/${tenderUpdate?._id}`, {
+        method: "PUT",
+        headers: {
+          Authorization:
+            "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+          token: token,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          newTender: tenderUpdate,
+        }),
+      })
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          loadTenders()
+            .then((res) => getResultFromServer(res))
+            .then((res) => {
+              let r = res.filter((d) => {
+                return d._id === tenderUpdate?._id;
+              });
+              setRowData(r[0]);
+              setLoadingRowData(false);
+            })
+            .catch((err) => {
+              setLoadingRowData(false);
+              messageApi.open({
+                type: "error",
+                content: "Something happened! Please try again.",
+              });
+            });
+        })
+        .catch((err) => {
+          setLoadingRowData(false);
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
+          });
+        });
+    });
   }
 
   function refresh() {

@@ -986,6 +986,8 @@ export default function PaymentRequest({ params }) {
                     accountName: paymentRequest?.paymentDetails?.accountName,
                     accountNumber:
                       paymentRequest?.paymentDetails?.accountNumber,
+                    phoneName: paymentRequest?.paymentDetails?.phoneName,
+                    phoneNumber: paymentRequest?.paymentDetails?.phoneNumber,
                   }}
                 >
                   <div className="grid md:grid-cols-3 sm:grid-cols-1 gap-6">

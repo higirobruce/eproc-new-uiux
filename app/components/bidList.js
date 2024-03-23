@@ -112,9 +112,9 @@ const BidList = ({
   };
 
   const statusClass = {
-    "pending": { bgColor: "#FFFFD3", color: "#BDC00A", status: "Pending" },
-    "selected": { bgColor: "#F0FEF3", color: "#00CE82", status: "Selected" },
-    "awarded": { bgColor: "#F0FEF3", color: "#00CE82", status: "Awarded" },
+    pending: { bgColor: "#FFFFD3", color: "#BDC00A", status: "Pending" },
+    selected: { bgColor: "#F0FEF3", color: "#00CE82", status: "Selected" },
+    awarded: { bgColor: "#F0FEF3", color: "#00CE82", status: "Awarded" },
     "not awarded": { bgColor: "#FEE", color: "#F5365C", status: "Not Awarded" },
   };
 
@@ -316,7 +316,11 @@ const BidList = ({
                     </div>
                     <div className="flex items-center gap-3">
                       <small className="text-[#455A64] text-[13px] font-medium">
-                        {moment(item?.deliveryDate).fromNow()}
+                      {(item?.deliveryTimeFrame &&
+                                          item?.deliveryTimeFrame +
+                                            " " +
+                                            item?.deliveryTimeFrameDuration) ||
+                                          moment(item?.deliveryDate).fromNow()}
                       </small>
                       <div className="bg-[#F1F3FF] py-1 px-3 rounded-xl text-[11px] font-medium text-[#353531]">
                         Delivery timeframe
@@ -328,13 +332,16 @@ const BidList = ({
                   <small className="text-[12px] text-[#8392AB]">
                     Additional Comments
                   </small>
-                  <textarea value={item?.comment} className="border-[#D9D9D9] px-3 py-2.5 rounded-lg text-[12px] text-[#8392AB]" rows={4}></textarea>
+                  <textarea
+                    value={item?.comment}
+                    className="border-[#D9D9D9] px-3 py-2.5 rounded-lg text-[12px] text-[#8392AB]"
+                    rows={4}
+                  ></textarea>
                 </div>
               </div>
             </div>
           </>
         ))}
-      
 
       {(!data || data?.length < 1) && <Empty />}
 

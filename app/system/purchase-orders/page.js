@@ -141,8 +141,8 @@ export default function PurchaseOrders() {
   const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
-    refresh()
-  }, [currentPage, pageSize])
+    refresh();
+  }, [currentPage, pageSize]);
 
   useEffect(() => {
     refresh();
@@ -898,7 +898,18 @@ export default function PurchaseOrders() {
                             Created At
                           </small>
                           <p className="text-[#344767] font-medium text-[14px] py-0 my-0">
-                            03 - Mar - 2023
+                            {(po?.createdAt &&
+                              moment(po?.createdAt).format(
+                                "DD - MMM - YYYY"
+                              )) ||
+                              (po?.updatedAt &&
+                                moment(po?.updatedAt).format(
+                                  "DD - MMM - YYYY"
+                                )) ||
+                              (po?.request?.createdAt &&
+                                moment(po?.request?.createdAt).format(
+                                  "DD - MMM - YYYY"
+                                ))}
                           </p>
                         </div>
                         {documentFullySigned(po) && (
@@ -911,10 +922,7 @@ export default function PurchaseOrders() {
 
                         {!documentFullySigned(po) && (
                           <div>
-                            <Tooltip
-                              placement="top"
-                              title={po?.status}
-                            >
+                            <Tooltip placement="top" title={po?.status}>
                               {/* <IoCheckmarkOutline className="text-[#00CE82]" /> */}
                               <div className="bg-[#F9BB01] capitalize rounded-xl text-[#FFF] text-[14px] font-medium px-3 py-1">
                                 {po?.status?.length > 6
@@ -927,7 +935,11 @@ export default function PurchaseOrders() {
 
                         <button
                           disabled={!documentFullySigned(po)}
-                          className={`${!documentFullySigned(po) ? `bg-gray-50 text-gray-400` : `bg-[#1677FF] text-white cursor-pointer`} border-none px-3 py-2 rounded-lg text-[13px] font-semibold`}
+                          className={`${
+                            !documentFullySigned(po)
+                              ? `bg-gray-50 text-gray-400`
+                              : `bg-[#1677FF] text-white cursor-pointer`
+                          } border-none px-3 py-2 rounded-lg text-[13px] font-semibold`}
                           onClick={() => createPaymentRequest(po)}
                         >
                           Request Payment
@@ -1010,7 +1022,7 @@ export default function PurchaseOrders() {
                               <BiEnvelope className="text-[#8392AB]" />
                               {/* {po?.vendor?.companyEmail} */}
                               <small className="text-[#455A64] text-[13px] font-medium">
-                                {po?.vendor?.companyEmail || "-"}
+                                {po?.vendor?.email || "-"}
                               </small>
                             </div>
                           </div>
