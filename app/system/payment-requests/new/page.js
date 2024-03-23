@@ -270,7 +270,9 @@ export default function NewPaymentRequest() {
                     {/* Title */}
                     <div>
                       <div className="flex items-center gap-2">
-                        <label className="text-[#000000e0] text-[14px]">Request Title</label>
+                        <label className="text-[#000000e0] text-[14px]">
+                          Request Title
+                        </label>
                         <div className="text-red-500">*</div>
                       </div>
                       <div>
@@ -295,7 +297,9 @@ export default function NewPaymentRequest() {
 
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
-                        <label className="text-[#000000e0] text-[14px]">Level 1 approver</label>
+                        <label className="text-[#000000e0] text-[14px]">
+                          Level 1 approver
+                        </label>
                         <div className="text-red-500">*</div>
                       </div>
                       <Form.Item
@@ -334,7 +338,9 @@ export default function NewPaymentRequest() {
                     {/* Description */}
                     <div>
                       <div className="flex items-center gap-2">
-                        <label className="text-[#000000e0] text-[14px]">Comment/additional note</label>
+                        <label className="text-[#000000e0] text-[14px]">
+                          Comment/additional note
+                        </label>
                         <div className="text-red-500">*</div>
                       </div>
                       <div>
@@ -360,7 +366,9 @@ export default function NewPaymentRequest() {
                     </div>
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
-                        <label className="text-[#000000e0] text-[14px]">Amount due</label>
+                        <label className="text-[#000000e0] text-[14px]">
+                          Amount due
+                        </label>
                         <div className="text-red-500">*</div>
                       </div>
                       <Form.Item>
@@ -415,7 +423,9 @@ export default function NewPaymentRequest() {
 
                     <div>
                       <div className="flex items-center gap-2">
-                        <label className="text-[#000000e0] text-[14px]">Budgeted?</label>
+                        <label className="text-[#000000e0] text-[14px]">
+                          Budgeted?
+                        </label>
                         <div className="text-red-500">*</div>
                       </div>
                       <div>
@@ -459,7 +469,9 @@ export default function NewPaymentRequest() {
 
                         <div>
                           <div className="flex items-center gap-2">
-                            <label className="text-[#000000e0] text-[14px]">Budget Line</label>
+                            <label className="text-[#000000e0] text-[14px]">
+                              Budget Line
+                            </label>
                             <div className="text-red-500">*</div>
                           </div>
                           <div>
@@ -553,8 +565,9 @@ export default function NewPaymentRequest() {
               <>
                 <div>
                   <div className="flex items-center gap-2">
-                    <label className="text-[#344767] text-[14px] mb-2">Bank Name</label>
-                    
+                    <label className="text-[#344767] text-[14px] mb-2">
+                      Bank Name
+                    </label>
                   </div>
                   <div>
                     <Form.Item
@@ -577,8 +590,9 @@ export default function NewPaymentRequest() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <label className="text-[#344767] text-[14px] mb-2">Account Name</label>
-                    
+                    <label className="text-[#344767] text-[14px] mb-2">
+                      Account Name
+                    </label>
                   </div>
                   <div>
                     <Form.Item
@@ -601,8 +615,9 @@ export default function NewPaymentRequest() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <label className="text-[#344767] text-[14px] mb-2">Account Number</label>
-                    
+                    <label className="text-[#344767] text-[14px] mb-2">
+                      Account Number
+                    </label>
                   </div>
                   <div>
                     <Form.Item
@@ -628,8 +643,9 @@ export default function NewPaymentRequest() {
               <>
                 <div>
                   <div className="flex items-center gap-2">
-                    <label className="text-[#344767] text-[14px] mb-2">Phone Name</label>
-                    
+                    <label className="text-[#344767] text-[14px] mb-2">
+                      Phone Name
+                    </label>
                   </div>
                   <div>
                     <Form.Item
@@ -652,8 +668,9 @@ export default function NewPaymentRequest() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <label className="text-[#344767] text-[14px]">Phone Number</label>
-                    
+                    <label className="text-[#344767] text-[14px]">
+                      Phone Number
+                    </label>
                   </div>
                   <div>
                     <Form.Item
@@ -681,9 +698,19 @@ export default function NewPaymentRequest() {
         <div className="flex w-full justify-end items-end self-end">
           <button
             onClick={() => {
+              if (files?.length <= 0)
+                message.error(
+                  "Please provide atleast one supporting document!"
+                );
               form.validateFields().then(() => {
-                setSubmitting(true);
-                handleUpload();
+                if (files?.length <= 0)
+                  message.error(
+                    "Please provid atlease one supporting document!"
+                  );
+                else {
+                  setSubmitting(true);
+                  handleUpload();
+                }
               });
             }}
             disabled={submitting}
