@@ -804,7 +804,7 @@ export default function NewPaymentRequest({ params }) {
           <button
             onClick={() => {
               if (files?.length <= 0)
-                message.error("Please provid atlease one supporting document!");
+                message.error("Please provide atleast one supporting document!");
               form.validateFields().then(() => {
                 if (files?.length <= 0)
                   message.error(
