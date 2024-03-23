@@ -139,6 +139,9 @@ const TenderDetails = ({
   let [contract, setContract] = useState(null);
   let [openCreatePO, setOpenCreatePO] = useState(false);
   let [openViewPO, setOpenViewPO] = useState(false);
+  let [deliveryTimeFrame, setDeliveryTimeFrame] = useState(null);
+  let [deliveryTimeFrameDuration, setDeliveryTimeFrameDuration] =
+    useState('months');
 
   let [users, setUsers] = useState([]);
 
@@ -676,6 +679,8 @@ const TenderDetails = ({
       bankAccountName,
       proposalDocId: proposalSelected ? proposalDocId : null,
       otherDocId: otherDocSelected ? otherDocId : null,
+      deliveryTimeFrame,
+      deliveryTimeFrameDuration
     };
     createSubmission(subData);
   }
@@ -834,6 +839,52 @@ const TenderDetails = ({
       <h6 className="text-[14px] text-[#263238] mt-5 mb-3 p-0">Bid Overview</h6>
       <div className="grid md:grid-cols-4 gap-x-5">
         <div className="flex flex-col">
+          <div className="mb-2">
+            <label> Delivery TimeFrame</label>
+          </div>
+          <Form.Item
+            name="deliveryTimeFrame"
+            noStyle
+            rules={[
+              {
+                required: true,
+                message: "Delivery timeframe is required",
+              },
+            ]}
+          >
+            <InputNumber
+              style={{ width: "100%" }}
+              className="h-11 pt-1"
+              onChange={(value) => setDeliveryTimeFrame(value)}
+              addonBefore={
+                <Form.Item noStyle name="deliveryTimeFrameDuration">
+                  <Select
+                    onChange={(value) => setDeliveryTimeFrameDuration(value)}
+                    defaultValue="months"
+                    size="large"
+                    options={[
+                      {
+                        value: "days",
+                        label: "Days",
+                      },
+                      {
+                        value: "months",
+                        label: "Months",
+                      },
+                      {
+                        value: "years",
+                        label: "Years",
+                      },
+                    ]}
+                  ></Select>
+                </Form.Item>
+              }
+              
+            />
+          </Form.Item>
+        </div>
+
+        {/* <div className="flex flex-col">
           <div className="mb-3">
             <label> Delivery date</label>
           </div>
@@ -856,7 +907,7 @@ const TenderDetails = ({
               }
             />
           </Form.Item>
-        </div>
+        </div> */}
 
         <div className="flex flex-col">
           <div className="mb-2">
@@ -3175,7 +3226,11 @@ const TenderDetails = ({
                                       objToUpdate.approvedAt =
                                         moment().toDate();
                                       invitees[invIndex] = objToUpdate;
-                                      handleSendEvalApproval(data, invitees);
+                                      handleSendEvalApproval(
+                                        data,
+                                        invitees,
+                                        true
+                                      );
                                     }}
                                   >
                                     I Agree
@@ -3945,7 +4000,11 @@ const TenderDetails = ({
                                     </div>
                                     <div className="flex items-center gap-3">
                                       <small className="text-[#455A64] text-[13px] font-medium">
-                                        {moment(item?.deliveryDate).fromNow()}
+
+                                        {item?.deliveryTimeFrame +
+                                            " " +
+                                            item?.deliveryTimeFrameDuration
+                                          }
                                       </small>
                                       <div className="bg-[#F1F3FF] py-1 px-3 rounded-xl text-[11px] font-medium text-[#353531]">
                                         Delivery timeframe
