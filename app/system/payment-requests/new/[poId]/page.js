@@ -320,7 +320,9 @@ export default function NewPaymentRequest({ params }) {
                       {/* Title */}
                       <div>
                         <div className="flex items-center gap-2">
-                          <label className="text-[#000000e0] text-[14px]">Request Title</label>
+                          <label className="text-[#000000e0] text-[14px]">
+                            Request Title
+                          </label>
                           <div className="text-red-500">*</div>
                         </div>
                         <div>
@@ -346,7 +348,9 @@ export default function NewPaymentRequest({ params }) {
                       {/* Description */}
                       <div>
                         <div className="flex items-center gap-2">
-                          <label className="text-[#000000e0] text-[14px]">Comment/additional note</label>
+                          <label className="text-[#000000e0] text-[14px]">
+                            Comment/additional note
+                          </label>
                           <div className="text-red-500">*</div>
                         </div>
                         <div>
@@ -376,7 +380,9 @@ export default function NewPaymentRequest({ params }) {
                       {/* Amount */}
                       <div className="flex flex-col">
                         <div className="flex items-center gap-2">
-                          <label className="text-[#000000e0] text-[14px]">Amount due</label>
+                          <label className="text-[#000000e0] text-[14px]">
+                            Amount due
+                          </label>
                           <div className="text-red-500">*</div>
                         </div>
                         <Form.Item>
@@ -587,174 +593,200 @@ export default function NewPaymentRequest({ params }) {
             </div>
           </div>
           <div>
-            <div className="mr-5 lg:col-span-1 bg-[#EFF4F8] pb-8 pt-3 px-10">
-              <h5 className="text-[18px] text-[#344767] mb-7">
-                Payment Details
-              </h5>
-              <div className="flex items-center">
-                <Form.Item
-                  name="bankPay"
-                  valuePropName="checked"
-                  // wrapperCol={{ offset: 8, span: 16 }}
-                >
-                  <Radio.Group
-                    onChange={(e) => {
-                      setBankPay(e.target.value);
-                      if (e.target.value === false) setBudgetLine(null);
-                    }}
-                    value={bankPay}
-                    className="my-2"
+            <Form
+              form={form}
+              
+            >
+              <div className="mr-5 lg:col-span-1 bg-[#EFF4F8] pb-8 pt-3 px-10">
+                <h5 className="text-[18px] text-[#344767] mb-7">
+                  Payment Details
+                </h5>
+                <div className="flex items-center">
+                  <Form.Item
+                    name="bankPay"
+                    valuePropName="checked"
+                    // wrapperCol={{ offset: 8, span: 16 }}
                   >
-                    <div className="flex gap-x-10">
-                      <div className="my-1 border-t-2 border-x-2 border-[#BFC5C5]">
-                        <Radio
-                          value={true}
-                          className="flex gap-x-1 items-center"
-                        >
-                          <MdAccountBalance /> &nbsp;<span>Bank Info</span>
-                        </Radio>
+                    <Radio.Group
+                      onChange={(e) => {
+                        setBankPay(e.target.value);
+                        // if (e.target.value === false) setBudgetLine(null);
+                      }}
+                      value={bankPay}
+                      className="my-2"
+                    >
+                      <div className="flex gap-x-10">
+                        <div className="my-1 border-t-2 border-x-2 border-[#BFC5C5]">
+                          <Radio
+                            value={true}
+                            className="flex gap-x-1 items-center"
+                          >
+                            <MdAccountBalance /> &nbsp;<span>Bank Info</span>
+                          </Radio>
+                        </div>
+                        <div className="my-1 border-2 border-[#BFC5C5]">
+                          <Radio
+                            value={false}
+                            className="flex gap-x-1 items-center"
+                          >
+                            <FaMobileAlt /> &nbsp;<span>Mobile Pay</span>
+                          </Radio>
+                        </div>
                       </div>
-                      <div className="my-1 border-2 border-[#BFC5C5]">
-                        <Radio
-                          value={false}
-                          className="flex gap-x-1 items-center"
-                        >
-                          <FaMobileAlt /> &nbsp;<span>Mobile Pay</span>
-                        </Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                </div>
+                {bankPay ? (
+                  <>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <label className="text-[#344767] text-[14px] mb-2">
+                          Bank Name
+                        </label>
+                        <div className="text-red-500">*</div>
                       </div>
-                    </div>
-                  </Radio.Group>
-                </Form.Item>
-              </div>
-              {bankPay ? (
-                <>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <label className="text-[#344767] text-[14px] mb-2">Bank Name</label>
-                      <div className="text-red-500">*</div>
-                    </div>
 
-                    <div>
-                      <Form.Item
-                        name="bankName"
-                        rules={bankPay && [
-                          {
-                            required: true,
-                            message: "Request Bank name is required",
-                          },
-                        ]}
-                      >
-                        <Input
-                          value={bankName}
-                          className="h-11"
-                          onChange={(e) => setBankName(e.target.value)}
-                          placeholder="Type in Bank Name"
-                        />
-                      </Form.Item>
-                    </div>
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <label className="text-[#344767] text-[14px] mb-2">Account Name</label>
-                      <div className="text-red-500">*</div>
+                      <div>
+                        <Form.Item
+                          name="bankName"
+                          rules={
+                            bankPay && [
+                              {
+                                required: true,
+                                message: "Request Bank name is required",
+                              },
+                            ]
+                          }
+                        >
+                          <Input
+                            value={bankName}
+                            className="h-11"
+                            onChange={(e) => setBankName(e.target.value)}
+                            placeholder="Type in Bank Name"
+                          />
+                        </Form.Item>
+                      </div>
                     </div>
                     <div>
-                      <Form.Item
-                        name="accountName"
-                        rules={bankPay && [
-                          {
-                            required: true,
-                            message: "Request account name is required",
-                          },
-                        ]}
-                      >
-                        <Input
-                          value={accountName}
-                          className="h-11"
-                          onChange={(e) => setAccountName(e.target.value)}
-                          placeholder="Type in User account name"
-                        />
-                      </Form.Item>
-                    </div>
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <label className="text-[#344767] text-[14px] mb-2">Account Number</label>
-                      <div className="text-red-500">*</div>
-                    </div>
-                    <div>
-                      <Form.Item
-                        name="accountNumber"
-                        rules={bankPay && [
-                          {
-                            required: true,
-                            message: "Request account number is required",
-                          },
-                        ]}
-                      >
-                        <Input
-                          value={accountNumber}
-                          className="h-11"
-                          onChange={(e) => setAccountNumber(e.target.value)}
-                          placeholder="Type in User account number"
-                        />
-                      </Form.Item>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <label className="text-[#344767] text-[14px] mb-2">Phone Name</label>
-                      <div className="text-red-500">*</div>
+                      <div className="flex items-center gap-2">
+                        <label className="text-[#344767] text-[14px] mb-2">
+                          Account Name
+                        </label>
+                        <div className="text-red-500">*</div>
+                      </div>
+                      <div>
+                        <Form.Item
+                          name="accountName"
+                          rules={
+                            bankPay && [
+                              {
+                                required: true,
+                                message: "Request account name is required",
+                              },
+                            ]
+                          }
+                        >
+                          <Input
+                            value={accountName}
+                            className="h-11"
+                            onChange={(e) => setAccountName(e.target.value)}
+                            placeholder="Type in User account name"
+                          />
+                        </Form.Item>
+                      </div>
                     </div>
                     <div>
-                      <Form.Item
-                        name="phoneName"
-                        rules={!bankPay && [
-                          {
-                            required: true,
-                            message: "Request Phone name is required",
-                          },
-                        ]}
-                      >
-                        <Input
-                          value={phoneName}
-                          className="h-11"
-                          onChange={(e) => setPhoneName(e.target.value)}
-                          placeholder="Type in Phone name"
-                        />
-                      </Form.Item>
+                      <div className="flex items-center gap-2">
+                        <label className="text-[#344767] text-[14px] mb-2">
+                          Account Number
+                        </label>
+                        <div className="text-red-500">*</div>
+                      </div>
+                      <div>
+                        <Form.Item
+                          name="accountNumber"
+                          rules={
+                            bankPay && [
+                              {
+                                required: true,
+                                message: "Request account number is required",
+                              },
+                            ]
+                          }
+                        >
+                          <Input
+                            value={accountNumber}
+                            className="h-11"
+                            onChange={(e) => setAccountNumber(e.target.value)}
+                            placeholder="Type in User account number"
+                          />
+                        </Form.Item>
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <label className="text-[#344767] text-[14px] mb-2">Phone Number</label>
-                      <div className="text-red-500">*</div>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <label className="text-[#344767] text-[14px] mb-2">
+                          Phone Name
+                        </label>
+                        <div className="text-red-500">*</div>
+                      </div>
+                      <div>
+                        <Form.Item
+                          name="phoneName"
+                          rules={
+                            !bankPay && [
+                              {
+                                required: true,
+                                message: "Request Phone name is required",
+                              },
+                            ]
+                          }
+                        >
+                          <Input
+                            value={phoneName}
+                            className="h-11"
+                            onChange={(e) => setPhoneName(e.target.value)}
+                            placeholder="Type in Phone name"
+                          />
+                        </Form.Item>
+                      </div>
                     </div>
                     <div>
-                      <Form.Item
-                        name="phoneNumber"
-                        rules={!bankPay && [
-                          {
-                            required: true,
-                            message: "Request Phone number required",
-                          },
-                        ]}
-                      >
-                        <Input
-                          value={phoneNumber}
-                          className="h-11"
-                          onChange={(e) => setPhoneNumber(e.target.value)}
-                          placeholder="Type in phone number"
-                        />
-                      </Form.Item>
+                      <div className="flex items-center gap-2">
+                        <label className="text-[#344767] text-[14px] mb-2">
+                          Phone Number
+                        </label>
+                        <div className="text-red-500">*</div>
+                      </div>
+                      <div>
+                        <Form.Item
+                          name="phoneNumber"
+                          rules={
+                            !bankPay && [
+                              {
+                                required: true,
+                                message: "Request Phone number required",
+                              },
+                            ]
+                          }
+                        >
+                          <Input
+                            value={phoneNumber}
+                            className="h-11"
+                            onChange={(e) => setPhoneNumber(e.target.value)}
+                            placeholder="Type in phone number"
+                          />
+                        </Form.Item>
+                      </div>
                     </div>
-                  </div>
-                </>
-              )}
-            </div>
+                  </>
+                )}
+              </div>
+            </Form>
+
             <h5 className="text-[16px] text-[#344767] pt-5">
               Related Document
             </h5>
