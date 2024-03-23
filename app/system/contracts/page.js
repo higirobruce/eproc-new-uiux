@@ -2513,7 +2513,15 @@ export default function Contracts() {
                                 Created At
                               </small>
                               <p className="text-[#344767] font-medium text-[14px] py-0 my-0">
-                                03 - Mar - 2023
+                                {moment(contract?.createdAt).format(
+                                  "DD - MMM - YYYY"
+                                ) ||
+                                  moment(contract?.updatedAt).format(
+                                    "DD - MMM - YYYY"
+                                  ) ||
+                                  moment(contract?.request?.updatedAt).format(
+                                    "DD - MMM - YYYY"
+                                  )}
                               </p>
                             </div>
                             {(!documentFullySignedInternally(contract) ||
@@ -2526,7 +2534,9 @@ export default function Contracts() {
                                   {/* <IoCheckmarkOutline className="text-[#00CE82]" /> */}
                                   <div className="bg-[#F9BB01] capitalize rounded-xl text-[#FFF] text-[14px] font-medium px-3 py-1">
                                     {contract?.status?.length > 6
-                                      ? (contract?.status?.slice(0, 5) + "..").toString()
+                                      ? (
+                                          contract?.status?.slice(0, 5) + ".."
+                                        ).toString()
                                       : contract?.status || "Pending"}
                                   </div>
                                 </Tooltip>
@@ -2542,7 +2552,9 @@ export default function Contracts() {
                                     {/* <IoCheckmarkOutline className="text-[#00CE82]" /> */}
                                     <div className="bg-[#D2FBD0] capitalize rounded-xl text-[#0D4A26] text-[14px] font-medium px-3 py-1">
                                       {contract?.status?.length > 6
-                                        ? (contract?.status?.slice(0, 5) + "..").toString()
+                                        ? (
+                                            contract?.status?.slice(0, 5) + ".."
+                                          ).toString()
                                         : contract?.status || "Pending"}
                                     </div>
                                   </Tooltip>
