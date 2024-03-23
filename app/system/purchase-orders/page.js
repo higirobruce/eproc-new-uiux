@@ -898,7 +898,18 @@ export default function PurchaseOrders() {
                             Created At
                           </small>
                           <p className="text-[#344767] font-medium text-[14px] py-0 my-0">
-                            03 - Mar - 2023
+                            {(po?.createdAt &&
+                              moment(po?.createdAt).format(
+                                "DD - MMM - YYYY"
+                              )) ||
+                              (po?.updatedAt &&
+                                moment(po?.updatedAt).format(
+                                  "DD - MMM - YYYY"
+                                )) ||
+                              (po?.request?.createdAt &&
+                                moment(po?.request?.createdAt).format(
+                                  "DD - MMM - YYYY"
+                                ))}
                           </p>
                         </div>
                         {documentFullySigned(po) && (
