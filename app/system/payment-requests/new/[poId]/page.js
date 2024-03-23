@@ -769,23 +769,24 @@ export default function NewPaymentRequest({ params }) {
                 {po?.number}
               </Link>
             </div>
+            <div className="flex w-full mt-5">
+              <button
+                onClick={() => {
+                  form.validateFields().then(() => {
+                    setSubmitting(true);
+                    handleUpload();
+                  });
+                }}
+                disabled={submitting}
+                className="flex item-center cursor-pointer border-none text-[16px] text-white gap-x-4 bg-[#0065DD] rounded-lg py-3 px-6"
+              >
+                <SaveOutlined className="font-[19px]" />
+                Submit
+              </button>
+        </div>
           </div>
         </div>
-        <div className="flex w-full justify-end items-end self-end">
-          <button
-            onClick={() => {
-              form.validateFields().then(() => {
-                setSubmitting(true);
-                handleUpload();
-              });
-            }}
-            disabled={submitting}
-            className="flex item-center cursor-pointer border-none text-[16px] text-white gap-x-4 bg-[#0065DD] rounded-lg py-3 px-6"
-          >
-            <SaveOutlined className="font-[19px]" />
-            Save
-          </button>
-        </div>
+        
       </div>
     </motion.div>
   );

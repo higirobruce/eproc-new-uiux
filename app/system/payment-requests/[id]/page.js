@@ -1019,6 +1019,7 @@ export default function PaymentRequest({ params }) {
                               _p.title = e.target.value;
                               setPaymentRequest(_p);
                             }}
+                            disabled={!conditions}
                           />
                         </Form.Item>
                       </div>

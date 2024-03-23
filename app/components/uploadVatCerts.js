@@ -92,7 +92,7 @@ function UploadVatCerts({
         {!iconOnly && (
           <Tooltip 
             placement="top"
-            title={`Total file size 12 Mbs with a format: PDF, Docx`}
+            title={`Upload limit: 12 MB. Supported formats: PDF.`}
           >
             <Button icon={<UploadOutlined />}>{label ? label : "Upload"}</Button>
           </Tooltip>

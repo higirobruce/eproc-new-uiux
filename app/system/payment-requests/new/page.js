@@ -515,183 +515,185 @@ export default function NewPaymentRequest() {
               </div>
             </div>
           </div>
-          <div className="mr-5 lg:col-span-1 bg-[#EFF4F8] pb-10 px-10">
-            <h5 className="text-[18px] text-[#344767]">Payment Details</h5>
-            <div className="flex items-center">
-              <Form.Item
-                name="budgeted"
-                valuePropName="checked"
-                // wrapperCol={{ offset: 8, span: 16 }}
-              >
-                <Radio.Group
-                  onChange={(e) => {
-                    setBankPay(e.target.value);
-                    if (e.target.value === false) setBudgetLine(null);
-                  }}
-                  value={bankPay}
-                  className="mb-2 mt-5"
+          <div className="mr-5 lg:col-span-1">
+            <div className="bg-[#EFF4F8] pt-2 pb-5 px-10">
+              <h5 className="text-[18px] text-[#344767]">Payment Details</h5>
+              <div className="flex items-center">
+                <Form.Item
+                  name="budgeted"
+                  valuePropName="checked"
+                  // wrapperCol={{ offset: 8, span: 16 }}
                 >
-                  <div className="flex gap-x-10">
-                    <div className="my-1 border-t-2 border-x-2 border-[#BFC5C5]">
-                      <Radio value={true} className="flex gap-x-1 items-center">
-                        <MdAccountBalance /> &nbsp;<span>Bank Info</span>
-                      </Radio>
+                  <Radio.Group
+                    onChange={(e) => {
+                      setBankPay(e.target.value);
+                      if (e.target.value === false) setBudgetLine(null);
+                    }}
+                    value={bankPay}
+                    className="mb-2 mt-5"
+                  >
+                    <div className="flex gap-x-10">
+                      <div className="my-1 border-t-2 border-x-2 border-[#BFC5C5]">
+                        <Radio value={true} className="flex gap-x-1 items-center">
+                          <MdAccountBalance /> &nbsp;<span>Bank Info</span>
+                        </Radio>
+                      </div>
+                      <div className="my-1 border-2 border-[#BFC5C5]">
+                        <Radio
+                          value={false}
+                          className="flex gap-x-1 items-center"
+                        >
+                          <FaMobileAlt /> &nbsp;<span>Mobile Pay</span>
+                        </Radio>
+                      </div>
                     </div>
-                    <div className="my-1 border-2 border-[#BFC5C5]">
-                      <Radio
-                        value={false}
-                        className="flex gap-x-1 items-center"
+                  </Radio.Group>
+                </Form.Item>
+              </div>
+              {bankPay ? (
+                <>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-[#344767] text-[14px] mb-2">Bank Name</label>
+                      <div className="text-red-500">*</div>
+                    </div>
+                    <div>
+                      <Form.Item
+                        name="bankName"
+                        rules={bankPay && [
+                          {
+                            required: true,
+                            message: "Request Bank name is required",
+                          },
+                        ]}
                       >
-                        <FaMobileAlt /> &nbsp;<span>Mobile Pay</span>
-                      </Radio>
+                        <Input
+                          value={bankName}
+                          className="h-11"
+                          onChange={(e) => setBankName(e.target.value)}
+                          placeholder="Type in Bank Name"
+                        />
+                      </Form.Item>
                     </div>
                   </div>
-                </Radio.Group>
-              </Form.Item>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-[#344767] text-[14px] mb-2">Account Name</label>
+                      <div className="text-red-500">*</div>
+                    </div>
+                    <div>
+                      <Form.Item
+                        name="accountName"
+                        rules={bankPay && [
+                          {
+                            required: true,
+                            message: "Request account name is required",
+                          },
+                        ]}
+                      >
+                        <Input
+                          value={accountName}
+                          className="h-11"
+                          onChange={(e) => setAccountName(e.target.value)}
+                          placeholder="Type in User account name"
+                        />
+                      </Form.Item>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-[#344767] text-[14px] mb-2">Account Number</label>
+                      <div className="text-red-500">*</div>
+                    </div>
+                    <div>
+                      <Form.Item
+                        name="accountNumber"
+                        rules={bankPay && [
+                          {
+                            required: true,
+                            message: "Request account number is required",
+                          },
+                        ]}
+                      >
+                        <Input
+                          value={accountNumber}
+                          className="h-11"
+                          onChange={(e) => setAccountNumber(e.target.value)}
+                          placeholder="Type in User account number"
+                        />
+                      </Form.Item>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-[#344767] text-[14px] mb-2">Phone Name</label>
+                      <div className="text-red-500">*</div>
+                    </div>
+                    <div>
+                      <Form.Item
+                        name="phoneName"
+                        rules={!bankPay && [
+                          {
+                            required: true,
+                            message: "Request Phone name is required",
+                          },
+                        ]}
+                      >
+                        <Input
+                          value={phoneName}
+                          className="h-11"
+                          onChange={(e) => setPhoneName(e.target.value)}
+                          placeholder="Type in Phone name"
+                        />
+                      </Form.Item>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-[#344767] text-[14px]">Phone Number</label>
+                      <div className="text-red-500">*</div>
+                    </div>
+                    <div>
+                      <Form.Item
+                        name="phoneNumber"
+                        rules={!bankPay && [
+                          {
+                            required: true,
+                            message: "Request Phone number required",
+                          },
+                        ]}
+                      >
+                        <Input
+                          value={phoneNumber}
+                          className="h-11"
+                          onChange={(e) => setPhoneNumber(e.target.value)}
+                          placeholder="Type in phone number"
+                        />
+                      </Form.Item>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
-            {bankPay ? (
-              <>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <label className="text-[#344767] text-[14px] mb-2">Bank Name</label>
-                    <div className="text-red-500">*</div>
-                  </div>
-                  <div>
-                    <Form.Item
-                      name="bankName"
-                      rules={bankPay && [
-                        {
-                          required: true,
-                          message: "Request Bank name is required",
-                        },
-                      ]}
-                    >
-                      <Input
-                        value={bankName}
-                        className="h-11"
-                        onChange={(e) => setBankName(e.target.value)}
-                        placeholder="Type in Bank Name"
-                      />
-                    </Form.Item>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <label className="text-[#344767] text-[14px] mb-2">Account Name</label>
-                    <div className="text-red-500">*</div>
-                  </div>
-                  <div>
-                    <Form.Item
-                      name="accountName"
-                      rules={bankPay && [
-                        {
-                          required: true,
-                          message: "Request account name is required",
-                        },
-                      ]}
-                    >
-                      <Input
-                        value={accountName}
-                        className="h-11"
-                        onChange={(e) => setAccountName(e.target.value)}
-                        placeholder="Type in User account name"
-                      />
-                    </Form.Item>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <label className="text-[#344767] text-[14px] mb-2">Account Number</label>
-                    <div className="text-red-500">*</div>
-                  </div>
-                  <div>
-                    <Form.Item
-                      name="accountNumber"
-                      rules={bankPay && [
-                        {
-                          required: true,
-                          message: "Request account number is required",
-                        },
-                      ]}
-                    >
-                      <Input
-                        value={accountNumber}
-                        className="h-11"
-                        onChange={(e) => setAccountNumber(e.target.value)}
-                        placeholder="Type in User account number"
-                      />
-                    </Form.Item>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <label className="text-[#344767] text-[14px] mb-2">Phone Name</label>
-                    <div className="text-red-500">*</div>
-                  </div>
-                  <div>
-                    <Form.Item
-                      name="phoneName"
-                      rules={!bankPay && [
-                        {
-                          required: true,
-                          message: "Request Phone name is required",
-                        },
-                      ]}
-                    >
-                      <Input
-                        value={phoneName}
-                        className="h-11"
-                        onChange={(e) => setPhoneName(e.target.value)}
-                        placeholder="Type in Phone name"
-                      />
-                    </Form.Item>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <label className="text-[#344767] text-[14px]">Phone Number</label>
-                    <div className="text-red-500">*</div>
-                  </div>
-                  <div>
-                    <Form.Item
-                      name="phoneNumber"
-                      rules={!bankPay && [
-                        {
-                          required: true,
-                          message: "Request Phone number required",
-                        },
-                      ]}
-                    >
-                      <Input
-                        value={phoneNumber}
-                        className="h-11"
-                        onChange={(e) => setPhoneNumber(e.target.value)}
-                        placeholder="Type in phone number"
-                      />
-                    </Form.Item>
-                  </div>
-                </div>
-              </>
-            )}
+            <div className="flex w-full mt-10">
+              <button
+                onClick={() => {
+                  form.validateFields().then(() => {
+                    setSubmitting(true);
+                    handleUpload();
+                  });
+                }}
+                disabled={submitting}
+                className="flex item-center cursor-pointer border-none text-[16px] text-white gap-x-4 bg-[#0065DD] rounded-lg py-3 px-6"
+              >
+                <SaveOutlined className="font-[19px]" />
+                Submit
+              </button>
+            </div>
           </div>
-        </div>
-        <div className="flex w-full justify-end items-end self-end">
-          <button
-            onClick={() => {
-              form.validateFields().then(() => {
-                setSubmitting(true);
-                handleUpload();
-              });
-            }}
-            disabled={submitting}
-            className="flex item-center mr-7 cursor-pointer border-none text-[15px] text-white gap-x-2 bg-[#0065DD] rounded pt-2.5 pb-3 pl-4 pr-5"
-          >
-            <SaveOutlined className="font-[17px]" />
-            Submit
-          </button>
         </div>
       </div>
     </motion.div>

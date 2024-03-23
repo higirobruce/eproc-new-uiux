@@ -1,7 +1,7 @@
 'use client'
 import React from "react";
 import { UploadOutlined } from "@ant-design/icons";
-import { Button, Upload, message, UploadFile } from "antd";
+import { Button, Upload, message, UploadFile, Tooltip } from "antd";
 
 function UploadEvaluationReport({ label, uuid, setSelected}) {
   const [messageApi, contextHolder] = message.useMessage();
@@ -54,7 +54,12 @@ function UploadEvaluationReport({ label, uuid, setSelected}) {
     <>
       {contextHolder}
       <Upload {...props} headers={{}} maxCount={1}>
-        <Button icon={<UploadOutlined />}>{label ? label : "Upload"}</Button>
+        <Tooltip 
+          placement="top"
+          title={`Upload limit: 12 MB. Supported formats: PDF.`}
+        >
+          <Button icon={<UploadOutlined />}>{label ? label : "Upload"}</Button>
+        </Tooltip>
       </Upload>
     </>
   );
