@@ -1553,7 +1553,7 @@ const SignupForm = () => {
         hqAddress: values.hqAddress,
         country: values.country,
         passportNid: values.passportNid,
-        services: values.services,
+        services: updatedServices,
         rdbCertId: rdbSelected ? rdbCertId : null,
         vatCertId: vatSelected ? vatCertId : null,
         tempPassword: "password",
@@ -2653,7 +2653,6 @@ const SignupForm = () => {
                   >
                     agreement
                   </a>
-
                 </Checkbox>
               </Form.Item>
               <Form.Item className="flex justify-end" {...tailFormItemLayout}>
