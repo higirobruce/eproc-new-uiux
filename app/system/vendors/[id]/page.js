@@ -817,18 +817,33 @@ export default function page({ params }) {
                 <div className="grid lg:grid-cols-2 items-center gap-x-5 -my-1">
                   <div>
                     {rowData?.rdbCertId && (
-                      <div>
+                      <div className="flex flex-row items-center">
                         {/* <div className="flex gap-2">
                           <label className="text-[#6A757B] mb-3">
                             Incorporation document
                           </label>
                         </div> */}
-                        <Link
-                          href={`${fendUrl}/api/?folder=rdbCerts&name=${rowData?.rdbCertId}.pdf`}
-                          target="_blank"
-                        >
-                          Incorporation document
-                        </Link>
+                        <div className="mt-2 ">
+                          <Link
+                          className="text-blue-500 text-sm"
+                            href={`${fendUrl}/api/?folder=rdbCerts&name=${rowData?.rdbCertId}.pdf`}
+                            target="_blank"
+                          >
+                            Incorporation document
+                          </Link>
+                        </div>
+
+                        <div>
+                          <UploadRDCerts
+                            // label="Incorporation Certificate (missing)"
+                            iconOnly={true}
+                            setSelected={setRDBSelected}
+                            setId={setRdbCertId}
+                            uuid={rdbCertId}
+                            setStatus={(status) => {}}
+                            uploadingStatus={fileUploadStatus}
+                          />
+                        </div>
                       </div>
                     )}
 
@@ -850,7 +865,7 @@ export default function page({ params }) {
                           ]
                         }
                       >
-                        <div className="">
+                        <div className="mt-2">
                           <UploadRDCerts
                             label="Incorporation Certificate (missing)"
                             iconOnly={true}
@@ -866,18 +881,33 @@ export default function page({ params }) {
                   </div>
                   <div>
                     {rowData?.vatCertId && (
-                      <div>
+                      <div className="flex flex-row items-center">
                         {/* <div className="flex gap-2">
                         <label className="text-[#6A757B] mb-3">
                           Incorporation document
                         </label>
                       </div> */}
-                        <Link
-                          href={`${fendUrl}/api/?folder=vatCerts&name=${rowData?.vatCertId}.pdf`}
-                          target="_blank"
-                        >
-                          VAT Certificate
-                        </Link>
+                        <div className="mt-2">
+                          <Link
+                          className="text-blue-500 text-sm"
+                            href={`${fendUrl}/api/?folder=vatCerts&name=${rowData?.vatCertId}.pdf`}
+                            target="_blank"
+                          >
+                            VAT Certificate
+                          </Link>
+                        </div>
+
+                        <div className="">
+                          <UploadVatCerts
+                            // label="VAT Certificate (missing)"
+                            iconOnly={true}
+                            setSelected={setVatSelected}
+                            setId={setVatCertId}
+                            uuid={vatCertId}
+                            setStatus={(status) => {}}
+                            uploadingStatus={fileUploadStatus}
+                          />
+                        </div>
                       </div>
                     )}
 
@@ -899,7 +929,7 @@ export default function page({ params }) {
                           ]
                         }
                       >
-                        <div className="">
+                        <div className="mt-5">
                           <UploadVatCerts
                             label="VAT Certificate (missing)"
                             iconOnly={true}
