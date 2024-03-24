@@ -546,7 +546,10 @@ export default function NewPaymentRequest() {
                   >
                     <div className="flex gap-x-10">
                       <div className="my-1 border-t-2 border-x-2 border-[#BFC5C5]">
-                        <Radio value={true} className="flex gap-x-1 items-center">
+                        <Radio
+                          value={true}
+                          className="flex gap-x-1 items-center"
+                        >
                           <MdAccountBalance /> &nbsp;<span>Bank Info</span>
                         </Radio>
                       </div>
@@ -566,7 +569,9 @@ export default function NewPaymentRequest() {
                 <>
                   <div>
                     <div className="flex items-center gap-2">
-                      <label className="text-[#344767] text-[14px] mb-2">Bank Name</label>
+                      <label className="text-[#344767] text-[14px] mb-2">
+                        Bank Name
+                      </label>
                     </div>
                     <div>
                       <Form.Item
@@ -589,7 +594,9 @@ export default function NewPaymentRequest() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <label className="text-[#344767] text-[14px] mb-2">Account Name</label>
+                      <label className="text-[#344767] text-[14px] mb-2">
+                        Account Name
+                      </label>
                     </div>
                     <div>
                       <Form.Item
@@ -612,7 +619,9 @@ export default function NewPaymentRequest() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <label className="text-[#344767] text-[14px] mb-2">Account Number</label>
+                      <label className="text-[#344767] text-[14px] mb-2">
+                        Account Number
+                      </label>
                     </div>
                     <div>
                       <Form.Item
@@ -638,7 +647,9 @@ export default function NewPaymentRequest() {
                 <>
                   <div>
                     <div className="flex items-center gap-2">
-                      <label className="text-[#344767] text-[14px] mb-2">Phone Name</label>
+                      <label className="text-[#344767] text-[14px] mb-2">
+                        Phone Name
+                      </label>
                     </div>
                     <div>
                       <Form.Item
@@ -661,7 +672,9 @@ export default function NewPaymentRequest() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <label className="text-[#344767] text-[14px]">Phone Number</label>
+                      <label className="text-[#344767] text-[14px]">
+                        Phone Number
+                      </label>
                     </div>
                     <div>
                       <Form.Item
@@ -688,9 +701,19 @@ export default function NewPaymentRequest() {
             <div className="flex w-full mt-10">
               <button
                 onClick={() => {
+                  if (files?.length <= 0)
+                    message.error(
+                      "Please provide atleast one supporting document!"
+                    );
                   form.validateFields().then(() => {
-                    setSubmitting(true);
-                    handleUpload();
+                    if (files?.length <= 0)
+                      message.error(
+                        "Please provid atlease one supporting document!"
+                      );
+                    else {
+                      setSubmitting(true);
+                      handleUpload();
+                    }
                   });
                 }}
                 disabled={submitting}
@@ -702,7 +725,7 @@ export default function NewPaymentRequest() {
             </div>
           </div>
         </div>
-        <div className="flex w-full justify-end items-end self-end">
+        {/* <div className="flex w-full justify-end items-end self-end">
           <button
             onClick={() => {
               if (files?.length <= 0)
@@ -726,7 +749,7 @@ export default function NewPaymentRequest() {
             <SaveOutlined className="font-[17px]" />
             Submit
           </button>
-        </div>
+        </div> */}
       </div>
     </motion.div>
   );
