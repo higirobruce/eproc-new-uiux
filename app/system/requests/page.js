@@ -1006,11 +1006,15 @@ export default function UserRequests() {
               New request
             </Button>
             <div className="flex items-center gap-5">
-              <Button
-                className="bg-white h-8 px-5 text-[13px] font-semibold text-[#0063CF] pt-1.5"
-                icon={<BsFiletypeCsv size={18} className="text-[#00AC47]" />}
-                onClick={() => handleExport(tempDataset)}
-              ></Button>
+              {(user?.permissions?.canApproveAsHod ||
+                user?.permissions?.canApproveAsHof ||
+                user?.permissions?.canApproveAsPM) && (
+                <Button
+                  className="bg-white h-8 px-5 text-[13px] font-semibold text-[#0063CF] pt-1.5"
+                  icon={<BsFiletypeCsv size={18} className="text-[#00AC47]" />}
+                  onClick={() => handleExport(tempDataset)}
+                ></Button>
+              )}
               <Select
                 // mode="tags"
                 className="text-[14px] text-[#2c6ad6] w-48 rounded-sm"
