@@ -66,7 +66,7 @@ const BidList = ({
   let [evaluationReportId, setEvaluationRptId] = useState(v4());
   let token = typeof window !== "undefined" && localStorage.getItem("token");
   let [fileSelected, setFileSelected] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const contentHeight = useRef();
 
   const appendData = () => {
@@ -92,7 +92,7 @@ const BidList = ({
   };
 
   const handleItemClick = (value) => {
-    setActiveIndex((prevIndex) => (prevIndex === value ? "" : value));
+    setActiveIndex((prevIndex) => (prevIndex === value ? -1 : value));
   };
 
   useEffect(() => {

@@ -2275,7 +2275,7 @@ const SignupForm = () => {
                 <div className="grid lg:grid-cols-2 items-center gap-x-5 -my-1">
                   <div>
                     <div className="flex items-center gap-2">
-                      <label className="text-[#6A757B]">HQ Adress</label>
+                      <label className="text-[#6A757B]">HQ Address</label>
                     </div>
 
                     <Form.Item name="hqAddress">
@@ -2640,19 +2640,21 @@ const SignupForm = () => {
                     validator: (_, value) =>
                       value
                         ? Promise.resolve()
-                        : Promise.reject(new Error("Should accept agreement")),
+                        : Promise.reject(new Error("Please agree to T&Cs to proceed.")),
                   },
                 ]}
                 {...tailFormItemLayout}
               >
                 <Checkbox>
-                  I have read the{" "}
+                  I have read and agree to the {" "}
                   <a
                     href={`${fendUrl}/api/?folder=termsAndConditions&name=tcs.pdf`}
                     target="_blank"
                   >
-                    agreement
+                    Terms & Conditions{" "}
                   </a>
+                    (T&Cs)
+
                 </Checkbox>
               </Form.Item>
               <Form.Item className="flex justify-end" {...tailFormItemLayout}>

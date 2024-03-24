@@ -169,7 +169,7 @@ const TenderDetails = ({
   ]);
   const [tab, setTab] = useState(0);
   const [open, setOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const contentHeight = useRef();
 
   const itemColumns =
@@ -1723,7 +1723,7 @@ const TenderDetails = ({
         <div className="space-y-10 px-20 py-5">
           {contextHolder}
           <Typography.Title level={4}>
-            CONTRACTOR: {vendor?.companyName}
+            CONTRACT: {vendor?.companyName}
           </Typography.Title>
           <div className="grid grid-cols-2 w-1/2">
             <div>
@@ -2886,7 +2886,7 @@ const TenderDetails = ({
           <div className="flex flex-row justify-between items-center">
             <Typography.Title level={4} className="flex flex-row items-center">
               <div>
-                CONTRACTOR: {contract?.vendor?.companyName}{" "}
+                CONTRACT: {contract?.vendor?.companyName}{" "}
                 <div>
                   <Popover
                     placement="topLeft"
@@ -3545,15 +3545,15 @@ const TenderDetails = ({
           </div>
 
           {!value && (
-            <div className="relative flex flex-col space-y-2 bg-white px-5 pt-5 rounded-lg">
-              <div className="flex flex-row space-x-3 pl-14">
+            <div className="relative flex flex-col items-start space-y-2 bg-white px-5 pt-5 rounded-lg">
+              <div className="flex flex-row space-x-3">
                 {!extending &&
                   (submittingExtensionRe ? (
                     <Spin size="small" />
                   ) : (
                     <Statistic.Countdown
                       title="Submission Deadline (days:hrs:min:sec)"
-                      className="text-[26px] text-gray-500"
+                      className="text-[26px] pl-14 text-gray-500"
                       // valueStyle={{ fontSize: "0.75rem", lineHeight: "1rem" }}
                       format="DD:HH:mm:ss"
                       value={moment(deadLine)}
@@ -3598,7 +3598,7 @@ const TenderDetails = ({
                 extending &&
                 deadLine &&
                 data?.invitees?.length < 1 && (
-                  <div className="flex flex-row self-end items-center space-x-2">
+                  <div className="flex flex-row self-start mt-4 items-center space-x-2">
                     <div>
                       <Popconfirm
                         title="Are you sure?"
@@ -3624,18 +3624,19 @@ const TenderDetails = ({
                         <CloseOutlined className="h-3 w-3h-3  " />
                       </div>
                     </div>
+                    
                   </div>
                 )}
 
-              {/* {user?.userType !== "VENDOR" && (
-              <Tag color="magenta">
-                {iSubmitted
-                  ? "submitted"
-                  : moment().isAfter(moment(data?.submissionDeadLine))
-                  ? "closed"
-                  : data?.status}
-              </Tag>
-            )} */}
+              {user?.userType !== "VENDOR" && (
+                <Tag className="border-0 px-6 py-1.5 mt-2" color="magenta">
+                  {iSubmitted
+                    ? "submitted"
+                    : moment().isAfter(moment(data?.submissionDeadLine))
+                    ? "closed"
+                    : data?.status}
+                </Tag>
+              )}
             </div>
           )}
         </div>
@@ -3796,7 +3797,7 @@ const TenderDetails = ({
   }
 
   const handleItemClick = (value) => {
-    setActiveIndex((prevIndex) => (prevIndex === value ? "" : value));
+    setActiveIndex((prevIndex) => (prevIndex === value ? -1 : value));
   };
 
   const statusClass = {

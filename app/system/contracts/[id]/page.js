@@ -187,7 +187,7 @@ export default function page({ params }) {
         <div className="flex flex-row justify-between items-center">
           <Typography.Title level={4} className="flex flex-row items-center">
             <div>
-              CONTRACTOR #{contract?.number}{" "}
+              CONTRACT #{contract?.number}{" "}
               <div>
                 <Popover
                   placement="topLeft"
@@ -602,7 +602,7 @@ export default function page({ params }) {
         <div className="flex flex-row justify-between items-center">
           <Typography.Title level={4} className="flex flex-row items-center">
             <div>
-              CONTRACTOR #{contract?.number}{" "}
+              CONTRACT #{contract?.number}{" "}
               <div>
                 <Popover
                   placement="topLeft"

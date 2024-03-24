@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Badge, Form, Row, Table, Tag, Typography } from "antd";
+import { Badge, Form, Row, Table, Tag, Typography, Tooltip as Tip } from "antd";
 import {
   FileDoneOutlined,
   FileProtectOutlined,
@@ -9,6 +9,7 @@ import {
 } from "@ant-design/icons";
 import moment from "moment/moment";
 import { useRouter } from "next/navigation";
+import { Tooltip } from "chart.js";
 
 const TendersTable = ({
   dataSet,
@@ -81,11 +82,11 @@ const TendersTable = ({
             key: "title",
             sorter: (a, b) => b > a,
             render: (_, record) => (
-              <>
+              <Tip title={record?.purchaseRequest?.title}>
                 <Typography.Text className="capitalize text-[#8392AB] text-[14px]">
-                  {record?.purchaseRequest?.title.toLowerCase()}
+                  {record?.purchaseRequest?.title?.length > 15 ? record?.purchaseRequest?.title.toLowerCase().slice(0, 10) + '...' : record?.purchaseRequest?.title.toLowerCase()}
                 </Typography.Text>
-              </>
+              </Tip>
             ),
           },
           {

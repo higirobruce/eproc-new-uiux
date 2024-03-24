@@ -329,6 +329,10 @@ export default function page({ params }) {
       .then((res) => res.json())
       .then((res) => {
         res.avgRate = rowData.avgRate;
+        messageApi.open({
+          type: "success",
+          content: "Successfully Updated Vendor Information!",
+        });
         setRowData(res);
         refresh();
       })

@@ -441,7 +441,7 @@ const RequestDetails = ({
   const [tenderDocSelected, setTendeDocSelected] = useState(false);
   const [attachSelected, setAttachSelected] = useState(false);
   const [approvalShow, setApprovalShow] = useState(true);
-  const [activeIndex, setActiveIndex] = useState("");
+  const [activeIndex, setActiveIndex] = useState(-1);
   const contentHeight = useRef();
   const scrollRef = useRef();
 
@@ -2238,7 +2238,7 @@ const RequestDetails = ({
         <div className="space-y-10 px-20 py-5">
           {contextHolder}
           <Typography.Title level={4}>
-            CONTRACTOR: {vendor?.companyName}
+            CONTRACT: {vendor?.companyName}
           </Typography.Title>
           <div className="grid grid-cols-2 w-1/2">
             <div>
@@ -2631,7 +2631,7 @@ const RequestDetails = ({
   }
 
   const handleItemClick = (value) => {
-    setActiveIndex((prevIndex) => ((value && (prevIndex == "" && approvalShow)) ? "" : (value && (prevIndex == "" && !approvalShow)) ? value : prevIndex === value ? "" : value));
+    setActiveIndex((prevIndex) => ((value && (prevIndex == -1 && approvalShow)) ? "" : (value && (prevIndex == "" && !approvalShow)) ? value : prevIndex === value ? "" : value));
     setApprovalShow(false)
   };
 
@@ -3481,7 +3481,7 @@ const RequestDetails = ({
                   </div>
                 </div>
               )}
-              {currentCode === 3 &&
+              {currentCode === 3 && (!tender || !po || !contract) &&
                 (user?.permissions?.canCreateTenders ||
                   user?.permissions?.canCreatePurchaseOrders ||
                   user?.permissions?.canCreateContracts) && (
@@ -3516,9 +3516,8 @@ const RequestDetails = ({
                             ]}
                           />
                         </Form.Item>
-                      </div>
-
-                      {refDoc === "Tendering" &&
+                      </div>    
+                      {(refDoc === "Tendering" && !tender) &&
                         buildTenderForm(
                           setDeadLine,
                           user,
@@ -3528,7 +3527,7 @@ const RequestDetails = ({
                           tenderDocSelected
                         )}
 
-                      {refDoc === "From Existing Contract" &&
+                      {(refDoc === "From Existing Contract" && !contract) &&
                         buildPOForm(
                           setSelectedContract,
                           contracts,
@@ -3539,7 +3538,7 @@ const RequestDetails = ({
                           documentFullySigned
                         )}
 
-                      {refDoc === "Direct Contracting" && (
+                      {(refDoc === "Direct Contracting" && !contract) && (
                         <div>
                           <div className="items-center">
                             <div className="mb-2">Select registered vendor</div>

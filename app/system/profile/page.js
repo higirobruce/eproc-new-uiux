@@ -960,16 +960,11 @@ export default function page() {
                   <div className="grid lg:grid-cols-2 items-center gap-x-5 -my-1">
                     <div>
                       {user?.rdbCertId && (
-                        <div>
+                        <div className="flex flex-col gap-x-3">
                           <div className="flex gap-2">
-                            <Link
-                              href={`${url}/file/rdbCerts/${user?.rdbCertId}.pdf`}
-                              target="_blank"
-                            >
-                              <label className="text-[#6A757B] mb-3">
-                                Incorporation document
-                              </label>
-                            </Link>
+                            <label className="text-[#6A757B] mb-3">
+                              Incorporation document
+                            </label>
                             
                             <div>
                               <Tooltip
@@ -981,35 +976,44 @@ export default function page() {
                               </Tooltip>
                             </div>
                           </div>
-                          <Form.Item
-                            name="rdbRegistraction"
-                            rules={
-                              [
-                                // {
-                                //   validator: (_, value) =>
-                                //     rdbSelected
-                                //       ? Promise.resolve()
-                                //       : Promise.reject(
-                                //           new Error(
-                                //             "Please attach your incorporation document"
-                                //           )
-                                //         ),
-                                // },
-                              ]
-                            }
-                          >
-                            <div className="">
-                              <UploadRDCerts
-                                // label="Incorporation Certificate"
-                                iconOnly={true}
-                                setSelected={setRDBSelected}
-                                setId={setRdbCertId}
-                                uuid={rdbCertId}
-                                setStatus={(status) => {}}
-                                uploadingStatus={fileUploadStatus}
-                              />
-                            </div>
-                          </Form.Item>
+                          <div className="flex gap-x-3 -ml-8">
+                            <Form.Item
+                              name="rdbRegistraction"
+                              rules={
+                                [
+                                  // {
+                                  //   validator: (_, value) =>
+                                  //     rdbSelected
+                                  //       ? Promise.resolve()
+                                  //       : Promise.reject(
+                                  //           new Error(
+                                  //             "Please attach your incorporation document"
+                                  //           )
+                                  //         ),
+                                  // },
+                                ]
+                              }
+                            >
+                              <div className="">
+                                <UploadRDCerts
+                                  // label="Incorporation Certificate"
+                                  iconOnly={true}
+                                  setSelected={setRDBSelected}
+                                  setId={setRdbCertId}
+                                  uuid={rdbCertId}
+                                  setStatus={(status) => {}}
+                                  uploadingStatus={fileUploadStatus}
+                                />
+                              </div>
+                            </Form.Item>
+                            <Link
+                              href={`${url}/file/rdbCerts/${user?.rdbCertId}.pdf`}
+                              target="_blank"
+                              className="mt-3 no-underline cursor-pointer text-[14.5px]"
+                            >
+                              View Uploaded Incorporation Doc
+                            </Link>
+                          </div>
                         </div>
                         
                       )}
@@ -1050,14 +1054,9 @@ export default function page() {
                       {user?.vatCertId && (
                         <div>
                           <div className="flex gap-2">
-                            <Link
-                              href={`${url}/file/vatCerts/${user?.vatCertId}.pdf`}
-                              target="_blank"
-                            >
-                              <label className="text-[#6A757B] mb-3">
-                                VAT Certificate
-                              </label>
-                            </Link>
+                            <label className="text-[#6A757B] mb-3">
+                              VAT Certificate
+                            </label>
                             <div>
                               <Tooltip
                                 placement="top"
@@ -1068,35 +1067,44 @@ export default function page() {
                               </Tooltip>
                             </div>
                           </div>
-                          <Form.Item
-                            name="vatRegistraction"
-                            rules={
-                              [
-                                // {
-                                //   validator: (_, value) =>
-                                //     rdbSelected
-                                //       ? Promise.resolve()
-                                //       : Promise.reject(
-                                //           new Error(
-                                //             "Please attach your incorporation document"
-                                //           )
-                                //         ),
-                                // },
-                              ]
-                            }
-                          >
-                            <div className="">
-                              <UploadVatCerts
-                                // label="Incorporation Certificate"
-                                iconOnly={true}
-                                setSelected={setVatSelected}
-                                setId={setVatCertId}
-                                uuid={vatCertId}
-                                setStatus={(status) => {}}
-                                uploadingStatus={fileUploadStatus}
-                              />
-                            </div>
-                          </Form.Item>
+                          <div className="flex gap-x-3 -ml-8">
+                            <Form.Item
+                              name="vatRegistraction"
+                              rules={
+                                [
+                                  // {
+                                  //   validator: (_, value) =>
+                                  //     rdbSelected
+                                  //       ? Promise.resolve()
+                                  //       : Promise.reject(
+                                  //           new Error(
+                                  //             "Please attach your incorporation document"
+                                  //           )
+                                  //         ),
+                                  // },
+                                ]
+                              }
+                            >
+                              <div className="">
+                                <UploadVatCerts
+                                  // label="Incorporation Certificate"
+                                  iconOnly={true}
+                                  setSelected={setVatSelected}
+                                  setId={setVatCertId}
+                                  uuid={vatCertId}
+                                  setStatus={(status) => {}}
+                                  uploadingStatus={fileUploadStatus}
+                                />
+                              </div>
+                            </Form.Item>
+                            <Link
+                              href={`${url}/file/vatCerts/${user?.vatCertId}.pdf`}
+                              target="_blank"
+                              className="mt-3 no-underline cursor-pointer text-[14.5px]"
+                            >
+                              View Uploaded VAT Cert
+                            </Link>
+                          </div>
                         </div>
                       )}
 
