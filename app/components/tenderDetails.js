@@ -3624,7 +3624,6 @@ const TenderDetails = ({
                         <CloseOutlined className="h-3 w-3h-3  " />
                       </div>
                     </div>
-                    
                   </div>
                 )}
 
@@ -3943,7 +3942,8 @@ const TenderDetails = ({
                           <div className="text-lg flex flex-row  justify-end items-center space-x-5">
                             {data?.evaluationReportId && (
                               <a
-                                href={`${url}/file/evaluationReports/${data?.evaluationReportId}.pdf`}
+                                // href={`${url}/file/evaluationReports/${data?.evaluationReportId}.pdf`}
+                                href={`${fendUrl}/api/?folder=evaluationReports&name=${data?.evaluationReportId}.pdf`}
                                 target="_blank"
                                 className="text-sm no-underline text-[#1677FF]"
                                 onClick={() => {
@@ -4336,7 +4336,8 @@ const TenderDetails = ({
 
                                           <div className="flex flex-col">
                                             <Link
-                                              href={`${url}/file/bidDocs/${item?.proposalDocId}.pdf`}
+                                              // href={`${url}/file/bidDocs/${item?.proposalDocId}.pdf`}
+                                              href={`${fendUrl}/api/?folder=bidDocs&name=${item?.proposalDocId}.pdf`}
                                               target="_blank"
                                             >
                                               <Typography.Link className="flex flex-row items-center space-x-2">
@@ -4348,7 +4349,8 @@ const TenderDetails = ({
                                             </Link>
 
                                             <Link
-                                              href={`${url}/file/bidDocs/${item?.otherDocId}.pdf`}
+                                              // href={`${url}/file/bidDocs/${item?.otherDocId}.pdf`}
+                                              href={`${fendUrl}/api/?folder=bidDocs&name=${item?.otherDocId}.pdf`}
                                               target="_blank"
                                             >
                                               <Typography.Link className="flex flex-row items-center space-x-2">
@@ -4677,7 +4679,8 @@ const TenderDetails = ({
                                     {item?.proposalDocId && (
                                       <div className="flex flex-row items-center mb-4">
                                         <a
-                                          href={`${url}/file/bidDocs/${item?.proposalDocId}.pdf`}
+                                          // href={`${url}/file/bidDocs/${item?.proposalDocId}.pdf`}
+                                          href={`${fendUrl}/api/?folder=bidDocs&name=${item?.proposalDocId}.pdf`}
                                           target="_blank"
                                           // onClick={() => {
                                           //   setAttachmentId(
@@ -4700,7 +4703,8 @@ const TenderDetails = ({
                                     {item?.otherDocId && (
                                       <div>
                                         <a
-                                          href={`${url}/file/bidDocs/${item?.otherDocId}.pdf`}
+                                          // href={`${url}/file/bidDocs/${item?.otherDocId}.pdf`}
+                                          href={`${fendUrl}/api/?folder=bidDocs&name=${item?.otherDocId}.pdf`}
                                           target="_blank"
                                           // onClick={() => {
                                           //   // router.push(`bidDocs/${item?.otherDocId}.pdf`)

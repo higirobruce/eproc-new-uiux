@@ -57,6 +57,7 @@ const BidList = ({
   let router = useRouter();
   const [data, setData] = useState(null);
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
+  let fendUrl = process.env.NEXT_PUBLIC_FTEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
   const [messageApi, contextHolder] = message.useMessage();
@@ -236,7 +237,8 @@ const BidList = ({
                     {item?.proposalDocId && (
                       <div className="flex flex-row items-center">
                         <a
-                          href={`${url}/file/bidDocs/${item?.proposalDocId}.pdf`}
+                          // href={`${url}/file/bidDocs/${item?.proposalDocId}.pdf`}
+                          href={`${fendUrl}/api/?folder=bidDocs&name=${item?.proposalDocId}.pdf`}
                           target="_blank"
                           // onClick={() => {
                           //   setAttachmentId(
@@ -256,7 +258,8 @@ const BidList = ({
                     {item?.otherDocId && (
                       <div>
                         <a
-                          href={`${url}/file/bidDocs/${item?.otherDocId}.pdf`}
+                          // href={`${url}/file/bidDocs/${item?.otherDocId}.pdf`}
+                          href={`${fendUrl}/api/?folder=bidDocs&name=${item?.otherDocId}.pdf`}
                           target="_blank"
                           // onClick={() => {
                           //   // router.push(`bidDocs/${item?.otherDocId}.pdf`)
@@ -316,11 +319,11 @@ const BidList = ({
                     </div>
                     <div className="flex items-center gap-3">
                       <small className="text-[#455A64] text-[13px] font-medium">
-                      {(item?.deliveryTimeFrame &&
-                                          item?.deliveryTimeFrame +
-                                            " " +
-                                            item?.deliveryTimeFrameDuration) ||
-                                          moment(item?.deliveryDate).fromNow()}
+                        {(item?.deliveryTimeFrame &&
+                          item?.deliveryTimeFrame +
+                            " " +
+                            item?.deliveryTimeFrameDuration) ||
+                          moment(item?.deliveryDate).fromNow()}
                       </small>
                       <div className="bg-[#F1F3FF] py-1 px-3 rounded-xl text-[11px] font-medium text-[#353531]">
                         Delivery timeframe
