@@ -2653,7 +2653,6 @@ const SignupForm = () => {
                   >
                     Terms & Conditions{" "}
                   </a>
-                    (T&Cs)
 
                 </Checkbox>
               </Form.Item>

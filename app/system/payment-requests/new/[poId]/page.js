@@ -801,9 +801,17 @@ export default function NewPaymentRequest({ params }) {
             <div className="flex w-full mt-5">
               <button
                 onClick={() => {
+                  if (files?.length <= 0)
+                    message.error("Please provide atleast one supporting document!");
                   form.validateFields().then(() => {
-                    setSubmitting(true);
-                    handleUpload();
+                    if (files?.length <= 0)
+                      message.error(
+                        "Please provid atlease one supporting document!"
+                      );
+                    else {
+                      setSubmitting(true);
+                      handleUpload();
+                    }
                   });
                 }}
                 disabled={submitting}
@@ -813,7 +821,7 @@ export default function NewPaymentRequest({ params }) {
                 Submit
               </button>
         </div>
-        <div className="flex w-full justify-end items-end self-end">
+        {/* <div className="flex w-full justify-end items-end self-end">
           <button
             onClick={() => {
               if (files?.length <= 0)
@@ -835,7 +843,7 @@ export default function NewPaymentRequest({ params }) {
             <SaveOutlined className="font-[19px]" />
             Save
           </button>
-        </div>
+        </div> */}
         
       </div>
     </div>
