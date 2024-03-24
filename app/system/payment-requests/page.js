@@ -36,8 +36,17 @@ import { encode } from "base-64";
 import { motion } from "framer-motion";
 import PaymentRequestsTable from "@/app/components/paymentRequestsTable";
 import { FiSearch } from "react-icons/fi";
+import { BsFiletypeCsv } from "react-icons/bs";
 import { useUser } from "@/app/context/UserContext";
+import { saveAs } from "file-saver";
 
+function exportToCSV(data, fileName) {
+  const csvHeader = Object.keys(data[0]).join(",");
+  const csvRows = data.map((obj) => Object.values(obj).join(",")).join("\n");
+  const csv = `${csvHeader}\n${csvRows}`;
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  saveAs(blob, fileName);
+}
 export default function UserRequests() {
   let router = useRouter();
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -70,7 +79,7 @@ export default function UserRequests() {
   const [currentUser, setCurrentUser] = useState("");
   const [sourcingMethod, setSourcingMethod] = useState("");
   let [submitting, setSubmitting] = useState(false);
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
 
   useEffect(() => {
     setDataLoaded(false);
@@ -243,6 +252,47 @@ export default function UserRequests() {
     setUpdatingId("");
   }, [dataset]);
 
+  const handleExport = (data) => {
+    console.log("Row data", data);
+
+    let _data = data?.map((d) => {
+      let _docs = "";
+      d?.purchaseOrder?.referenceDocs?.map((doc) => {
+        _docs += doc;
+      });
+      return {
+        id: d?._id,
+        "Request Number": d?.number,
+        Description: d?.description,
+        Title: '"' + d?.title + '"',
+        Amount: d?.amount,
+        Currency: d?.currency,
+        Initator: d?.createdBy?.email,
+        "Level1 Approver": d?.approver?.email && '"' + d?.approver?.email + '"',
+        Status: d?.status,
+        "Internal/External": d?.category,
+        "Bank Name": d?.paymentDetails?.bankName,
+        "Account Name": d?.paymentDetails?.accountName,
+        "Account Number": d?.paymentDetails?.accountNumber,
+        "Phone Name": d?.paymentDetails?.phoneName,
+        "Phone Number": d?.paymentDetails?.phoneNumber,
+        "Created At": d?.createdAt,
+        "Declined At": d?.status == "rejected" && d?.rejectionDate,
+        "Reason for rejection":
+          d?.reasonForRejection && '"' + d?.reasonForRejection + '"',
+        "Level 1 approval date": moment(d?.hod_approvalDate).format(
+          "DD-MMM-YYYY hh:mm a"
+        ),
+        "Head of Finance approval date": moment(d?.hod_approvalDate).format(
+          "DD-MMM-YYYY hh:mm a"
+        ),
+        "Purchase order Number": d?.purchaseOrder?.number,
+        "PO-SAP Transaction Number(s)": _docs,
+      };
+    });
+    exportToCSV(_data, "exported_data.csv");
+  };
+
   return !rowData ? (
     <>
       {contextHolder}
@@ -352,8 +402,19 @@ export default function UserRequests() {
               >
                 New Payment request
               </Button>
-            ) : <div />}
+            ) : (
+              <div />
+            )}
             <div className="flex items-center gap-5">
+              {(user?.permissions?.canApproveAsHod ||
+                user?.permissions?.canApproveAsHof ||
+                user?.permissions?.canApproveAsPM) && (
+                <Button
+                  className="bg-white h-8 px-5 text-[13px] font-semibold text-[#0063CF] pt-1.5"
+                  icon={<BsFiletypeCsv size={18} className="text-[#00AC47]" />}
+                  onClick={() => handleExport(tempDataset)}
+                ></Button>
+              )}
               <Select
                 // mode="tags"
                 className="text-[9px] w-32 rounded-sm"
@@ -386,7 +447,6 @@ export default function UserRequests() {
                 onClick={() => refresh()}
               ></Button>
             </div>
-
           </div>
           {/* <RequestStats totalRequests={dataset?.length}/> */}
           <div className="request mr-6 bg-white h-[calc(100vh-161px)] rounded-lg mb-10 px-5 overflow-y-auto">
@@ -406,10 +466,11 @@ export default function UserRequests() {
                             getMyPendingRequest(e.target.checked);
                           }}
                         />
-                        <div className="text-[13px] text-[#344767]">Awaiting my approval</div>
+                        <div className="text-[13px] text-[#344767]">
+                          Awaiting my approval
+                        </div>
                       </div>
-                    )
-                  }
+                    )}
                   {user?.userType !== "VENDOR" && (
                     <div className="flex flex-row items-center space-x-1">
                       <Checkbox
@@ -417,8 +478,10 @@ export default function UserRequests() {
                         onChange={(e) => {
                           setOnlyMine(e.target.checked);
                         }}
-                        />
-                        <div className="text-[13px] text-[#344767]">My requests</div>
+                      />
+                      <div className="text-[13px] text-[#344767]">
+                        My requests
+                      </div>
                     </div>
                   )}
                 </div>
