@@ -31,7 +31,7 @@ import { decode as base64_decode, encode as base64_encode } from "base-64";
 import Login from "@/public/login.svg";
 import LoginForm from "./loginForm";
 import Link from "next/link";
-import Logo from "@/public/Logo.png";
+import Logo from "@/public/icons/Blue Logo.png";
 import * as _ from "lodash";
 
 const { Option } = Select;
@@ -2640,7 +2640,7 @@ const SignupForm = () => {
                     validator: (_, value) =>
                       value
                         ? Promise.resolve()
-                        : Promise.reject(new Error("Please agree to T&Cs to proceed.")),
+                        : Promise.reject(new Error("Please agree to the T&Cs to proceed.")),
                   },
                 ]}
                 {...tailFormItemLayout}
