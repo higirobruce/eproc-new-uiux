@@ -6,7 +6,7 @@ import LoginText from "../components/loginText";
 import { getIpAddress } from "../helpers/rtc";
 import Login from "@/public/login.svg";
 import Image from 'next/image';
-import Logo from '@/public/Logo.png';
+import Logo from '@/public/icons/Blue Logo.png';
 
 export default function LoginPage() {
   const searchParams = useSearchParams()

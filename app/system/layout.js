@@ -16,7 +16,7 @@ import {
 import Image from "next/image";
 import UserImage from "@/public/favicon.png";
 import { Dropdown } from "antd";
-import Logo from "@/public/Logo.png";
+import Logo from "@/public/icons/Blue Logo.png";
 import { useUser } from "../context/UserContext";
 
 export default function SystemLayout({ children }) {
