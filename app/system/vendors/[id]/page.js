@@ -59,6 +59,7 @@ import { FaFirefoxBrowser } from "react-icons/fa6";
 import { useUser } from "@/app/context/UserContext";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
+let fendUrl = process.env.NEXT_PUBLIC_FTEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
 
@@ -817,49 +818,17 @@ export default function page({ params }) {
                   <div>
                     {rowData?.rdbCertId && (
                       <div>
-                        <div className="flex gap-2">
+                        {/* <div className="flex gap-2">
                           <label className="text-[#6A757B] mb-3">
                             Incorporation document
                           </label>
-                          <div>
-                            <Tooltip
-                              placement="top"
-                              title="Please attach your incorporation document. For businesses registered in Rwanda, please provide your RDB certificate."
-                              arrow={false}
-                            >
-                              <QuestionCircleOutlined />
-                            </Tooltip>
-                          </div>
-                        </div>
-                        <Form.Item
-                          name="rdbRegistraction"
-                          rules={
-                            [
-                              // {
-                              //   validator: (_, value) =>
-                              //     rdbSelected
-                              //       ? Promise.resolve()
-                              //       : Promise.reject(
-                              //           new Error(
-                              //             "Please attach your incorporation document"
-                              //           )
-                              //         ),
-                              // },
-                            ]
-                          }
+                        </div> */}
+                        <Link
+                          href={`${fendUrl}/api/?folder=rdbCerts&name=${rowData?.rdbCertId}.pdf`}
+                          target="_blank"
                         >
-                          <div className="">
-                            <UploadRDCerts
-                              // label="Incorporation Certificate"
-                              iconOnly={true}
-                              setSelected={setRDBSelected}
-                              setId={setRdbCertId}
-                              uuid={rdbCertId}
-                              setStatus={(status) => {}}
-                              uploadingStatus={fileUploadStatus}
-                            />
-                          </div>
-                        </Form.Item>
+                          Incorporation document
+                        </Link>
                       </div>
                     )}
 
@@ -898,49 +867,17 @@ export default function page({ params }) {
                   <div>
                     {rowData?.vatCertId && (
                       <div>
-                        <div className="flex gap-2">
-                          <label className="text-[#6A757B] mb-3">
-                            VAT Certificate
-                          </label>
-                          <div>
-                            <Tooltip
-                              placement="top"
-                              title="Please attach your vat document. For businesses registered in Rwanda, please provide your RDB certificate."
-                              arrow={false}
-                            >
-                              <QuestionCircleOutlined />
-                            </Tooltip>
-                          </div>
-                        </div>
-                        <Form.Item
-                          name="vatRegistraction"
-                          rules={
-                            [
-                              // {
-                              //   validator: (_, value) =>
-                              //     rdbSelected
-                              //       ? Promise.resolve()
-                              //       : Promise.reject(
-                              //           new Error(
-                              //             "Please attach your incorporation document"
-                              //           )
-                              //         ),
-                              // },
-                            ]
-                          }
+                        {/* <div className="flex gap-2">
+                        <label className="text-[#6A757B] mb-3">
+                          Incorporation document
+                        </label>
+                      </div> */}
+                        <Link
+                          href={`${fendUrl}/api/?folder=vatCerts&name=${rowData?.vatCertId}.pdf`}
+                          target="_blank"
                         >
-                          <div className="">
-                            <UploadVatCerts
-                              // label="Incorporation Certificate"
-                              iconOnly={true}
-                              setSelected={setVatSelected}
-                              setId={setVatCertId}
-                              uuid={vatCertId}
-                              setStatus={(status) => {}}
-                              uploadingStatus={fileUploadStatus}
-                            />
-                          </div>
-                        </Form.Item>
+                          VAT Certificate
+                        </Link>
                       </div>
                     )}
 
