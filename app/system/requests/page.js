@@ -37,13 +37,13 @@ import { motion } from "framer-motion";
 import { FiSearch } from "react-icons/fi";
 import { BsFiletypeCsv } from "react-icons/bs";
 import { useUser } from "@/app/context/UserContext";
-import { saveAs } from 'file-saver';
+import { saveAs } from "file-saver";
 
 function exportToCSV(data, fileName) {
-  const csvHeader = Object.keys(data[0]).join(',');
-  const csvRows = data.map(obj => Object.values(obj).join(',')).join('\n');
+  const csvHeader = Object.keys(data[0]).join(",");
+  const csvRows = data.map((obj) => Object.values(obj).join(",")).join("\n");
   const csv = `${csvHeader}\n${csvRows}`;
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
   saveAs(blob, fileName);
 }
 
@@ -734,7 +734,7 @@ export default function UserRequests() {
     contractEndDate,
     signatories,
     reqAttachmentDocId,
-    status,
+    status
   ) {
     fetch(`${url}/contracts/`, {
       method: "POST",
@@ -753,7 +753,7 @@ export default function UserRequests() {
         signatories,
         reqAttachmentDocId,
         request: rowData?._id,
-        status
+        status,
       }),
     })
       .then((res) => getResultFromServer(res))
@@ -863,8 +863,43 @@ export default function UserRequests() {
   }
 
   const handleExport = (data) => {
-    console.log('Row Data ', data)
-    exportToCSV(data, 'exported_data.csv');
+    console.log("Row data", data);
+    let _data = data?.map((d) => {
+      let totalAmount = 0;
+      d?.items?.map((i) => {
+        totalAmount += i?.estimatedUnitCost;
+      });
+
+      return {
+        id: d?._id,
+        "Request Number": d?.number,
+        "Due date": moment(d?.dueDate).format("DD-MMM-YYYY"),
+        Description: d?.description,
+        Title: '"' + d?.title + '"',
+        Amount: totalAmount,
+        Currency: d?.items[0]?.currency,
+        Initator: d?.createdBy?.email,
+        "Approver (department level)": '"' + d?.level1Approver?.email + '"',
+        Budgeted: d?.budgeted ? "YES" : "NO",
+        "Budget Line": '"' + d?.budgetLine?.description + '"',
+        Status: d?.status,
+        "Service Category": '"' + d?.serviceCategory + '"',
+        "Created At": d?.createdAt,
+        "Declined At": d?.declinedBy,
+        "Reason for rejection":
+          d?.reasonForRejection && '"' + d?.reasonForRejection + '"',
+        "Head of Department approval date": moment(d?.hod_approvalDate).format(
+          "DD-MMM-YYYY hh:mm a"
+        ),
+        "Head of Finance approval date": moment(d?.hof_approvalDate).format(
+          "DD-MMM-YYYY hh:mm a"
+        ),
+        "Procurement Manager approval date": moment(d?.pm_approvalDate).format(
+          "DD-MMM-YYYY hh:mm a"
+        ),
+      };
+    });
+    exportToCSV(_data, "exported_data.csv");
   };
 
   return !rowData ? (
@@ -975,8 +1010,7 @@ export default function UserRequests() {
                 className="bg-white h-8 px-5 text-[13px] font-semibold text-[#0063CF] pt-1.5"
                 icon={<BsFiletypeCsv size={18} className="text-[#00AC47]" />}
                 onClick={() => handleExport(tempDataset)}
-              >
-              </Button>
+              ></Button>
               <Select
                 // mode="tags"
                 className="text-[14px] text-[#2c6ad6] w-48 rounded-sm"
