@@ -170,15 +170,18 @@ export default function PurchaseOrders() {
   function refresh() {
     setDataLoaded(false);
     if (user?.userType === "VENDOR") {
-      fetch(`${url}/purchaseOrders/byVendorId/${user?._id}`, {
-        method: "GET",
-        headers: {
-          Authorization:
-            "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
-          token: token,
-          "Content-Type": "application/json",
-        },
-      })
+      fetch(
+        `${url}/purchaseOrders/byVendorId/${user?._id}?status=${searchStatus}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization:
+              "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+            token: token,
+            "Content-Type": "application/json",
+          },
+        }
+      )
         .then((res) => getResultFromServer(res))
         .then((res) => {
           console.log(res);
@@ -191,15 +194,18 @@ export default function PurchaseOrders() {
           setDataLoaded(true);
         });
     } else {
-      fetch(`${url}/purchaseOrders?pagesize=${pageSize}&page=${currentPage}`, {
-        method: "GET",
-        headers: {
-          Authorization:
-            "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
-          token: token,
-          "Content-Type": "application/json",
-        },
-      })
+      fetch(
+        `${url}/purchaseOrders?pagesize=${pageSize}&page=${currentPage}&status=${searchStatus}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization:
+              "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+            token: token,
+            "Content-Type": "application/json",
+          },
+        }
+      )
         .then((res) => getResultFromServer(res))
         .then((res) => {
           setPOs(res?.data);
@@ -704,15 +710,21 @@ export default function PurchaseOrders() {
   const getData = () => {
     let filtered = (tempPOs && tempPOs) || [];
 
-    if (searchStatus !== "all") {
-      if (searchStatus === "pending-signature")
-        filtered =
-          tempPOs &&
-          tempPOs.filter((item) => item.status == searchStatus || !item.status);
-      else
-        filtered =
-          tempPOs && tempPOs.filter((item) => item.status == searchStatus);
-    }
+    // if (searchStatus !== "all") {
+    //   if (searchStatus === "pending-signature")
+    //     filtered =
+    //       tempPOs &&
+    //       tempPOs.filter((item) => item.status == searchStatus || !item.status);
+    //   else if (searchStatus === "signed")
+    //     filtered =
+    //       tempPOs &&
+    //       tempPOs.filter(
+    //         (item) => item.status == "started" || item.status == "signed"
+    //       );
+    //   else
+    //     filtered =
+    //       tempPOs && tempPOs.filter((item) => item.status == searchStatus);
+    // }
 
     return { length: filtered.length, data: filtered };
   };
