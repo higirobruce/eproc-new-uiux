@@ -791,7 +791,7 @@ export default function PurchaseOrders() {
                 // mode="tags"
                 className="text-[14px] text-[#2c6ad6] w-48 rounded-sm"
                 placeholder="Select status"
-                onChange={(value) => setSearchStatus(value)}
+                onChange={(value) => {setCurrentPage(1); setSearchStatus(value)}}
                 value={searchStatus}
                 options={[
                   { value: "all", label: "All" },
