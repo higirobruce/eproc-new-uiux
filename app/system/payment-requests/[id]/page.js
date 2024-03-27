@@ -399,8 +399,7 @@ export default function PaymentRequest({ params }) {
       });
   }, [po]);
 
-  useEffect(() => {
-  }, [files]);
+  useEffect(() => {}, [files]);
 
   function getPoTotalVal() {
     let t = 0;
@@ -685,41 +684,41 @@ export default function PaymentRequest({ params }) {
     let _amount = overrideAmount ? amountOverride : paymentRequest?.amount;
     let _currency = overrideAmount ? "RWF" : paymentRequest?.currency;
 
-    if (paymentRequest?.category === "internal")
-      paymentRequest.journalEntry = {
-        Memo: paymentRequest?.title,
-        ReferenceDate: moment(),
-        JournalEntryLines: [
-          {
-            AccountCode: debitAccount,
+    // if (paymentRequest?.category === "internal")
+    //   paymentRequest.journalEntry = {
+    //     Memo: paymentRequest?.title,
+    //     ReferenceDate: moment(),
+    //     JournalEntryLines: [
+    //       {
+    //         AccountCode: debitAccount,
 
-            // FCCurrency: paymentRequest?.currency,
-            LineMemo: paymentRequest?.title,
-            CostingCode: distributionRuleDb,
-            ...(_currency !== "RWF" && {
-              FCCurrency: _currency,
-              FCDebit: _amount,
-            }),
-            ...(_currency == "RWF" && {
-              Debit: _amount,
-            }),
-          },
-          {
-            AccountCode: creditAccount,
+    //         // FCCurrency: paymentRequest?.currency,
+    //         LineMemo: paymentRequest?.title,
+    //         CostingCode: distributionRuleDb,
+    //         ...(_currency !== "RWF" && {
+    //           FCCurrency: _currency,
+    //           FCDebit: _amount,
+    //         }),
+    //         ...(_currency == "RWF" && {
+    //           Debit: _amount,
+    //         }),
+    //       },
+    //       {
+    //         AccountCode: creditAccount,
 
-            // FCCurrency: _currency,
-            LineMemo: paymentRequest?.title,
-            CostingCode: distributionRuleCr,
-            ...(_currency !== "RWF" && {
-              FCCurrency: _currency,
-              FCCredit: _amount,
-            }),
-            ...(_currency == "RWF" && {
-              Credit: _amount,
-            }),
-          },
-        ],
-      };
+    //         // FCCurrency: _currency,
+    //         LineMemo: paymentRequest?.title,
+    //         CostingCode: distributionRuleCr,
+    //         ...(_currency !== "RWF" && {
+    //           FCCurrency: _currency,
+    //           FCCredit: _amount,
+    //         }),
+    //         ...(_currency == "RWF" && {
+    //           Credit: _amount,
+    //         }),
+    //       },
+    //     ],
+    //   };
 
     let updates = { ...paymentRequest };
 
@@ -743,6 +742,7 @@ export default function PaymentRequest({ params }) {
           message.error(res?.message, 10);
         } else {
           paymentRequest.paymentProofDocs = docIds;
+          alert(JSON.stringify(res?.status));
           refresh();
         }
       })
@@ -2536,11 +2536,10 @@ export default function PaymentRequest({ params }) {
                           <div className="mt-10">
                             <Button
                               loading={saving}
-                              onClick={() =>
-                                paymentForm.validateFields().then(() => {
-                                  handleUpload("paymentProof");
-                                })
-                              }
+                              onClick={() => {
+                                alert("Hello");
+                                handleUpload("paymentProof");
+                              }}
                               type="primary"
                               disabled={!filesProof || filesProof.length == 0}
                             >
