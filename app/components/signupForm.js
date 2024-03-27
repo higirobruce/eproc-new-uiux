@@ -2479,7 +2479,7 @@ const SignupForm = () => {
                   <div>
                     <div className="flex items-center gap-2">
                       <label className="text-[#6A757B]">
-                        Contact Person Title
+                        Contact Person Position
                       </label>
                       <div className="text-red-500">*</div>
                     </div>
@@ -2494,7 +2494,7 @@ const SignupForm = () => {
                       ]}
                     >
                       <Input
-                        placeholder="E.g: Mrs, Mr, Mss"
+                        placeholder="E.g: CEO/MD, Sales rep"
                         className="h-10 mt-1 w-full"
                       />
                     </Form.Item>
