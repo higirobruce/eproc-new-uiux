@@ -443,6 +443,7 @@ const RequestDetails = ({
   const [attachSelected, setAttachSelected] = useState(false);
   const [approvalShow, setApprovalShow] = useState(true);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [emptySignatory, setEmptySignatory] = useState([])
   const contentHeight = useRef();
   const scrollRef = useRef();
 
@@ -2138,6 +2139,11 @@ const RequestDetails = ({
                   return !s?.onBehalfOf || !s?.title || !s?.names || !s?.email;
                 })?.length >= 1
               ) {
+                setEmptySignatory([{email: "",
+                  names: "",
+                  onBehalfOf: "Irembo Ltd",
+                  title: "Procurement Manager"
+                }])
                 messageApi.open({
                   type: "error",
                   content:
@@ -2190,8 +2196,14 @@ const RequestDetails = ({
                   return !s?.onBehalfOf || !s?.title || !s?.names || !s?.email;
                 })?.length >= 1
               ) {
+                setEmptySignatory([{email: "",
+                  names: "",
+                  onBehalfOf: "Irembo Ltd",
+                  title: "Procurement Manager"
+                }])
                 messageApi.open({
                   type: "error",
+                  duration: 10,
                   content:
                     "Contract can not be submitted. Please fill in the relevant signatories' details!",
                 });
@@ -2411,12 +2423,13 @@ const RequestDetails = ({
           </div> */}
 
           {/* Signatories */}
+          {console.log('Signatories 123 ', emptySignatory)}
           <div className="grid grid-cols-3 gap-5">
             {signatories.map((s, index) => {
               return (
                 <div
                   key={index}
-                  className="flex flex-col ring-1 ring-gray-300 rounded py-5"
+                  className={`flex flex-col ring-2 ${emptySignatory && emptySignatory[0]?.onBehalfOf == s?.onBehalfOf ? `ring-red-500` : `ring-gray-300`} rounded py-5`}
                 >
                   <div className="flex flex-row items-start justify-between">
                     <div className="flex flex-col space-y-3 px-5">
@@ -2721,9 +2734,9 @@ const RequestDetails = ({
   };
 
   return (
-    <div className="request-details grid md:grid-cols-5 gap-4 items-start h-screen mb-2 overflow-y-auto">
+    <div className="request-details grid lg:grid-cols-5 gap-4 items-start h-screen mb-2 overflow-y-auto">
       {contextHolder}
-      <div className="md:col-span-4">
+      <div className="lg:col-span-4">
         <div className="flex flex-col ring-1 ring-gray-200 pl-5 pr-8 rounded-lg bg-white border-0">
           {data && (
             <Form form={form}>
@@ -3086,7 +3099,7 @@ const RequestDetails = ({
           {previewAttachmentModal()}
           {createContractMOdal()}
         </div>
-        <div className="md:col-span-4 flex pb-8 flex-col px-6 rounded-lg bg-white mb-24">
+        <div className="md:col-span-4 flex pb-8 flex-col px-6 rounded-lg bg-white lg:mb-24 mb-10">
           <Divider />
           <h4 className="mb-1 text-[15px] mt-0 pt-0">Request Process</h4>
           <div className="-my-3.5">
@@ -3350,7 +3363,7 @@ const RequestDetails = ({
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 w-full">
         <div className="flex flex-col rounded bg-white px-5 shadow">
           <Typography.Title level={5} className="pb-4">
             Workflow tracker
@@ -3465,7 +3478,7 @@ const RequestDetails = ({
           className="bg-white rounded shadow py-1.5"
         >
           <div
-            className="request px-4 max-h-[calc(100vh-665px)] overflow-y-auto"
+            className="request px-4 xl:max-h-[calc(100vh-265px)] max-h-[calc(100vh-65px)] overflow-y-auto"
           >
             <div 
               // Transition duration
