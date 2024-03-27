@@ -742,7 +742,6 @@ export default function PaymentRequest({ params }) {
           message.error(res?.message, 10);
         } else {
           paymentRequest.paymentProofDocs = docIds;
-          alert(JSON.stringify(res?.status));
           refresh();
         }
       })
@@ -2537,7 +2536,6 @@ export default function PaymentRequest({ params }) {
                             <Button
                               loading={saving}
                               onClick={() => {
-                                alert("Hello");
                                 handleUpload("paymentProof");
                               }}
                               type="primary"
