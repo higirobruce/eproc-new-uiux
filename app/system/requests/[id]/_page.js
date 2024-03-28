@@ -79,7 +79,6 @@ export default function page({ params }) {
   let [files, setFiles] = useState([]);
 
   useEffect(() => {
-    alert('fiddded')
     loadData();
   }, []);
 

@@ -355,7 +355,7 @@ const BidList = ({
   function selectBidModal() {
     return (
       <Modal
-        title="Select Bid"
+        title="Bid Selection Decision"
         centered
         open={openSelectBid}
         onOk={() => {
@@ -363,7 +363,7 @@ const BidList = ({
             setOpenSelectBid(false);
             handleSelectBid(selectedBid, evaluationReportId);
           } else {
-            messageApi.error("Please first select the evaluation report!");
+            messageApi.error("Please upload the evaluation report!");
           }
         }}
         width={"30%"}
@@ -373,6 +373,27 @@ const BidList = ({
       >
         <Form>
           <div className="flex flex-col">
+            <span className="my-4">To <b>Select this Bid</b> the following evaluators should first confirm the findings in the attached evaluation report</span>
+            <div className="grid grid-cols1 gap-3 bg-[#FFFBE6] py-4 px-6">
+              {comitee?.map((c) => {
+                return (
+                  <>
+                    <div
+                      key={c.approver}
+                      className="flex flex-row items-center space-x-2 w-full"
+                    >
+                      <UserIcon className="h-4 w-4" />
+                      <div>{c.approver}</div>
+                    </div>
+                    {/* <div className="flex flex-row space-x-2 items-center">
+                <CheckCircleIcon className="cursor-pointer h-5 w-5 text-green-500" />
+                <XCircleIcon className="cursor-pointer h-5 w-5 text-red-500" />
+                <MinusCircleIcon className="cursor-pointer h-5 w-5 text-yellow-500" />
+              </div> */}
+                  </>
+                );
+              })}
+            </div>
             <Typography.Title level={4}>
               Please upload the evaluation report.
             </Typography.Title>
@@ -383,37 +404,6 @@ const BidList = ({
                 setSelected={setFileSelected}
               />
             </Form.Item>
-
-            <Alert
-              banner
-              message={
-                <>
-                  <div className="text-sm mb-2">
-                    The following people should approve of this.
-                  </div>
-                  <div className="grid grid-cols1 gap-3">
-                    {comitee?.map((c) => {
-                      return (
-                        <>
-                          <div
-                            key={c.approver}
-                            className="flex flex-row items-center space-x-2 w-full"
-                          >
-                            <UserIcon className="h-4 w-4" />
-                            <div>{c.approver}</div>
-                          </div>
-                          {/* <div className="flex flex-row space-x-2 items-center">
-                      <CheckCircleIcon className="cursor-pointer h-5 w-5 text-green-500" />
-                      <XCircleIcon className="cursor-pointer h-5 w-5 text-red-500" />
-                      <MinusCircleIcon className="cursor-pointer h-5 w-5 text-yellow-500" />
-                    </div> */}
-                        </>
-                      );
-                    })}
-                  </div>
-                </>
-              }
-            />
           </div>
         </Form>
       </Modal>

@@ -3626,16 +3626,17 @@ const TenderDetails = ({
                     </div>
                   </div>
                 )}
-
-              {user?.userType !== "VENDOR" && (
-                <Tag className="border-0 px-6 py-1.5 mt-2" color="magenta">
-                  {iSubmitted
-                    ? "submitted"
-                    : moment().isAfter(moment(data?.submissionDeadLine))
-                    ? "closed"
-                    : data?.status}
-                </Tag>
-              )}
+              <div className="py-3">
+                {user?.userType !== "VENDOR" && (
+                  <Tag className="border-0 px-6 py-1.5 text-[14.5px] capitalize" color={iSubmitted ? "cyan" : moment().isAfter(moment(data?.submissionDeadLine)) ? "magneta" : "success"}>
+                    {iSubmitted
+                      ? "Submitted"
+                      : moment().isAfter(moment(data?.submissionDeadLine))
+                      ? "Closed"
+                      : data?.status.toString()}
+                  </Tag>
+                )}
+              </div>
             </div>
           )}
         </div>

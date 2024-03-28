@@ -793,7 +793,7 @@ export default function NewPaymentRequest({ params }) {
               </small>
               <Link
                 className="text-[#1677FF] text-[14px]"
-                href={"/system/purchase-orders/" + po?.number}
+                href={"/system/purchase-orders/" + po?._id}
               >
                 {po?.number}
               </Link>
