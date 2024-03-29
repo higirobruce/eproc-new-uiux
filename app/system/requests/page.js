@@ -31,13 +31,14 @@ import React, { useState, useEffect, useRef } from "react";
 import ItemsTable from "../../components/itemsTable";
 import RequestDetails from "../../components/requestDetails";
 import UsersRequestsTable from "../../components/userRequestsTable";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { encode } from "base-64";
 import { motion } from "framer-motion";
 import { FiSearch } from "react-icons/fi";
 import { BsFiletypeCsv } from "react-icons/bs";
 import { useUser } from "@/app/context/UserContext";
 import { saveAs } from "file-saver";
+import { RequestProvider, useRequestContext } from "@/app/context/RequestContext";
 
 function exportToCSV(data, fileName) {
   const csvHeader = Object.keys(data[0]).join(",");
@@ -49,7 +50,15 @@ function exportToCSV(data, fileName) {
 
 export default function UserRequests() {
   const { user, login, logout } = useUser();
+  const searchParams = useSearchParams()
   let router = useRouter();
+  const pagination = searchParams.get('page');
+  const search = searchParams.get('search');
+  const statusFilter = searchParams.get('filter');
+
+  // Context
+  const { page, setPage, filter, setFilter } = useRequestContext();
+
   const [serviceCategories, setServiceCategories] = useState([]);
   let [serviceCategory, setServiceCategory] = useState("");
   let [budgetLines, setBudgetLines] = useState([]);
@@ -81,8 +90,8 @@ export default function UserRequests() {
   let [defaultApprover, setDefaultApprover] = useState({});
   const [editRequest, setEditRequest] = useState(false);
 
-  let [searchStatus, setSearchStatus] = useState("all");
-  let [searchText, setSearchText] = useState("");
+  let [searchStatus, setSearchStatus] = useState(statusFilter ? statusFilter : "all");
+  let [searchText, setSearchText] = useState("offi");
   const [form] = Form.useForm();
   const [onlyMine, setOnlyMine] = useState(
     !user?.permissions?.canApproveAsHof &&
@@ -96,6 +105,11 @@ export default function UserRequests() {
   const [sourcingMethod, setSourcingMethod] = useState("");
   let [files, setFiles] = useState([]);
   let token = typeof window !== "undefined" && localStorage.getItem("token");
+
+  useEffect(() => {
+    setPage(pagination);
+    setFilter(statusFilter)
+  }, [pagination])
 
   useEffect(() => {
     // loadRequests()
@@ -202,7 +216,7 @@ export default function UserRequests() {
             "Something happened fetching budget lines! Please try again.",
         });
       });
-  }, []);
+  }, [search]);
 
   useEffect(() => {
     setDataLoaded(false);
@@ -229,7 +243,7 @@ export default function UserRequests() {
           content: "Something happened! Please try again.",
         });
       });
-  }, [searchStatus, onlyMine]);
+  }, [searchStatus, onlyMine, search]);
 
   useEffect(() => {
     if (searchText === "") {
@@ -252,7 +266,7 @@ export default function UserRequests() {
       setTempDataset(filtered);
       // else setTempDataset(dataset)
     }
-  }, [searchText]);
+  }, [searchText, search]);
 
   function refresh() {
     setDataLoaded(false);
@@ -294,7 +308,7 @@ export default function UserRequests() {
 
   useEffect(() => {
     setUpdatingId("");
-  }, [dataset]);
+  }, [dataset, search]);
 
   const save = (_fileList) => {
     if (values && values[0]) {
@@ -1019,7 +1033,7 @@ export default function UserRequests() {
                 // mode="tags"
                 className="text-[14px] text-[#2c6ad6] w-48 rounded-sm"
                 placeholder="Select status"
-                onChange={(value) => setSearchStatus(value)}
+                onChange={(value) => {setFilter(value); setSearchStatus(value)}}
                 value={searchStatus}
                 options={[
                   // { value: "mine", label: "My requests" },
