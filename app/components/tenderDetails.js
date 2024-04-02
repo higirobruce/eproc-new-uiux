@@ -3628,7 +3628,7 @@ const TenderDetails = ({
                 )}
               <div className="py-3">
                 {user?.userType !== "VENDOR" && (
-                  <Tag className="border-0 px-6 py-1.5 text-[14.5px] capitalize" color={iSubmitted ? "cyan" : moment().isAfter(moment(data?.submissionDeadLine)) ? "magneta" : "success"}>
+                  <Tag className="border-0 px-6 py-1.5 text-[14.5px] capitalize" color={iSubmitted ? "cyan" : moment().isAfter(moment(data?.submissionDeadLine)) ? "magenta" : "success"}>
                     {iSubmitted
                       ? "Submitted"
                       : moment().isAfter(moment(data?.submissionDeadLine))

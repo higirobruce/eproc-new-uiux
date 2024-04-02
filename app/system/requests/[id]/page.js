@@ -1,13 +1,14 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { encode } from "base-64";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { usePr} from 'next/router'
 import { Button, message, Switch, Typography } from "antd";
 import {
   ArrowLeftOutlined,
   EditOutlined,
   EyeOutlined,
-  SaveOutlined,
+  SaveOutlined
 } from "@ant-design/icons";
 import RequestDetails from "../../../components/requestDetails";
 import { motion } from "framer-motion";
@@ -62,6 +63,7 @@ export async function fileExists(filepath) {
 
 export default function page({ params }) {
   let router = useRouter();
+  const [searchParams] = useSearchParams();
   const { user, login, logout } = useUser();
 
   const [messageApi, contextHolder] = message.useMessage();
@@ -527,6 +529,12 @@ export default function page({ params }) {
     }
   }
 
+  const handleGoBack = () => {
+    const queryParams = window.location.href.split("?")[1];
+
+    router.push('/system/requests/?' + queryParams);
+  };
+
   return (
     <>
       {contextHolder}
@@ -543,6 +551,16 @@ export default function page({ params }) {
         }}
         className="flex flex-col mr-5 transition-opacity ease-in-out duration-1000 py-5 flex-1 space-y-3 h-screen"
       >
+        <div className="flex items-center justify-between mr-6 mb-4">
+          <Button
+            className="bg-white h-9 px-5 text-[13px] font-semibold rounded text-[#0063CF]"
+            icon={<ArrowLeftOutlined className="font-[15px]" />}
+            onClick={handleGoBack}
+          >
+            Return to List
+          </Button>
+          <div className="gap-5" />
+        </div>
         {/* <div className="flex flex-row justify-between items-center">
           <div className="flex flex-row space-x-10 items-center">
             <div>

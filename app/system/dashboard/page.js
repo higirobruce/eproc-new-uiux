@@ -19,8 +19,10 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { encode } from "base-64";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { MdFileCopy, MdAttachFile, MdOutlineAllInbox } from "react-icons/md";
+import { MdFileCopy, MdAttachFile, MdOutlineAllInbox, MdOutlinePendingActions, MdOutlinePayments } from "react-icons/md";
 import { FiUsers } from "react-icons/fi";
+import { PiCurrencyCircleDollarFill } from "react-icons/pi";  
+import { Pie, Label, Cell, PieChart, BarChart, Bar, LineChart, Area, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function page() {
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -227,13 +229,288 @@ export default function page() {
       return res.json();
     }
   }
+
+  const departmentExpanditure = [
+    { name: 'CK', value: '400', current: 300 },
+    { name: 'P&C', value: '300', current: 600 },
+    { name: 'Ops', value: '200', current: 700 },
+    { name: 'D&F', value: '500', current: 400 },
+    { name: 'PoC', value: '400', current: 200 },
+    { name: 'UY', value: '300', current: 500 },
+    { name: 'G&I', value: '200', current: 600 },
+    { name: 'H&C', value: '500', current: 400 },
+    { name: 'I&B', value: '400', current: 300 },
+    { name: 'Kos', value: '300', current: 500 },
+    { name: 'L&D', value: '200', current: 300 },
+  ]
+
+  const purchaseData = [
+    { name: 'JAN', value: '400', current: 300 },
+    { name: 'FEB', value: '300', current: 600 },
+    { name: 'MAR', value: '200', current: 700 },
+    { name: 'APR', value: '500', current: 400 },
+    { name: 'MAY', value: '400', current: 200 },
+    { name: 'JUN', value: '300', current: 500 },
+    { name: 'JUL', value: '200', current: 600 },
+    { name: 'AUG', value: '500', current: 400 },
+    { name: 'SEP', value: '400', current: 300 },
+    { name: 'OCT', value: '300', current: 500 },
+    { name: 'NOV', value: '200', current: 300 },
+  ]
+
+  const data = [
+    {
+      name: 'JAN',
+      value: 4000,
+      current: 2400,
+      amt: 2400,
+    },
+    {
+      name: 'FEB',
+      value: 3000,
+      current: 1398,
+      amt: 2210,
+    },
+    {
+      name: 'MAR',
+      value: 2000,
+      current: 9800,
+      amt: 2290,
+    },
+    {
+      name: 'APR',
+      value: 2780,
+      current: 3908,
+      amt: 2000,
+    },
+    {
+      name: 'MAY',
+      value: 1890,
+      current: 4800,
+      amt: 2181,
+    },
+    {
+      name: 'JUN',
+      value: 2390,
+      current: 3800,
+      amt: 2500,
+    },
+    {
+      name: 'JULY',
+      value: 3490,
+      current: 4300,
+      amt: 2100,
+    },
+  ];
+
+  const budgetData = [
+    { name: 'Group A', value: 400 },
+    { name: 'Group B', value: 300 },
+  ];
+  const COLORS = ['#2C7BE5', '#D2DDEC'];
+
+  const CustomYAxisTick = ({ x, y, payload }) => (
+    <g transform={`translate(${x},${y})`}>
+      <text x={0} y={0} dy={16} textAnchor="end" fill="#666" transform="rotate(0)" fontSize={11}>{payload.value + "k"}</text>
+    </g>
+  );
+
   return (
     <>
       {contextHolder}
 
       {dataLoaded ? (
-        <div className="payment-request mt-10 h-screen pb-1 overflow-y-auto">
-          <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4 mr-6 my-5">
+        <div className="request mr-6 bg-white h-[calc(100vh-81px)] rounded-lg mb-10 px-5 overflow-y-auto">
+          <div className="my-5 flex justify-between w-full">
+            <div>
+              <small className="text-[#97ABCA] text-[10px]">Overview</small>
+              <h5 className="text-[#12263F] text-[22px] mb-2 mx-0 mt-0">Dashboards</h5>
+            </div>
+
+          </div>
+          <div className="grid grid-cols-7 gap-x-8 bg-[#F9FAFD] p-4">
+            <div className="col-span-5">
+              <span className="text-[16px] text-[#12263F]">Amount Paid vs Requests over time</span>
+              <div className="bg-white w-full py-3 grid grid-cols-2 justify-center mt-4">
+                <div className="flex flex-col space-y-2 items-center">
+                  <div className="flex items-center gap-x-2">
+                    <div className="w-2 h-2 rounded-full bg-[#2C7BE5]" />
+                    <span className="text-[15px] text-[#6C757D]">Amount Paid</span>
+                  </div>
+                </div>
+                <div className="flex flex-col space-y-2 items-center">
+                  <div className="flex items-center gap-x-2">
+                    <div className="w-2 h-2 rounded-full bg-[#D2DDEC]" />
+                    <span className="text-[15px] text-[#6C757D]">Payment Request</span>
+                  </div>
+                </div>
+              </div>
+              <ResponsiveContainer width="100%" height={260}>
+                <BarChart
+                  data={purchaseData}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                >
+                  <XAxis dataKey="name" tickMargin={20} tick={{ fontSize: 11 }} tickSize={0} axisLine={{ strokeDasharray: '5 5' }} />
+                  <YAxis yAxisId="left" orientation="left" axisLine={false} tickMargin={20} tickSize={0} tick={<CustomYAxisTick />} />
+                  <YAxis yAxisId="right" orientation="right" axisLine={false} tickMargin={20} tickSize={0} tick={{ fontSize: 11 }} />
+                  <Tooltip />
+                  <Bar yAxisId="left" dataKey="value" fill="#2C7BE5" barSize={20} radius={0} />
+                  <Bar yAxisId="right" dataKey="current" fill="#D2DDEC" barSize={20} radius={0} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex flex-col space-y-3 col-span-2">
+              <div className="bg-white flex justify-between items-center py-1 px-4 ring-1 ring-[#EDF2F9] rounded-lg">
+                <div>
+                  <h6 className="text-[#95AAC9] font-light text-[12px] mt-4 mb-6">Total Amount</h6>
+                  <h2 className="text-[#6C757D] text-[20px] font-semibold mt-0">$1,200,000</h2>
+                </div>
+                <PiCurrencyCircleDollarFill size={24} className="text-[#95AAC9]" />
+              </div>
+              <div className="bg-white flex justify-between items-center py-1 px-4 ring-1 ring-[#EDF2F9] rounded-lg">
+                <div>
+                  <h6 className="text-[#95AAC9] font-light text-[12px] mt-4 mb-0">
+                    Total Requests
+                  </h6>
+                  <h2 className="text-[#6C757D] text-[20px] font-semibold mt-4">1,870</h2>
+                </div>
+                <MdOutlinePendingActions size={22} className="text-[#95AAC9]" />
+              </div>
+              <div className="bg-white flex justify-between items-center py-1 px-4 ring-1 ring-[#EDF2F9] rounded-lg">
+                <div>
+                  <h6 className="text-[#95AAC9] font-light text-[12px] mt-4 mb-0">
+                    Average
+                  </h6>
+                  <h2 className="text-[#6C757D] text-[20px] font-semibold mt-4">$640 / requests</h2>
+                </div>
+                <MdOutlinePayments size={24} className="text-[#95AAC9]" />
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-3 space-x-4 mt-5">
+            <div className="col-span-1 bg-[#F9FAFD] flex flex-col justify-between">
+              <div className="m-5">
+                <span className="text-[16px] text-[#12263F]">Budget Comparison</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <ResponsiveContainer width="100%" height={320}>
+                  <PieChart margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                    <Pie
+                      data={budgetData}
+                      cx={130}
+                      cy={120}
+                      startAngle={360}
+                      endAngle={0}
+                      innerRadius={80}
+                      outerRadius={95}
+                      fill="#8884d8"
+                      paddingAngle={2}
+                      dataKey="value"
+                    >
+                      {data.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="flex flex-col bg-white px-6 py-3.5 space-y-3 mr-12 -mt-10">
+                  <span className="text-[13px] text-[#A1A7AD]">Budgeted</span>
+                  <span className="text-[23px] text-[#12263F]"><b>72%</b></span>
+                  <span className="text-[13px] text-[#12263F]"><b>$864k</b>/3360k</span>
+                </div>
+              </div>
+              <div className="w-full flex space-x-5 justify-center mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-4 h-4 bg-[#2C7BE5]" />
+                  <small className="text-[#A2B4D0] font-light">Budgeted</small>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-4 h-4 bg-[#D2DDEC]" />
+                  <small className="text-[#A2B4D0] font-light">Un-Budgeted</small>
+                </div>
+              </div>
+            </div>
+            <div className="w-full col-span-2 bg-[#F9FAFD]">
+              <div className="m-5">
+                <span className="text-[16px] text-[#12263F]">Department Expenditures</span>
+              </div>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={departmentExpanditure}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                >
+                  <XAxis dataKey="name" tickMargin={20} tick={{ fontSize: 11 }} tickSize={0} axisLine={{ strokeDasharray: '5 5' }} />
+                  <YAxis axisLine={false} tickMargin={20} tickSize={0} tick={<CustomYAxisTick />} />
+                  <Tooltip />
+                  <Bar dataKey="value" stackId="a" fill="#6786F5" barSize={20} radius={0} />
+                  <Bar dataKey="current" stackId="a" fill="#D2DDEC" barSize={20} radius={0} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+          <div className="grid grid-cols-5 gap-x-8 bg-[#F9FAFD] py-4 my-4">
+            <div className="col-span-4">
+              <span className="text-[16px] text-[#12263F]">Expense Planning</span>
+              <div className="bg-white w-full py-5 grid grid-cols-2 justify-center mt-4">
+                <div className="flex flex-col space-y-3 items-center">
+                  <div className="flex items-center gap-x-2">
+                    <div className="w-2 h-2 rounded-full bg-[#31D5A6]" />
+                    <span className="text-[15px] text-[#6C757D]">Approved purchase requests</span>
+                  </div>
+                </div>
+                <div className="flex flex-col space-y-3 items-center">
+                  <div className="flex items-center gap-x-2">
+                    <div className="w-2 h-2 rounded-full bg-[#878FF6]" />
+                    <span className="text-[15px] text-[#6C757D]">Payments made</span>
+                  </div>
+                </div>
+              </div>
+              <ResponsiveContainer width="100%" height={280}>
+                <LineChart margin={{ top: 20, right: 30, left: 20, bottom: 5 }} data={data}>
+                  <XAxis dataKey="name" tickMargin={20} tick={{ fontSize: 11 }} tickSize={0} axisLine={{ strokeDasharray: '5 5' }} />
+                  <YAxis axisLine={false} tickMargin={20} tickSize={0} tick={<CustomYAxisTick />} />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="value" stroke="#31D5A6" dot={false} strokeWidth={3} />
+                  <Line type="monotone" dataKey="current" stroke="#878FF6" dot={false} strokeWidth={3} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex flex-col space-y-3 col-span-1">
+              <div className="bg-white flex justify-between items-center py-1 px-4 ring-1 ring-[#EDF2F9] rounded-lg">
+                <div>
+                  <h6 className="text-[#95AAC9] font-light text-[12px] mt-4 mb-6">Request Amount</h6>
+                  <h2 className="text-[#6C757D] text-[20px] font-semibold mt-0">$1,200,000</h2>
+                </div>
+                <PiCurrencyCircleDollarFill size={24} className="text-[#95AAC9]" />
+              </div>
+              <div className="bg-white flex justify-between items-center py-1 px-4 ring-1 ring-[#EDF2F9] rounded-lg">
+                <div>
+                  <div>
+                    <h6 className="text-[#95AAC9] font-light text-[12px] mt-4 mb-0">
+                      Pending Payments
+                    </h6>
+                    <span className="text-[#95AAC9] font-light text-[12px] mt-0 mb-0"> (this week)</span>
+                  </div>
+                  <h2 className="text-[#6C757D] text-[20px] font-semibold mt-4">$85,000</h2>
+                </div>
+                <MdOutlinePendingActions size={22} className="text-[#95AAC9]" />
+              </div>
+              <div className="bg-white flex justify-between items-center py-1 px-4 ring-1 ring-[#EDF2F9] rounded-lg">
+                <div>
+                  <div>
+                    <h6 className="text-[#95AAC9] font-light text-[12px] mt-4 mb-0">
+                      Pending Payments Requests
+                    </h6>
+                    <span className="text-[#95AAC9] font-light text-[12px] mt-0 mb-0"> (this week)</span>
+                  </div>
+                  <h2 className="text-[#6C757D] text-[20px] font-semibold mt-4">10</h2>
+                </div>
+                <MdOutlinePayments size={24} className="text-[#95AAC9]" />
+              </div>
+            </div>
+          </div>
+
+          {/* <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4 mr-6 my-5">
             <div className="bg-white rounded p-5">
               <div className="flex items-center gap-7">
                 <div className="w-16 h-16 flex justify-center items-center rounded-full bg-[#E9EAF5]">
@@ -302,15 +579,15 @@ export default function page() {
                 <h6>Budgeted vs Unbudgeted Breakdown</h6>
               </div>
             </div>
-          </div>
-          <div className="grid lg:grid-cols-2 gap-4 mr-6 my-5">
+          </div> */}
+          {/* <div className="grid lg:grid-cols-2 gap-4 mr-6 my-5">
             <div className="bg-white rounded-lg px-5 h-96">
               <h6>Tenders by Category</h6>
             </div>
             <div className="bg-white rounded-lg px-5 h-96">
               <h6>Tenders by Department</h6>
             </div>
-          </div>
+          </div> */}
         </div>
       ) : (
         <div className="flex items-center justify-center flex-1 h-screen">
