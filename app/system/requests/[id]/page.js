@@ -140,6 +140,8 @@ export default function page({ params }) {
 
       let request = res;
 
+      
+
       request?.supportingDocs?.map(async (doc, i) => {
         let uid = `rc-upload-${moment().milliseconds()}-${i}`;
         let _url = `${url}/file/termsOfReference/${encodeURI(doc)}`;
@@ -164,7 +166,7 @@ export default function page({ params }) {
           setFilesAreSet(true);
         });
       });
-
+      
       // let items = await res?.items?.map(async (item) => {
       //   let paths = await item?.paths?.map(async (path, i) => {
       //     let uid = `rc-upload-${moment().milliseconds()}-${i}`;
@@ -464,7 +466,7 @@ export default function page({ params }) {
         : rowData?.status;
 
     rowData.status = newStatus;
-    rowData.supportingDocs=  _files
+    rowData.supportingDocs = _files;
 
     let reqItems = [...rowData.items];
     // reqItems?.map((v, index) => {
