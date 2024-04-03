@@ -7,6 +7,7 @@ import moment from "moment/moment";
 import { encode } from "base-64";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/app/context/UserContext";
+import UploadOtherFiles from "@/app/components/uploadOtherFiles";
 
 export default function NewRequest() {
   let router = useRouter();
@@ -37,7 +38,8 @@ export default function NewRequest() {
   let [budgetLines, setBudgetLines] = useState([]);
   const [values, setValues] = useState([]);
   let [files, setFiles] = useState([]);
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
+  let [currency, setCurrency] = useState("RWF");
 
   const [form] = Form.useForm();
 
@@ -185,17 +187,19 @@ export default function NewRequest() {
           dueDate,
           description,
           serviceCategory,
-          items: _values,
+          items: values,
           createdBy: user?._id,
           budgeted,
           budgetLine: budgetLine,
           title,
           level1Approver,
+          supportingDocs: _fileList,
+          currency,
         }),
       })
         .then((res) => getResultFromServer(res))
         .then(async (res) => {
-          router.push('/system/requests')
+          router.push("/system/requests");
           setDueDate(null),
             setDescription(""),
             setServiceCategory(""),
@@ -224,7 +228,7 @@ export default function NewRequest() {
                 type: "error",
                 content: "Something happened! Please try again.",
               });
-          });
+            });
         })
         .catch((err) => {
           setConfirmLoading(false);
@@ -240,7 +244,7 @@ export default function NewRequest() {
     }
   };
 
-  const handleUpload = (files) => {
+  const _handleUpload = (files) => {
     if (files?.length < 1) {
       messageApi.error("Please add at least one doc.");
       setConfirmLoading(false);
@@ -285,8 +289,58 @@ export default function NewRequest() {
     }
   };
 
+  const handleUpload = () => {
+    if (files?.length < 1) {
+      messageApi.error("Please add at least one doc?.");
+    } else {
+      // setSaving(true);
+
+      let _files = [];
+      _files = [...files];
+
+      const formData = new FormData();
+      _files.forEach((fileToSave, rowIndex) => {
+        formData.append("files[]", fileToSave);
+      });
+
+      // You can use any AJAX library you like
+      fetch(`${url}/uploads/termsOfReference/`, {
+        method: "POST",
+        body: formData,
+        headers: {
+          Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+          token: token,
+          // "Content-Type": "multipart/form-data",
+        },
+      })
+        .then((res) => res.json())
+        .then((savedFiles) => {
+          let _filenames = savedFiles?.map((f) => {
+            return f?.filename;
+          });
+
+          save(_filenames);
+        })
+        .catch((err) => {
+          console.log(err);
+          messageApi.error("upload failed.");
+        })
+        .finally(() => {
+          // setSaving(false);
+        });
+    }
+  };
+
   const totalAmount = useMemo(() => {
-    return values.reduce((sum, value) => sum + (parseInt(value.estimatedUnitCost == '' ? '0' : value.estimatedUnitCost) * parseInt(value.quantity == '' ? '0' : value.quantity)), 0);
+    return values.reduce(
+      (sum, value) =>
+        sum +
+        parseInt(
+          value.estimatedUnitCost == "" ? "0" : value.estimatedUnitCost
+        ) *
+          parseInt(value.quantity == "" ? "0" : value.quantity),
+      0
+    );
   }, [values]);
 
   return (
@@ -473,7 +527,7 @@ export default function NewRequest() {
                   </div>
                 </div>
               </div>
-              <div className="grid grid-cols-3">
+              <div className="grid grid-cols-3 gap-10">
                 <div>
                   <div className="mb-3">
                     <label>Is this a budgeted request?</label>
@@ -553,15 +607,64 @@ export default function NewRequest() {
                     </div>
                   </div>
                 )}
+
+                <div>
+                  <div className="mb-3">
+                    <label>Purchase Request Currency</label>
+                  </div>
+                  <Form.Item
+                    name="currency"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Currency is required",
+                      },
+                    ]}
+                  >
+                    <Select
+                      defaultValue="RWF"
+                      // disabled={disable}
+                      size="large"
+                      className="w-full"
+                      onChange={(value) => setCurrency(value)}
+                      options={[
+                        {
+                          value: "RWF",
+                          label: "RWF",
+                          key: "RWF",
+                        },
+                        {
+                          value: "USD",
+                          label: "USD",
+                          key: "USD",
+                        },
+                        {
+                          value: "EUR",
+                          label: "EUR",
+                          key: "EUR",
+                        },
+                        {
+                          value: "GBP",
+                          label: "GBP",
+                          key: "GBP",
+                        },
+                      ]}
+                    />
+                  </Form.Item>
+                </div>
               </div>
+
               <div className="flex justify-between items-center">
-                <h3 className="my-5 font-bold text-[15px]">Request specifications</h3>
+                <h3 className="my-5 font-bold text-[15px]">
+                  Request specifications
+                </h3>
                 {/* 
                   Total Currency needs to be worked on in the future
                     
                   {values[0]?.currency && <h4 className="my-5 font-bold text-[14px]">Total: {values[0]?.currency + ' ' + totalAmount.toLocaleString()}</h4>} 
                 */}
               </div>
+
               <ItemsTable
                 setDataSource={setValues}
                 dataSource={values}
@@ -570,14 +673,28 @@ export default function NewRequest() {
                 files={files}
                 setFiles={_setFiles}
               />
+
+              <div className="md:w-1/2 lg:w-1/3">
+                <UploadOtherFiles
+                  label="Supporting Docs"
+                  files={files}
+                  setFiles={setFiles}
+                />
+              </div>
             </Form>
           </div>
           <div className="flex justify-end gap-5 xl:mt-7 md:mt-5 mt-3">
-            <button onClick={() => router.push('/system/requests')} className="cursor-pointer bg-white rounded-lg px-6 py-2 border border-[#0065DD]">
+            <button
+              onClick={() => router.push("/system/requests")}
+              className="cursor-pointer bg-white rounded-lg px-6 py-2 border border-[#0065DD]"
+            >
               <small className="py-0 text-[15px] text-[#0065DD]">Cancel</small>
             </button>
-            <button className="bg-[#0065DD] rounded-lg px-6 py-2 border-none cursor-pointer" onClick={async () => {
+            <button
+              className="bg-[#0065DD] rounded-lg px-6 py-2 border-none cursor-pointer"
+              onClick={async () => {
                 await form.validateFields();
+
                 if (values && values[0]) {
                   let invalidValues = values?.filter(
                     (v) =>
@@ -592,7 +709,8 @@ export default function NewRequest() {
                 } else {
                   messageApi.error("Please add atleast one item!");
                 }
-              }}>
+              }}
+            >
               <small className="py-5 text-[15px] text-white">
                 Submit for Approval
               </small>

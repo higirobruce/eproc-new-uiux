@@ -2,13 +2,13 @@
 import React, { useEffect, useState } from "react";
 import { encode } from "base-64";
 import { useRouter, useSearchParams } from "next/navigation";
-import { usePr} from 'next/router'
+import { usePr } from "next/router";
 import { Button, message, Switch, Typography } from "antd";
 import {
   ArrowLeftOutlined,
   EditOutlined,
   EyeOutlined,
-  SaveOutlined
+  SaveOutlined,
 } from "@ant-design/icons";
 import RequestDetails from "../../../components/requestDetails";
 import { motion } from "framer-motion";
@@ -87,24 +87,44 @@ export default function page({ params }) {
   function loadData() {
     geRequestDetails(params?.id, router, messageApi).then(async (res) => {
       let itemFiles = await res?.items?.map(async (item) => {
-        let paths = await item?.paths?.map(async (path, i) => {
-          let uid = `rc-upload-${moment().milliseconds()}-${i}`;
-          let _url = `${url}/file/termsOfReference/${path}`;
-          let exists = await fileExists(
-            `${url}/check/file/termsOfReference/${path}`
-          );
-          let status = "done";
-          let name = `supporting doc${i + 1}.pdf`;
+        let paths = !(await res?.supportingDocs)
+          ? await item?.paths?.map(async (path, i) => {
+              let uid = `rc-upload-${moment().milliseconds()}-${i}`;
+              let _url = `${url}/file/termsOfReference/${path}`;
+              let exists = await fileExists(
+                `${url}/check/file/termsOfReference/${path}`
+              );
+              let status = "done";
+              // let name = `supporting doc${i + 1}.pdf`;
+              let name = `${path}`;
 
-          let reader = new FileReader();
-          const r = await fetch(_url);
-          const blob = await r.blob();
-          let p = new File([blob], name, { uid });
-          p.uid = uid;
-          p.exists = exists;
-          p.url = _url;
-          return p;
-        });
+              let reader = new FileReader();
+              const r = await fetch(_url);
+              const blob = await r.blob();
+              let p = new File([blob], name, { uid });
+              p.uid = uid;
+              p.exists = exists;
+              p.url = _url;
+              return p;
+            })
+          : await res?.supportingDocs?.map(async (path, i) => {
+              let uid = `rc-upload-${moment().milliseconds()}-${i}`;
+              let _url = `${url}/file/termsOfReference/${path}`;
+              let exists = await fileExists(
+                `${url}/check/file/termsOfReference/${path}`
+              );
+              let status = "done";
+              let name = `${path}`;
+
+              let reader = new FileReader();
+              const r = await fetch(_url);
+              const blob = await r.blob();
+              let p = new File([blob], name, { uid });
+              p.uid = uid;
+              p.exists = exists;
+              p.url = _url;
+              return p;
+            });
         let ps = paths
           ? await Promise.all(paths).then((values) => {
               return values;
@@ -115,25 +135,25 @@ export default function page({ params }) {
         // return paths;
       });
 
-      let items = await res?.items?.map(async (item) => {
-        let paths = await item?.paths?.map(async (path, i) => {
-          let uid = `rc-upload-${moment().milliseconds()}-${i}`;
-          let _url = `${url}/file/termsOfReference/${path}`;
-          let exists = await fileExists(
-            `${url}/check/file/termsOfReference/${path}`
-          );
-          if (exists) return path;
-          else return null;
-        });
-        let ps = paths
-          ? await Promise.all(paths).then((values) => {
-              item.paths = values;
-              return item;
-            })
-          : null;
-        return ps;
-        // return paths;
-      });
+      // let items = await res?.items?.map(async (item) => {
+      //   let paths = await item?.paths?.map(async (path, i) => {
+      //     let uid = `rc-upload-${moment().milliseconds()}-${i}`;
+      //     let _url = `${url}/file/termsOfReference/${path}`;
+      //     let exists = await fileExists(
+      //       `${url}/check/file/termsOfReference/${path}`
+      //     );
+      //     if (exists) return path;
+      //     else return null;
+      //   });
+      //   let ps = paths
+      //     ? await Promise.all(paths).then((values) => {
+      //         item.paths = values;
+      //         return item;
+      //       })
+      //     : null;
+      //   return ps;
+      //   // return paths;
+      // });
       setFileList(await Promise.all(itemFiles).then((values) => values));
       setFiles(await Promise.all(itemFiles).then((values) => values));
       setRowData(res);
@@ -460,8 +480,7 @@ export default function page({ params }) {
       });
   }
 
-  useEffect(() => {
-  }, [files]);
+  useEffect(() => {}, [files]);
 
   const handleUpload = () => {
     let _filesPaths = [...files];
@@ -532,7 +551,7 @@ export default function page({ params }) {
   const handleGoBack = () => {
     const queryParams = window.location.href.split("?")[1];
 
-    router.push('/system/requests/?' + queryParams);
+    router.push("/system/requests/?" + queryParams);
   };
 
   return (
