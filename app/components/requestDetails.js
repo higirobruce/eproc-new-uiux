@@ -3110,61 +3110,54 @@ const RequestDetails = ({
                 <label className="text-[#000000e0] text-[14px]">
                   Supporting Documents
                 </label>
-                {disable &&
-                  filesAreSet &&
-                  (data?.supportingDocs || data?.supportingDocs?.length >= 1 ? (
-                    <div className="flex flex-col">
-                      {data?.supportingDocs?.map((p, i) => {
-                        return (
-                          <div key={i}>
-                            {
-                              <Link
-                                // href={`${url}/file/termsOfReference/${p}`}
-                                href={`${fendUrl}/api?folder=termsOfReference&name=${p}`}
-                                target="_blank"
-                              >
-                                <Typography.Link
-                                  className="flex flex-row items-center space-x-2"
-                                  // onClick={() => {
-                                  //   setPreviewAttachment(!previewAttachment);
-                                  //   setAttachmentId(p);
-                                  // }}
+                {
+                  disable &&
+                    filesAreSet &&
+                    (data?.supportingDocs ||
+                      data?.supportingDocs?.length >= 1) && (
+                      <div className="flex flex-col">
+                        {data?.supportingDocs?.map((p, i) => {
+                          return (
+                            <div key={i}>
+                              {
+                                <Link
+                                  // href={`${url}/file/termsOfReference/${p}`}
+                                  href={`${fendUrl}/api?folder=termsOfReference&name=${p}`}
+                                  target="_blank"
                                 >
-                                  <div>{p} </div>{" "}
-                                  <div>
-                                    <PaperClipIcon className="h-4 w-4" />
-                                  </div>
-                                </Typography.Link>
-                              </Link>
-                            }
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className="items-center justify-center flex flex-col">
-                      <div>
-                        <RectangleStackIcon className="h-5 w-5 text-gray-200" />
+                                  <Typography.Link
+                                    className="flex flex-row items-center space-x-2"
+                                    // onClick={() => {
+                                    //   setPreviewAttachment(!previewAttachment);
+                                    //   setAttachmentId(p);
+                                    // }}
+                                  >
+                                    <div>{p} </div>{" "}
+                                    <div>
+                                      <PaperClipIcon className="h-4 w-4" />
+                                    </div>
+                                  </Typography.Link>
+                                </Link>
+                              }
+                            </div>
+                          );
+                        })}
                       </div>
-                      <div className="text-xs text-gray-400">No docs found</div>
-                    </div>
-                  ))}
+                    )
+                  // (
+                  //   <div className="items-center justify-center flex flex-col">
+                  //     <div>
+                  //       <RectangleStackIcon className="h-5 w-5 text-gray-200" />
+                  //     </div>
+                  //     <div className="text-xs text-gray-400">No docs found</div>
+                  //   </div>
+                  // ))
+                }
 
-                {!disable &&
-                  filesAreSet &&
-                  (data?.supportingDocs || data?.supportingDocs?.length >= 1 ? (
-                    <UploadOtherFiles files={files} setFiles={setFiles} />
-                  ) : (
-                    <div className="items-center justify-center flex flex-col">
-                      <div>
-                        <RectangleStackIcon className="h-5 w-5 text-gray-200" />
-                      </div>
-                      <div className="text-xs text-gray-400">No docs found</div>
-                    </div>
-                  ))}
-
-                {/* {!filesAreSet  && data?.supportingDocs || data?.supportingDocs?.length >= 1 && <Spin indicator={antIcon} />} */}
-                {files?.length==0 && (
+                {(disable && filesAreSet && data?.supportingDocs) ||
+                !disable ? (
+                  <UploadOtherFiles files={files} setFiles={setFiles} />
+                ) : (
                   <div className="items-center justify-center flex flex-col">
                     <div>
                       <RectangleStackIcon className="h-5 w-5 text-gray-200" />
@@ -3172,6 +3165,16 @@ const RequestDetails = ({
                     <div className="text-xs text-gray-400">No docs found</div>
                   </div>
                 )}
+
+                {/* {!filesAreSet  && data?.supportingDocs || data?.supportingDocs?.length >= 1 && <Spin indicator={antIcon} />} */}
+                {/* {files?.length == 0 && (
+                  <div className="items-center justify-center flex flex-col">
+                    <div>
+                      <RectangleStackIcon className="h-5 w-5 text-gray-200" />
+                    </div>
+                    <div className="text-xs text-gray-400">No docs found</div>
+                  </div>
+                )} */}
               </div>
               {!disable && (
                 <div className="flex justify-end gap-5 mb-5">
