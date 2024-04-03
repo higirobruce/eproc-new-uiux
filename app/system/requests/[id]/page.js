@@ -79,62 +79,94 @@ export default function page({ params }) {
   let [filePaths, setFilePaths] = useState([]);
   let [fileList, setFileList] = useState([]);
   let [files, setFiles] = useState([]);
+  let [filesAreSet, setFilesAreSet] = useState(false);
 
   useEffect(() => {
     loadData();
   }, []);
 
   function loadData() {
-    geRequestDetails(params?.id, router, messageApi).then(async (res) => {
-      let itemFiles = await res?.items?.map(async (item) => {
-        let paths = !(await res?.supportingDocs)
-          ? await item?.paths?.map(async (path, i) => {
-              let uid = `rc-upload-${moment().milliseconds()}-${i}`;
-              let _url = `${url}/file/termsOfReference/${path}`;
-              let exists = await fileExists(
-                `${url}/check/file/termsOfReference/${path}`
-              );
-              let status = "done";
-              // let name = `supporting doc${i + 1}.pdf`;
-              let name = `${path}`;
+    geRequestDetails(params?.id, router, messageApi).then((res) => {
+      // let itemFiles = await res?.items?.map(async (item) => {
+      //   let paths = !(await res?.supportingDocs)
+      //     ? await item?.paths?.map(async (path, i) => {
+      //         let uid = `rc-upload-${moment().milliseconds()}-${i}`;
+      //         let _url = `${url}/file/termsOfReference/${path}`;
+      //         let exists = await fileExists(
+      //           `${url}/check/file/termsOfReference/${path}`
+      //         );
+      //         let status = "done";
+      //         // let name = `supporting doc${i + 1}.pdf`;
+      //         let name = `${path}`;
 
-              let reader = new FileReader();
-              const r = await fetch(_url);
-              const blob = await r.blob();
-              let p = new File([blob], name, { uid });
-              p.uid = uid;
-              p.exists = exists;
-              p.url = _url;
-              return p;
-            })
-          : await res?.supportingDocs?.map(async (path, i) => {
-              let uid = `rc-upload-${moment().milliseconds()}-${i}`;
-              let _url = `${url}/file/termsOfReference/${path}`;
-              let exists = await fileExists(
-                `${url}/check/file/termsOfReference/${path}`
-              );
-              let status = "done";
-              let name = `${path}`;
+      //         let reader = new FileReader();
+      //         const r = await fetch(_url);
+      //         const blob = await r.blob();
+      //         let p = new File([blob], name, { uid });
+      //         p.uid = uid;
+      //         p.exists = exists;
+      //         p.url = _url;
+      //         return p;
+      //       })
+      //     : await res?.supportingDocs?.map(async (path, i) => {
+      //         let uid = `rc-upload-${moment().milliseconds()}-${i}`;
+      //         let _url = `${url}/file/termsOfReference/${path}`;
+      //         let exists = await fileExists(
+      //           `${url}/check/file/termsOfReference/${path}`
+      //         );
+      //         let status = "done";
+      //         let name = `${path}`;
 
-              let reader = new FileReader();
-              const r = await fetch(_url);
-              const blob = await r.blob();
-              let p = new File([blob], name, { uid });
-              p.uid = uid;
-              p.exists = exists;
-              p.url = _url;
-              return p;
-            });
-        let ps = paths
-          ? await Promise.all(paths).then((values) => {
-              return values;
-            })
-          : null;
+      //         let reader = new FileReader();
+      //         const r = await fetch(_url);
+      //         const blob = await r.blob();
+      //         let p = new File([blob], name, { uid });
+      //         p.uid = uid;
+      //         p.exists = exists;
+      //         p.url = _url;
+      //         return p;
+      //       });
+      //   let ps = paths
+      //     ? await Promise.all(paths).then((values) => {
+      //         return values;
+      //       })
+      //     : null;
 
-        return ps;
-        // return paths;
+      //   return ps;
+      //   // return paths;
+      // });
+
+      let _files = [...files];
+
+      let request = res;
+
+      
+
+      request?.supportingDocs?.map(async (doc, i) => {
+        let uid = `rc-upload-${moment().milliseconds()}-${i}`;
+        let _url = `${url}/file/termsOfReference/${encodeURI(doc)}`;
+        let status = "done";
+        let name = `${doc}`;
+
+        let response = await fetch(_url);
+        let data = await response.blob();
+
+        getBase64(data).then((result) => {
+          let newFile = new File([data], name, {
+            uid,
+            url: _url,
+            status,
+            name,
+            // type:'pdf'
+          });
+
+          _files.push(newFile);
+          setFiles(_files);
+          setFileList(_files);
+          setFilesAreSet(true);
+        });
       });
-
+      
       // let items = await res?.items?.map(async (item) => {
       //   let paths = await item?.paths?.map(async (path, i) => {
       //     let uid = `rc-upload-${moment().milliseconds()}-${i}`;
@@ -154,11 +186,19 @@ export default function page({ params }) {
       //   return ps;
       //   // return paths;
       // });
-      setFileList(await Promise.all(itemFiles).then((values) => values));
-      setFiles(await Promise.all(itemFiles).then((values) => values));
+      // setFileList(await Promise.all(itemFiles).then((values) => values));
+      // setFiles(await Promise.all(itemFiles).then((values) => values));
       setRowData(res);
     });
   }
+
+  const getBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
 
   function updateStatus(id, status) {
     setLoadingRowData(true);
@@ -426,24 +466,25 @@ export default function page({ params }) {
         : rowData?.status;
 
     rowData.status = newStatus;
+    rowData.supportingDocs = _files;
 
     let reqItems = [...rowData.items];
-    reqItems?.map((v, index) => {
-      if (_files?.length > index) {
-        if (_files[index]?.every((item) => typeof item === "string")) {
-          v.paths = _files[index];
-          return v;
-        } else {
-          // console.log("Uploooooodiiing", _files[index]);
-          // messageApi.error("Something went wrong! Please try again.");\
-          v.paths = null;
-          return v;
-        }
-      } else {
-        v.paths = null;
-        return v;
-      }
-    });
+    // reqItems?.map((v, index) => {
+    //   if (_files?.length > index) {
+    //     if (_files[index]?.every((item) => typeof item === "string")) {
+    //       v.paths = _files[index];
+    //       return v;
+    //     } else {
+    //       // console.log("Uploooooodiiing", _files[index]);
+    //       // messageApi.error("Something went wrong! Please try again.");\
+    //       v.paths = null;
+    //       return v;
+    //     }
+    //   } else {
+    //     v.paths = null;
+    //     return v;
+    //   }
+    // });
 
     fetch(`${url}/requests/${rowData?._id}`, {
       method: "PUT",
@@ -482,7 +523,7 @@ export default function page({ params }) {
 
   useEffect(() => {}, [files]);
 
-  const handleUpload = () => {
+  const __handleUpload = () => {
     let _filesPaths = [...files];
     let __filePaths = [..._filesPaths];
 
@@ -533,6 +574,48 @@ export default function page({ params }) {
             });
         });
       });
+    }
+  };
+
+  const handleUpload = () => {
+    if (files?.length < 1) {
+      messageApi.error("Please add at least one doc?.");
+    } else {
+      // setSaving(true);
+
+      let _files = [];
+      _files = [...files];
+
+      const formData = new FormData();
+      _files.forEach((fileToSave, rowIndex) => {
+        formData.append("files[]", fileToSave);
+      });
+
+      // You can use any AJAX library you like
+      fetch(`${url}/uploads/termsOfReference/`, {
+        method: "POST",
+        body: formData,
+        headers: {
+          Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+          token: token,
+          // "Content-Type": "multipart/form-data",
+        },
+      })
+        .then((res) => res.json())
+        .then((savedFiles) => {
+          let _filenames = savedFiles?.map((f) => {
+            return f?.filename;
+          });
+
+          updateRequest(_filenames);
+        })
+        .catch((err) => {
+          console.log(err);
+          messageApi.error("upload failed.");
+        })
+        .finally(() => {
+          // setSaving(false);
+        });
     }
   };
 
@@ -671,6 +754,7 @@ export default function page({ params }) {
             setFileList={setFileList}
             setFiles={setFiles}
             handleUpload={handleUpload}
+            filesAreSet={filesAreSet}
           />
         )}
       </motion.div>

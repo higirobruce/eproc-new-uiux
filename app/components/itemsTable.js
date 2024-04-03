@@ -324,7 +324,7 @@ const ItemsTable = ({
         {
           title: "Item title",
           dataIndex: "title",
-          width: "25%",
+          // width: "25%",
           editable: !disable,
         },
         {
@@ -336,7 +336,7 @@ const ItemsTable = ({
         {
           title: "Estimated Unit cost",
           dataIndex: "estimatedUnitCost",
-          width: "15%",
+          // width: "15%",
           editable: !disable,
           render: (_, item) => {
             return <div>{item.estimatedUnitCost.toLocaleString()}</div>;
