@@ -606,6 +606,21 @@ export default function PurchaseOrders() {
     };
   }
 
+  function getPoTotalVal2(po) {
+    let t = 0;
+    let tax = 0;
+    po?.items?.map((i) => {
+      t = t + i?.quantity * i?.estimatedUnitCost;
+      if (i.taxGroup === "I1")
+        tax = tax + (i?.quantity * i?.estimatedUnitCost * 18) / 100;
+    });
+    return {
+      totalVal: t,
+      totalTax: tax,
+      grossTotal: t + tax,
+    };
+  }
+
   function handleStartDelivery(po) {
     let _pos = [...pOs];
     // Find item index using _.findIndex (thanks @AJ Richardson for comment)
@@ -791,7 +806,10 @@ export default function PurchaseOrders() {
                 // mode="tags"
                 className="text-[14px] text-[#2c6ad6] w-48 rounded-sm"
                 placeholder="Select status"
-                onChange={(value) => {setCurrentPage(1); setSearchStatus(value)}}
+                onChange={(value) => {
+                  setCurrentPage(1);
+                  setSearchStatus(value);
+                }}
                 value={searchStatus}
                 options={[
                   { value: "all", label: "All" },
@@ -851,6 +869,7 @@ export default function PurchaseOrders() {
               getData()?.length >= 1 &&
               getData()?.data?.map((po, key) => {
                 let t = 0;
+                let gross = getPoTotalVal2(po).grossTotal?.toLocaleString();
                 return (
                   <div className="my-5">
                     <button
@@ -898,11 +917,12 @@ export default function PurchaseOrders() {
                             Total Value
                           </small>
                           <p className="text-[#344767] font-medium text-[14px] py-0 my-0">
-                            {po?.items?.map((i) => {
+                            {/* {po?.items?.map((i) => {
                               let lTot = i?.quantity * i?.estimatedUnitCost;
                               t = t + lTot;
                             })}{" "}
-                            {t.toLocaleString()} {po?.items[0]?.currency}
+                            {t.toLocaleString()} {po?.items[0]?.currency} */}
+                            {gross}
                           </p>
                         </div>
                         <div className="flex flex-col items-start gap-2">
