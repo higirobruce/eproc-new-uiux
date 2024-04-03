@@ -510,7 +510,7 @@ export default function UserRequests() {
                       setSearchText(e?.target?.value);
                     }}
                     placeholder="Search by request#, po#, initiator"
-                    className="border-0 text-[#8392AB] bg-transparent text-[12px] hover:border-none hover:outline-none"
+                    className="border-0 text-[#8392AB] bg-transparent text-[15px] hover:border-none hover:outline-none"
                   />
                   <div></div>
                 </div>
