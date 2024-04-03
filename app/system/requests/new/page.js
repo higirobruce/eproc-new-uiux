@@ -331,18 +331,6 @@ export default function NewRequest() {
     }
   };
 
-  const totalAmount = useMemo(() => {
-    return values.reduce(
-      (sum, value) =>
-        sum +
-        parseInt(
-          value.estimatedUnitCost == "" ? "0" : value.estimatedUnitCost
-        ) *
-          parseInt(value.quantity == "" ? "0" : value.quantity),
-      0
-    );
-  }, [values]);
-
   return (
     <>
       {contextHolder}
@@ -661,7 +649,6 @@ export default function NewRequest() {
                 {/* 
                   Total Currency needs to be worked on in the future
                     
-                  {values[0]?.currency && <h4 className="my-5 font-bold text-[14px]">Total: {values[0]?.currency + ' ' + totalAmount.toLocaleString()}</h4>} 
                 */}
               </div>
 

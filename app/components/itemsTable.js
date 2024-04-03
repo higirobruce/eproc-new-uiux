@@ -13,7 +13,7 @@ import {
 } from "antd";
 import { PaperClipIcon, RectangleStackIcon } from "@heroicons/react/24/outline";
 import moment from "moment";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { v4 } from "uuid";
 import UploadTORs from "./uploadTORs";
 import { FaPlus } from "react-icons/fa6";
@@ -145,6 +145,18 @@ const ItemsTable = ({
     setCount(count - 1);
     setDataSource(newData);
   };
+
+  const totalAmount = useMemo(() => {
+    return dataSource.reduce(
+      (sum, value) =>
+        sum +
+        parseInt(
+          value.estimatedUnitCost == "" ? "0" : value.estimatedUnitCost
+        ) *
+          parseInt(value.quantity == "" ? "0" : value.quantity),
+      0
+    );
+  }, [dataSource, disable]);
 
   const defaultColumns = !noItemDocs
     ? [
@@ -431,18 +443,21 @@ const ItemsTable = ({
   return (
     <>
       <div className="flex flex-col gap-2 request-empty">
-        <div className="flex w-full justify-between items-center">
-          {!disable ? (
-            <Button
-              onClick={handleAdd}
-              className="flex self-start items-center gap-1 border-0 bg-[#EAF1FC] text-[#0065DD] mb-1"
-            >
-              <FaPlus />
-              Row
-            </Button>
-          ) : (
-            <div className="mb-1" />
-          )}
+        <div className="flex items-center justify-between w-full">
+          <div className="flex justify-between items-center">
+            {!disable ? (
+              <Button
+                onClick={handleAdd}
+                className="flex self-start items-center gap-1 border-0 bg-[#EAF1FC] text-[#0065DD] mb-1"
+              >
+                <FaPlus />
+                Row
+              </Button>
+            ) : (
+              <div className="mb-1" />
+            )}
+          </div>
+          <h4 className="my-5 font-bold text-[15px]">Total: {totalAmount.toLocaleString()}</h4>
         </div>
         <Table
           components={components}
