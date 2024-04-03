@@ -522,7 +522,7 @@ export default function Vendors() {
                     setSearchText(e?.target?.value);
                   }}
                   placeholder="Search vendors"
-                  className="border-0 [#8392AB] bg-transparent text-[12px] hover:border-none hover:outline-none"
+                  className="border-0 [#8392AB] bg-transparent text-[15px] hover:border-none hover:outline-none"
                 />
                 <div></div>
               </div>
