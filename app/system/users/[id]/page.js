@@ -491,9 +491,25 @@ export default function page({ params }) {
       });
   }
 
+  const handleGoBack = () => {
+    const queryParams = window.location.href.split("?")[1];
+
+    router.push("/system/users?" + queryParams);
+  };
+
   return (
-    <div className="payment-request flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-screen pb-1 mb-32 overflow-y-auto">
+    <div className="payment-request flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-2 h-screen pb-1 mb-32 overflow-y-auto">
       {contextHolder}
+      <div className="flex items-center justify-between mr-6">
+        <Button
+          className="bg-white h-9 px-5 text-[13px] font-semibold rounded text-[#0063CF]"
+          icon={<ArrowLeftOutlined className="font-[15px]" />}
+          onClick={handleGoBack}
+        >
+          Return to List
+        </Button>
+        <div className="gap-5" />
+      </div>
       <div className="flex flex-col space-y-5">
         {/* <div className="flex flex-row justify-between">
           <div className="flex flex-row items-center space-x-2">

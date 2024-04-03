@@ -31,7 +31,7 @@ import React, { useState, useEffect, useRef } from "react";
 import ItemsTable from "../../components/itemsTable";
 import RequestDetails from "../../components/requestDetails";
 import UsersRequestsTable from "../../components/userRequestsTable";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { encode } from "base-64";
 import { motion } from "framer-motion";
 import PaymentRequestsTable from "@/app/components/paymentRequestsTable";
@@ -39,6 +39,7 @@ import { FiSearch } from "react-icons/fi";
 import { BsFiletypeCsv } from "react-icons/bs";
 import { useUser } from "@/app/context/UserContext";
 import { saveAs } from "file-saver";
+import { usePaymentContext } from "@/app/context/PaymentContext";
 
 function exportToCSV(data, fileName) {
   const csvHeader = Object.keys(data[0]).join(",");
@@ -49,6 +50,14 @@ function exportToCSV(data, fileName) {
 }
 export default function UserRequests() {
   let router = useRouter();
+  const searchParams = useSearchParams()
+  const pagination = searchParams.get('page');
+  const search = searchParams.get('search');
+  const statusFilter = searchParams.get('filter');
+
+  // Routing Context
+  const {setPage, setFilter, filter, page} = usePaymentContext();
+
   const [dataLoaded, setDataLoaded] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
@@ -82,11 +91,16 @@ export default function UserRequests() {
   let token = typeof window !== "undefined" && localStorage.getItem("token");
 
   useEffect(() => {
+    setPage(pagination ? pagination : 1);
+    setFilter(statusFilter ? statusFilter : 'all')
+  }, [pagination])
+
+  useEffect(() => {
     setDataLoaded(false);
     let requestUrl =
       onlyMine || user?.userType === "VENDOR"
-        ? `${url}/paymentRequests/byStatus/${searchStatus}/${user?._id}`
-        : `${url}/paymentRequests/byStatus/${searchStatus}/${null}`;
+        ? `${url}/paymentRequests/byStatus/${filter ? filter : searchStatus}/${user?._id}`
+        : `${url}/paymentRequests/byStatus/${filter ? filter : searchStatus}/${null}`;
     fetch(requestUrl, {
       method: "GET",
       headers: {
@@ -107,7 +121,7 @@ export default function UserRequests() {
           content: "Something happened! Please try again.",
         });
       });
-  }, [searchStatus, onlyMine]);
+  }, [searchStatus, onlyMine, filter]);
 
   useEffect(() => {
     if (searchText === "") {
@@ -173,8 +187,8 @@ export default function UserRequests() {
   async function loadRequests() {
     // setDataLoaded(false);
     let requestUrl = onlyMine
-      ? `${url}/paymentRequests/byStatus/${searchStatus}/${user?._id}`
-      : `${url}/paymentRequests/byStatus/${searchStatus}/${null}`;
+      ? `${url}/paymentRequests/byStatus/${filter ? filter : searchStatus}/${user?._id}`
+      : `${url}/paymentRequests/byStatus/${filter ? filter : searchStatus}/${null}`;
     // let requestUrl =
     //   searchStatus === "mine"
     //     ? `${url}/requests/${user?._id}`
@@ -397,7 +411,7 @@ export default function UserRequests() {
                 icon={<PlusOutlined />}
                 onClick={() => {
                   setSubmitting(true);
-                  router.push("/system/payment-requests/new");
+                  router.push(`/system/payment-requests/new?page=${page}&filter=${filter}`);
                 }}
               >
                 New Payment request
@@ -419,7 +433,11 @@ export default function UserRequests() {
                 // mode="tags"
                 className="text-[9px] w-32 rounded-sm"
                 placeholder="Select status"
-                onChange={(value) => setSearchStatus(value)}
+                onChange={(value) => {
+                  setPage(1);
+                  setFilter(value);
+                  setSearchStatus(value);
+                }}
                 value={searchStatus}
                 options={[
                   // { value: "mine", label: "My requests" },

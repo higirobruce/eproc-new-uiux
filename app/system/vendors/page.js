@@ -52,10 +52,21 @@ import moment from "moment";
 import { motion } from "framer-motion";
 import { FiSearch } from 'react-icons/fi'
 import { useUser } from "@/app/context/UserContext";
+import { useVendorContext } from "@/app/context/VendorContext";
+import { useSearchParams } from "next/navigation";
 
 export default function Vendors() {
   const { user, login, logout } = useUser();
+  const searchParams = useSearchParams();
   // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
+  
+  const pagination = searchParams.get('page');
+  const search = searchParams.get('search');
+  const statusFilter = searchParams.get('filter');
+
+  // Context
+  const { setPage, setFilter, filter, page } = useVendorContext();
+
   let token = typeof window !== 'undefined' && localStorage.getItem("token");
   const [passwordForm] = Form.useForm();
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -79,6 +90,11 @@ export default function Vendors() {
 
   let [searchStatus, setSearchStatus] = useState("all");
   let [searchText, setSearchText] = useState("");
+
+  useEffect(() => {
+    setPage(pagination ? pagination : 1);
+    setFilter(statusFilter ? statusFilter : 'all')
+  }, [pagination, statusFilter])
 
   useEffect(() => {
     loadVendors();
@@ -146,7 +162,7 @@ export default function Vendors() {
 
   useEffect(() => {
     setDataLoaded(false);
-    let requestUrl = `${url}/users/vendors/byStatus/${searchStatus}/`;
+    let requestUrl = `${url}/users/vendors/byStatus/${filter ? filter : searchStatus}/`;
     fetch(requestUrl, {
       method: "GET",
       headers: {
@@ -486,7 +502,11 @@ export default function Vendors() {
                 // mode="tags"
                 className="text-[9px] w-32 rounded-sm"
                 placeholder="Select status"
-                onChange={(value) => setSearchStatus(value)}
+                onChange={(value) => {
+                  setPage(1);
+                  setFilter(value); 
+                  setSearchStatus(value)
+                }}
                 value={searchStatus}
                 options={[
                   { value: "all", label: "All" },
@@ -512,7 +532,7 @@ export default function Vendors() {
               ></Button>
             </div>
           </div>
-          <div className="request mr-6 bg-white rounded-lg h-[calc(100vh-160px)] mb-10 px-5 pb-2 overflow-y-auto">
+          <div className="request mr-6 bg-white rounded-lg h-[calc(100vh-175px)] mb-10 px-5 pb-2 overflow-y-auto">
             <div className="flex justify-between items-center mb-5">
               <h4 className="text-[19px] text-[#344767]">Vendors List</h4>
               <div className="flex items-center rounded-lg bg-[#F5F7FA] p-1.5">
