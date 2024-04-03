@@ -742,7 +742,7 @@ export default function Users() {
                     setSearchText(e?.target?.value);
                   }}
                   placeholder="Search Email, Names"
-                  className="border-0 text-[#8392AB] bg-transparent text-[12px] hover:border-none hover:outline-none"
+                  className="border-0 text-[#8392AB] bg-transparent text-[15px] hover:border-none hover:outline-none"
                 />
                 <div></div>
               </div>
