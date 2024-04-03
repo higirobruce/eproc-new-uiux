@@ -728,7 +728,7 @@ export default function page({ params }) {
               />
             )}
         </div> */}
-        {rowData && filesAreSet && (
+        {rowData && (
           <RequestDetails
             handleUpdateStatus={updateStatus}
             loading={loadingRowData}
@@ -752,6 +752,7 @@ export default function page({ params }) {
             setFileList={setFileList}
             setFiles={setFiles}
             handleUpload={handleUpload}
+            filesAreSet={filesAreSet}
           />
         )}
       </motion.div>

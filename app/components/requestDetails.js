@@ -376,6 +376,7 @@ const RequestDetails = ({
   setFileList,
   setFiles,
   handleUpload,
+  filesAreSet
 }) => {
   const [form] = Form.useForm();
   const router = useRouter();
@@ -3107,7 +3108,7 @@ const RequestDetails = ({
                 <label className="text-[#000000e0] text-[14px]">
                   Supporting Documents
                 </label>
-                {disable &&
+                {disable && filesAreSet &&
                   (data?.supportingDocs || data?.supportingDocs?.length >= 1 ? (
                     <div className="flex flex-col">
                       {data?.supportingDocs?.map((p, i) => {
@@ -3146,7 +3147,7 @@ const RequestDetails = ({
                     </div>
                   ))}
 
-                {!disable &&
+                {!disable && filesAreSet &&
                   (data?.supportingDocs || data?.supportingDocs?.length >= 1 ? (
                     <UploadOtherFiles files={files} setFiles={setFiles} />
                   ) : (
@@ -3157,6 +3158,8 @@ const RequestDetails = ({
                       <div className="text-xs text-gray-400">No docs found</div>
                     </div>
                   ))}
+
+                  {!filesAreSet && <div>loaindg</div>}
               </div>
               {!disable && (
                 <div className="flex justify-end gap-5 mb-5">
