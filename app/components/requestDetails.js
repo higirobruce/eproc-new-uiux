@@ -88,6 +88,8 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import UploadOtherFiles from "./uploadOtherFiles";
 
+const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
+
 let modules = {
   toolbar: [
     [{ header: [1, 2, false] }],
@@ -376,7 +378,7 @@ const RequestDetails = ({
   setFileList,
   setFiles,
   handleUpload,
-  filesAreSet
+  filesAreSet,
 }) => {
   const [form] = Form.useForm();
   const router = useRouter();
@@ -3108,7 +3110,8 @@ const RequestDetails = ({
                 <label className="text-[#000000e0] text-[14px]">
                   Supporting Documents
                 </label>
-                {disable && filesAreSet &&
+                {disable &&
+                  filesAreSet &&
                   (data?.supportingDocs || data?.supportingDocs?.length >= 1 ? (
                     <div className="flex flex-col">
                       {data?.supportingDocs?.map((p, i) => {
@@ -3147,7 +3150,8 @@ const RequestDetails = ({
                     </div>
                   ))}
 
-                {!disable && filesAreSet &&
+                {!disable &&
+                  filesAreSet &&
                   (data?.supportingDocs || data?.supportingDocs?.length >= 1 ? (
                     <UploadOtherFiles files={files} setFiles={setFiles} />
                   ) : (
@@ -3159,7 +3163,15 @@ const RequestDetails = ({
                     </div>
                   ))}
 
-                  {!filesAreSet && <div>loaindg</div>}
+                {/* {!filesAreSet  && data?.supportingDocs || data?.supportingDocs?.length >= 1 && <Spin indicator={antIcon} />} */}
+                {files?.length==0 && (
+                  <div className="items-center justify-center flex flex-col">
+                    <div>
+                      <RectangleStackIcon className="h-5 w-5 text-gray-200" />
+                    </div>
+                    <div className="text-xs text-gray-400">No docs found</div>
+                  </div>
+                )}
               </div>
               {!disable && (
                 <div className="flex justify-end gap-5 mb-5">
