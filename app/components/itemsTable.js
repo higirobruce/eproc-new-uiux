@@ -135,6 +135,7 @@ const ItemsTable = ({
   setFiles,
   editingRequest,
   disable,
+  noItemDocs = true,
 }) => {
   const [count, setCount] = useState(dataSource?.length + 1);
   const [rowForm] = Form.useForm();
@@ -145,162 +146,151 @@ const ItemsTable = ({
     setDataSource(newData);
   };
 
-  const defaultColumns = [
-    {
-      title: "Item title",
-      dataIndex: "title",
-      width: "25%",
-      editable: !disable,
-    },
-    {
-      title: "Quantity",
-      dataIndex: "quantity",
-      width: "15%",
-      editable: !disable,
-    },
-    {
-      title: "Estimated Unit cost",
-      dataIndex: "estimatedUnitCost",
-      width: "15%",
-      editable: !disable,
-      render: (_, item) => {
-        return <div>{item.estimatedUnitCost.toLocaleString()}</div>;
-      },
-    },
-    {
-      title: "Currency",
-      dataIndex: "currency",
-      width: "10%",
-      render: (_, record) => {
-        return (
-          <Select
-            defaultValue={record.currency}
-            disabled={disable}
-            size="large"
-            className="w-full"
-            onChange={(value) => (record.currency = value)}
-            options={[
-              {
-                value: "RWF",
-                label: "RWF",
-                key: "RWF",
-              },
-              {
-                value: "USD",
-                label: "USD",
-                key: "USD",
-              },
-              {
-                value: "EUR",
-                label: "EUR",
-                key: "EUR",
-              },
-              {
-                value: "GBP",
-                label: "GBP",
-                key: "GBP",
-              },
-            ]}
-          />
-        );
-      },
-    },
-    {
-      title: (
-        <div className="flex flex-row space-x-1 items-center">
-          <div>Supporting Docs</div>
-          <Tooltip
-            title="(e.g specs, ToR,... expected in PDF format)"
-            placement="top"
-            arrow={false}
-          >
-            <QuestionCircleOutlined />
-          </Tooltip>
-        </div>
-      ),
-      dataIndex: "attachements",
-      width: "20%",
-      render: (_, record, index) => {
-        return (
-          dataSource?.length >= 1 && (
-            <div>
-              {!disable && (
-                <UploadTORs
-                  uuid={record?.key - 1}
-                  setFileList={setFileList}
-                  fileList={fileList}
-                  files={files}
-                  setFiles={setFiles}
-                  itemFiles={files[index]}
-                  disabled={disable}
-                  setStatus={() => {}}
-                  iconOnly={false}
-                />
-              )}
-              {disable &&
-                (record?.paths || record?.paths?.length >= 1 ? (
-                  <div className="flex flex-col m-2">
-                    {record?.paths?.map((p, i) => {
-                      return (
-                        <div key={p}>
-                          {p && (
-                            <Link
-                              // href={`${url}/file/termsOfReference/${p}`}
-                              href={`${fendUrl}/api?folder=termsOfReference&name=${p}`}
-                              target="_blank"
-                            >
-                              <Typography.Link
-                                className="flex flex-row items-center space-x-2"
-                                // onClick={() => {
-                                //   setPreviewAttachment(!previewAttachment);
-                                //   setAttachmentId(p);
-                                // }}
-                              >
-                                <div>supporting doc{i + 1} </div>{" "}
-                                <div>
-                                  <PaperClipIcon className="h-4 w-4" />
-                                </div>
-                              </Typography.Link>
-                            </Link>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="items-center justify-center flex flex-col">
-                    <div>
-                      <RectangleStackIcon className="h-5 w-5 text-gray-200" />
-                    </div>
-                    <div className="text-xs text-gray-400">No docs found</div>
-                  </div>
-                ))}
-            </div>
-          )
-        );
-      },
-    },
-    {
-      title: "Action",
-      dataIndex: "operation",
-      render: (_, record) =>
-        dataSource?.length >= 1 ? (
-          <div>
-            {disable ? (
-              <MdDeleteOutline
-                className={`${
-                  disable
-                    ? `text-[#b8b5b6] cursor-not-allowed`
-                    : `text-[#F5365C]`
-                }`}
-                size={24}
+  const defaultColumns = !noItemDocs
+    ? [
+        {
+          title: "Item title",
+          dataIndex: "title",
+          width: "25%",
+          editable: !disable,
+        },
+        {
+          title: "Quantity",
+          dataIndex: "quantity",
+          width: "15%",
+          editable: !disable,
+        },
+        {
+          title: "Estimated Unit cost",
+          dataIndex: "estimatedUnitCost",
+          width: "15%",
+          editable: !disable,
+          render: (_, item) => {
+            return <div>{item.estimatedUnitCost.toLocaleString()}</div>;
+          },
+        },
+        {
+          title: "Currency",
+          dataIndex: "currency",
+          width: "10%",
+          render: (_, record) => {
+            return (
+              <Select
+                defaultValue={record.currency}
+                disabled={disable}
+                size="large"
+                className="w-full"
+                onChange={(value) => (record.currency = value)}
+                options={[
+                  {
+                    value: "RWF",
+                    label: "RWF",
+                    key: "RWF",
+                  },
+                  {
+                    value: "USD",
+                    label: "USD",
+                    key: "USD",
+                  },
+                  {
+                    value: "EUR",
+                    label: "EUR",
+                    key: "EUR",
+                  },
+                  {
+                    value: "GBP",
+                    label: "GBP",
+                    key: "GBP",
+                  },
+                ]}
               />
-            ) : (
-              <Popconfirm
-                title="Are you sure?"
-                onConfirm={() => handleDelete(record.key)}
+            );
+          },
+        },
+        {
+          title: (
+            <div className="flex flex-row space-x-1 items-center">
+              <div>Supporting Docs</div>
+              <Tooltip
+                title="(e.g specs, ToR,... expected in PDF format)"
+                placement="top"
+                arrow={false}
               >
-                <a>
+                <QuestionCircleOutlined />
+              </Tooltip>
+            </div>
+          ),
+          dataIndex: "attachements",
+          width: "20%",
+          render: (_, record, index) => {
+            return (
+              dataSource?.length >= 1 && (
+                <div>
+                  {!disable && (
+                    <UploadTORs
+                      uuid={record?.key - 1}
+                      setFileList={setFileList}
+                      fileList={fileList}
+                      files={files}
+                      setFiles={setFiles}
+                      itemFiles={files[index]}
+                      disabled={disable}
+                      setStatus={() => {}}
+                      iconOnly={false}
+                    />
+                  )}
+                  {disable &&
+                    (record?.paths || record?.paths?.length >= 1 ? (
+                      <div className="flex flex-col m-2">
+                        {record?.paths?.map((p, i) => {
+                          return (
+                            <div key={p}>
+                              {p && (
+                                <Link
+                                  // href={`${url}/file/termsOfReference/${p}`}
+                                  href={`${fendUrl}/api?folder=termsOfReference&name=${p}`}
+                                  target="_blank"
+                                >
+                                  <Typography.Link
+                                    className="flex flex-row items-center space-x-2"
+                                    // onClick={() => {
+                                    //   setPreviewAttachment(!previewAttachment);
+                                    //   setAttachmentId(p);
+                                    // }}
+                                  >
+                                    <div>supporting doc{i + 1} </div>{" "}
+                                    <div>
+                                      <PaperClipIcon className="h-4 w-4" />
+                                    </div>
+                                  </Typography.Link>
+                                </Link>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="items-center justify-center flex flex-col">
+                        <div>
+                          <RectangleStackIcon className="h-5 w-5 text-gray-200" />
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          No docs found
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )
+            );
+          },
+        },
+        {
+          title: "Action",
+          dataIndex: "operation",
+          render: (_, record) =>
+            dataSource?.length >= 1 ? (
+              <div>
+                {disable ? (
                   <MdDeleteOutline
                     className={`${
                       disable
@@ -309,13 +299,85 @@ const ItemsTable = ({
                     }`}
                     size={24}
                   />
-                </a>
-              </Popconfirm>
-            )}
-          </div>
-        ) : null,
-    },
-  ];
+                ) : (
+                  <Popconfirm
+                    title="Are you sure?"
+                    onConfirm={() => handleDelete(record.key)}
+                  >
+                    <a>
+                      <MdDeleteOutline
+                        className={`${
+                          disable
+                            ? `text-[#b8b5b6] cursor-not-allowed`
+                            : `text-[#F5365C]`
+                        }`}
+                        size={24}
+                      />
+                    </a>
+                  </Popconfirm>
+                )}
+              </div>
+            ) : null,
+        },
+      ]
+    : [
+        {
+          title: "Item title",
+          dataIndex: "title",
+          width: "25%",
+          editable: !disable,
+        },
+        {
+          title: "Quantity",
+          dataIndex: "quantity",
+          width: "15%",
+          editable: !disable,
+        },
+        {
+          title: "Estimated Unit cost",
+          dataIndex: "estimatedUnitCost",
+          width: "15%",
+          editable: !disable,
+          render: (_, item) => {
+            return <div>{item.estimatedUnitCost.toLocaleString()}</div>;
+          },
+        },
+        {
+          title: "Action",
+          dataIndex: "operation",
+          render: (_, record) =>
+            dataSource?.length >= 1 ? (
+              <div>
+                {disable ? (
+                  <MdDeleteOutline
+                    className={`${
+                      disable
+                        ? `text-[#b8b5b6] cursor-not-allowed`
+                        : `text-[#F5365C]`
+                    }`}
+                    size={24}
+                  />
+                ) : (
+                  <Popconfirm
+                    title="Are you sure?"
+                    onConfirm={() => handleDelete(record.key)}
+                  >
+                    <a>
+                      <MdDeleteOutline
+                        className={`${
+                          disable
+                            ? `text-[#b8b5b6] cursor-not-allowed`
+                            : `text-[#F5365C]`
+                        }`}
+                        size={24}
+                      />
+                    </a>
+                  </Popconfirm>
+                )}
+              </div>
+            ) : null,
+        },
+      ];
 
   const handleAdd = () => {
     let c = dataSource?.length;
@@ -378,7 +440,9 @@ const ItemsTable = ({
               <FaPlus />
               Row
             </Button>
-          ) : <div className="mb-1" />}
+          ) : (
+            <div className="mb-1" />
+          )}
         </div>
         <Table
           components={components}
