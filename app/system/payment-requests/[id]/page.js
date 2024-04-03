@@ -852,6 +852,12 @@ export default function PaymentRequest({ params }) {
     setActiveIndex((prevIndex) => (prevIndex === value ? "" : value));
   };
 
+  const handleGoBack = () => {
+    const queryParams = window.location.href.split("?")[1];
+
+    router.push("/system/payment-requests?" + queryParams);
+  };
+
   const conditions =
     (paymentRequest?.createdBy?._id === user?._id &&
       (paymentRequest?.status == "pending-review" ||
@@ -877,6 +883,16 @@ export default function PaymentRequest({ params }) {
       className="flex flex-col mr-5 transition-opacity ease-in-out duration-1000 py-5 flex-1 space-y-3 h-screen mb-10"
     >
       {contextHolder}
+      <div className="flex items-center justify-between mr-6 mb-4">
+        <Button
+          className="bg-white h-9 px-5 text-[13px] font-semibold rounded text-[#0063CF]"
+          icon={<ArrowLeftOutlined className="font-[15px]" />}
+          onClick={handleGoBack}
+        >
+          Return to List
+        </Button>
+        <div className="gap-5" />
+      </div>
       <div className="request-details gap-4 mb-6 items-start h-[calc(100vh-200px)] overflow-y-auto">
         <div className="grid md:grid-cols-5 gap-1 items-start">
           <div className="md:col-span-4 flex flex-col bg-white p-5 space-y-5 pb-5 rounded-xl">

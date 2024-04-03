@@ -38,7 +38,7 @@ import { FiSearch } from "react-icons/fi";
 import { BsFiletypeCsv } from "react-icons/bs";
 import { useUser } from "@/app/context/UserContext";
 import { saveAs } from "file-saver";
-import { RequestProvider, useRequestContext } from "@/app/context/RequestContext";
+import { useRequestContext } from "@/app/context/RequestContext";
 
 function exportToCSV(data, fileName) {
   const csvHeader = Object.keys(data[0]).join(",");
@@ -57,7 +57,7 @@ export default function UserRequests() {
   const statusFilter = searchParams.get('filter');
 
   // Context
-  const { page, setPage, filter, setFilter } = useRequestContext();
+  const { setPage, setFilter, filter, page } = useRequestContext();
 
   const [serviceCategories, setServiceCategories] = useState([]);
   let [serviceCategory, setServiceCategory] = useState("");
@@ -105,11 +105,11 @@ export default function UserRequests() {
   const [sourcingMethod, setSourcingMethod] = useState("");
   let [files, setFiles] = useState([]);
   let token = typeof window !== "undefined" && localStorage.getItem("token");
-
+  
   useEffect(() => {
-    setPage(pagination);
-    setFilter(statusFilter)
-  }, [pagination])
+    setPage(pagination ? pagination : 1);
+    setFilter(statusFilter ? statusFilter : 'all')
+  }, [pagination, statusFilter])
 
   useEffect(() => {
     // loadRequests()
@@ -221,8 +221,8 @@ export default function UserRequests() {
   useEffect(() => {
     setDataLoaded(false);
     let requestUrl = onlyMine
-      ? `${url}/requests/byStatus/${searchStatus}/${user?._id}`
-      : `${url}/requests/byStatus/${searchStatus}/${null}`;
+      ? `${url}/requests/byStatus/${filter ? filter : searchStatus}/${user?._id}`
+      : `${url}/requests/byStatus/${filter ? filter : searchStatus}/${null}`;
     fetch(requestUrl, {
       method: "GET",
       headers: {
@@ -243,7 +243,7 @@ export default function UserRequests() {
           content: "Something happened! Please try again.",
         });
       });
-  }, [searchStatus, onlyMine, search]);
+  }, [searchStatus, onlyMine, search, filter]);
 
   useEffect(() => {
     if (searchText === "") {
@@ -289,8 +289,8 @@ export default function UserRequests() {
   async function loadRequests() {
     // setDataLoaded(false);
     let requestUrl = onlyMine
-      ? `${url}/requests/byStatus/${searchStatus}/${user?._id}`
-      : `${url}/requests/byStatus/${searchStatus}/${null}`;
+      ? `${url}/requests/byStatus/${filter ? filter : searchStatus}/${user?._id}`
+      : `${url}/requests/byStatus/${filter ? filter : searchStatus}/${null}`;
     // let requestUrl =
     //   searchStatus === "mine"
     //     ? `${url}/requests/${user?._id}`
@@ -1014,7 +1014,7 @@ export default function UserRequests() {
               onClick={() => {
                 form.resetFields();
 
-                router.push("/system/requests/new");
+                router.push(`/system/requests/new?page=${page}&filter=${filter}`);
               }}
             >
               New request
@@ -1033,7 +1033,11 @@ export default function UserRequests() {
                 // mode="tags"
                 className="text-[14px] text-[#2c6ad6] w-48 rounded-sm"
                 placeholder="Select status"
-                onChange={(value) => {setFilter(value); setSearchStatus(value)}}
+                onChange={(value) => {
+                  setPage(1);
+                  setFilter(value); 
+                  setSearchStatus(value)
+                }}
                 value={searchStatus}
                 options={[
                   // { value: "mine", label: "My requests" },

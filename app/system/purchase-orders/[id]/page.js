@@ -1,5 +1,6 @@
 "use client";
 import {
+  ArrowLeftOutlined,
   CloseCircleOutlined,
   EditOutlined,
   EyeOutlined,
@@ -497,6 +498,12 @@ export default function page({ params }) {
     }
   }
 
+  const handleGoBack = () => {
+    const queryParams = window.location.href.split("?")[1];
+
+    router.push('/system/payment-requests?' + queryParams);
+  };
+
   return (
     <div className="flex flex-col p-3">
       {contextHolder}
@@ -506,6 +513,16 @@ export default function page({ params }) {
         icon={<PrinterOutlined />}
         className="self-end"
       ></Button> */}
+      <div className="flex items-center justify-between mr-6 mb-4">
+          <Button
+            className="bg-white h-9 px-5 text-[13px] font-semibold rounded text-[#0063CF]"
+            icon={<ArrowLeftOutlined className="font-[15px]" />}
+            onClick={handleGoBack}
+          >
+            Return to List
+          </Button>
+          <div className="gap-5" />
+        </div>
       <div className="request space-y-10 px-20 overflow-auto h-[calc(100vh-165px)] bg-white mr-6 py-10 shadow-md">
         <div className="flex flex-row justify-between items-center">
           <Typography.Title level={4} className="flex flex-row items-center">

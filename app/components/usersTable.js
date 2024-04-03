@@ -20,6 +20,7 @@ import {
   LoadingOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
+import { useInternalContext } from "../context/InternalContext";
 
 const UsersTable = ({
   dataSet,
@@ -32,6 +33,7 @@ const UsersTable = ({
   const [form] = Form.useForm();
   const [data, setData] = useState(dataSet);
   const antIcon = <LoadingOutlined style={{ fontSize: 9 }} spin />;
+  const {page, setPage, filter} = useInternalContext()
 
   const cancel = () => {
     setEditingKey("");
@@ -58,7 +60,7 @@ const UsersTable = ({
           <div
             className="cursor-pointer space-x-1 flex flex-row items-center text-blue-500 hover:underline"
             onClick={() => {
-              router.push(`/system/users/${record._id}`);
+              router.push(`/system/users/${record._id}?page=${page}&filter=${filter}`);
               // if(!record?.permissions) record.permissions={}
               // handleSetRow(record)
             }}
@@ -179,9 +181,7 @@ const UsersTable = ({
         dataSource={data}
         columns={columns}
         rowClassName="editable-row"
-        // pagination={{
-        //   onChange: cancel,
-        // }}
+        pagination={{defaultCurrent: page ? +page : 1, onChange: (page, pageSize) => setPage(page)}}
       />
     </Form>
   );

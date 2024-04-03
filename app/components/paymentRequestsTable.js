@@ -20,6 +20,7 @@ import moment from "moment/moment";
 import Highlighter from "react-highlight-words";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { usePaymentContext } from "../context/PaymentContext";
 
 const PaymentRequestsTable = ({
   dataSet,
@@ -35,6 +36,7 @@ const PaymentRequestsTable = ({
   const [data, setData] = useState(dataSet);
   let [selectedRow, setSelectedRow] = useState("");
   const antIcon = <LoadingOutlined style={{ fontSize: 9 }} spin />;
+  const {page, setPage, filter} = usePaymentContext()
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
@@ -189,7 +191,7 @@ const PaymentRequestsTable = ({
             onClick={() => {
               // handleSetRow(record);
               handleSubmitting(true);
-              router.push(`/system/payment-requests/${record?._id}`);
+              router.push(`/system/payment-requests/${record?._id}?page=${page}&filter=${filter}`);
             }}
           >
             <div>
@@ -214,7 +216,7 @@ const PaymentRequestsTable = ({
               // handleSetRow(record);
               handleSubmitting(true);
               router.push(
-                `/system/purchase-orders/${record?.purchaseOrder?._id}`
+                `/system/purchase-orders/${record?.purchaseOrder?._id}/?page=${page}&filter=${filter}`
               );
             }}
           >
@@ -385,9 +387,7 @@ const PaymentRequestsTable = ({
         dataSource={data}
         columns={columns}
         className="shadow-lg rounded-md"
-        // pagination={{
-        //   pageSize: 20,
-        // }}
+        pagination={{defaultCurrent: page ? +page : 1, onChange: (page, pageSize) => setPage(page)}}
       />
     </Form>
   );

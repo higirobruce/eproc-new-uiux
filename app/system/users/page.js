@@ -54,15 +54,25 @@ import {
 } from "@heroicons/react/24/outline";
 import PermissionsTable from "../../components/permissionsTable";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FiSearch } from "react-icons/fi";
 import { useUser } from "@/app/context/UserContext";
+import { useInternalContext } from "@/app/context/InternalContext";
 
 export default function Users() {
   const { user, login, logout } = useUser();
   // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
   let router = useRouter();
+  const searchParams = useSearchParams()
   let token = typeof window !== "undefined" && localStorage.getItem("token");
+  
+  const pagination = searchParams.get('page');
+  const search = searchParams.get('search');
+  const statusFilter = searchParams.get('filter');
+
+  // Routing Context
+  const {setPage, setFilter, filter} = useInternalContext();
+  
   const [dataLoaded, setDataLoaded] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
@@ -94,6 +104,11 @@ export default function Users() {
     "canViewRequests",
     "canCreateRequests",
   ]);
+
+  useEffect(() => {
+    setPage(pagination ? pagination : 1);
+    setFilter(statusFilter ? statusFilter : 'all')
+  }, [pagination, statusFilter])
 
   const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -180,7 +195,7 @@ export default function Users() {
 
   useEffect(() => {
     setDataLoaded(false);
-    let requestUrl = `${url}/users/internal/byStatus/${searchStatus}/`;
+    let requestUrl = `${url}/users/internal/byStatus/${filter ? filter : searchStatus}/`;
     fetch(requestUrl, {
       method: "GET",
       headers: {
@@ -704,7 +719,11 @@ export default function Users() {
                 // mode="tags"
                 className="text-[9px] w-32 rounded-sm"
                 placeholder="Select status"
-                onChange={(value) => setSearchStatus(value)}
+                onChange={(value) => {
+                  setPage(1);
+                  setFilter(value); 
+                  setSearchStatus(value)
+                }}
                 value={searchStatus}
                 options={[
                   { value: "all", label: "All" },
