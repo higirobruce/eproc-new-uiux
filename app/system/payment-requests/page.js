@@ -438,7 +438,7 @@ export default function UserRequests() {
                   setFilter(value);
                   setSearchStatus(value);
                 }}
-                value={searchStatus}
+                value={filter ? filter : searchStatus}
                 options={[
                   // { value: "mine", label: "My requests" },
                   { value: "all", label: "All requests" },

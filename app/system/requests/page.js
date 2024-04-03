@@ -1033,12 +1033,13 @@ export default function UserRequests() {
                 // mode="tags"
                 className="text-[14px] text-[#2c6ad6] w-48 rounded-sm"
                 placeholder="Select status"
+                
                 onChange={(value) => {
                   setPage(1);
                   setFilter(value); 
                   setSearchStatus(value)
                 }}
-                value={searchStatus}
+                value={filter ? filter : searchStatus}
                 options={[
                   // { value: "mine", label: "My requests" },
                   { value: "all", label: "All Requests" },
