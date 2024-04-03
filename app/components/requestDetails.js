@@ -555,7 +555,6 @@ const RequestDetails = ({
   let [budgetLines, setBudgetLines] = useState([]);
 
   useEffect(() => {
-    console.log("jiiiii", files);
     refresh();
     let _openConfirmDeliv = [...openConfirmDeliv];
     let _deliveredQties = [...deliveredQties];
@@ -2930,7 +2929,12 @@ const RequestDetails = ({
                             .toLowerCase()
                             .includes(inputValue.toLowerCase());
                         }}
-                        options={[{ label: "RWF", value: "RWF" }]}
+                        options={[
+                          { label: "RWF", value: "RWF" },
+                          { label: "USD", value: "USD" },
+                          { label: "EUR", value: "EUR" },
+                          { label: "GBP", value: "GBP" },
+                        ]}
                       ></Select>
                     </Form.Item>
                   </div>
@@ -3108,8 +3112,8 @@ const RequestDetails = ({
                     <div className="flex flex-col">
                       {data?.supportingDocs?.map((p, i) => {
                         return (
-                          <div key={p}>
-                            {p && (
+                          <div key={i}>
+                            {
                               <Link
                                 // href={`${url}/file/termsOfReference/${p}`}
                                 href={`${fendUrl}/api?folder=termsOfReference&name=${p}`}
@@ -3128,7 +3132,7 @@ const RequestDetails = ({
                                   </div>
                                 </Typography.Link>
                               </Link>
-                            )}
+                            }
                           </div>
                         );
                       })}
@@ -3144,20 +3148,7 @@ const RequestDetails = ({
 
                 {!disable &&
                   (data?.supportingDocs || data?.supportingDocs?.length >= 1 ? (
-                    <div className="flex flex-col">
-                      {data?.supportingDocs?.map((p, i) => {
-                        return (
-                          <div key={p}>
-                            {p && (
-                              <UploadOtherFiles
-                                files={files}
-                                setFiles={setFiles}
-                              />
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
+                    <UploadOtherFiles files={files} setFiles={setFiles} />
                   ) : (
                     <div className="items-center justify-center flex flex-col">
                       <div>
