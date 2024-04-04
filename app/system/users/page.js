@@ -724,7 +724,7 @@ export default function Users() {
                   setFilter(value); 
                   setSearchStatus(value)
                 }}
-                value={searchStatus}
+                value={filter ? filter : searchStatus}
                 options={[
                   { value: "all", label: "All" },
                   // {
