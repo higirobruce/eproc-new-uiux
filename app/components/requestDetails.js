@@ -3112,13 +3112,12 @@ const RequestDetails = ({
                 </label>
                 {
                   disable &&
-                    filesAreSet &&
                     (data?.supportingDocs ||
                       data?.supportingDocs?.length >= 1) && (
                       <div className="flex flex-col">
                         {data?.supportingDocs?.map((p, i) => {
                           return (
-                            <div key={i}>
+                            <div key={p}>
                               {
                                 <Link
                                   // href={`${url}/file/termsOfReference/${p}`}
@@ -3153,11 +3152,12 @@ const RequestDetails = ({
                   //   </div>
                   // ))
                 }
-
-                {(disable && filesAreSet && data?.supportingDocs) ||
-                !disable ? (
+                {!disable && data?.supportingDocs && (
                   <UploadOtherFiles files={files} setFiles={setFiles} />
-                ) : (
+                )}
+
+                {(!data?.supportingDocs ||
+                  data?.supportingDocs?.length == 0) && (
                   <div className="items-center justify-center flex flex-col">
                     <div>
                       <RectangleStackIcon className="h-5 w-5 text-gray-200" />
