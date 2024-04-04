@@ -90,85 +90,59 @@ export default function page({ params }) {
     loadData();
   }, []);
 
+
   function loadData() {
-    geRequestDetails(params?.id, router, messageApi).then((res) => {
-      // let itemFiles = await res?.items?.map(async (item) => {
-      //   let paths = !(await res?.supportingDocs)
-      //     ? await item?.paths?.map(async (path, i) => {
-      //         let uid = `rc-upload-${moment().milliseconds()}-${i}`;
-      //         let _url = `${url}/file/termsOfReference/${path}`;
-      //         let exists = await fileExists(
-      //           `${url}/check/file/termsOfReference/${path}`
-      //         );
-      //         let status = "done";
-      //         // let name = `supporting doc${i + 1}.pdf`;
-      //         let name = `${path}`;
+    geRequestDetails(params?.id, router, messageApi).then(async (res) => {
+      let paths = await res?.supportingDocs?.map(async (path, i) => {
+            let uid = `rc-upload-${moment().milliseconds()}-${i}`;
+            let _url = `${url}/file/termsOfReference/${path}`;
+            let exists = await fileExists(
+              `${url}/check/file/termsOfReference/${path}`
+            );
+            let status = "done";
+            let name = `${path}`;
 
-      //         let reader = new FileReader();
-      //         const r = await fetch(_url);
-      //         const blob = await r.blob();
-      //         let p = new File([blob], name, { uid });
-      //         p.uid = uid;
-      //         p.exists = exists;
-      //         p.url = _url;
-      //         return p;
-      //       })
-      //     : await res?.supportingDocs?.map(async (path, i) => {
-      //         let uid = `rc-upload-${moment().milliseconds()}-${i}`;
-      //         let _url = `${url}/file/termsOfReference/${path}`;
-      //         let exists = await fileExists(
-      //           `${url}/check/file/termsOfReference/${path}`
-      //         );
-      //         let status = "done";
-      //         let name = `${path}`;
-
-      //         let reader = new FileReader();
-      //         const r = await fetch(_url);
-      //         const blob = await r.blob();
-      //         let p = new File([blob], name, { uid });
-      //         p.uid = uid;
-      //         p.exists = exists;
-      //         p.url = _url;
-      //         return p;
-      //       });
-      //   let ps = paths
-      //     ? await Promise.all(paths).then((values) => {
-      //         return values;
-      //       })
-      //     : null;
-
-      //   return ps;
-      //   // return paths;
-      // });
-
-      let _files = [...files];
-
-      let request = res;
-
-      request?.supportingDocs?.map(async (doc, i) => {
-        let uid = `rc-upload-${moment().milliseconds()}-${i}`;
-        let _url = `${url}/file/termsOfReference/${encodeURI(doc)}`;
-        let status = "done";
-        let name = `${doc}`;
-
-        let response = await fetch(_url);
-        let data = await response.blob();
-
-        getBase64(data).then((result) => {
-          let newFile = new File([data], name, {
-            uid,
-            url: _url,
-            status,
-            name,
-            // type:'pdf'
+            let reader = new FileReader();
+            const r = await fetch(_url);
+            const blob = await r.blob();
+            let p = new File([blob], name, { uid });
+            p.uid = uid;
+            p.exists = exists;
+            p.url = _url;
+            return p;
           });
+      let ps = paths
+        ? await Promise.all(paths).then((values) => {
+            return values;
+          })
+        : null;
 
-          _files.push(newFile);
-          setFiles(_files);
-          setFileList(_files);
-          setFilesAreSet(true);
-        });
-      });
+
+      // request?.supportingDocs?.map(async (doc, i) => {
+      //   let uid = `rc-upload-${moment().milliseconds()}-${i}`;
+      //   let _url = `${url}/file/termsOfReference/${encodeURI(doc)}`;
+      //   let status = "done";
+      //   let name = `${doc}`;
+
+      //   let response = await fetch(_url);
+      //   let data = await response.blob();
+
+      //   getBase64(data).then((result) => {
+      //     let newFile = new File([data], name, {
+      //       uid,
+      //       url: _url,
+      //       status,
+      //       name,
+      //       // type:'pdf'
+      //     });
+
+      //     _files.push(newFile);
+
+      //     setFiles(_files);
+      //     setFileList(_files);
+      //     setFilesAreSet(true);
+      //   });
+      // });
 
       // let items = await res?.items?.map(async (item) => {
       //   let paths = await item?.paths?.map(async (path, i) => {
@@ -189,8 +163,8 @@ export default function page({ params }) {
       //   return ps;
       //   // return paths;
       // });
-      // setFileList(await Promise.all(itemFiles).then((values) => values));
-      // setFiles(await Promise.all(itemFiles).then((values) => values));
+      setFileList(await Promise.all(paths).then((values) => values));
+      setFiles(await Promise.all(paths).then((values) => values));
       setRowData(res);
     });
   }
