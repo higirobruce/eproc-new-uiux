@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Fragment } from "react";
 import { encode } from "base-64";
 import { useRouter, useSearchParams } from "next/navigation";
 import { usePr } from "next/router";
@@ -14,6 +14,10 @@ import RequestDetails from "../../../components/requestDetails";
 import { motion } from "framer-motion";
 import moment from "moment";
 import { useUser } from "@/app/context/UserContext";
+import { Dialog, Transition } from "@headlessui/react";
+import { XMarkIcon } from "@heroicons/react/24/outline";
+import { TiInfoLarge } from "react-icons/ti";
+import Link from 'next/link';
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
@@ -65,7 +69,7 @@ export default function page({ params }) {
   let router = useRouter();
   const [searchParams] = useSearchParams();
   const { user, login, logout } = useUser();
-
+  const [show, setShow] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
   let [loadingRowData, setLoadingRowData] = useState(false);
@@ -80,6 +84,7 @@ export default function page({ params }) {
   let [fileList, setFileList] = useState([]);
   let [files, setFiles] = useState([]);
   let [filesAreSet, setFilesAreSet] = useState(false);
+  const [tab, setTab] = useState(0);
 
   useEffect(() => {
     loadData();
@@ -140,8 +145,6 @@ export default function page({ params }) {
 
       let request = res;
 
-      
-
       request?.supportingDocs?.map(async (doc, i) => {
         let uid = `rc-upload-${moment().milliseconds()}-${i}`;
         let _url = `${url}/file/termsOfReference/${encodeURI(doc)}`;
@@ -166,7 +169,7 @@ export default function page({ params }) {
           setFilesAreSet(true);
         });
       });
-      
+
       // let items = await res?.items?.map(async (item) => {
       //   let paths = await item?.paths?.map(async (path, i) => {
       //     let uid = `rc-upload-${moment().milliseconds()}-${i}`;
@@ -661,7 +664,9 @@ export default function page({ params }) {
           >
             Return to List
           </Button>
-          <div className="gap-5" />
+          <button onClick={() => setShow(true)} className="cursor-pointer bg-transparent px-1.5 py-1 rounded-full border-solid border-2 border-[#FFF]">
+            <TiInfoLarge className="text-[#FFF]" />
+          </button>
         </div>
         {/* <div className="flex flex-row justify-between items-center">
           <div className="flex flex-row space-x-10 items-center">
@@ -730,6 +735,115 @@ export default function page({ params }) {
               />
             )}
         </div> */}
+        <Transition.Root show={show} as={Fragment}>
+          <Dialog
+            as="div"
+            className="relative z-10"
+            onClose={() => setShow(false)}
+          >
+            <Transition.Child
+              as={Fragment}
+              enter="ease-in-out duration-500"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in-out duration-500"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+            </Transition.Child>
+
+            <div className="fixed inset-0 overflow-hidden">
+              <div className="absolute inset-0 overflow-hidden">
+                <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+                  <Transition.Child
+                    as={Fragment}
+                    enter="transform transition ease-in-out duration-500 sm:duration-700"
+                    enterFrom="translate-x-full"
+                    enterTo="translate-x-0"
+                    leave="transform transition ease-in-out duration-500 sm:duration-700"
+                    leaveFrom="translate-x-0"
+                    leaveTo="translate-x-full"
+                  >
+                    <Dialog.Panel className="pointer-events-auto relative w-screen max-w-md">
+                      <Transition.Child
+                        as={Fragment}
+                        enter="ease-in-out duration-500"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="ease-in-out duration-500"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                      >
+                        <div className="absolute left-0 top-0 -ml-8 flex pr-2 pt-4 sm:-ml-10 sm:pr-4"></div>
+                      </Transition.Child>
+                      <div className="flex h-full flex-col bg-white py-6 shadow-xl w-full">
+                        <div className="flex justify-between pl-4 -pr-10 sm:px-6">
+                          <Dialog.Title className="text-base font-semibold leading-6 text-gray-900">
+                            Details
+                          </Dialog.Title>
+                          <button
+                            type="button"
+                            className="border-0 rounded-md bg-transparent text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                            onClick={() => setShow(false)}
+                          >
+                            <XMarkIcon
+                              className="h-5 w-5 text-red-500"
+                              aria-hidden="true"
+                            />
+                          </button>
+                        </div>
+                        <div className="border-x-0 border-b-0 border-t border-[#BBBBBBEE] border-solid px-4 sm:px-6 mt-5">
+                          <div className="flex items-center gap-x-5">
+                            <button
+                              className={`bg-transparent py-3 my-3 ${
+                                tab == 0
+                                  ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238] px-4`
+                                  : `border-none text-[#8392AB]`
+                              } text-[14px] cursor-pointer`}
+                              onClick={() => setTab(0)}
+                            >
+                              Related Docs
+                            </button>
+                          </div>
+                        </div>
+                        {sourcingMethod == 'Tendering' && <>
+                          <h4 className="mb-2 mt-4 font-semibold ml-6">Tendering</h4>
+                          {[1, 2].map((item, i) => (
+                            <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                              <Link href={'/'} className="font-bold text-[16px] no-underline text-blue-600">10002031</Link>
+                              <small className="text-gray-500 text-[11px]">14:00 - Yesterday</small>
+                            </div>
+                          ))}
+                        </>}
+                        {sourcingMethod == 'Direct Contracting' && <>
+                          <h4 className="mb-2 mt-4 font-semibold ml-6">Direct Contracting</h4>
+                          {[1, 2].map((item, i) => (
+                            <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                              <Link href={'/'} className="font-bold text-[16px] no-underline text-blue-600">10002031</Link>
+                              <small className="text-gray-500 text-[11px]">14:00 - Yesterday</small>
+                            </div>
+                          ))}
+                        </>}
+                        {sourcingMethod == 'From Existing Contract' && <>
+                          <h4 className="mb-2 mt-4 font-semibold ml-6">Direct Contracting</h4>
+                          {[1, 2].map((item, i) => (
+                            <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                              <Link href={'/'} className="font-bold text-[16px] no-underline text-blue-600">10002031</Link>
+                              <small className="text-gray-500 text-[11px]">14:00 - Yesterday</small>
+                            </div>
+                          ))}
+                        </>}
+                        {console.log('SOurcing Contract ', sourcingMethod)}
+                        <div />
+                      </div>
+                    </Dialog.Panel>
+                  </Transition.Child>
+                </div>
+              </div>
+            </div>
+          </Dialog>
+        </Transition.Root>
         {rowData && (
           <RequestDetails
             handleUpdateStatus={updateStatus}

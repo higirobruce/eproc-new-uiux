@@ -646,10 +646,7 @@ export default function NewRequest() {
                 <h3 className="my-5 font-bold text-[15px]">
                   Request specifications
                 </h3>
-                {/* 
-                  Total Currency needs to be worked on in the future
-                    
-                */}
+                
               </div>
 
               <ItemsTable

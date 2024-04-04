@@ -136,6 +136,7 @@ const ItemsTable = ({
   editingRequest,
   disable,
   noItemDocs = true,
+  currency = "RWF"
 }) => {
   const [count, setCount] = useState(dataSource?.length + 1);
   const [rowForm] = Form.useForm();
@@ -457,7 +458,7 @@ const ItemsTable = ({
               <div className="mb-1" />
             )}
           </div>
-          <h4 className="my-5 font-bold text-[15px]">Total: {totalAmount.toLocaleString()}</h4>
+          <h4 className="my-5 font-bold text-[15px]">Total: {currency} {totalAmount.toLocaleString()}</h4>
         </div>
         <Table
           components={components}

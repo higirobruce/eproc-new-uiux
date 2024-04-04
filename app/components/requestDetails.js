@@ -3095,6 +3095,7 @@ const RequestDetails = ({
                     handleUpdateRequest(r);
                   }}
                   dataSource={values}
+                  currency={data.currency}
                   fileList={fileList}
                   setFileList={_setFileList}
                   files={files}
