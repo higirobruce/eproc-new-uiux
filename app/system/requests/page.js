@@ -1101,7 +1101,7 @@ export default function UserRequests() {
                   <FiSearch size={18} className="text-[#E4E4E4] ml-2" />
                   <Input
                     placeholder="Search by request #, Initiator"
-                    className="border-0 text-[#8392AB] bg-transparent text-[12px] hover:bg-transparent hover:border-none hover:outline-none"
+                    className="border-0 text-[#8392AB] bg-transparent text-[15px] hover:bg-transparent hover:border-none hover:outline-none"
                     onChange={(e) => {
                       setSearchText(e?.target?.value);
                     }}

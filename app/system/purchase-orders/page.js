@@ -845,7 +845,7 @@ export default function PurchaseOrders() {
                 <div className="flex items-center rounded-lg bg-[#F5F7FA] p-1.5">
                   <FiSearch size={18} className="text-[#E4E4E4] ml-2" />
                   <Input
-                    className="border-0 text-[#8392AB] bg-transparent text-[12px] hover:bg-transparent hover:border-none hover:outline-none"
+                    className="border-0 text-[#8392AB] bg-transparent text-[15px] hover:bg-transparent hover:border-none hover:outline-none"
                     onChange={(e) => {
                       setSearchText(e?.target?.value);
                     }}
