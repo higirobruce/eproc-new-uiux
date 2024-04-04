@@ -438,6 +438,8 @@ const RequestDetails = ({
 
   const [assetOptions, setAssetOptions] = useState([]);
 
+  const [users, setUsers] = useState([]);
+
   const [assets, setAssets] = useState([]);
 
   let [tendor, setTendor] = useState("");
@@ -636,7 +638,9 @@ const RequestDetails = ({
       });
   }, [data]);
 
-  useEffect(() => {}, [edit]);
+  useEffect(() => {
+    getInternalUsers();
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -894,6 +898,22 @@ const RequestDetails = ({
       .then((res) => {
         if (res) setContracts(res);
         else setContracts([]);
+      });
+  }
+
+  function getInternalUsers() {
+    fetch(`${url}/users/internal`, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if (res) setUsers(res);
+        else setUsers([]);
       });
   }
 
@@ -1943,6 +1963,49 @@ const RequestDetails = ({
 
                         <div className="flex flex-col space-y-1">
                           <Typography.Text type="secondary">
+                            <div className="text-xs">Email</div>
+                          </Typography.Text>
+                          {s?.onBehalfOf === "Irembo Ltd" && (
+                            <Select
+                              showSearch={true}
+                              className="w-full"
+                              onChange={(e) => {
+                                let _signatories = [...signatories];
+                                _signatories[index].email = e;
+                                _signatories[index].names =
+                                  users?.find((user) => user?.email == e)
+                                    ?.firstName +
+                                  " " +
+                                  users?.find((user) => user?.email == e)
+                                    ?.lastName;
+
+                                setSignatories(_signatories);
+                              }}
+                              options={users?.map((user, i) => {
+                                return {
+                                  value: user?.email,
+                                  label: user?.email,
+                                };
+                              })}
+                            />
+                          )}
+                          {s?.onBehalfOf !== "Irembo Ltd" && (
+                            <Typography.Text
+                              editable={{
+                                text: s.email,
+                                onChange: (e) => {
+                                  let _signatories = [...signatories];
+                                  _signatories[index].email = e;
+                                  setSignatories(_signatories);
+                                },
+                              }}
+                            >
+                              {s.email}
+                            </Typography.Text>
+                          )}
+                        </div>
+                        <div className="flex flex-col space-y-1">
+                          <Typography.Text type="secondary">
                             <div className="text-xs">
                               Company Representative
                             </div>
@@ -1958,24 +2021,6 @@ const RequestDetails = ({
                             }}
                           >
                             {s.names}
-                          </Typography.Text>
-                        </div>
-
-                        <div className="flex flex-col space-y-1">
-                          <Typography.Text type="secondary">
-                            <div className="text-xs">Email</div>
-                          </Typography.Text>
-                          <Typography.Text
-                            editable={{
-                              text: s.email,
-                              onChange: (e) => {
-                                let _signatories = [...signatories];
-                                _signatories[index].email = e;
-                                setSignatories(_signatories);
-                              },
-                            }}
-                          >
-                            {s.email}
                           </Typography.Text>
                         </div>
                       </div>
