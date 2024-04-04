@@ -222,40 +222,40 @@ const TenderDetails = ({
               </div>
             ),
           },
-          {
-            title: "Supporting docs",
-            dataIndex: "supportingDocs",
-            key: "supportingDocs",
-            render: (_, item) => (
-              <div className="flex flex-col">
-                {item?.paths?.map((p, i) => {
-                  return (
-                    <div key={p}>
-                      <Link
-                        href={`${fendUrl}/api?folder=termsOfReference&name=${p}`}
-                        target="_blank"
-                      >
-                        <Typography.Link className="flex flex-row items-center space-x-2">
-                          <div>supporting doc{i + 1} </div>{" "}
-                          <div>
-                            <PaperClipIcon className="h-4 w-4" />
-                          </div>
-                        </Typography.Link>
-                      </Link>
-                    </div>
-                  );
-                })}
-                {(item?.paths?.length < 1 || !item?.paths) && (
-                  <div className="items-center justify-center flex flex-col">
-                    <div>
-                      <RectangleStackIcon className="h-5 w-5 text-gray-200" />
-                    </div>
-                    <div className="text-xs text-gray-400">No docs found</div>
-                  </div>
-                )}
-              </div>
-            ),
-          },
+          // {
+          //   title: "Supporting docs",
+          //   dataIndex: "supportingDocs",
+          //   key: "supportingDocs",
+          //   render: (_, item) => (
+          //     <div className="flex flex-col">
+          //       {item?.paths?.map((p, i) => {
+          //         return (
+          //           <div key={p}>
+          //             <Link
+          //               href={`${fendUrl}/api?folder=termsOfReference&name=${p}`}
+          //               target="_blank"
+          //             >
+          //               <Typography.Link className="flex flex-row items-center space-x-2">
+          //                 <div>supporting doc{i + 1} </div>{" "}
+          //                 <div>
+          //                   <PaperClipIcon className="h-4 w-4" />
+          //                 </div>
+          //               </Typography.Link>
+          //             </Link>
+          //           </div>
+          //         );
+          //       })}
+          //       {(item?.paths?.length < 1 || !item?.paths) && (
+          //         <div className="items-center justify-center flex flex-col">
+          //           <div>
+          //             <RectangleStackIcon className="h-5 w-5 text-gray-200" />
+          //           </div>
+          //           <div className="text-xs text-gray-400">No docs found</div>
+          //         </div>
+          //       )}
+          //     </div>
+          //   ),
+          // },
         ]
       : [
           {
@@ -282,41 +282,41 @@ const TenderDetails = ({
               </div>
             ),
           },
-          {
-            title: "Supporting docs",
-            dataIndex: "supportingDocs",
-            key: "supportingDocs",
-            render: (_, item) => (
-              <div className="flex flex-col">
-                {item?.paths?.map((p, i) => {
-                  return (
-                    <div key={p}>
-                      <Link
-                        // href={`${url}/file/termsOfReference/${p}`}
-                        href={`${fendUrl}/api?folder=termsOfReference&name=${p}`}
-                        target="_blank"
-                      >
-                        <Typography.Link className="flex flex-row items-center space-x-2">
-                          <div>supporting doc{i + 1} </div>{" "}
-                          <div>
-                            <PaperClipIcon className="h-4 w-4" />
-                          </div>
-                        </Typography.Link>
-                      </Link>
-                    </div>
-                  );
-                })}
-                {(item?.paths?.length < 1 || !item?.paths) && (
-                  <div className="items-center justify-center flex flex-col">
-                    <div>
-                      <RectangleStackIcon className="h-5 w-5 text-gray-200" />
-                    </div>
-                    <div className="text-xs text-gray-400">No docs found</div>
-                  </div>
-                )}
-              </div>
-            ),
-          },
+          // {
+          //   title: "Supporting docs",
+          //   dataIndex: "supportingDocs",
+          //   key: "supportingDocs",
+          //   render: (_, item) => (
+          //     <div className="flex flex-col">
+          //       {item?.paths?.map((p, i) => {
+          //         return (
+          //           <div key={p}>
+          //             <Link
+          //               // href={`${url}/file/termsOfReference/${p}`}
+          //               href={`${fendUrl}/api?folder=termsOfReference&name=${p}`}
+          //               target="_blank"
+          //             >
+          //               <Typography.Link className="flex flex-row items-center space-x-2">
+          //                 <div>supporting doc{i + 1} </div>{" "}
+          //                 <div>
+          //                   <PaperClipIcon className="h-4 w-4" />
+          //                 </div>
+          //               </Typography.Link>
+          //             </Link>
+          //           </div>
+          //         );
+          //       })}
+          //       {(item?.paths?.length < 1 || !item?.paths) && (
+          //         <div className="items-center justify-center flex flex-col">
+          //           <div>
+          //             <RectangleStackIcon className="h-5 w-5 text-gray-200" />
+          //           </div>
+          //           <div className="text-xs text-gray-400">No docs found</div>
+          //         </div>
+          //       )}
+          //     </div>
+          //   ),
+          // },
         ];
   const columns = [
     {
@@ -3628,7 +3628,16 @@ const TenderDetails = ({
                 )}
               <div className="py-3">
                 {user?.userType !== "VENDOR" && (
-                  <Tag className="border-0 px-6 py-1.5 text-[14.5px] capitalize" color={iSubmitted ? "cyan" : moment().isAfter(moment(data?.submissionDeadLine)) ? "magenta" : "success"}>
+                  <Tag
+                    className="border-0 px-6 py-1.5 text-[14.5px] capitalize"
+                    color={
+                      iSubmitted
+                        ? "cyan"
+                        : moment().isAfter(moment(data?.submissionDeadLine))
+                        ? "magenta"
+                        : "success"
+                    }
+                  >
                     {iSubmitted
                       ? "Submitted"
                       : moment().isAfter(moment(data?.submissionDeadLine))
@@ -3884,8 +3893,44 @@ const TenderDetails = ({
                           columns={itemColumns}
                           pagination={false}
                         />
+
+                        <h6 className="text-[17px] text-[#263238] font-semibold mt-5">
+                          Supporting Documents
+                        </h6>
+
+                        <div className="flex flex-col">
+                          {data?.purchaseRequest?.supportingDocs?.map(
+                            (p, i) => {
+                              return (
+                                <div key={p}>
+                                  {
+                                    <Link
+                                      // href={`${url}/file/termsOfReference/${p}`}
+                                      href={`${fendUrl}/api?folder=termsOfReference&name=${p}`}
+                                      target="_blank"
+                                    >
+                                      <Typography.Link
+                                        className="flex flex-row items-center space-x-2"
+                                        // onClick={() => {
+                                        //   setPreviewAttachment(!previewAttachment);
+                                        //   setAttachmentId(p);
+                                        // }}
+                                      >
+                                        <div>{p} </div>{" "}
+                                        <div>
+                                          <PaperClipIcon className="h-4 w-4" />
+                                        </div>
+                                      </Typography.Link>
+                                    </Link>
+                                  }
+                                </div>
+                              );
+                            }
+                          )}
+                        </div>
                       </div>
                     </div>
+
                     <div className="bg-white px-5 rounded-xl flex flex-col">
                       {user?.userType === "VENDOR" &&
                         moment().isBefore(moment(data?.submissionDeadLine)) &&
