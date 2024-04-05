@@ -50,13 +50,13 @@ function exportToCSV(data, fileName) {
 }
 export default function UserRequests() {
   let router = useRouter();
-  const searchParams = useSearchParams()
-  const pagination = searchParams.get('page');
-  const search = searchParams.get('search');
-  const statusFilter = searchParams.get('filter');
+  const searchParams = useSearchParams();
+  const pagination = searchParams.get("page");
+  const search = searchParams.get("search");
+  const statusFilter = searchParams.get("filter");
 
   // Routing Context
-  const {setPage, setFilter, filter, page} = usePaymentContext();
+  const { setPage, setFilter, filter, page } = usePaymentContext();
 
   const [dataLoaded, setDataLoaded] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
@@ -92,15 +92,19 @@ export default function UserRequests() {
 
   useEffect(() => {
     setPage(pagination ? pagination : 1);
-    setFilter(statusFilter ? statusFilter : 'all')
-  }, [pagination])
+    setFilter(statusFilter ? statusFilter : "all");
+  }, [pagination]);
 
   useEffect(() => {
     setDataLoaded(false);
     let requestUrl =
       onlyMine || user?.userType === "VENDOR"
-        ? `${url}/paymentRequests/byStatus/${filter ? filter : searchStatus}/${user?._id}`
-        : `${url}/paymentRequests/byStatus/${filter ? filter : searchStatus}/${null}`;
+        ? `${url}/paymentRequests/byStatus/${filter ? filter : searchStatus}/${
+            user?._id
+          }`
+        : `${url}/paymentRequests/byStatus/${
+            filter ? filter : searchStatus
+          }/${null}`;
     fetch(requestUrl, {
       method: "GET",
       headers: {
@@ -187,8 +191,12 @@ export default function UserRequests() {
   async function loadRequests() {
     // setDataLoaded(false);
     let requestUrl = onlyMine
-      ? `${url}/paymentRequests/byStatus/${filter ? filter : searchStatus}/${user?._id}`
-      : `${url}/paymentRequests/byStatus/${filter ? filter : searchStatus}/${null}`;
+      ? `${url}/paymentRequests/byStatus/${filter ? filter : searchStatus}/${
+          user?._id
+        }`
+      : `${url}/paymentRequests/byStatus/${
+          filter ? filter : searchStatus
+        }/${null}`;
     // let requestUrl =
     //   searchStatus === "mine"
     //     ? `${url}/requests/${user?._id}`
@@ -277,7 +285,7 @@ export default function UserRequests() {
       return {
         id: d?._id,
         "Request Number": d?.number,
-        Description: d?.description,
+        Description: d?.description?.split("\n").join(" "),
         Title: '"' + d?.title + '"',
         Amount: d?.amount,
         Currency: d?.currency,
@@ -304,6 +312,7 @@ export default function UserRequests() {
         "PO-SAP Transaction Number(s)": _docs,
       };
     });
+
     exportToCSV(_data, "exported_data.csv");
   };
 
@@ -411,7 +420,9 @@ export default function UserRequests() {
                 icon={<PlusOutlined />}
                 onClick={() => {
                   setSubmitting(true);
-                  router.push(`/system/payment-requests/new?page=${page}&filter=${filter}`);
+                  router.push(
+                    `/system/payment-requests/new?page=${page}&filter=${filter}`
+                  );
                 }}
               >
                 New Payment request
