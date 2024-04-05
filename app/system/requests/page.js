@@ -50,11 +50,11 @@ function exportToCSV(data, fileName) {
 
 export default function UserRequests() {
   const { user, login, logout } = useUser();
-  const searchParams = useSearchParams()
+  const searchParams = useSearchParams();
   let router = useRouter();
-  const pagination = searchParams.get('page');
-  const search = searchParams.get('search');
-  const statusFilter = searchParams.get('filter');
+  const pagination = searchParams.get("page");
+  const search = searchParams.get("search");
+  const statusFilter = searchParams.get("filter");
 
   // Context
   const { setPage, setFilter, filter, page } = useRequestContext();
@@ -90,7 +90,9 @@ export default function UserRequests() {
   let [defaultApprover, setDefaultApprover] = useState({});
   const [editRequest, setEditRequest] = useState(false);
 
-  let [searchStatus, setSearchStatus] = useState(statusFilter ? statusFilter : "all");
+  let [searchStatus, setSearchStatus] = useState(
+    statusFilter ? statusFilter : "all"
+  );
   let [searchText, setSearchText] = useState("offi");
   const [form] = Form.useForm();
   const [onlyMine, setOnlyMine] = useState(
@@ -105,11 +107,11 @@ export default function UserRequests() {
   const [sourcingMethod, setSourcingMethod] = useState("");
   let [files, setFiles] = useState([]);
   let token = typeof window !== "undefined" && localStorage.getItem("token");
-  
+
   useEffect(() => {
     setPage(pagination ? pagination : 1);
-    setFilter(statusFilter ? statusFilter : 'all')
-  }, [pagination, statusFilter])
+    setFilter(statusFilter ? statusFilter : "all");
+  }, [pagination, statusFilter]);
 
   useEffect(() => {
     // loadRequests()
@@ -221,7 +223,9 @@ export default function UserRequests() {
   useEffect(() => {
     setDataLoaded(false);
     let requestUrl = onlyMine
-      ? `${url}/requests/byStatus/${filter ? filter : searchStatus}/${user?._id}`
+      ? `${url}/requests/byStatus/${filter ? filter : searchStatus}/${
+          user?._id
+        }`
       : `${url}/requests/byStatus/${filter ? filter : searchStatus}/${null}`;
     fetch(requestUrl, {
       method: "GET",
@@ -289,7 +293,9 @@ export default function UserRequests() {
   async function loadRequests() {
     // setDataLoaded(false);
     let requestUrl = onlyMine
-      ? `${url}/requests/byStatus/${filter ? filter : searchStatus}/${user?._id}`
+      ? `${url}/requests/byStatus/${filter ? filter : searchStatus}/${
+          user?._id
+        }`
       : `${url}/requests/byStatus/${filter ? filter : searchStatus}/${null}`;
     // let requestUrl =
     //   searchStatus === "mine"
@@ -888,7 +894,7 @@ export default function UserRequests() {
         id: d?._id,
         "Request Number": d?.number,
         "Due date": moment(d?.dueDate).format("DD-MMM-YYYY"),
-        Description: d?.description,
+        Description: d?.description?.split("\n").join(" "),
         Title: '"' + d?.title + '"',
         Amount: totalAmount,
         Currency: d?.items[0]?.currency,
@@ -1014,7 +1020,9 @@ export default function UserRequests() {
               onClick={() => {
                 form.resetFields();
 
-                router.push(`/system/requests/new?page=${page}&filter=${filter}`);
+                router.push(
+                  `/system/requests/new?page=${page}&filter=${filter}`
+                );
               }}
             >
               New request
@@ -1033,11 +1041,10 @@ export default function UserRequests() {
                 // mode="tags"
                 className="text-[14px] text-[#2c6ad6] w-48 rounded-sm"
                 placeholder="Select status"
-                
                 onChange={(value) => {
                   setPage(1);
-                  setFilter(value); 
-                  setSearchStatus(value)
+                  setFilter(value);
+                  setSearchStatus(value);
                 }}
                 value={filter ? filter : searchStatus}
                 options={[
