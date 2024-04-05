@@ -285,7 +285,7 @@ export default function UserRequests() {
       return {
         id: d?._id,
         "Request Number": d?.number,
-        Description: d?.description?.split("\n").join(" "),
+        Description: '"' + d?.description?.split("\n").join(" ") + '"',
         Title: '"' + d?.title?.split("\n").join(" ") + '"',
         Amount: d?.amount,
         Currency: d?.currency,
