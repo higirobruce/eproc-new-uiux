@@ -895,7 +895,7 @@ export default function UserRequests() {
         "Request Number": d?.number,
         "Due date": moment(d?.dueDate).format("DD-MMM-YYYY"),
         Description: d?.description?.split("\n").join(" "),
-        Title: '"' + d?.title + '"',
+        Title: '"' + d?.title?.split("\n").join(" ") + '"',
         Amount: totalAmount,
         Currency: d?.items[0]?.currency,
         Initator: d?.createdBy?.email,
