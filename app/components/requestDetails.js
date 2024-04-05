@@ -316,7 +316,9 @@ function buildPOForm(
             options={contracts
               .filter(
                 (c) =>
-                  documentFullySigned(c) && moment().isBefore(moment(c.endDate))
+                  documentFullySigned(c) &&
+                  moment().isBefore(moment(c.endDate)) &&
+                  c?.vendor?.status == "approved"
               )
               .map((c) => {
                 return {
