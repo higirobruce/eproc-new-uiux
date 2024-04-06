@@ -906,8 +906,8 @@ export default function UserRequests() {
         "Service Category": '"' + d?.serviceCategory + '"',
         "Created At": d?.createdAt,
         "Declined At": d?.declinedBy,
-        "Reason for rejection":
-          d?.reasonForRejection && '"' + d?.reasonForRejection + '"',
+        // "Reason for rejection":
+        //   d?.reasonForRejection && '"' + d?.reasonForRejection + '"',
         "Head of Department approval date": moment(d?.hod_approvalDate).format(
           "DD-MMM-YYYY hh:mm a"
         ),
