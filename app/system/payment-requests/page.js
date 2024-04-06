@@ -287,7 +287,7 @@ export default function UserRequests() {
         "Request Number": d?.number,
         // Description: '"' + d?.description?.split("\n").join(" ") + '"',
         Title: '"' + d?.title?.split("\n").join(" ").split(",").join(" ") + '"',
-        Amount: d?.amount,
+        Amount: +d?.amount,
         Currency: d?.currency,
         Initator: d?.createdBy?.email,
         "Level1 Approver": d?.approver?.email && '"' + d?.approver?.email + '"',

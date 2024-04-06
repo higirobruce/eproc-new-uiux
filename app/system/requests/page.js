@@ -896,7 +896,7 @@ export default function UserRequests() {
         "Due date": moment(d?.dueDate).format("DD-MMM-YYYY"),
         // Description: '"' + d?.description?.split("\n").join(" ") + '"',
         Title: '"' + d?.title?.split("\n").join(" ").split(",").join(" ") + '"',
-        Amount: totalAmount,
+        Amount: +totalAmount,
         Currency: d?.items[0]?.currency,
         Initator: d?.createdBy?.email,
         "Approver (department level)": '"' + d?.level1Approver?.email + '"',
