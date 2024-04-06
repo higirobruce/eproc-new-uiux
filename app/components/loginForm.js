@@ -117,7 +117,7 @@ const LoginForm = ({ goTo }) => {
                   `${
                     payload.userObj?.userType === "VENDOR"
                       ? "/system/tenders"
-                      : "/system/dashboard"
+                      : "/system/requests"
                   }`
                 );
             setSubmitting(false);
