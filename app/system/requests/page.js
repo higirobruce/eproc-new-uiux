@@ -901,7 +901,7 @@ export default function UserRequests() {
         Initator: d?.createdBy?.email,
         "Approver (department level)": '"' + d?.level1Approver?.email + '"',
         Budgeted: d?.budgeted ? "YES" : "NO",
-        "Budget Line": '"' + d?.budgetLine?.description + '"',
+        "Budget Line": '"' + d?.budgetLine?.description || "" + '"',
         Status: d?.status,
         "Service Category": '"' + d?.serviceCategory + '"',
         "Created At": d?.createdAt,
