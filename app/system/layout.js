@@ -74,7 +74,7 @@ export default function SystemLayout({ children }) {
     if (user?.userType !== "VENDOR") setScreen("dashboard");
     else setScreen("tenders");
 
-    if (user?.userType !== "VENDOR") {
+    if (user?.userType !== "VENDOR" && user) {
       const allFalse = Object.values(user?.permissions).every(
         (value) => value === false
       );
