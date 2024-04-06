@@ -300,8 +300,8 @@ export default function UserRequests() {
         "Phone Number": d?.paymentDetails?.phoneNumber,
         "Created At": d?.createdAt,
         "Declined At": d?.status == "rejected" && d?.rejectionDate,
-        "Reason for rejection":
-          d?.reasonForRejection && '"' + d?.reasonForRejection + '"',
+        // "Reason for rejection":
+        //   d?.reasonForRejection && '"' + d?.reasonForRejection + '"',
         "Level 1 approval date": moment(d?.hod_approvalDate).format(
           "DD-MMM-YYYY hh:mm a"
         ),
