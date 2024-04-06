@@ -3865,7 +3865,7 @@ const RequestDetails = ({
                         {tender && data?.sourcingMethod === "Tendering" && (
                           <>
                             <h4 className="mb-2 mt-4 font-semibold ml-6">
-                              Tendering Reference
+                              Tender Reference
                             </h4>
                             <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
                               <Link
