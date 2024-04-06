@@ -71,7 +71,7 @@ export default function SystemLayout({ children }) {
     setLoggedInUser(user);
     // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
     setToken(localStorage.getItem("token"));
-    if (user?.userType !== "VENDOR") setScreen("dashboard");
+    if (user?.userType !== "VENDOR") setScreen("requests");
     else setScreen("tenders");
 
     if (user?.userType !== "VENDOR" && user) {
