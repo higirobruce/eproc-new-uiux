@@ -17,7 +17,6 @@ function UploadOtherFiles({
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
 
-
   const props = {
     onRemove: (file) => {
       const index = files?.indexOf(file?.originFileObj);
@@ -64,7 +63,7 @@ function UploadOtherFiles({
     <>
       {contextHolder}
       <Upload {...props} headers={{}} multiple defaultFileList={[...files]}>
-        <Tooltip 
+        <Tooltip
           placement="top"
           title={`Upload limit: 12 MB. Supported formats: PDF.`}
         >

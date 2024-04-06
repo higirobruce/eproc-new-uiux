@@ -3,6 +3,7 @@ import React, { Suspense, useEffect, useState } from "react";
 import { Badge, Form, Rate, Spin, Table } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
+import { useVendorContext } from "../context/VendorContext";
 
 const VendorsTable = ({
   dataSet,
@@ -16,6 +17,7 @@ const VendorsTable = ({
   const [form] = Form.useForm();
   let router = useRouter();
   const [data, setData] = useState(dataSet);
+  const {page, setPage, filter} = useVendorContext()
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
@@ -58,7 +60,7 @@ const VendorsTable = ({
             className="cursor-pointer space-x-1 flex flex-row items-center text-blue-500 hover:underline"
             onClick={() => {
               // handleSetRow(record)
-              router.push(`/system/vendors/${record?._id}`);
+              router.push(`/system/vendors/${record?._id}?page=${page}&filter=${filter}`);
             }}
           >
             {/* <div>
@@ -267,9 +269,7 @@ const VendorsTable = ({
           dataSource={data}
           columns={columns}
           className="shadow-lg rounded-md"
-          pagination={{
-            pageSize: 10,
-          }}
+          pagination={{defaultCurrent: page ? +page : 1, onChange: (page, pageSize) => setPage(page)}}
         />
       </Form>
     </Suspense>

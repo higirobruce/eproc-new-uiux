@@ -18,6 +18,7 @@ import moment from "moment/moment";
 import Highlighter from "react-highlight-words";
 import { useRouter } from "next/navigation";
 import { IoMdCheckmarkCircleOutline, IoMdCloseCircleOutline } from "react-icons/io";
+import { useRequestContext } from "../context/RequestContext";
 
 const UsersRequestsTable = ({
   dataSet,
@@ -32,7 +33,7 @@ const UsersRequestsTable = ({
   const [data, setData] = useState(dataSet);
   let [selectedRow, setSelectedRow] = useState("");
   const antIcon = <LoadingOutlined style={{ fontSize: 9 }} spin />;
-
+  const {page, setPage, filter} = useRequestContext()
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
@@ -192,7 +193,7 @@ const UsersRequestsTable = ({
             className="font-semibold cursor-pointer space-x-1 flex flex-row items-center text-blue-500 hover:underline"
             onClick={() => {
               // handleSetRow(record);
-              router.push(`/system/requests/${record?._id}`);
+              router.push(`/system/requests/${record?._id}/?page=${page}&filter=${filter}`);
             }}
           >
             <div>
@@ -360,10 +361,8 @@ const UsersRequestsTable = ({
           size="small"
           dataSource={data}
           columns={columns}
+          pagination={{defaultCurrent: page ? +page : 1, onChange: (page, pageSize) => setPage(page)}}
           className="shadow-lg rounded-md"
-          // pagination={{
-          //   pageSize: 20,
-          // }}
         />
       </div>
     </Form>

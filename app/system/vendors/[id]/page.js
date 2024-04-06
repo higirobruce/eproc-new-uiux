@@ -430,9 +430,25 @@ export default function page({ params }) {
       });
   }
 
+  const handleGoBack = () => {
+    const queryParams = window.location.href.split("?")[1];
+
+    router.push("/system/vendors?" + queryParams);
+  };
+
   return (
     <div className="payment-request flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-[calc(100vh-40px)] pb-1 overflow-y-auto">
       {contextHolder}
+      <div className="flex items-center justify-between mr-6 mb-2">
+        <Button
+          className="bg-white h-9 px-5 text-[13px] font-semibold rounded text-[#0063CF]"
+          icon={<ArrowLeftOutlined className="font-[15px]" />}
+          onClick={handleGoBack}
+        >
+          Return to List
+        </Button>
+        <div className="gap-5" />
+      </div>
       <div className="grid md:grid-cols-3 gap-5 mb-16">
         <div className="flex flex-col space-y-5">
           <div className="bg-white rounded-lg shadow px-5 pb-7">

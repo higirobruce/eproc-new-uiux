@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.0.1",
+    "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.0.18",
     "antd": "^5.4.7",
     "autoprefixer": "10.4.14",
@@ -28,6 +29,7 @@
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.43",
     "next": "13.4.2",
+    "nextjs-toploader": "^1.6.11",
     "postcss": "8.4.23",
     "rc-virtual-list": "^3.4.13",
     "react": "18.2.0",
@@ -38,6 +40,7 @@
     "react-pdf-tailwind": "2.1.0",
     "react-qr-code": "^2.0.12",
     "react-quill": "^2.0.0",
+    "recharts": "^2.12.3",
     "sharp": "^0.32.1",
     "tailwindcss": "3.3.2",
     "uuid": "^9.0.0"

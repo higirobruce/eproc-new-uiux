@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import {
   Button,
   DatePicker,
@@ -84,8 +84,12 @@ import { MdFileCopy, MdAttachFile } from "react-icons/md";
 import { BiPurchaseTagAlt } from "react-icons/bi";
 import { TbTruckDelivery } from "react-icons/tb";
 import { useUser } from "../context/UserContext";
-import { useRouter } from 'next/navigation';
-import {motion} from 'framer-motion';
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import UploadOtherFiles from "./uploadOtherFiles";
+import { Dialog, Transition } from "@headlessui/react";
+
+const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 let modules = {
   toolbar: [
@@ -313,7 +317,9 @@ function buildPOForm(
             options={contracts
               .filter(
                 (c) =>
-                  documentFullySigned(c) && moment().isBefore(moment(c.endDate))
+                  documentFullySigned(c) &&
+                  moment().isBefore(moment(c.endDate)) &&
+                  c?.vendor?.status == "approved"
               )
               .map((c) => {
                 return {
@@ -375,6 +381,9 @@ const RequestDetails = ({
   setFileList,
   setFiles,
   handleUpload,
+  filesAreSet,
+  show,
+  handleClose,
 }) => {
   const [form] = Form.useForm();
   const router = useRouter();
@@ -434,6 +443,8 @@ const RequestDetails = ({
 
   const [assetOptions, setAssetOptions] = useState([]);
 
+  const [users, setUsers] = useState([]);
+
   const [assets, setAssets] = useState([]);
 
   let [tendor, setTendor] = useState("");
@@ -443,7 +454,8 @@ const RequestDetails = ({
   const [attachSelected, setAttachSelected] = useState(false);
   const [approvalShow, setApprovalShow] = useState(true);
   const [activeIndex, setActiveIndex] = useState(-1);
-  const [emptySignatory, setEmptySignatory] = useState([])
+  const [emptySignatory, setEmptySignatory] = useState([]);
+  const [tab, setTab] = useState(0);
   const contentHeight = useRef();
   const scrollRef = useRef();
 
@@ -505,7 +517,7 @@ const RequestDetails = ({
       ),
     },
 
-    {
+    !data?.supportingDocs && {
       title: "Supporting docs",
       dataIndex: "title",
       key: "title",
@@ -632,16 +644,19 @@ const RequestDetails = ({
       });
   }, [data]);
 
-  useEffect(() => {}, [edit]);
+  useEffect(() => {
+    getInternalUsers();
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behavior: 'smooth',
-      block: 'start',
-      inline: 'start'
-    });
+      scrollRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+        inline: "start",
+      });
     }
-  }, [data]);
+  }, []);
 
   useEffect(() => {
     let t = 0;
@@ -889,6 +904,22 @@ const RequestDetails = ({
       .then((res) => {
         if (res) setContracts(res);
         else setContracts([]);
+      });
+  }
+
+  function getInternalUsers() {
+    fetch(`${url}/users/internal`, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if (res) setUsers(res);
+        else setUsers([]);
       });
   }
 
@@ -1938,6 +1969,49 @@ const RequestDetails = ({
 
                         <div className="flex flex-col space-y-1">
                           <Typography.Text type="secondary">
+                            <div className="text-xs">Email</div>
+                          </Typography.Text>
+                          {s?.onBehalfOf === "Irembo Ltd" && (
+                            <Select
+                              showSearch={true}
+                              className="w-full"
+                              onChange={(e) => {
+                                let _signatories = [...signatories];
+                                _signatories[index].email = e;
+                                _signatories[index].names =
+                                  users?.find((user) => user?.email == e)
+                                    ?.firstName +
+                                  " " +
+                                  users?.find((user) => user?.email == e)
+                                    ?.lastName;
+
+                                setSignatories(_signatories);
+                              }}
+                              options={users?.map((user, i) => {
+                                return {
+                                  value: user?.email,
+                                  label: user?.email,
+                                };
+                              })}
+                            />
+                          )}
+                          {s?.onBehalfOf !== "Irembo Ltd" && (
+                            <Typography.Text
+                              editable={{
+                                text: s.email,
+                                onChange: (e) => {
+                                  let _signatories = [...signatories];
+                                  _signatories[index].email = e;
+                                  setSignatories(_signatories);
+                                },
+                              }}
+                            >
+                              {s.email}
+                            </Typography.Text>
+                          )}
+                        </div>
+                        <div className="flex flex-col space-y-1">
+                          <Typography.Text type="secondary">
                             <div className="text-xs">
                               Company Representative
                             </div>
@@ -1953,24 +2027,6 @@ const RequestDetails = ({
                             }}
                           >
                             {s.names}
-                          </Typography.Text>
-                        </div>
-
-                        <div className="flex flex-col space-y-1">
-                          <Typography.Text type="secondary">
-                            <div className="text-xs">Email</div>
-                          </Typography.Text>
-                          <Typography.Text
-                            editable={{
-                              text: s.email,
-                              onChange: (e) => {
-                                let _signatories = [...signatories];
-                                _signatories[index].email = e;
-                                setSignatories(_signatories);
-                              },
-                            }}
-                          >
-                            {s.email}
                           </Typography.Text>
                         </div>
                       </div>
@@ -2139,11 +2195,14 @@ const RequestDetails = ({
                   return !s?.onBehalfOf || !s?.title || !s?.names || !s?.email;
                 })?.length >= 1
               ) {
-                setEmptySignatory([{email: "",
-                  names: "",
-                  onBehalfOf: "Irembo Ltd",
-                  title: "Procurement Manager"
-                }])
+                setEmptySignatory([
+                  {
+                    email: "",
+                    names: "",
+                    onBehalfOf: "Irembo Ltd",
+                    title: "Procurement Manager",
+                  },
+                ]);
                 messageApi.open({
                   type: "error",
                   content:
@@ -2196,11 +2255,14 @@ const RequestDetails = ({
                   return !s?.onBehalfOf || !s?.title || !s?.names || !s?.email;
                 })?.length >= 1
               ) {
-                setEmptySignatory([{email: "",
-                  names: "",
-                  onBehalfOf: "Irembo Ltd",
-                  title: "Procurement Manager"
-                }])
+                setEmptySignatory([
+                  {
+                    email: "",
+                    names: "",
+                    onBehalfOf: "Irembo Ltd",
+                    title: "Procurement Manager",
+                  },
+                ]);
                 messageApi.open({
                   type: "error",
                   duration: 10,
@@ -2423,13 +2485,17 @@ const RequestDetails = ({
           </div> */}
 
           {/* Signatories */}
-          {console.log('Signatories 123 ', emptySignatory)}
           <div className="grid grid-cols-3 gap-5">
-            {signatories.map((s, index) => {
+            {/* {signatories.map((s, index) => {
               return (
                 <div
                   key={index}
-                  className={`flex flex-col ring-2 ${emptySignatory && emptySignatory[0]?.onBehalfOf == s?.onBehalfOf ? `ring-red-500` : `ring-gray-300`} rounded py-5`}
+                  className={`flex flex-col ring-2 ${
+                    emptySignatory &&
+                    emptySignatory[0]?.onBehalfOf == s?.onBehalfOf
+                      ? `ring-red-500`
+                      : `ring-gray-300`
+                  } rounded py-5`}
                 >
                   <div className="flex flex-row items-start justify-between">
                     <div className="flex flex-col space-y-3 px-5">
@@ -2502,6 +2568,125 @@ const RequestDetails = ({
                           }}
                         >
                           {s.email}
+                        </Typography.Text>
+                      </div>
+                    </div>
+                    <div
+                      onClick={() => {
+                        let _signatories = [...signatories];
+                        _signatories.splice(index, 1);
+                        setSignatories(_signatories);
+                      }}
+                    >
+                      <XMarkIcon className="h-3 px-5 cursor-pointer" />
+                    </div>
+                  </div>
+                </div>
+              );
+            })} */}
+
+            {signatories.map((s, index) => {
+              return (
+                <div
+                  key={index}
+                  className="flex flex-col ring-1 ring-gray-300 rounded py-5"
+                >
+                  <div className="flex flex-row items-start justify-between">
+                    <div className="flex flex-col space-y-3 px-5">
+                      <div className="flex flex-col space-y-1">
+                        <Typography.Text type="secondary">
+                          <div className="text-xs">On Behalf of</div>
+                        </Typography.Text>
+                        <Typography.Text
+                          editable={{
+                            text: s.onBehalfOf,
+                            onChange: (e) => {
+                              let _signatories = [...signatories];
+                              _signatories[index].onBehalfOf = e;
+                              setSignatories(_signatories);
+                            },
+                          }}
+                        >
+                          {s.onBehalfOf}
+                        </Typography.Text>
+                      </div>
+
+                      <div className="flex flex-col space-y-1">
+                        <Typography.Text type="secondary">
+                          <div className="text-xs">Representative Title</div>
+                        </Typography.Text>
+                        <Typography.Text
+                          editable={{
+                            text: s.title,
+                            onChange: (e) => {
+                              let _signatories = [...signatories];
+                              _signatories[index].title = e;
+                              setSignatories(_signatories);
+                            },
+                          }}
+                        >
+                          {s.title}
+                        </Typography.Text>
+                      </div>
+
+                      <div className="flex flex-col space-y-1">
+                        <Typography.Text type="secondary">
+                          <div className="text-xs">Email</div>
+                        </Typography.Text>
+                        {s?.onBehalfOf === "Irembo Ltd" && (
+                          <Select
+                            showSearch={true}
+                            className="w-full"
+                            onChange={(e) => {
+                              let _signatories = [...signatories];
+                              _signatories[index].email = e;
+                              _signatories[index].names =
+                                users?.find((user) => user?.email == e)
+                                  ?.firstName +
+                                " " +
+                                users?.find((user) => user?.email == e)
+                                  ?.lastName;
+
+                              setSignatories(_signatories);
+                            }}
+                            options={users?.map((user, i) => {
+                              return {
+                                value: user?.email,
+                                label: user?.email,
+                              };
+                            })}
+                          />
+                        )}
+                        {s?.onBehalfOf !== "Irembo Ltd" && (
+                          <Typography.Text
+                            editable={{
+                              text: s.email,
+                              onChange: (e) => {
+                                let _signatories = [...signatories];
+                                _signatories[index].email = e;
+                                setSignatories(_signatories);
+                              },
+                            }}
+                          >
+                            {s.email}
+                          </Typography.Text>
+                        )}
+                      </div>
+                      <div className="flex flex-col space-y-1">
+                        <Typography.Text type="secondary">
+                          <div className="text-xs">Company Representative</div>
+                        </Typography.Text>
+                        <Typography.Text
+                          editable={{
+                            text: s.names,
+                            onChange: (e) => {
+                              let _signatories = [...signatories];
+                              _signatories[index].names = e;
+                              setSignatories(_signatories);
+                            },
+                          }}
+                        >
+                          {s.names}
                         </Typography.Text>
                       </div>
                     </div>
@@ -2646,8 +2831,16 @@ const RequestDetails = ({
   }
 
   const handleItemClick = (value) => {
-    setActiveIndex((prevIndex) => ((value && (prevIndex == -1 && approvalShow)) ? "" : (value && (prevIndex == "" && !approvalShow)) ? value : prevIndex === value ? "" : value));
-    setApprovalShow(false)
+    setActiveIndex((prevIndex) =>
+      value && prevIndex == -1 && approvalShow
+        ? ""
+        : value && prevIndex == "" && !approvalShow
+        ? value
+        : prevIndex === value
+        ? ""
+        : value
+    );
+    setApprovalShow(false);
   };
 
   function updateRequest(_files) {
@@ -2829,7 +3022,7 @@ const RequestDetails = ({
                   </p>
                 </div>
               </div>
-              <div className="grid lg:grid-cols-3 gap-5 ml-3">
+              <div className="grid lg:grid-cols-4 gap-5 ml-3">
                 <div>
                   <label className="text-[#000000e0] text-[14px]">
                     Service category:
@@ -2868,6 +3061,56 @@ const RequestDetails = ({
                     </Select>
                   </Form.Item>
                 </div>
+                <div>
+                  <label className="text-[#000000e0] text-[14px]">
+                    Purchase Request Currency:
+                  </label>
+                  <div className="text-xs text-gray-400">
+                    <Form.Item
+                      initialValue={data?.currency}
+                      name="currency"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Currency is required",
+                        },
+                      ]}
+                    >
+                      <Select
+                        // defaultValue={budgetLine}
+                        className="mt-3 w-full"
+                        size="large"
+                        placeholder="Select currency"
+                        showSearch
+                        value={data?.currency}
+                        disabled={disable}
+                        onChange={(value, option) => {
+                          let r = { ...data };
+                          r.currency = value;
+                          handleUpdateRequest(r);
+                        }}
+                        // filterSort={(optionA, optionB) =>
+                        //   (optionA?.label ?? "")
+                        //     .toLowerCase()
+                        //     .localeCompare(
+                        //       (optionB?.label ?? "").toLowerCase()
+                        //     )
+                        // }
+                        filterOption={(inputValue, option) => {
+                          return option.label
+                            .toLowerCase()
+                            .includes(inputValue.toLowerCase());
+                        }}
+                        options={[
+                          { label: "RWF", value: "RWF" },
+                          { label: "USD", value: "USD" },
+                          { label: "EUR", value: "EUR" },
+                          { label: "GBP", value: "GBP" },
+                        ]}
+                      ></Select>
+                    </Form.Item>
+                  </div>
+                </div>
                 <div className="flex flex-col col-span-2">
                   <label className="text-[#000000e0] text-[14px]">
                     Description:
@@ -2899,7 +3142,7 @@ const RequestDetails = ({
                   </Form.Item>
                 </div>
               </div>
-              <div className="grid lg:grid-cols-3 md:grid-cols-3 gap-5 ml-3">
+              <div className="grid lg:grid-cols-4 md:grid-cols-3 gap-5 ml-3">
                 <div>
                   <label className="text-[#000000e0] text-[14px]">
                     Request Budgeted?
@@ -3008,7 +3251,11 @@ const RequestDetails = ({
                   </Form.Item>
                 </div>
               </div>
-              <div className="my-10 pt-5 border-2 border-[#732083]">
+
+              <h3 className="mt-5 font-bold text-[15px]">
+                Request specifications
+              </h3>
+              <div className="mb-10 border-2 border-[#732083]">
                 <ItemsTable
                   setDataSource={(v) => {
                     setValues(v);
@@ -3017,13 +3264,87 @@ const RequestDetails = ({
                     handleUpdateRequest(r);
                   }}
                   dataSource={values}
+                  currency={data.currency}
                   fileList={fileList}
                   setFileList={_setFileList}
                   files={files}
                   setFiles={_setFiles}
                   editingRequest={true}
                   disable={disable ? true : false}
+                  noItemDocs={
+                    data?.supportingDocs && data?.supportingDocs?.length >= 1
+                  }
                 />
+              </div>
+              <div className="flex flex-col space-y-2">
+                <label className="text-[#000000e0] text-[14px]">
+                  Supporting Documents
+                </label>
+                {
+                  disable &&
+                    (data?.supportingDocs ||
+                      data?.supportingDocs?.length >= 1) && (
+                      <div className="flex flex-col">
+                        {data?.supportingDocs?.map((p, i) => {
+                          return (
+                            <div key={p}>
+                              {
+                                <Link
+                                  // href={`${url}/file/termsOfReference/${p}`}
+                                  href={`${fendUrl}/api?folder=termsOfReference&name=${p}`}
+                                  target="_blank"
+                                >
+                                  <Typography.Link
+                                    className="flex flex-row items-center space-x-2"
+                                    // onClick={() => {
+                                    //   setPreviewAttachment(!previewAttachment);
+                                    //   setAttachmentId(p);
+                                    // }}
+                                  >
+                                    <div>{p} </div>{" "}
+                                    <div>
+                                      <PaperClipIcon className="h-4 w-4" />
+                                    </div>
+                                  </Typography.Link>
+                                </Link>
+                              }
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )
+                  // (
+                  //   <div className="items-center justify-center flex flex-col">
+                  //     <div>
+                  //       <RectangleStackIcon className="h-5 w-5 text-gray-200" />
+                  //     </div>
+                  //     <div className="text-xs text-gray-400">No docs found</div>
+                  //   </div>
+                  // ))
+                }
+                {!disable && data?.supportingDocs && (
+                  <UploadOtherFiles files={files} setFiles={setFiles} />
+                )}
+
+                {(!data?.supportingDocs ||
+                  data?.supportingDocs?.length == 0) && (
+                  <div className="items-center justify-center flex flex-col">
+                    <div>
+                      <RectangleStackIcon className="h-5 w-5 text-gray-200" />
+                    </div>
+                    <div className="text-xs text-gray-400">No docs found</div>
+                  </div>
+                )}
+
+                {/* {!filesAreSet  && data?.supportingDocs || data?.supportingDocs?.length >= 1 && <Spin indicator={antIcon} />} */}
+                {/* {files?.length == 0 && (
+                  <div className="items-center justify-center flex flex-col">
+                    <div>
+                      <RectangleStackIcon className="h-5 w-5 text-gray-200" />
+                    </div>
+                    <div className="text-xs text-gray-400">No docs found</div>
+                  </div>
+                )} */}
               </div>
               {!disable && (
                 <div className="flex justify-end gap-5 mb-5">
@@ -3121,7 +3442,9 @@ const RequestDetails = ({
               <RiArrowDropDownLine
                 size={34}
                 className={`text-[48px] text-[#344767] arrow ${
-                  (activeIndex == "request" || (data && approvalShow)) ? "active" : ""
+                  activeIndex == "request" || (data && approvalShow)
+                    ? "active"
+                    : ""
                 }`}
               />
             </button>
@@ -3129,7 +3452,7 @@ const RequestDetails = ({
               ref={contentHeight}
               className="answer-container"
               style={
-                (activeIndex == "request" || (data && approvalShow))
+                activeIndex == "request" || (data && approvalShow)
                   ? { display: "block" }
                   : { display: "none" }
               }
@@ -3471,227 +3794,364 @@ const RequestDetails = ({
             ]}
           />
         </div>
-        {(currentCode == 3 || (tender || po || contract)) && <motion.div 
-          variants={bounceVariants}
-          initial="initial"
-          animate="animate"
-          className="bg-white rounded shadow py-1.5"
-        >
-          <div
-            className="request px-4 xl:max-h-[calc(100vh-265px)] max-h-[calc(100vh-65px)] overflow-y-auto"
-          >
-            <div 
-              // Transition duration
-              className="pt-3"
+        <Transition.Root show={show} as={Fragment}>
+          <Dialog as="div" className="relative z-10" onClose={handleClose}>
+            <Transition.Child
+              as={Fragment}
+              enter="ease-in-out duration-500"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in-out duration-500"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
             >
-              {/* Sourcing Method */}
-              {currentCode !== 3 && (
-                <div className="mb-5">
-                  <div className="text-[16px] font-bold">Sourcing Method</div>
-                  <div className="mt-4 text-[14px] line text-[#A3AEB4] leading-6">
-                    {(data?.sourcingMethod && (
-                      <Tag>{data?.sourcingMethod}</Tag>
-                    )) ||
-                      "No sourcing method selected at the moment."}
-                  </div>
-                </div>
-              )}
-              {currentCode === 3 && (!tender || !po || !contract) &&
-                (user?.permissions?.canCreateTenders ||
-                  user?.permissions?.canCreatePurchaseOrders ||
-                  user?.permissions?.canCreateContracts) && (
-                  <>
-                    <Form form={form}>
-                      <div className="text-[16px] font-bold">
-                        Sourcing Method Selection
+              <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+            </Transition.Child>
+
+            <div className="fixed inset-0 overflow-hidden">
+              <div className="absolute inset-0 overflow-hidden">
+                <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+                  <Transition.Child
+                    as={Fragment}
+                    enter="transform transition ease-in-out duration-500 sm:duration-700"
+                    enterFrom="translate-x-full"
+                    enterTo="translate-x-0"
+                    leave="transform transition ease-in-out duration-500 sm:duration-700"
+                    leaveFrom="translate-x-0"
+                    leaveTo="translate-x-full"
+                  >
+                    <Dialog.Panel className="pointer-events-auto relative w-screen max-w-md">
+                      <Transition.Child
+                        as={Fragment}
+                        enter="ease-in-out duration-500"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="ease-in-out duration-500"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                      >
+                        <div className="absolute left-0 top-0 -ml-8 flex pr-2 pt-4 sm:-ml-10 sm:pr-4"></div>
+                      </Transition.Child>
+                      <div className="flex h-full flex-col bg-white py-6 shadow-xl w-full">
+                        <div className="flex justify-between pl-4 -pr-10 sm:px-6">
+                          <Dialog.Title className="text-base font-semibold leading-6 text-gray-900">
+                            Details
+                          </Dialog.Title>
+                          <button
+                            type="button"
+                            className="border-0 rounded-md bg-transparent text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                            onClick={() => setShow(false)}
+                          >
+                            <XMarkIcon
+                              className="h-5 w-5 text-red-500"
+                              aria-hidden="true"
+                            />
+                          </button>
+                        </div>
+                        <div className="border-x-0 border-b-0 border-t border-[#BBBBBBEE] border-solid px-4 sm:px-6 mt-5">
+                          <div className="flex items-center gap-x-5">
+                            <button
+                              className={`bg-transparent py-3 my-3 ${
+                                tab == 0
+                                  ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238] px-4`
+                                  : `border-none text-[#8392AB]`
+                              } text-[14px] cursor-pointer`}
+                              onClick={() => setTab(0)}
+                            >
+                              Related Docs
+                            </button>
+                          </div>
+                        </div>
+                        {tender && data?.sourcingMethod === "Tendering" && (
+                          <>
+                            <h4 className="mb-2 mt-4 font-semibold ml-6">
+                              Tender Reference
+                            </h4>
+                            <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                              <Link
+                                href={`/system/tenders/${tender?._id}`}
+                                className="font-bold text-[16px] no-underline text-blue-600"
+                              >
+                                {tender?.number}
+                              </Link>
+                            </div>
+                          </>
+                        )}
+                        {contract &&
+                          (data?.sourcingMethod === "Direct Contracting" ||
+                            data?.sourcingMethod ===
+                              "From Existing Contract") && (
+                            <>
+                              <h4 className="mb-2 mt-4 font-semibold ml-6">
+                                Contract Reference
+                              </h4>
+                              <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                                <Link
+                                  href={`/system/contracts/${contract?._id}`}
+                                  className="font-bold text-[16px] no-underline text-blue-600"
+                                >
+                                  {contract?.number}
+                                </Link>
+                              </div>
+                            </>
+                          )}
+                        {po &&
+                          (data?.sourcingMethod === "Direct Contracting" ||
+                            data?.sourcingMethod ===
+                              "From Existing Contract") && (
+                            <>
+                              <h4 className="mb-2 mt-4 font-semibold ml-6">
+                                PO Reference
+                              </h4>
+                              <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                                <Link
+                                  href={`/system/purchase-orders/${po?._id}`}
+                                  className="font-bold text-[16px] no-underline text-blue-600"
+                                >
+                                  {po?.number}
+                                </Link>
+                              </div>
+                            </>
+                          )}
+                        <div />
                       </div>
-                      <div className="mt-5 items-center">
-                        <div className="mb-2">
-                          Please select a sourcing method
-                        </div>
-                        <Form.Item name="refDoc">
-                          <Select
-                            onChange={(value) => setRefDoc(value)}
-                            style={{ width: "100%", borderRadius: '6px', outline: refDoc ? "" : "1.8px solid #4297FF" }}
-                            defaultValue={false}
-                            options={[
-                              {
-                                value: "From Existing Contract",
-                                label: "Sourcing from Existing Contract",
-                              },
-
-                              {
-                                value: "Direct Contracting",
-                                label: "Direct contracting",
-                              },
-                              {
-                                value: "Tendering",
-                                label: "Tendering",
-                              },
-                            ]}
-                          />
-                        </Form.Item>
-                      </div>    
-                      {(refDoc === "Tendering" && !tender) &&
-                        buildTenderForm(
-                          setDeadLine,
-                          user,
-                          docId,
-                          submitTenderData,
-                          setTendeDocSelected,
-                          tenderDocSelected
-                        )}
-
-                      {(refDoc === "From Existing Contract" && !contract) &&
-                        buildPOForm(
-                          setSelectedContract,
-                          contracts,
-                          user,
-                          submitPOData,
-                          setVendor,
-                          selectedContract,
-                          documentFullySigned
-                        )}
-
-                      {(refDoc === "Direct Contracting" && !contract) && (
-                        <div>
-                          <div className="items-center">
-                            <div className="mb-2">Select registered vendor</div>
-                            <Form.Item name="vendor">
-                              <Select
-                                onChange={(value, option) => {
-                                  setVendor(option?.payload);
-                                }}
-                                style={{ width: "100%" }}
-                                showSearch
-                                filterSort={(optionA, optionB) =>
-                                  (optionA?.label ?? "")
-                                    .toLowerCase()
-                                    .localeCompare(
-                                      (optionB?.label ?? "").toLowerCase()
-                                    )
-                                }
-                                filterOption={(inputValue, option) =>
-                                  option?.label
-                                    .toLowerCase()
-                                    .includes(inputValue.toLowerCase())
-                                }
-                                options={vendors
-                                  ?.filter(
-                                    (v) => v?.vendor?.status === "approved"
-                                  )
-                                  ?.map((v) => {
-                                    return {
-                                      value: v?.vendor?._id,
-                                      label: v?.vendor?.companyName,
-                                      payload: v?.vendor,
-                                    };
-                                  })}
-                              />
-                            </Form.Item>
-                          </div>
-                          <div className="items-center">
-                            <div>
-                              Upload reference document{" "}
-                              <i className="text-xs">
-                                (expected in PDF format)
-                              </i>
-                            </div>
-                            <Form.Item name="vendor">
-                              <UploadReqAttach
-                                uuid={reqAttachId}
-                                setAttachSelected={setAttachSelected}
-                              />
-                            </Form.Item>
-                          </div>
-                          <div>
-                            <div className="flex flex-col w-full">
-                              <div className="flex flex-row space-x-1 items-center w-full mt-4">
-                                <Form.Item className="w-full my-2">
-                                  <Button
-                                    icon={<FileDoneOutlined />}
-                                    type="primary"
-                                    htmlType="submit"
-                                    onClick={submitContractData}
-                                    disabled={
-                                      !user?.permissions?.canCreateContracts ||
-                                      !vendor ||
-                                      !attachSelected
-                                    }
-                                    className="space-x-0 pt-1 pb-3 gap-2 px-2 mx-1 w-full"
-                                  >
-                                    Create Contract
-                                  </Button>
-                                </Form.Item>
-                              </div>
-
-                              <div className="flex flex-row space-x-1 items-center w-full mb-3">
-                                <Form.Item className="w-full my-2">
-                                  <Button
-                                    icon={<FileDoneOutlined />}
-                                    type="primary"
-                                    htmlType="submit"
-                                    onClick={submitPOData}
-                                    disabled={
-                                      !user?.permissions
-                                        ?.canCreatePurchaseOrders ||
-                                      !vendor ||
-                                      !attachSelected
-                                    }
-                                    className="space-x-0 pt-1 pb-3 gap-2 px-2 mx-1 w-full"
-                                  >
-                                    Create PO
-                                  </Button>
-                                </Form.Item>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </Form>
-                  </>
-                )}
-
-              {tender && data?.sourcingMethod === "Tendering" && (
-                <div className="mb-5">
-                  <Typography.Text type="secondary">
-                    Tender reference:{" "}
-                    <Link href={`/system/tenders/${tender?._id}`}
-                    >
-                      {tender?.number}
-                    </Link>
-                  </Typography.Text>
+                    </Dialog.Panel>
+                  </Transition.Child>
                 </div>
-              )}
-
-              {contract &&
-                (data?.sourcingMethod === "Direct Contracting" ||
-                  data?.sourcingMethod === "From Existing Contract") && (
-                  <div className="ml-3 mb-5">
-                    <Typography.Text type="secondary">
-                      Contract reference:{" "}
-                      <Link href={`/system/contracts/${contract?._id}`}>
-                        {contract?.number}
-                      </Link>
-                    </Typography.Text>
-                  </div>
-                )}
-
-              {po &&
-                (data?.sourcingMethod === "Direct Contracting" ||
-                  data?.sourcingMethod === "From Existing Contract") && (
-                  <div className="ml-3 mb-5">
-                    <Typography.Text type="secondary">
-                      PO reference:{" "}
-                      <Link href={`/system/purchase-orders/${po?._id}`}>
-                        {po?.number}
-                      </Link>
-                    </Typography.Text>
-                  </div>
-                )}
+              </div>
             </div>
-          </div>
-        </motion.div>}
+          </Dialog>
+        </Transition.Root>
+        {(currentCode == 3 || tender || po || contract) && (
+          <motion.div
+            variants={bounceVariants}
+            initial="initial"
+            animate="animate"
+            className="bg-white rounded shadow py-1.5"
+          >
+            <div className="request px-4 xl:max-h-[calc(100vh-265px)] max-h-[calc(100vh-65px)] overflow-y-auto">
+              <div
+                // Transition duration
+                className="pt-3"
+              >
+                {/* Sourcing Method */}
+                {currentCode !== 3 && (
+                  <div className="mb-5">
+                    <div className="text-[16px] font-bold">Sourcing Method</div>
+                    <div className="mt-4 text-[14px] line text-[#A3AEB4] leading-6">
+                      {(data?.sourcingMethod && (
+                        <Tag>{data?.sourcingMethod}</Tag>
+                      )) ||
+                        "No sourcing method selected at the moment."}
+                    </div>
+                  </div>
+                )}
+                {currentCode === 3 &&
+                  (!tender || !po || !contract) &&
+                  (user?.permissions?.canCreateTenders ||
+                    user?.permissions?.canCreatePurchaseOrders ||
+                    user?.permissions?.canCreateContracts) && (
+                    <>
+                      <Form form={form}>
+                        <div className="text-[16px] font-bold">
+                          Sourcing Method Selection
+                        </div>
+                        <div className="mt-5 items-center">
+                          <div className="mb-2">
+                            Please select a sourcing method
+                          </div>
+                          <Form.Item name="refDoc">
+                            <Select
+                              onChange={(value) => setRefDoc(value)}
+                              style={{
+                                width: "100%",
+                                borderRadius: "6px",
+                                outline: refDoc ? "" : "1.8px solid #4297FF",
+                              }}
+                              defaultValue={false}
+                              options={[
+                                {
+                                  value: "From Existing Contract",
+                                  label: "Sourcing from Existing Contract",
+                                },
+
+                                {
+                                  value: "Direct Contracting",
+                                  label: "Direct contracting",
+                                },
+                                {
+                                  value: "Tendering",
+                                  label: "Tendering",
+                                },
+                              ]}
+                            />
+                          </Form.Item>
+                        </div>
+                        {refDoc === "Tendering" &&
+                          !tender &&
+                          buildTenderForm(
+                            setDeadLine,
+                            user,
+                            docId,
+                            submitTenderData,
+                            setTendeDocSelected,
+                            tenderDocSelected
+                          )}
+
+                        {refDoc === "From Existing Contract" &&
+                          !contract &&
+                          buildPOForm(
+                            setSelectedContract,
+                            contracts,
+                            user,
+                            submitPOData,
+                            setVendor,
+                            selectedContract,
+                            documentFullySigned
+                          )}
+
+                        {refDoc === "Direct Contracting" && !contract && (
+                          <div>
+                            <div className="items-center">
+                              <div className="mb-2">
+                                Select registered vendor
+                              </div>
+                              <Form.Item name="vendor">
+                                <Select
+                                  onChange={(value, option) => {
+                                    setVendor(option?.payload);
+                                  }}
+                                  style={{ width: "100%" }}
+                                  showSearch
+                                  filterSort={(optionA, optionB) =>
+                                    (optionA?.label ?? "")
+                                      .toLowerCase()
+                                      .localeCompare(
+                                        (optionB?.label ?? "").toLowerCase()
+                                      )
+                                  }
+                                  filterOption={(inputValue, option) =>
+                                    option?.label
+                                      .toLowerCase()
+                                      .includes(inputValue.toLowerCase())
+                                  }
+                                  options={vendors
+                                    ?.filter(
+                                      (v) => v?.vendor?.status === "approved"
+                                    )
+                                    ?.map((v) => {
+                                      return {
+                                        value: v?.vendor?._id,
+                                        label: v?.vendor?.companyName,
+                                        payload: v?.vendor,
+                                      };
+                                    })}
+                                />
+                              </Form.Item>
+                            </div>
+                            <div className="items-center">
+                              <div>
+                                Upload reference document{" "}
+                                <i className="text-xs">
+                                  (expected in PDF format)
+                                </i>
+                              </div>
+                              <Form.Item name="vendor">
+                                <UploadReqAttach
+                                  uuid={reqAttachId}
+                                  setAttachSelected={setAttachSelected}
+                                />
+                              </Form.Item>
+                            </div>
+                            <div>
+                              <div className="flex flex-col w-full">
+                                <div className="flex flex-row space-x-1 items-center w-full mt-4">
+                                  <Form.Item className="w-full my-2">
+                                    <Button
+                                      icon={<FileDoneOutlined />}
+                                      type="primary"
+                                      htmlType="submit"
+                                      onClick={submitContractData}
+                                      disabled={
+                                        !user?.permissions
+                                          ?.canCreateContracts ||
+                                        !vendor ||
+                                        !attachSelected
+                                      }
+                                      className="space-x-0 pt-1 pb-3 gap-2 px-2 mx-1 w-full"
+                                    >
+                                      Create Contract
+                                    </Button>
+                                  </Form.Item>
+                                </div>
+
+                                <div className="flex flex-row space-x-1 items-center w-full mb-3">
+                                  <Form.Item className="w-full my-2">
+                                    <Button
+                                      icon={<FileDoneOutlined />}
+                                      type="primary"
+                                      htmlType="submit"
+                                      onClick={submitPOData}
+                                      disabled={
+                                        !user?.permissions
+                                          ?.canCreatePurchaseOrders ||
+                                        !vendor ||
+                                        !attachSelected
+                                      }
+                                      className="space-x-0 pt-1 pb-3 gap-2 px-2 mx-1 w-full"
+                                    >
+                                      Create PO
+                                    </Button>
+                                  </Form.Item>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </Form>
+                    </>
+                  )}
+
+                {tender && data?.sourcingMethod === "Tendering" && (
+                  <div className="mb-5">
+                    <Typography.Text type="secondary">
+                      Tender reference:{" "}
+                      <Link href={`/system/tenders/${tender?._id}`}>
+                        {tender?.number}
+                      </Link>
+                    </Typography.Text>
+                  </div>
+                )}
+
+                {contract &&
+                  (data?.sourcingMethod === "Direct Contracting" ||
+                    data?.sourcingMethod === "From Existing Contract") && (
+                    <div className="ml-3 mb-5">
+                      <Typography.Text type="secondary">
+                        Contract reference:{" "}
+                        <Link href={`/system/contracts/${contract?._id}`}>
+                          {contract?.number}
+                        </Link>
+                      </Typography.Text>
+                    </div>
+                  )}
+
+                {po &&
+                  (data?.sourcingMethod === "Direct Contracting" ||
+                    data?.sourcingMethod === "From Existing Contract") && (
+                    <div className="ml-3 mb-5">
+                      <Typography.Text type="secondary">
+                        PO reference:{" "}
+                        <Link href={`/system/purchase-orders/${po?._id}`}>
+                          {po?.number}
+                        </Link>
+                      </Typography.Text>
+                    </div>
+                  )}
+              </div>
+            </div>
+          </motion.div>
+        )}
       </div>
     </div>
   );
