@@ -656,6 +656,7 @@ export default function NewRequest() {
                 setFileList={_setFileList}
                 files={files}
                 setFiles={_setFiles}
+                currency={currency}
               />
 
               <div className="md:w-1/2 lg:w-1/3">

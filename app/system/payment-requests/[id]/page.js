@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import { encode } from "base-64";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -49,6 +49,7 @@ import {
   LockClosedIcon,
   UserGroupIcon,
   LightBulbIcon,
+  XMarkIcon
 } from "@heroicons/react/24/outline";
 import UploadPaymentReq from "@/app/components/uploadPaymentReq";
 import UpdatePaymentReqDoc from "@/app/components/updatePaymentReqDoc";
@@ -57,7 +58,10 @@ import { MdApproval, MdOutlinePayments } from "react-icons/md";
 import { RiForbidLine, RiArrowDropDownLine } from "react-icons/ri";
 import { MdAccountBalance } from "react-icons/md";
 import { FaMobileAlt } from "react-icons/fa";
+import { TiInfoLarge } from "react-icons/ti";
 import { useUser } from "@/app/context/UserContext";
+import { Dialog, Transition } from "@headlessui/react";
+import { usePaymentContext } from "@/app/context/PaymentContext";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let fend_url = process.env.NEXT_PUBLIC_FTEND_URL;
@@ -243,6 +247,7 @@ export default function PaymentRequest({ params }) {
   //   typeof window !== "undefined" && localStorage.getItem("user")
   // );
   let token = typeof window !== "undefined" && localStorage.getItem("token");
+  const [show, setShow] = useState(false);
   let [paymentRequest, setPaymentRequest] = useState(null);
   let router = useRouter();
   let [form] = Form.useForm();
@@ -296,6 +301,8 @@ export default function PaymentRequest({ params }) {
   let [accountNumber, setAccountNumber] = useState("");
   let [phoneName, setPhoneName] = useState("");
   let [phoneNumber, setPhoneNumber] = useState("");
+  const [tab, setTab] = useState(0)
+  const {page, filter} = usePaymentContext()
 
   useEffect(() => {
     getPaymentRequestDetails(params.id, router).then((res) => {
@@ -882,6 +889,98 @@ export default function PaymentRequest({ params }) {
       }}
       className="flex flex-col mr-5 transition-opacity ease-in-out duration-1000 py-5 flex-1 space-y-3 h-screen mb-10"
     >
+      <Transition.Root show={show || false} as={Fragment}>
+        <Dialog as="div" className="relative z-10" onClose={() => setShow(false)}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-in-out duration-500"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in-out duration-500"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-hidden">
+            <div className="absolute inset-0 overflow-hidden">
+              <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+                <Transition.Child
+                  as={Fragment}
+                  enter="transform transition ease-in-out duration-500 sm:duration-700"
+                  enterFrom="translate-x-full"
+                  enterTo="translate-x-0"
+                  leave="transform transition ease-in-out duration-500 sm:duration-700"
+                  leaveFrom="translate-x-0"
+                  leaveTo="translate-x-full"
+                >
+                  <Dialog.Panel className="pointer-events-auto relative w-screen max-w-md">
+                    <Transition.Child
+                      as={Fragment}
+                      enter="ease-in-out duration-500"
+                      enterFrom="opacity-0"
+                      enterTo="opacity-100"
+                      leave="ease-in-out duration-500"
+                      leaveFrom="opacity-100"
+                      leaveTo="opacity-0"
+                    >
+                      <div className="absolute left-0 top-0 -ml-8 flex pr-2 pt-4 sm:-ml-10 sm:pr-4"></div>
+                    </Transition.Child>
+                    <div className="flex h-full flex-col bg-white py-6 shadow-xl w-full">
+                      <div className="flex justify-between pl-4 -pr-10 sm:px-6">
+                        <Dialog.Title className="text-base font-semibold leading-6 text-gray-900">
+                          Details
+                        </Dialog.Title>
+                        <button
+                          type="button"
+                          className="border-0 rounded-md bg-transparent text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                          onClick={() => setShow(false)}
+                        >
+                          <XMarkIcon
+                            className="h-5 w-5 text-red-500"
+                            aria-hidden="true"
+                          />
+                        </button>
+                      </div>
+                      <div className="border-x-0 border-b-0 border-t border-[#BBBBBBEE] border-solid px-4 sm:px-6 mt-5">
+                        <div className="flex items-center gap-x-5">
+                          <button
+                            className={`bg-transparent py-3 my-3 ${
+                              tab == 0
+                                ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238] px-4`
+                                : `border-none text-[#8392AB]`
+                            } text-[14px] cursor-pointer`}
+                            onClick={() => setTab(0)}
+                          >
+                            Related Docs
+                          </button>
+                        </div>
+                      </div>
+                      {paymentRequest?.purchaseOrder && (
+                          <>
+                            <h4 className="mb-2 mt-4 font-semibold ml-6">
+                              PO Reference
+                            </h4>
+                            <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                              <Link
+                                href={`/system/purchase-orders/${paymentRequest?.purchaseOrder?._id}/?page=${page}&filter=${filter}`}
+                                className="font-bold text-[16px] no-underline text-blue-600"
+                              >
+                                {paymentRequest?.purchaseOrder?.number}
+                              </Link>
+                            </div>
+                          </>
+                        )}
+                      <div />
+                    </div>
+                  </Dialog.Panel>
+                </Transition.Child>
+              </div>
+            </div>
+          </div>
+        </Dialog>
+      </Transition.Root>
       {contextHolder}
       <div className="flex items-center justify-between mr-6 mb-4">
         <Button
@@ -891,7 +990,9 @@ export default function PaymentRequest({ params }) {
         >
           Return to List
         </Button>
-        <div className="gap-5" />
+        <button onClick={() => setShow(true)} className="cursor-pointer bg-transparent px-1.5 py-1 rounded-full border-solid border-2 border-[#FFF]">
+          <TiInfoLarge className="text-[#FFF]" />
+        </button>
       </div>
       <div className="request-details gap-4 mb-6 items-start h-[calc(100vh-200px)] overflow-y-auto">
         <div className="grid md:grid-cols-5 gap-1 items-start">

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import {
   Button,
   DatePicker,
@@ -87,6 +87,7 @@ import { useUser } from "../context/UserContext";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import UploadOtherFiles from "./uploadOtherFiles";
+import { Dialog, Transition } from "@headlessui/react";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -379,6 +380,8 @@ const RequestDetails = ({
   setFiles,
   handleUpload,
   filesAreSet,
+  show,
+  handleClose,
 }) => {
   const [form] = Form.useForm();
   const router = useRouter();
@@ -450,6 +453,7 @@ const RequestDetails = ({
   const [approvalShow, setApprovalShow] = useState(true);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [emptySignatory, setEmptySignatory] = useState([]);
+  const [tab, setTab] = useState(0);
   const contentHeight = useRef();
   const scrollRef = useRef();
 
@@ -650,7 +654,7 @@ const RequestDetails = ({
         inline: "start",
       });
     }
-  }, [data]);
+  }, []);
 
   useEffect(() => {
     let t = 0;
@@ -3670,6 +3674,134 @@ const RequestDetails = ({
             ]}
           />
         </div>
+        <Transition.Root show={show} as={Fragment}>
+          <Dialog as="div" className="relative z-10" onClose={handleClose}>
+            <Transition.Child
+              as={Fragment}
+              enter="ease-in-out duration-500"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in-out duration-500"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+            </Transition.Child>
+
+            <div className="fixed inset-0 overflow-hidden">
+              <div className="absolute inset-0 overflow-hidden">
+                <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+                  <Transition.Child
+                    as={Fragment}
+                    enter="transform transition ease-in-out duration-500 sm:duration-700"
+                    enterFrom="translate-x-full"
+                    enterTo="translate-x-0"
+                    leave="transform transition ease-in-out duration-500 sm:duration-700"
+                    leaveFrom="translate-x-0"
+                    leaveTo="translate-x-full"
+                  >
+                    <Dialog.Panel className="pointer-events-auto relative w-screen max-w-md">
+                      <Transition.Child
+                        as={Fragment}
+                        enter="ease-in-out duration-500"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="ease-in-out duration-500"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                      >
+                        <div className="absolute left-0 top-0 -ml-8 flex pr-2 pt-4 sm:-ml-10 sm:pr-4"></div>
+                      </Transition.Child>
+                      <div className="flex h-full flex-col bg-white py-6 shadow-xl w-full">
+                        <div className="flex justify-between pl-4 -pr-10 sm:px-6">
+                          <Dialog.Title className="text-base font-semibold leading-6 text-gray-900">
+                            Details
+                          </Dialog.Title>
+                          <button
+                            type="button"
+                            className="border-0 rounded-md bg-transparent text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                            onClick={() => setShow(false)}
+                          >
+                            <XMarkIcon
+                              className="h-5 w-5 text-red-500"
+                              aria-hidden="true"
+                            />
+                          </button>
+                        </div>
+                        <div className="border-x-0 border-b-0 border-t border-[#BBBBBBEE] border-solid px-4 sm:px-6 mt-5">
+                          <div className="flex items-center gap-x-5">
+                            <button
+                              className={`bg-transparent py-3 my-3 ${
+                                tab == 0
+                                  ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238] px-4`
+                                  : `border-none text-[#8392AB]`
+                              } text-[14px] cursor-pointer`}
+                              onClick={() => setTab(0)}
+                            >
+                              Related Docs
+                            </button>
+                          </div>
+                        </div>
+                        {tender && data?.sourcingMethod === "Tendering" && (
+                          <>
+                            <h4 className="mb-2 mt-4 font-semibold ml-6">
+                              Tendering Reference
+                            </h4>
+                            <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                              <Link
+                                href={`/system/tenders/${tender?._id}`}
+                                className="font-bold text-[16px] no-underline text-blue-600"
+                              >
+                                {tender?.number}
+                              </Link>
+                            </div>
+                          </>
+                        )}
+                        {contract &&
+                          (data?.sourcingMethod === "Direct Contracting" ||
+                            data?.sourcingMethod ===
+                              "From Existing Contract") && (
+                            <>
+                              <h4 className="mb-2 mt-4 font-semibold ml-6">
+                                Contract Reference
+                              </h4>
+                              <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                                <Link
+                                  href={`/system/contracts/${contract?._id}`}
+                                  className="font-bold text-[16px] no-underline text-blue-600"
+                                >
+                                  {contract?.number}
+                                </Link>
+                              </div>
+                            </>
+                          )}
+                        {po &&
+                          (data?.sourcingMethod === "Direct Contracting" ||
+                            data?.sourcingMethod ===
+                              "From Existing Contract") && (
+                            <>
+                              <h4 className="mb-2 mt-4 font-semibold ml-6">
+                                PO Reference
+                              </h4>
+                              <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                                <Link
+                                  href={`/system/purchase-orders/${po?._id}`}
+                                  className="font-bold text-[16px] no-underline text-blue-600"
+                                >
+                                  {po?.number}
+                                </Link>
+                              </div>
+                            </>
+                          )}
+                        <div />
+                      </div>
+                    </Dialog.Panel>
+                  </Transition.Child>
+                </div>
+              </div>
+            </div>
+          </Dialog>
+        </Transition.Root>
         {(currentCode == 3 || tender || po || contract) && (
           <motion.div
             variants={bounceVariants}
