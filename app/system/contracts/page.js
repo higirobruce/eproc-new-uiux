@@ -1669,23 +1669,51 @@ export default function Contracts() {
                         <Typography.Text type="secondary">
                           <div className="text-xs">Email</div>
                         </Typography.Text>
-                        <Typography.Text
-                          strong
-                          editable={
-                            editContract &&
-                            (contract?.status === "draft" ||
-                              contract?.status === "legal-review") && {
-                              text: s.email,
-                              onChange: (e) => {
-                                let _signatories = [...signatories];
-                                _signatories[index].email = e;
-                                setSignatories(_signatories);
-                              },
+                        {(!editContract || s?.onBehalfOf !== "Irembo Ltd") && (
+                          <Typography.Text
+                            strong
+                            editable={
+                              editContract &&
+                              s?.onBehalfOf !== "Irembo Ltd" &&
+                              (contract?.status === "draft" ||
+                                contract?.status === "legal-review") && {
+                                text: s.email,
+                                onChange: (e) => {
+                                  let _signatories = [...signatories];
+                                  _signatories[index].email = e;
+                                  setSignatories(_signatories);
+                                },
+                              }
                             }
-                          }
-                        >
-                          {s.email}
-                        </Typography.Text>
+                          >
+                            {s.email}
+                          </Typography.Text>
+                        )}
+                        {editContract && s?.onBehalfOf === "Irembo Ltd" && (
+                          <Select
+                            showSearch={true}
+                            defaultValue={`${s?.email}`}
+                            className="w-full"
+                            onChange={(e) => {
+                              let _signatories = [...signatories];
+                              _signatories[index].email = e;
+                              _signatories[index].names =
+                                users?.find((user) => user?.email == e)
+                                  ?.firstName +
+                                " " +
+                                users?.find((user) => user?.email == e)
+                                  ?.lastName;
+
+                              setSignatories(_signatories);
+                            }}
+                            options={users?.map((user, i) => {
+                              return {
+                                value: user?.email,
+                                label: user?.email,
+                              };
+                            })}
+                          />
+                        )}
                       </div>
 
                       {s.signed && (
@@ -2715,8 +2743,7 @@ export default function Contracts() {
                               <button
                                 disabled={
                                   !documentFullySigned(contract) ||
-                                  user?.userType == "VENDOR" 
-                                  ||
+                                  user?.userType == "VENDOR" ||
                                   moment(contract?.endDate).isBefore(moment())
                                 }
                                 className={`${

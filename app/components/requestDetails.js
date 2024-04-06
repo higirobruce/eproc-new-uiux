@@ -2481,9 +2481,8 @@ const RequestDetails = ({
           </div> */}
 
           {/* Signatories */}
-          {console.log("Signatories 123 ", emptySignatory)}
           <div className="grid grid-cols-3 gap-5">
-            {signatories.map((s, index) => {
+            {/* {signatories.map((s, index) => {
               return (
                 <div
                   key={index}
@@ -2565,6 +2564,125 @@ const RequestDetails = ({
                           }}
                         >
                           {s.email}
+                        </Typography.Text>
+                      </div>
+                    </div>
+                    <div
+                      onClick={() => {
+                        let _signatories = [...signatories];
+                        _signatories.splice(index, 1);
+                        setSignatories(_signatories);
+                      }}
+                    >
+                      <XMarkIcon className="h-3 px-5 cursor-pointer" />
+                    </div>
+                  </div>
+                </div>
+              );
+            })} */}
+
+            {signatories.map((s, index) => {
+              return (
+                <div
+                  key={index}
+                  className="flex flex-col ring-1 ring-gray-300 rounded py-5"
+                >
+                  <div className="flex flex-row items-start justify-between">
+                    <div className="flex flex-col space-y-3 px-5">
+                      <div className="flex flex-col space-y-1">
+                        <Typography.Text type="secondary">
+                          <div className="text-xs">On Behalf of</div>
+                        </Typography.Text>
+                        <Typography.Text
+                          editable={{
+                            text: s.onBehalfOf,
+                            onChange: (e) => {
+                              let _signatories = [...signatories];
+                              _signatories[index].onBehalfOf = e;
+                              setSignatories(_signatories);
+                            },
+                          }}
+                        >
+                          {s.onBehalfOf}
+                        </Typography.Text>
+                      </div>
+
+                      <div className="flex flex-col space-y-1">
+                        <Typography.Text type="secondary">
+                          <div className="text-xs">Representative Title</div>
+                        </Typography.Text>
+                        <Typography.Text
+                          editable={{
+                            text: s.title,
+                            onChange: (e) => {
+                              let _signatories = [...signatories];
+                              _signatories[index].title = e;
+                              setSignatories(_signatories);
+                            },
+                          }}
+                        >
+                          {s.title}
+                        </Typography.Text>
+                      </div>
+
+                      <div className="flex flex-col space-y-1">
+                        <Typography.Text type="secondary">
+                          <div className="text-xs">Email</div>
+                        </Typography.Text>
+                        {s?.onBehalfOf === "Irembo Ltd" && (
+                          <Select
+                            showSearch={true}
+                            className="w-full"
+                            onChange={(e) => {
+                              let _signatories = [...signatories];
+                              _signatories[index].email = e;
+                              _signatories[index].names =
+                                users?.find((user) => user?.email == e)
+                                  ?.firstName +
+                                " " +
+                                users?.find((user) => user?.email == e)
+                                  ?.lastName;
+
+                              setSignatories(_signatories);
+                            }}
+                            options={users?.map((user, i) => {
+                              return {
+                                value: user?.email,
+                                label: user?.email,
+                              };
+                            })}
+                          />
+                        )}
+                        {s?.onBehalfOf !== "Irembo Ltd" && (
+                          <Typography.Text
+                            editable={{
+                              text: s.email,
+                              onChange: (e) => {
+                                let _signatories = [...signatories];
+                                _signatories[index].email = e;
+                                setSignatories(_signatories);
+                              },
+                            }}
+                          >
+                            {s.email}
+                          </Typography.Text>
+                        )}
+                      </div>
+                      <div className="flex flex-col space-y-1">
+                        <Typography.Text type="secondary">
+                          <div className="text-xs">Company Representative</div>
+                        </Typography.Text>
+                        <Typography.Text
+                          editable={{
+                            text: s.names,
+                            onChange: (e) => {
+                              let _signatories = [...signatories];
+                              _signatories[index].names = e;
+                              setSignatories(_signatories);
+                            },
+                          }}
+                        >
+                          {s.names}
                         </Typography.Text>
                       </div>
                     </div>
