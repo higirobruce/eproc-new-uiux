@@ -919,7 +919,7 @@ export default function UserRequests() {
         ),
       };
     });
-    exportToCSV(_data, "exported_data.csv");
+    exportToCSV(_data, "purchase_requests.csv");
   };
 
   return !rowData ? (
