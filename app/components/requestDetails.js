@@ -445,6 +445,7 @@ const RequestDetails = ({
 
   const [users, setUsers] = useState([]);
 
+  const [poCurrency, setPoCurrency] = useState(null);
   const [assets, setAssets] = useState([]);
 
   let [tendor, setTendor] = useState("");
@@ -578,6 +579,7 @@ const RequestDetails = ({
     });
 
     setValues(data?.items);
+    setPoCurrency(data?.currency || "RWF");
 
     // let _p = data?.items?.map((item) => {
     //   let _files = [];
@@ -1585,7 +1587,7 @@ const RequestDetails = ({
           setCreatingPO(true);
           let assetItems = [];
           let nonAssetItems = [];
-          let docCurrency = (items && items[0]?.currency) || "RWF";
+          let docCurrency = poCurrency || "RWF";
           let assetsNeeded = false;
 
           items
@@ -1598,7 +1600,7 @@ const RequestDetails = ({
                   Quantity: i.quantity / i?.assetCodes?.length,
                   UnitPrice: i.estimatedUnitCost,
                   VatGroup: i.taxGroup ? i.taxGroup : "X1",
-                  Currency: i.currency ? i.currency : "RWF",
+                  Currency: poCurrency || "RWF",
                 });
               });
             });
@@ -1611,7 +1613,7 @@ const RequestDetails = ({
                 Quantity: i.quantity,
                 UnitPrice: i.estimatedUnitCost,
                 VatGroup: i.taxGroup ? i.taxGroup : "X1",
-                Currency: i.currency ? i.currency : "RWF",
+                Currency: poCurrency || "RWF",
               });
             });
 
@@ -1717,6 +1719,7 @@ const RequestDetails = ({
             PURCHASE ORDER: {vendor?.companyName}
           </Typography.Title>
           {/* header */}
+
           <div className="grid grid-cols-2 w-1/2">
             {/* PO Document date */}
             {/* <div>
@@ -1735,7 +1738,53 @@ const RequestDetails = ({
                   { value: "dDocument_Item", label: "Item" },
                 ]}
               />
+
             </div> */}
+            <div>
+              <div className="mb-3">
+                <label>Purchase Order Currency</label>
+              </div>
+              <Form.Item
+                name="currency"
+                rules={[
+                  {
+                    required: true,
+                    message: "Currency is required",
+                  },
+                ]}
+              >
+                <Select
+                  // defaultValue={poCurrency}
+                  value={poCurrency}
+                  // disabled={disable}
+                  size="large"
+                  className="w-full"
+                  onChange={(value) => setPoCurrency(value)}
+                  options={[
+                    {
+                      value: "RWF",
+                      label: "RWF",
+                      key: "RWF",
+                    },
+                    {
+                      value: "USD",
+                      label: "USD",
+                      key: "USD",
+                    },
+                    {
+                      value: "EUR",
+                      label: "EUR",
+                      key: "EUR",
+                    },
+                    {
+                      value: "GBP",
+                      label: "GBP",
+                      key: "GBP",
+                    },
+                  ]}
+                />
+              </Form.Item>
+            </div>
           </div>
 
           {/* Parties */}
@@ -1837,17 +1886,16 @@ const RequestDetails = ({
               dataSource={items}
               setDataSource={setItems}
               assetOptions={assetOptions}
+              currency={poCurrency}
             />
             <Typography.Title level={5} className="self-end">
-              Total (Tax Excl.):{" "}
-              {items[0]?.currency + " " + totalVal?.toLocaleString()}
+              Total (Tax Excl.): {poCurrency + " " + totalVal?.toLocaleString()}
             </Typography.Title>
             <Typography.Title level={5} className="self-end">
-              Total Tax: {items[0]?.currency + " " + totalTax?.toLocaleString()}
+              Total Tax: {poCurrency + " " + totalTax?.toLocaleString()}
             </Typography.Title>
             <Typography.Title level={4} className="self-end">
-              Gross Total:{" "}
-              {items[0]?.currency + " " + grossTotal?.toLocaleString()}
+              Gross Total: {poCurrency + " " + grossTotal?.toLocaleString()}
             </Typography.Title>
 
             {/* Sections */}

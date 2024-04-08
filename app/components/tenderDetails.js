@@ -135,6 +135,7 @@ const TenderDetails = ({
   let [discount, setDiscount] = useState(0);
   let [comment, setComment] = useState("");
   let [currency, setCurrency] = useState("RWF");
+  let [poCurrency, setPoCurrency] = useState("RWF");
   let [iSubmitted, setISubmitted] = useState(false);
   let [checkingSubmission, setCheckingSubmission] = useState(false);
   let [refresh, setRefresh] = useState(1);
@@ -1088,7 +1089,7 @@ const TenderDetails = ({
           setCreatingPo(true);
           let assetItems = [];
           let nonAssetItems = [];
-          let docCurrency = (items && items[0]?.currency) || "RWF";
+          let docCurrency = poCurrency || "RWF";
 
           items
             .filter((i) => i.itemType === "asset")
@@ -1099,7 +1100,7 @@ const TenderDetails = ({
                   Quantity: i.quantity / i?.assetCodes?.length,
                   UnitPrice: i.estimatedUnitCost,
                   VatGroup: i.taxGroup ? i.taxGroup : "X1",
-                  Currency: i.currency ? i.currency : "RWF",
+                  Currency: poCurrency || "RWF",
                 });
               });
             });
@@ -1112,7 +1113,7 @@ const TenderDetails = ({
                 Quantity: i.quantity,
                 UnitPrice: i.estimatedUnitCost,
                 VatGroup: i.taxGroup ? i.taxGroup : "X1",
-                Currency: i.currency ? i.currency : "RWF",
+                Currency: poCurrency || "RWF",
               });
             });
 
@@ -1124,7 +1125,7 @@ const TenderDetails = ({
           //         Quantity: i.quantity / assets[index]?.length,
           //         UnitPrice: i.estimatedUnitCost,
           //         VatGroup: i.taxGroup ? i.taxGroup : "X1",
-          // Currency: i.currency ? i.currency : "RWF"
+          // Currency: poCurrency || "RWF"
           //       });
           //     });
           //   });
@@ -1195,7 +1196,8 @@ const TenderDetails = ({
                 B1Data_Assets,
                 B1Data_NonAssets,
               },
-              signatories
+              signatories,
+              poCurrency
             );
             setCreatingPo(false);
             setOpenCreatePO(false);
@@ -1231,6 +1233,51 @@ const TenderDetails = ({
                 ]}
               />
             </div> */}
+            <div>
+              <div className="mb-3">
+                <label>Purchase Order Currency</label>
+              </div>
+              <Form.Item
+                name="currency"
+                rules={[
+                  {
+                    required: true,
+                    message: "Currency is required",
+                  },
+                ]}
+              >
+                <Select
+                  defaultValue={poCurrency}
+                  value={poCurrency}
+                  // disabled={disable}
+                  size="large"
+                  className="w-full"
+                  onChange={(value) => setPoCurrency(value)}
+                  options={[
+                    {
+                      value: "RWF",
+                      label: "RWF",
+                      key: "RWF",
+                    },
+                    {
+                      value: "USD",
+                      label: "USD",
+                      key: "USD",
+                    },
+                    {
+                      value: "EUR",
+                      label: "EUR",
+                      key: "EUR",
+                    },
+                    {
+                      value: "GBP",
+                      label: "GBP",
+                      key: "GBP",
+                    },
+                  ]}
+                />
+              </Form.Item>
+            </div>
           </div>
 
           {/* Parties */}
@@ -1336,18 +1383,17 @@ const TenderDetails = ({
                 dataSource={items}
                 setDataSource={setItems}
                 assetOptions={assetOptions}
+                currency={poCurrency}
               />
               <Typography.Title level={5} className="self-end">
                 Total (Tax Excl.):{" "}
-                {items[0]?.currency + " " + totalVal?.toLocaleString()}
+                {poCurrency + " " + totalVal?.toLocaleString()}
               </Typography.Title>
               <Typography.Title level={5} className="self-end">
-                Total Tax:{" "}
-                {items[0]?.currency + " " + totalTax?.toLocaleString()}
+                Total Tax: {poCurrency + " " + totalTax?.toLocaleString()}
               </Typography.Title>
               <Typography.Title level={4} className="self-end">
-                Gross Total:{" "}
-                {items[0]?.currency + " " + grossTotal?.toLocaleString()}
+                Gross Total: {poCurrency + " " + grossTotal?.toLocaleString()}
               </Typography.Title>
 
               {/* Sections */}
@@ -2673,19 +2719,19 @@ const TenderDetails = ({
             />
             <Typography.Title level={5} className="self-end">
               Total (Tax Excl.):{" "}
-              {po?.items[0]?.currency +
+              {po?.poCurrency +
                 " " +
                 getPoTotalVal().totalVal?.toLocaleString()}{" "}
             </Typography.Title>
             <Typography.Title level={5} className="self-end">
               Tax:{" "}
-              {po?.items[0]?.currency +
+              {po?.poCurrency +
                 " " +
                 getPoTotalVal().totalTax?.toLocaleString()}
             </Typography.Title>
             <Typography.Title level={5} className="self-end">
               Gross Total:{" "}
-              {po?.items[0]?.currency +
+              {po?.poCurrency +
                 " " +
                 getPoTotalVal().grossTotal?.toLocaleString()}
             </Typography.Title>
@@ -3844,13 +3890,17 @@ const TenderDetails = ({
     "not awarded": { bgColor: "#FEE", color: "#F5365C", status: "Not Awarded" },
   };
 
-  const [referenceTab, setReferenceTab] = useState(0)
+  const [referenceTab, setReferenceTab] = useState(0);
   const [show, setShow] = useState(false);
 
   return (
     <div className="flex flex-col p-3 rounded mb-6">
       <Transition.Root show={show} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={() => setShow(false)}>
+        <Dialog
+          as="div"
+          className="relative z-10"
+          onClose={() => setShow(false)}
+        >
           <Transition.Child
             as={Fragment}
             enter="ease-in-out duration-500"
@@ -3918,50 +3968,52 @@ const TenderDetails = ({
                         </div>
                       </div>
                       {contract && (
-                          <>
-                            <h4 className="mb-2 mt-4 font-semibold ml-6">
-                              Contract Reference
-                            </h4>
-                            <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
-                              <Link
-                                href={`/system/contracts/${contract?._id}`}
-                                className="font-bold text-[16px] no-underline text-blue-600"
-                              >
-                                {contract?.number}
-                              </Link>
-                            </div>
-                          </>
-                        )}
-                        {po && (
-                            <>
-                              <h4 className="mb-2 mt-4 font-semibold ml-6">
-                                PO Reference
-                              </h4>
-                              <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
-                                <Link
-                                  href={`/system/purchase-orders/${po?._id}`}
-                                  className="font-bold text-[16px] no-underline text-blue-600"
-                                >
-                                  {po?.number}
-                                </Link>
-                              </div>
-                            </>
-                          )}
-                        {data?.purchaseRequest && (
-                          <>
-                            <h4 className="mb-2 mt-4 font-semibold ml-6">
-                              Requests Reference
-                            </h4>
-                            <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
-                              <Link
-                                href={`/system/requests/${data?.purchaseRequest?._id}/?page=${1}&filter=${'all'}`}
-                                className="font-bold text-[16px] no-underline text-blue-600"
-                              >
-                                {data?.purchaseRequest?.number}
-                              </Link>
-                            </div>
-                          </>
-                        )}
+                        <>
+                          <h4 className="mb-2 mt-4 font-semibold ml-6">
+                            Contract Reference
+                          </h4>
+                          <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                            <Link
+                              href={`/system/contracts/${contract?._id}`}
+                              className="font-bold text-[16px] no-underline text-blue-600"
+                            >
+                              {contract?.number}
+                            </Link>
+                          </div>
+                        </>
+                      )}
+                      {po && (
+                        <>
+                          <h4 className="mb-2 mt-4 font-semibold ml-6">
+                            PO Reference
+                          </h4>
+                          <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                            <Link
+                              href={`/system/purchase-orders/${po?._id}`}
+                              className="font-bold text-[16px] no-underline text-blue-600"
+                            >
+                              {po?.number}
+                            </Link>
+                          </div>
+                        </>
+                      )}
+                      {data?.purchaseRequest && (
+                        <>
+                          <h4 className="mb-2 mt-4 font-semibold ml-6">
+                            Requests Reference
+                          </h4>
+                          <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                            <Link
+                              href={`/system/requests/${
+                                data?.purchaseRequest?._id
+                              }/?page=${1}&filter=${"all"}`}
+                              className="font-bold text-[16px] no-underline text-blue-600"
+                            >
+                              {data?.purchaseRequest?.number}
+                            </Link>
+                          </div>
+                        </>
+                      )}
                       <div />
                     </div>
                   </Dialog.Panel>
@@ -3974,7 +4026,10 @@ const TenderDetails = ({
       <contextHolder />
       <div className="flex items-center justify-between mr-6 mb-4">
         <div />
-        <button onClick={() => setShow(true)} className="cursor-pointer bg-transparent px-1.5 py-1 rounded-full border-solid border-2 border-[#FFF]">
+        <button
+          onClick={() => setShow(true)}
+          className="cursor-pointer bg-transparent px-1.5 py-1 rounded-full border-solid border-2 border-[#FFF]"
+        >
           <TiInfoLarge className="text-[#FFF]" />
         </button>
       </div>

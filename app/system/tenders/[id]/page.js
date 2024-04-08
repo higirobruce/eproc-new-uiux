@@ -153,7 +153,8 @@ export default function page({ params }) {
     sections,
     items,
     B1Data,
-    signatories
+    signatories,
+    currency
   ) {
     return fetch(`${url}/purchaseOrders/`, {
       method: "POST",
