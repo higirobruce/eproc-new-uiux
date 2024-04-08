@@ -70,6 +70,7 @@ import { MdOutlineAccountBalance } from "react-icons/md";
 import { LuHash, LuUser } from "react-icons/lu";
 import { Dialog, Transition } from "@headlessui/react";
 import { TiInfoLarge } from "react-icons/ti";
+import UploadOtherFiles from "./uploadOtherFiles";
 
 const PrintPDF = dynamic(() => import("@/app/components/printPDF"), {
   srr: false,
@@ -171,6 +172,7 @@ const TenderDetails = ({
   let [sections, setSections] = useState([
     { title: "Set section title", body: "" },
   ]);
+  let [otherFiles, setOtherFiles] = useState([]);
   const [tab, setTab] = useState(0);
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -672,7 +674,44 @@ const TenderDetails = ({
     handleCreateSubmission(submissionData);
   }
 
-  function submitSubmissionData() {
+  const handleUpload = () => {
+    // setSaving(true);
+    let _files = [];
+    _files = [...otherFiles];
+
+    const formData = new FormData();
+    _files.forEach((fileToSave, rowIndex) => {
+      formData.append("files[]", fileToSave);
+    });
+
+    // You can use any AJAX library you like
+    fetch(`${url}/uploads/bidOtherDocs/`, {
+      method: "POST",
+      body: formData,
+      headers: {
+        Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+        token: token,
+        // "Content-Type": "multipart/form-data",
+      },
+    })
+      .then((res) => res.json())
+      .then((savedFiles) => {
+        let _filenames = savedFiles?.map((f) => {
+          return f?.filename;
+        });
+
+        submitSubmissionData(_filenames);
+      })
+      .catch((err) => {
+        console.log(err);
+        messageApi.error("upload failed.");
+      })
+      .finally(() => {
+        // setSaving(false);
+      });
+  };
+
+  function submitSubmissionData(files) {
     let subData = {
       proposalUrls,
       deliveryDate,
@@ -690,6 +729,7 @@ const TenderDetails = ({
       bankAccountName,
       proposalDocId: proposalSelected ? proposalDocId : null,
       otherDocId: otherDocSelected ? otherDocId : null,
+      otherDocIds: files,
       deliveryTimeFrame,
       deliveryTimeFrameDuration,
     };
@@ -846,7 +886,7 @@ const TenderDetails = ({
   );
 
   const buildSubmissionForm = (
-    <div className="">
+    <div className="overflow-scroll">
       <h6 className="text-[14px] text-[#263238] mt-5 mb-3 p-0">Bid Overview</h6>
       <div className="grid md:grid-cols-4 gap-x-5">
         <div className="flex flex-col">
@@ -1060,7 +1100,12 @@ const TenderDetails = ({
             <label>Other documents</label>
           </div>
           <Form.Item name="otherDocs">
-            <UploadBidDoc uuid={otherDocId} setSelected={setOtherDocSelected} />
+            {/* <UploadBidDoc uuid={otherDocId} setSelected={setOtherDocSelected} /> */}
+            <UploadOtherFiles
+              files={otherFiles}
+              setFiles={setOtherFiles}
+              // label="Select"
+            />
           </Form.Item>
         </div>
         <div className="flex flex-col">
@@ -4092,7 +4137,7 @@ const TenderDetails = ({
                   spinning={loading || checkingSubmission}
                   indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />}
                 >
-                  <div className="payment-request py-3 space-y-5 h-[calc(100vh-200px)] overflow-y-auto">
+                  <div className="payment-request py-3 space-y-5 h-[calc(100vh-280px)] overflow-y-auto">
                     {/* TItle */}
                     {buildTabHeader(false)}
 
@@ -4113,45 +4158,46 @@ const TenderDetails = ({
                         </h6>
 
                         <div className="flex flex-col">
-                          {data?.purchaseRequest?.supportingDocs?.map(
-                            (p, i) => {
-                              return (
-                                <div key={p}>
-                                  {
-                                    <Link
-                                      // href={`${url}/file/termsOfReference/${p}`}
-                                      href={`${fendUrl}/api?folder=termsOfReference&name=${p}`}
-                                      target="_blank"
-                                    >
-                                      <Typography.Link
-                                        className="flex flex-row items-center space-x-2"
-                                        // onClick={() => {
-                                        //   setPreviewAttachment(!previewAttachment);
-                                        //   setAttachmentId(p);
-                                        // }}
+                          {data?.purchaseRequest?.supportingDocs &&
+                            data?.purchaseRequest?.supportingDocs?.map(
+                              (p, i) => {
+                                return (
+                                  <div key={p}>
+                                    {
+                                      <Link
+                                        // href={`${url}/file/termsOfReference/${p}`}
+                                        href={`${fendUrl}/api?folder=termsOfReference&name=${p}`}
+                                        target="_blank"
                                       >
-                                        <div>{p} </div>{" "}
-                                        <div>
-                                          <PaperClipIcon className="h-4 w-4" />
-                                        </div>
-                                      </Typography.Link>
-                                    </Link>
-                                  }
-                                </div>
-                              );
-                            }
-                          )}
+                                        <Typography.Link
+                                          className="flex flex-row items-center space-x-2"
+                                          // onClick={() => {
+                                          //   setPreviewAttachment(!previewAttachment);
+                                          //   setAttachmentId(p);
+                                          // }}
+                                        >
+                                          <div>{p} </div>{" "}
+                                          <div>
+                                            <PaperClipIcon className="h-4 w-4" />
+                                          </div>
+                                        </Typography.Link>
+                                      </Link>
+                                    }
+                                  </div>
+                                );
+                              }
+                            )}
                         </div>
                       </div>
                     </div>
 
-                    <div className="bg-white px-5 rounded-xl flex flex-col">
+                    <div className="bg-white px-5 rounded-xl flex flex-col overflow-y-scroll">
                       {user?.userType === "VENDOR" &&
                         moment().isBefore(moment(data?.submissionDeadLine)) &&
                         data?.status === "open" &&
                         !iSubmitted && (
                           <>
-                            <Form form={form} onFinish={submitSubmissionData}>
+                            <Form form={form} onFinish={handleUpload}>
                               <div className="ml-3 mt-5 items-center">
                                 {/* <Divider></Divider> */}
                                 <h6 className="text-[#263238] text-[16px] m-0 p-0">
@@ -4979,6 +5025,26 @@ const TenderDetails = ({
                                           <PaperClipIcon className="h-3 w-3" />
                                         </a>
                                       </div>
+                                    )}
+                                    {item?.otherDocIds && (
+                                      item?.otherDocIds?.map(doc=><div>
+                                        <a
+                                          // href={`${url}/file/bidDocs/${item?.otherDocId}.pdf`}
+                                          href={`${fendUrl}/api/?folder=bidDocs&name=${doc}`}
+                                          target="_blank"
+                                          // onClick={() => {
+                                          //   // router.push(`bidDocs/${item?.otherDocId}.pdf`)
+                                          //   // setAttachmentId(
+                                          //   //   `bidDocs/${item?.otherDocId}.pdf`
+                                          //   // );
+                                          //   // setPreviewAttachment(true);
+                                          // }}
+                                          className="text-xs no-underline text-[#1677FF]"
+                                        >
+                                          {doc}
+                                          <PaperClipIcon className="h-3 w-3" />
+                                        </a>
+                                      </div>)
                                     )}
                                   </div>
                                 </div>

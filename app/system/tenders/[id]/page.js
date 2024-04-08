@@ -61,6 +61,7 @@ export default function page({ params }) {
   useEffect(() => {
     getTenderDetails(params?.id, router).then((res) => {
       setRowData(res);
+      console.log(res);
     });
   }, [params]);
 
