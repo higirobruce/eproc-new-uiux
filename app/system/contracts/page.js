@@ -1441,7 +1441,7 @@ export default function Contracts() {
         bodyStyle={{ maxHeight: "700px", overflow: "scroll" }}
       >
         <div className="space-y-10 px-20 py-5 overflow-x-scroll">
-          <PrintPDF content={content} />
+          <PrintPDF content={content} file={'Contract'} />
           {/* Header */}
           <div className="flex flex-row justify-between items-center">
             <Typography.Title level={4} className="flex flex-row items-center">

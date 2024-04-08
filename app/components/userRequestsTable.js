@@ -33,7 +33,7 @@ const UsersRequestsTable = ({
   const [data, setData] = useState(dataSet);
   let [selectedRow, setSelectedRow] = useState("");
   const antIcon = <LoadingOutlined style={{ fontSize: 9 }} spin />;
-  const {page, setPage, filter} = useRequestContext()
+  const {page, setPage, filter, userPendingRequest, userRequest} = useRequestContext()
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
@@ -193,7 +193,7 @@ const UsersRequestsTable = ({
             className="font-semibold cursor-pointer space-x-1 flex flex-row items-center text-blue-500 hover:underline"
             onClick={() => {
               // handleSetRow(record);
-              router.push(`/system/requests/${record?._id}/?page=${page}&filter=${filter}`);
+              router.push(userRequest ? `/system/requests/${record?._id}/?page=${page}&filter=${filter}&myRequest=${userRequest}` : userPendingRequest ? `/system/requests/${record?._id}/?page=${page}&filter=${filter}&myApproval=${userPendingRequest}` : `/system/requests/${record?._id}/?page=${page}&filter=${filter}`);
             }}
           >
             <div>

@@ -27,7 +27,7 @@ import {
 } from "antd";
 import moment from "moment/moment";
 import Image from "next/image";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import ItemsTable from "../../components/itemsTable";
 import RequestDetails from "../../components/requestDetails";
 import UsersRequestsTable from "../../components/userRequestsTable";
@@ -55,9 +55,11 @@ export default function UserRequests() {
   const pagination = searchParams.get("page");
   const search = searchParams.get("search");
   const statusFilter = searchParams.get("filter");
+  const ownPendingRequest = searchParams.get("myApproval");
+  const ownRequest = searchParams.get('myRequest')
 
   // Context
-  const { setPage, setFilter, filter, page } = useRequestContext();
+  const { setPage, setFilter, filter, page, userPendingRequest, setUserPendingRequest, userRequest, setUserRequest } = useRequestContext();
 
   const [serviceCategories, setServiceCategories] = useState([]);
   let [serviceCategory, setServiceCategory] = useState("");
@@ -111,7 +113,9 @@ export default function UserRequests() {
   useEffect(() => {
     setPage(pagination ? pagination : 1);
     setFilter(statusFilter ? statusFilter : "all");
-  }, [pagination, statusFilter]);
+    setUserPendingRequest(ownPendingRequest ? ownPendingRequest : false);
+    setUserRequest(ownRequest ? ownRequest : onlyMine)
+  }, [pagination, statusFilter, ownPendingRequest, ownRequest]);
 
   useEffect(() => {
     // loadRequests()
@@ -222,7 +226,7 @@ export default function UserRequests() {
 
   useEffect(() => {
     setDataLoaded(false);
-    let requestUrl = onlyMine
+    let requestUrl = (onlyMine || userRequest)
       ? `${url}/requests/byStatus/${filter ? filter : searchStatus}/${
           user?._id
         }`
@@ -240,6 +244,7 @@ export default function UserRequests() {
         setDataLoaded(true);
         setDataset(res);
         setTempDataset(res);
+        getMyPendingRequest(userPendingRequest, res)
       })
       .catch((err) => {
         messageApi.open({
@@ -247,7 +252,7 @@ export default function UserRequests() {
           content: "Something happened! Please try again.",
         });
       });
-  }, [searchStatus, onlyMine, search, filter]);
+  }, [searchStatus, onlyMine, userRequest, search, filter]);
 
   useEffect(() => {
     if (searchText === "") {
@@ -278,9 +283,9 @@ export default function UserRequests() {
     loadRequests()
       .then((res) => getResultFromServer(res))
       .then((res) => {
-        setDataLoaded(true);
         setDataset(res);
         setTempDataset(res);
+        setDataLoaded(true);
       })
       .catch((err) => {
         messageApi.open({
@@ -292,7 +297,7 @@ export default function UserRequests() {
 
   async function loadRequests() {
     // setDataLoaded(false);
-    let requestUrl = onlyMine
+    let requestUrl = (onlyMine || userRequest)
       ? `${url}/requests/byStatus/${filter ? filter : searchStatus}/${
           user?._id
         }`
@@ -846,11 +851,13 @@ export default function UserRequests() {
     }
   };
 
-  const getMyPendingRequest = (value) => {
+  const getMyPendingRequest = (value, tempData = []) => {
+    let filterData = tempData?.length > 0 ? tempData : tempDataset;
     setMyPendingRequest(value);
+    setUserPendingRequest(value);
 
     if (value == true) {
-      const newFilter = tempDataset.filter(
+      const newFilter = filterData?.filter(
         (item) =>
           item?.level1Approver?._id == user._id ||
           (item?.status === "approved (hod)" &&
@@ -1081,9 +1088,9 @@ export default function UserRequests() {
                     <div className="flex flex-row items-center space-x-1">
                       <Checkbox
                         checked={myPendingRequest}
-                        disabled={onlyMine}
+                        disabled={onlyMine || userRequest}
                         onChange={(e) => {
-                          getMyPendingRequest(e.target.checked);
+                          getMyPendingRequest(e.target.checked, []);
                         }}
                       />
                       <div className="text-[13px] text-[#344767]">
@@ -1092,9 +1099,10 @@ export default function UserRequests() {
                     </div>
                     <div className="flex flex-row items-center space-x-1">
                       <Checkbox
-                        checked={onlyMine}
+                        checked={onlyMine || userRequest}
                         disabled={myPendingRequest}
                         onChange={(e) => {
+                          setUserRequest(e.target.checked)
                           setOnlyMine(e.target.checked);
                         }}
                       />
