@@ -955,8 +955,9 @@ const RequestDetails = ({
     })
       .then((res) => res.json())
       .then((res) => {
+        alert(JSON.stringify(res));
         if (res?.length >= 1) {
-          setPO(res[0]);
+          setPO(res?.filter((p) => p?.status !== "archived")[0]);
         } else {
           setPO(null);
         }
@@ -993,7 +994,8 @@ const RequestDetails = ({
     })
       .then((res) => res.json())
       .then((res) => {
-        if (res?.length >= 1) setPO(res[0]);
+        if (res?.length >= 1)
+          setPO(res?.filter((p) => p?.status !== "archived")[0]);
         else setPO(null);
       });
   }

@@ -281,19 +281,23 @@ export default function PurchaseOrders() {
                 >
                   Ok
                 </Button>,
-                po?.status !== "archived" && user?.permissions?.canApproveAsPM && (
-                  <Popconfirm title="Are you sure?" onConfirm={handleArchivePo}>
-                    <Button
-                      key="submit"
-                      type="primary"
-                      danger={true}
-                      loading={archiving}
-                      // onClick={() => handleArchivePo()}
+                po?.status !== "archived" &&
+                  user?.permissions?.canApproveAsPM && (
+                    <Popconfirm
+                      title="Are you sure?"
+                      onConfirm={handleArchivePo}
                     >
-                      Archive
-                    </Button>
-                  </Popconfirm>
-                ),
+                      <Button
+                        key="submit"
+                        type="primary"
+                        danger={true}
+                        loading={archiving}
+                        // onClick={() => handleArchivePo()}
+                      >
+                        Archive
+                      </Button>
+                    </Popconfirm>
+                  ),
               ]
             : []
         }
@@ -609,7 +613,7 @@ export default function PurchaseOrders() {
     setArchiving(true);
 
     let _po = { ...po };
-    _po.status = "archived";
+
     fetch(`${url}/purchaseOrders/status/${po?._id}`, {
       method: "PUT",
       headers: {
@@ -623,12 +627,14 @@ export default function PurchaseOrders() {
     })
       .then((res) => getResultFromServer(res))
       .then((res) => {
+        _po.status = "archived";
         setPO(_po);
         // setSignatories([]);
         // setSections([{ title: "Set section title", body: "" }]);
         // setPO(res);
         setOpenViewPO(false);
         setArchiving(false);
+        refresh()
       });
     //call API to sign
   }
