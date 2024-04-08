@@ -31,6 +31,7 @@ import {
   Input,
   Pagination,
   Col,
+  Form,
 } from "antd";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
@@ -112,6 +113,7 @@ export default function Contracts() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [users, setUsers] = useState([]);
+  const [form] = Form.useForm();
 
   const onMenuClick = (e) => {
     setOpenViewContract(true);
@@ -134,11 +136,13 @@ export default function Contracts() {
   let [items, setItems] = useState(null);
   const [assetOptions, setAssetOptions] = useState([]);
   const [assets, setAssets] = useState([]);
+  const [poCurrency, setPoCurrency] = useState("RWF");
 
   useEffect(() => {
     getContracts();
     getInternalUsers();
     getFixedAssets();
+    setPoCurrency(contract?.request?.currency);
   }, []);
 
   useEffect(() => {
@@ -152,6 +156,8 @@ export default function Contracts() {
 
   useEffect(() => {
     setItems(contract?.request?.items);
+    // alert(contract?.request?.currency);
+
     let t = 0;
     let tax = 0;
     items?.map((i) => {
@@ -162,6 +168,7 @@ export default function Contracts() {
     setTotVal(t);
     setTotTax(tax);
     setGrossTotal(t + tax);
+    setPoCurrency(contract?.request?.currency);
   }, [contract]);
 
   useEffect(() => {
@@ -466,6 +473,53 @@ export default function Contracts() {
                 ]}
               />
             </div> */}
+            <div>
+              <div className="mb-3">
+                <label>Purchase Order Currency</label>
+              </div>
+              <Form form={form}>
+                <Form.Item
+                  name="currency"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Currency is required",
+                    },
+                  ]}
+                >
+                  <Select
+                    defaultValue={contract?.request?.currency}
+                    // value={poCurrency}
+                    // disabled={disable}
+                    size="large"
+                    className="w-full"
+                    onChange={(value) => setPoCurrency(value)}
+                    options={[
+                      {
+                        value: "RWF",
+                        label: "RWF",
+                        key: "RWF",
+                      },
+                      {
+                        value: "USD",
+                        label: "USD",
+                        key: "USD",
+                      },
+                      {
+                        value: "EUR",
+                        label: "EUR",
+                        key: "EUR",
+                      },
+                      {
+                        value: "GBP",
+                        label: "GBP",
+                        key: "GBP",
+                      },
+                    ]}
+                  />
+                </Form.Item>
+              </Form>
+            </div>
           </div>
 
           {/* Parties */}
@@ -572,6 +626,7 @@ export default function Contracts() {
               dataSource={items}
               setDataSource={setItems}
               assetOptions={assetOptions}
+              currency={poCurrency}
             />
             <Typography.Title level={5} className="self-end">
               Total (Tax Excl.):{" "}
