@@ -87,6 +87,7 @@ export default function PurchaseOrders() {
   ];
 
   let [submitting, setSubmitting] = useState(false);
+  let [archiving, setArchiving] = useState(false);
 
   const [previewAttachment, setPreviewAttachment] = useState(false);
   const [attachmentId, setAttachmentId] = useState("TOR-id.pdf");
@@ -280,6 +281,19 @@ export default function PurchaseOrders() {
                 >
                   Ok
                 </Button>,
+                po?.status !== "archived" && user?.permissions?.canApproveAsPM && (
+                  <Popconfirm title="Are you sure?" onConfirm={handleArchivePo}>
+                    <Button
+                      key="submit"
+                      type="primary"
+                      danger={true}
+                      loading={archiving}
+                      // onClick={() => handleArchivePo()}
+                    >
+                      Archive
+                    </Button>
+                  </Popconfirm>
+                ),
               ]
             : []
         }
@@ -591,6 +605,33 @@ export default function PurchaseOrders() {
     //call API to sign
   }
 
+  function handleArchivePo() {
+    setArchiving(true);
+
+    let _po = { ...po };
+    _po.status = "archived";
+    fetch(`${url}/purchaseOrders/status/${po?._id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        status: "archived",
+      }),
+    })
+      .then((res) => getResultFromServer(res))
+      .then((res) => {
+        setPO(_po);
+        // setSignatories([]);
+        // setSections([{ title: "Set section title", body: "" }]);
+        // setPO(res);
+        setOpenViewPO(false);
+        setArchiving(false);
+      });
+    //call API to sign
+  }
   function getPoTotalVal() {
     let t = 0;
     let tax = 0;
@@ -956,8 +997,19 @@ export default function PurchaseOrders() {
                           <div>
                             <Tooltip placement="top" title={po?.status}>
                               {/* <IoCheckmarkOutline className="text-[#00CE82]" /> */}
-                              <div className="bg-[#F9BB01] capitalize rounded-xl text-[#FFF] text-[14px] font-medium px-3 py-1">
-                                {po?.status?.length > 6
+                              <div
+                                className={`
+                              ${
+                                po?.status == "archived"
+                                  ? "bg-[#ef554d]"
+                                  : po?.status == "signed" ||
+                                    po?.status == "started"
+                                  ? "bg-[#71d054]"
+                                  : "bg-[#F9BB01]"
+                              } 
+                              capitalize rounded-xl text-[#FFF] text-[14px] font-medium px-3 py-1`}
+                              >
+                                {po?.status?.length > 8
                                   ? (po?.status?.slice(0, 5) + "..").toString()
                                   : po?.status || "Pending"}
                               </div>
