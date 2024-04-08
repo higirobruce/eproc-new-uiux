@@ -1754,7 +1754,7 @@ const RequestDetails = ({
                 ]}
               >
                 <Select
-                  // defaultValue={poCurrency}
+                  defaultValue={data?.currency}
                   value={poCurrency}
                   // disabled={disable}
                   size="large"
