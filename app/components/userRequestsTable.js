@@ -153,7 +153,7 @@ const UsersRequestsTable = ({
   function getHighLevelStatus(status) {
     // return status
 
-    if (status === "Approved" || status === "Declined" || status=='Withdrawn') {
+    if (status === "Approved" || status === "Declined" || status=='Withdrawn' || status=='Archived') {
       return status;
     } else if (status === "Approved (pm)" || status == "Approved (fd)") {
       return "Pending PROC";
@@ -174,7 +174,7 @@ const UsersRequestsTable = ({
     else if (status === "Approved (fd)" || status === "Pending PROC") return "cyan";
     else if (status === "Approved (pm)" || status === "Pending PROC") return "geekblue";
     else if (status === "approved (hod)" || status === "Pending FIN") return "blue";
-    else if (status === "Declined" || status === "Withdrawn") return "red";
+    else if (status === "Declined" || status === "Withdrawn" || status=='Archived') return "red";
     else return "red"
   };
 

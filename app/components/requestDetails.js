@@ -395,6 +395,7 @@ const RequestDetails = ({
   const [openConfirmDeliv, setOpenConfirmDeliv] = useState([]);
   const [openApprove, setOpenApprove] = useState(false);
   const [openWithdraw, setOpenWithdraw] = useState(false);
+  const [openArchive, setOpenArchive] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   let [reason, setReason] = useState("");
   const [messageApi, contextHolder] = message.useMessage();
@@ -795,6 +796,7 @@ const RequestDetails = ({
     else if (code === 4) return "approved";
     else if (code === 5) return "withdrawn";
     else if (code === 6) return "declined";
+    else if (code === 7) return "archived";
     else return "pending for approval";
   }
 
@@ -807,6 +809,7 @@ const RequestDetails = ({
     else if (status === "approved") return 4;
     else if (status === "withdrawn") return 5;
     else if (status === "declined") return 6;
+    else if (status === "archived") return 7;
     else return -1;
   }
 
@@ -2957,6 +2960,7 @@ const RequestDetails = ({
       data?.createdBy?._id === user?._id) &&
       data?.status.startsWith("approved")) ||
     data?.status === "withdrawn" ||
+    data?.status === "archived" ||
     data?.status === "approved" ||
     data?.status === "approved (pm)";
 
@@ -2987,7 +2991,9 @@ const RequestDetails = ({
                 <h4>Request Details</h4>
                 <Tag
                   color={
-                    data?.status === "declined" || data?.status === "withdrawn"
+                    data?.status === "declined" ||
+                    data?.status === "withdrawn" ||
+                    data?.status === "archived"
                       ? "red"
                       : data?.status === "approved" ||
                         data?.status === "approved (pm)"
@@ -2998,7 +3004,8 @@ const RequestDetails = ({
                   {data?.status === "declined" ||
                   data?.status === "approved" ||
                   data?.status === "approved (pm)" ||
-                  data?.status === "withdrawn"
+                  data?.status === "withdrawn" ||
+                  data?.status === "archived"
                     ? data?.status
                     : "pending"}
                 </Tag>
@@ -3464,6 +3471,34 @@ const RequestDetails = ({
                   </Popconfirm>
                 </div>
               )}
+
+              {user?.permissions?.canApproveAsPM &&
+                data?.status == "approved (pm)" && (
+                  <div className="flex justify-end gap-5 mb-5">
+                    <Popconfirm
+                      title="Are you sure?"
+                      open={openArchive}
+                      icon={<QuestionCircleOutlined style={{ color: "red" }} />}
+                      onConfirm={() => {
+                        changeStatus(7);
+                        setOpenArchive(false);
+                      }}
+                      // okButtonProps={{
+                      //   loading: confirmRejectLoading,
+                      // }}
+                      onCancel={() => setOpenArchive(false)}
+                    >
+                      <Button
+                        type="primary"
+                        danger
+                        onClick={() => setOpenArchive(true)}
+                        className="rounded-lg px-5 pt-0.5s pb-6 bg-[#F5365C] border-none"
+                      >
+                        Archive request
+                      </Button>
+                    </Popconfirm>
+                  </div>
+                )}
             </Form>
           )}
           {createPOMOdal()}
