@@ -11,10 +11,16 @@ import { getIpAddress } from "./helpers/rtc";
 export default function PublicPortal() {
   let router = useRouter();
   let [loaded, setLoaded] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     setLoaded(true);
   }, []);
+
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
+
   return (
     <>
       <Head>
@@ -24,12 +30,12 @@ export default function PublicPortal() {
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </Head>
 
-      <main className="overflow-x-hidden bg-white flex flex-col h-screen">
+      <main className="overflow-x-hidden bg-white flex flex-col h-screen overflow-y-scroll">
         {loaded && (
           <Layout className="bg-white">
             <div className="bg-[#0065DD] pb-10">
-              <div className="flex flex-row justify-between items-center py-5">
-                <div className="pl-28">
+              <div className="flex flex-row justify-between items-center py-5 lg:px-0 px-5">
+                <div className="lg:pl-28">
                   <Image
                     src="/favicon.png"
                     className="text-blue-500"
@@ -37,7 +43,7 @@ export default function PublicPortal() {
                     height={80}
                   />
                 </div>
-                <div className="flex flex-row space-x-12 items-center mr-44">
+                <div className="hidden md:flex flex-row space-x-12 items-center lg:mr-44">
                   <Link
                     href="https://irembo.com/about/"
                     className="text-white text-[17px] font-semibold"
@@ -65,13 +71,77 @@ export default function PublicPortal() {
                     Log In
                   </button>
                 </div>
+                <div className="-mr-2 flex md:hidden">
+                  <button
+                    onClick={toggleMenu}
+                    type="button"
+                    className="inline-flex border-0 bg-transparent items-center justify-center p-2 rounded-md text-white hover:text-gray-200 hover:bg-transparent focus:outline-none focus:bg-transparent focus:text-white transition duration-150 ease-in-out"
+                  >
+                    <svg
+                      className="h-10 w-10"
+                      stroke="currentColor"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      {isOpen ? (
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      ) : (
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M4 6h16M4 12h16M4 18h16"
+                        />
+                      )}
+                    </svg>
+                  </button>
+                </div>
               </div>
-              <div className="grid grid-cols-4 w-[calc(100%-200px)] pl-10">
-                <div className="col-span-2 ml-20 flex flex-col justify-center">
+              <div className="relative">
+                {isOpen && (
+                  <div className="absolute top-0 w-full bg-white py-5 -mt-5 md:hidden">
+                    <div className="flex flex-col items-start gap-y-8 px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                      <Link
+                        href="https://irembo.com/about/"
+                        className="text-[#0065DD] text-[17px] font-semibold ml-3"
+                        target="_blank"
+                      >
+                        About Us
+                      </Link>
+                      <Link
+                        href="#howItWorks"
+                        className="text-[#0065DD] text-[17px] font-semibold ml-3"
+                      >
+                        How it works
+                      </Link>
+                      <Link
+                        type="link"
+                        className="text-[#0065DD] text-[17px] font-semibold ml-3"
+                        href={'/auth/signup'}
+                      >
+                        Register
+                      </Link>
+                      <Link
+                        className="cursor-pointer bg-[#0065DD] px-7 py-2.5 rounded font-semibold text-[#FFF] border-none text-[15px]"
+                        href={'/auth'}
+                      >
+                        Log In
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="grid xl:grid-cols-4 xl:w-[calc(100%-200px)] xl:pl-10 px-5">
+                <div className="col-span-2 lg:ml-20 flex flex-col justify-center">
                   <div className="text-[22px] text-white my-4">
                     Welcome to Irembo Procure!
                   </div>
-                  <div className="text-[40px] text-white font-bold my-4">
+                  <div className="md:text-[40px] text-[28px] text-white font-bold my-4">
                     Irembo Procure. Procurement made easy.
                   </div>
                   <p className="text-[20px] text-white leading-10 mt-10">
@@ -82,7 +152,7 @@ export default function PublicPortal() {
                     Irembo gain access to business opportunities.`}
                   </p>
 
-                  <div className="flex items-center gap-x-7 pt-10">
+                  <div className="flex md:flex-row flex-col md:items-center items-start gap-5 pt-7">
                     <button
                       className="cursor-pointer bg-white px-7 py-3 rounded font-semibold text-[#0063CF] border-none text-[16px]"
                       onClick={() => router.push("/auth/signup")}
@@ -101,11 +171,12 @@ export default function PublicPortal() {
                     </Link>
                   </div>
                 </div>
-                <div className="flex flex-col justify-center ml-48">
+                <div className="hidden xl:flex flex-col justify-center xl:ml-48 lg:ml-28 col-span-2 py-10">
                   <Image
                     src="/Business deal-cuate.svg"
-                    width={600}
-                    height={540}
+                    width={400}
+                    height={340}
+                    layout="responsive"
                   />
                 </div>
               </div>
@@ -122,8 +193,8 @@ export default function PublicPortal() {
                 <div className="text-[44px] text-[#121313] mt-5">
                   How it Works
                 </div>
-                <div className="flex flex-col gap-y-5 lg:max-w-[calc(100%-700px)] md:max-w-[calc(100%-600px)]">
-                  <div className="flex justify-between items-center gap-x-36">
+                <div className="flex flex-col gap-y-5 px-5 xl:max-w-[calc(100%-400px)] md:max-w-[calc(100%-100px)] max-w-full">
+                  <div className="flex lg:flex-row flex-col lg:justify-between items-center lg:gap-x-36">
                     <Image src={"/join.svg"} width={400} height={400} />
                     <div>
                       <h6 className="text-[17px] font-bold text-[#3F3D56] mb-0">
@@ -139,7 +210,7 @@ export default function PublicPortal() {
                       </p>
                     </div>
                   </div>
-                  <div className="flex justify-between items-center gap-x-36">
+                  <div className="flex lg:flex-row flex-col lg:justify-between items-center lg:gap-x-36">
                     <div>
                       <h6 className="text-[17px] font-bold text-[#00CEB2] mb-0">
                         Effortless Bidding and Collaboration
@@ -156,7 +227,7 @@ export default function PublicPortal() {
                     </div>
                     <Image src={"/Effort.svg"} width={400} height={400} />
                   </div>
-                  <div className="flex justify-between items-center gap-x-36">
+                  <div className="flex lg:flex-row flex-col lg:justify-between items-center lg:gap-x-36">
                     <Image src={"/contracts.svg"} width={400} height={400} />
                     <div>
                       <h6 className="text-[17px] font-bold text-[#0063CF] mb-0">
@@ -199,138 +270,196 @@ export default function PublicPortal() {
                 </div> */}
               </div>
 
-              <div className="bg-[#FAFAFA] flex flex-col items-center justify-center py-14 mt-5 space-y-10">
-                <div className="text-[36px] text-[#121313]">Frequently Asked Questions</div>
-                <Collapse className="w-3/4" defaultActiveKey={["1"]} accordion>
-                  <Collapse.Panel
-                    header="Registration"
-                    key="1"
-                  >
+              <div className="bg-[#FAFAFA] flex flex-col lg:items-center justify-center px-4 py-14 mt-5 space-y-10">
+                <div className="lg:text-[36px] text-[28px] text-[#121313]">
+                  Frequently Asked Questions
+                </div>
+                <Collapse
+                  className="lg:w-3/4 w-full"
+                  defaultActiveKey={["1"]}
+                  accordion
+                >
+                  <Collapse.Panel header="Registration" key="1">
                     <Collapse>
                       <Collapse.Panel
                         header="What documentation do I need to register? "
                         key="1"
-                      > 
-                        <small className="text-[18px] text-[#0063CF] leading-10"><small className="text-gray-400">Ansr: </small> &nbsp; You'll need basic information like company details, contact information, and proof of business registration.</small> 
-                        
+                      >
+                        <small className="text-[18px] text-[#0063CF] leading-10">
+                          <small className="text-gray-400">Ansr: </small> &nbsp;
+                          You'll need basic information like company details,
+                          contact information, and proof of business
+                          registration.
+                        </small>
                       </Collapse.Panel>
                       <Collapse.Panel
                         header="How long does registration take? "
                         key="2"
-                      > 
-                        <small className="text-[18px] text-[#0063CF] leading-10"><small className="text-gray-400">Ansr: </small> &nbsp; The registration process is quick and takes just a few minutes. Our team will then review your application and grant you access within 3-5 business days, if you meet our vendor criteria.</small> 
-                        
+                      >
+                        <small className="text-[18px] text-[#0063CF] leading-10">
+                          <small className="text-gray-400">Ansr: </small> &nbsp;
+                          The registration process is quick and takes just a few
+                          minutes. Our team will then review your application
+                          and grant you access within 3-5 business days, if you
+                          meet our vendor criteria.
+                        </small>
                       </Collapse.Panel>
                       <Collapse.Panel
                         header="What happens if my application is rejected? "
                         key="3"
-                      > 
-                        <small className="text-[18px] text-[#0063CF] leading-10"><small className="text-gray-400">Ansr: </small> &nbsp; If your application doesn't meet our vendor criteria, we'll provide you with feedback.</small> 
-                        
+                      >
+                        <small className="text-[18px] text-[#0063CF] leading-10">
+                          <small className="text-gray-400">Ansr: </small> &nbsp;
+                          If your application doesn't meet our vendor criteria,
+                          we'll provide you with feedback.
+                        </small>
                       </Collapse.Panel>
                     </Collapse>
                   </Collapse.Panel>
-                  <Collapse.Panel
-                    header="Opportunities"
-                    key="2"
-                  >
+                  <Collapse.Panel header="Opportunities" key="2">
                     <Collapse>
                       <Collapse.Panel
                         header="How do I find relevant opportunities?"
                         key="1"
-                      > 
-                        <small className="text-[18px] text-[#0063CF] leading-10"><small className="text-gray-400">Ansr: </small> &nbsp; You'll need basic information like company details, contact information, and proof of business registration.</small> 
-                        
+                      >
+                        <small className="text-[18px] text-[#0063CF] leading-10">
+                          <small className="text-gray-400">Ansr: </small> &nbsp;
+                          You'll need basic information like company details,
+                          contact information, and proof of business
+                          registration.
+                        </small>
                       </Collapse.Panel>
                       <Collapse.Panel
                         header="Are there any fees associated with participating in tenders? "
                         key="2"
-                      > 
-                        <small className="text-[18px] text-[#0063CF] leading-10"><small className="text-gray-400">Ansr: </small> &nbsp; No, registration and participation in tenders are completely free for vendors.</small> 
-                        
+                      >
+                        <small className="text-[18px] text-[#0063CF] leading-10">
+                          <small className="text-gray-400">Ansr: </small> &nbsp;
+                          No, registration and participation in tenders are
+                          completely free for vendors.
+                        </small>
                       </Collapse.Panel>
                       <Collapse.Panel
                         header="How much notice will I have to submit a bid? "
                         key="3"
-                      > 
-                        <small className="text-[18px] text-[#0063CF] leading-10"><small className="text-gray-400">Ansr: </small> &nbsp; The deadline for each tender will be clearly stated in the tender notice. We recommend reviewing opportunities early to ensure you have enough time to prepare your bid.</small> 
-                        
+                      >
+                        <small className="text-[18px] text-[#0063CF] leading-10">
+                          <small className="text-gray-400">Ansr: </small> &nbsp;
+                          The deadline for each tender will be clearly stated in
+                          the tender notice. We recommend reviewing
+                          opportunities early to ensure you have enough time to
+                          prepare your bid.
+                        </small>
                       </Collapse.Panel>
                     </Collapse>
                   </Collapse.Panel>
 
-                  <Collapse.Panel
-                    header="Bidding & Feedback"
-                    key="3"
-                  >
+                  <Collapse.Panel header="Bidding & Feedback" key="3">
                     <Collapse>
                       <Collapse.Panel
                         header="Can I submit bids electronically?"
                         key="1"
-                      > 
-                        <small className="text-[18px] text-[#0063CF] leading-10"><small className="text-gray-400">Ansr: </small> &nbsp; Yes, all bids must be submitted electronically through the platform.</small> 
-                        
+                      >
+                        <small className="text-[18px] text-[#0063CF] leading-10">
+                          <small className="text-gray-400">Ansr: </small> &nbsp;
+                          Yes, all bids must be submitted electronically through
+                          the platform.
+                        </small>
                       </Collapse.Panel>
                       <Collapse.Panel
                         header="How will I receive feedback on my bid? "
                         key="2"
-                      > 
-                        <small className="text-[18px] text-[#0063CF] leading-10"><small className="text-gray-400">Ansr: </small> &nbsp; You'll receive email notifications about your bid status and feedback from Irembo's procurement team.</small> 
-                        
+                      >
+                        <small className="text-[18px] text-[#0063CF] leading-10">
+                          <small className="text-gray-400">Ansr: </small> &nbsp;
+                          You'll receive email notifications about your bid
+                          status and feedback from Irembo's procurement team.
+                        </small>
                       </Collapse.Panel>
                       <Collapse.Panel
                         header="What happens if my bid is not selected? "
                         key="3"
-                      > 
-                        <small className="text-[18px] text-[#0063CF] leading-10"><small className="text-gray-400">Ansr: </small> &nbsp; We'll provide you with feedback on why your bid was not selected and encourage you to apply for future opportunities.</small> 
-                        
+                      >
+                        <small className="text-[18px] text-[#0063CF] leading-10">
+                          <small className="text-gray-400">Ansr: </small> &nbsp;
+                          We'll provide you with feedback on why your bid was
+                          not selected and encourage you to apply for future
+                          opportunities.
+                        </small>
                       </Collapse.Panel>
                     </Collapse>
                   </Collapse.Panel>
 
-                  <Collapse.Panel
-                    header="Contracting & Payment"
-                    key="4"
-                  >
+                  <Collapse.Panel header="Contracting & Payment" key="4">
                     <Collapse>
                       <Collapse.Panel
                         header="How long does it take to receive payment?"
                         key="1"
-                      > 
-                        <small className="text-[18px] text-[#0063CF] leading-10"><small className="text-gray-400">Ansr: </small> &nbsp; Payments are processed according to the timelines established in the contracting agreements, typically within 30-60 days of invoice submission.</small> 
-                        
+                      >
+                        <small className="text-[18px] text-[#0063CF] leading-10">
+                          <small className="text-gray-400">Ansr: </small> &nbsp;
+                          Payments are processed according to the timelines
+                          established in the contracting agreements, typically
+                          within 30-60 days of invoice submission.
+                        </small>
                       </Collapse.Panel>
                       <Collapse.Panel
                         header="Who can I contact if I have questions about a contract?  "
                         key="2"
-                      > 
-                        <small className="text-[18px] text-[#0063CF] leading-10"><small className="text-gray-400">Ansr: </small> &nbsp; You can contact the Irembo procurement team by email - <a className="underline text-[#00CEB2]" href="mailto:procurement@irembo.com" >procurement@irembo.com</a> </small> 
+                      >
+                        <small className="text-[18px] text-[#0063CF] leading-10">
+                          <small className="text-gray-400">Ansr: </small> &nbsp;
+                          You can contact the Irembo procurement team by email -{" "}
+                          <a
+                            className="underline text-[#00CEB2]"
+                            href="mailto:procurement@irembo.com"
+                          >
+                            procurement@irembo.com
+                          </a>{" "}
+                        </small>
                       </Collapse.Panel>
                     </Collapse>
                   </Collapse.Panel>
 
-                  <Collapse.Panel
-                    header="Additional Questions"
-                    key="5"
-                  >
+                  <Collapse.Panel header="Additional Questions" key="5">
                     <Collapse>
                       <Collapse.Panel
                         header="What support is available for using the platform? "
                         key="1"
-                      > 
-                        <small className="text-[18px] text-[#0063CF] leading-10"><small className="text-gray-400">Ansr: </small> &nbsp; Should you have any questions, please reach out to our team at <a className="underline text-[#00CEB2]" href="mailto:procurement@irembo.com" >procurement@irembo.com</a>.</small> 
-                        
+                      >
+                        <small className="text-[18px] text-[#0063CF] leading-10">
+                          <small className="text-gray-400">Ansr: </small> &nbsp;
+                          Should you have any questions, please reach out to our
+                          team at{" "}
+                          <a
+                            className="underline text-[#00CEB2]"
+                            href="mailto:procurement@irembo.com"
+                          >
+                            procurement@irembo.com
+                          </a>
+                          .
+                        </small>
                       </Collapse.Panel>
                       <Collapse.Panel
                         header="Where can I learn more about Irembo? "
                         key="2"
-                      > 
-                        <small className="text-[18px] text-[#0063CF] leading-10"><small className="text-gray-400">Ansr: </small> &nbsp; You can visit our <a className="underline text-[#00CEB2]" href="https://irembo.com/about/" target="_blank" >website</a> or contact us directly for more information about Irembo and its activities. </small> 
-                        
+                      >
+                        <small className="text-[18px] text-[#0063CF] leading-10">
+                          <small className="text-gray-400">Ansr: </small> &nbsp;
+                          You can visit our{" "}
+                          <a
+                            className="underline text-[#00CEB2]"
+                            href="https://irembo.com/about/"
+                            target="_blank"
+                          >
+                            website
+                          </a>{" "}
+                          or contact us directly for more information about
+                          Irembo and its activities.{" "}
+                        </small>
                       </Collapse.Panel>
                     </Collapse>
                   </Collapse.Panel>
-
                 </Collapse>
               </div>
             </div>

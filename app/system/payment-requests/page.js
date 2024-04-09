@@ -54,9 +54,11 @@ export default function UserRequests() {
   const pagination = searchParams.get("page");
   const search = searchParams.get("search");
   const statusFilter = searchParams.get("filter");
+  const ownPendingRequest = searchParams.get("myApproval");
+  const ownRequest = searchParams.get('myRequest')
 
   // Routing Context
-  const { setPage, setFilter, filter, page } = usePaymentContext();
+  const { setPage, setFilter, filter, page, userPendingRequest, setUserPendingRequest, userRequest, setUserRequest } = usePaymentContext();
 
   const [dataLoaded, setDataLoaded] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
@@ -93,42 +95,12 @@ export default function UserRequests() {
   useEffect(() => {
     setPage(pagination ? pagination : 1);
     setFilter(statusFilter ? statusFilter : "all");
-  }, [pagination]);
+    setUserPendingRequest(ownPendingRequest ? ownPendingRequest : false);
+    setUserRequest(ownRequest ? ownRequest : onlyMine)
+  }, [pagination, statusFilter, ownPendingRequest, ownRequest]);
 
   useEffect(() => {
-    setDataLoaded(false);
-    let requestUrl =
-      onlyMine || user?.userType === "VENDOR"
-        ? `${url}/paymentRequests/byStatus/${filter ? filter : searchStatus}/${
-            user?._id
-          }`
-        : `${url}/paymentRequests/byStatus/${
-            filter ? filter : searchStatus
-          }/${null}`;
-    fetch(requestUrl, {
-      method: "GET",
-      headers: {
-        Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
-        token: token,
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => getResultFromServer(res))
-      .then((res) => {
-        setDataLoaded(true);
-        setDataset(res);
-        setTempDataset(res);
-      })
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Something happened! Please try again.",
-        });
-      });
-  }, [searchStatus, onlyMine, filter]);
-
-  useEffect(() => {
-    if (searchText === "") {
+    if (searchText === "" && !ownPendingRequest && !ownRequest) {
       refresh();
       setDataset(dataset);
     } else {
@@ -150,6 +122,40 @@ export default function UserRequests() {
       // else setTempDataset(dataset)
     }
   }, [searchText]);
+
+  useEffect(() => {
+    setDataLoaded(false);
+    let requestUrl =
+      (userRequest || onlyMine || user?.userType === "VENDOR")
+        ? `${url}/paymentRequests/byStatus/${filter ? filter : searchStatus}/${
+            user?._id
+          }`
+        : `${url}/paymentRequests/byStatus/${
+            filter ? filter : searchStatus
+          }/${null}`;
+    fetch(requestUrl, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => getResultFromServer(res))
+      .then((res) => {
+        setDataLoaded(true);
+        setDataset(res);
+        setTempDataset(res);
+        getMyPendingRequest(userPendingRequest, res)
+      })
+      .catch((err) => {
+        messageApi.open({
+          type: "error",
+          content: "Something happened! Please try again.",
+        });
+      });
+  }, [searchStatus, onlyMine, search, filter]);
+
 
   useEffect(() => {
     fetch(`${url}/users/${user?._id}`, {
@@ -176,9 +182,10 @@ export default function UserRequests() {
     loadRequests()
       .then((res) => getResultFromServer(res))
       .then((res) => {
-        setDataLoaded(true);
         setDataset(res);
         setTempDataset(res);
+        setDataLoaded(true);
+        // getMyPendingRequest(userPendingRequest, res)
       })
       .catch((err) => {
         messageApi.open({
@@ -190,7 +197,7 @@ export default function UserRequests() {
 
   async function loadRequests() {
     // setDataLoaded(false);
-    let requestUrl = onlyMine
+    let requestUrl = (onlyMine || userRequest)
       ? `${url}/paymentRequests/byStatus/${filter ? filter : searchStatus}/${
           user?._id
         }`
@@ -212,22 +219,24 @@ export default function UserRequests() {
     });
   }
 
-  const getMyPendingRequest = (value) => {
+  const getMyPendingRequest = (value, tempData = []) => {
+    let filterData = tempData?.length > 0 ? tempData : tempDataset;
     setMyPendingRequest(value);
-    console.log(tempDataset);
+    setUserPendingRequest(value);
+    
     let filtered = [];
     if (value) {
-      const forHod = tempDataset.filter(
+      const forHod = filterData.filter(
         (item) =>
           (item?.status == "pending-approval" || item?.status == "reviewed") &&
           item?.approver?._id == user?._id
       );
 
-      const forHof = tempDataset.filter(
+      const forHof = filterData.filter(
         (item) => item.status == "approved (hod)"
       );
 
-      const forHod_Hof = tempDataset.filter(
+      const forHod_Hof = filterData.filter(
         (item) =>
           item.status == "approved (hod)" ||
           ((item?.status == "pending-approval" || item?.status == "reviewed") &&
@@ -490,9 +499,9 @@ export default function UserRequests() {
                       <div className="flex flex-row items-center space-x-1">
                         <Checkbox
                           checked={myPendingRequest}
-                          disabled={onlyMine}
+                          disabled={onlyMine || userRequest}
                           onChange={(e) => {
-                            getMyPendingRequest(e.target.checked);
+                            getMyPendingRequest(e.target.checked, []);
                           }}
                         />
                         <div className="text-[13px] text-[#344767]">
@@ -503,8 +512,9 @@ export default function UserRequests() {
                   {user?.userType !== "VENDOR" && (
                     <div className="flex flex-row items-center space-x-1">
                       <Checkbox
-                        checked={onlyMine}
+                        checked={onlyMine || userRequest}
                         onChange={(e) => {
+                          setUserRequest(e.target.checked)
                           setOnlyMine(e.target.checked);
                         }}
                       />

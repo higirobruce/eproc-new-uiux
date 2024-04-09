@@ -36,7 +36,7 @@ const PaymentRequestsTable = ({
   const [data, setData] = useState(dataSet);
   let [selectedRow, setSelectedRow] = useState("");
   const antIcon = <LoadingOutlined style={{ fontSize: 9 }} spin />;
-  const {page, setPage, filter} = usePaymentContext()
+  const {page, setPage, filter, userPendingRequest, userRequest} = usePaymentContext()
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
@@ -191,7 +191,7 @@ const PaymentRequestsTable = ({
             onClick={() => {
               // handleSetRow(record);
               handleSubmitting(true);
-              router.push(`/system/payment-requests/${record?._id}?page=${page}&filter=${filter}`);
+              router.push(userRequest ? `/system/payment-requests/${record?._id}?page=${page}&filter=${filter}&myRequest=${userRequest}` : userPendingRequest ? `/system/payment-requests/${record?._id}?page=${page}&filter=${filter}&myApproval=${userPendingRequest}` : `/system/payment-requests/${record?._id}?page=${page}&filter=${filter}`);
             }}
           >
             <div>
@@ -216,7 +216,12 @@ const PaymentRequestsTable = ({
               // handleSetRow(record);
               handleSubmitting(true);
               router.push(
-                `/system/purchase-orders/${record?.purchaseOrder?._id}/?page=${page}&filter=${filter}`
+                userRequest ?
+                  `/system/purchase-orders/${record?.purchaseOrder?._id}/?page=${page}&filter=${filter}&myRequest=${userRequest}`
+                : userPendingRequest ?
+                  `/system/purchase-orders/${record?.purchaseOrder?._id}/?page=${page}&filter=${filter}&myApproval=${userPendingRequest}`
+                : 
+                  `/system/purchase-orders/${record?.purchaseOrder?._id}/?page=${page}&filter=${filter}`
               );
             }}
           >
