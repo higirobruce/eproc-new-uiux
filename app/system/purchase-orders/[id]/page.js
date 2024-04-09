@@ -200,7 +200,7 @@ export default function page({ params }) {
     //call API to sign
   }
 
-  function handleArchivePo() {
+  function handleWithdrawPo() {
     setArchiving(true);
 
     fetch(`${url}/purchaseOrders/status/${po?._id}`, {
@@ -211,7 +211,7 @@ export default function page({ params }) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        status: po?.status === "archived",
+        status: po?.status === "withdrawn",
       }),
     })
       .then((res) => getResultFromServer(res))
