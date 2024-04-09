@@ -281,11 +281,11 @@ export default function PurchaseOrders() {
                 >
                   Ok
                 </Button>,
-                po?.status !== "archived" &&
+                po?.status !== "withdrawn" &&
                   user?.permissions?.canApproveAsPM && (
                     <Popconfirm
                       title="Are you sure?"
-                      onConfirm={handleArchivePo}
+                      onConfirm={handleWithdrawPo}
                     >
                       <Button
                         key="submit"
@@ -294,7 +294,7 @@ export default function PurchaseOrders() {
                         loading={archiving}
                         // onClick={() => handleArchivePo()}
                       >
-                        Archive
+                        Withdraw
                       </Button>
                     </Popconfirm>
                   ),
@@ -609,7 +609,7 @@ export default function PurchaseOrders() {
     //call API to sign
   }
 
-  function handleArchivePo() {
+  function handleWithdrawPo() {
     setArchiving(true);
 
     let _po = { ...po };
@@ -622,12 +622,12 @@ export default function PurchaseOrders() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        status: "archived",
+        status: "withdrawn",
       }),
     })
       .then((res) => getResultFromServer(res))
       .then((res) => {
-        _po.status = "archived";
+        _po.status = "withdrawn";
         setPO(_po);
         // setSignatories([]);
         // setSections([{ title: "Set section title", body: "" }]);
@@ -1006,7 +1006,7 @@ export default function PurchaseOrders() {
                               <div
                                 className={`
                               ${
-                                po?.status == "archived"
+                                po?.status == "withdrawn"
                                   ? "bg-[#ef554d]"
                                   : po?.status == "signed" ||
                                     po?.status == "started"
