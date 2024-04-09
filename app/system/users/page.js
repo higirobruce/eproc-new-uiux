@@ -680,7 +680,7 @@ export default function Users() {
       {contextHolder}
       {buildCreateUserScreen()}
       {dataLoaded ? (
-        <div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 h-screen mt-6 pb-10">
+        <div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 h-screen mt-6 pb-10 px-4">
           {/* <Row className="flex flex-row justify-between items-center">
             <Typography.Title level={4}>Users</Typography.Title>
             <Row className="flex flex-row space-x-5 items-center">
@@ -706,14 +706,15 @@ export default function Users() {
              
             </Row>
           </Row> */}
-          <div className="flex items-center justify-between mr-6">
+          <div className="flex items-center justify-between lg:mr-6">
             <Button
-              className="bg-white h-9 px-5 text-[11px] font-semibold rounded text-[#0063CF]"
+              className="md:block hidden bg-white h-9 px-5 text-[11px] font-semibold rounded text-[#0063CF]"
               icon={<PlusOutlined />}
               onClick={() => setOpenCreateUser(true)}
             >
               New user
             </Button>
+            <div />
             <div className="flex items-center gap-5">
               <Select
                 // mode="tags"
@@ -749,8 +750,8 @@ export default function Users() {
               ></Button>
             </div>
           </div>
-          <div className="request mr-6 bg-white rounded-lg h-[calc(100vh-160px)] mb-10 px-5 pb-2 overflow-y-auto">
-            <div className="flex justify-between items-center mb-5">
+          <div className="request lg:mr-6 bg-white rounded-lg h-[calc(100vh-160px)] mb-10 px-5 pb-2 overflow-y-auto">
+            <div className="flex justify-between items-center space-x-10 mb-5">
               <h4 className="text-[19px] text-[#344767]">
                 Internal Users List
               </h4>
@@ -1192,7 +1193,7 @@ export default function Users() {
         }}
         okText={"Save"}
         onCancel={() => setOpenCreateUser(false)}
-        width={"60%"}
+        width={"70%"}
         bodyStyle={{ maxHeight: "700px", overflow: "hidden" }}
       >
         <Form

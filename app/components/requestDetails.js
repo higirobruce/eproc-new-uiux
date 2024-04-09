@@ -2978,7 +2978,7 @@ const RequestDetails = ({
     <div className="request-details grid lg:grid-cols-5 gap-4 items-start h-screen mb-2 overflow-y-auto">
       {contextHolder}
       <div className="lg:col-span-4">
-        <div className="flex flex-col ring-1 ring-gray-200 pl-5 pr-8 rounded-lg bg-white border-0">
+        <div className="flex flex-col ring-1 ring-gray-200 lg:pl-5 lg:pr-8 rounded-lg bg-white border-0">
           {data && (
             <Form form={form}>
               <div className="flex items-center justify-between ml-3 mb-2">
@@ -3888,7 +3888,7 @@ const RequestDetails = ({
                           <button
                             type="button"
                             className="border-0 rounded-md bg-transparent text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
-                            onClick={() => setShow(false)}
+                            onClick={() => handleClose()}
                           >
                             <XMarkIcon
                               className="h-5 w-5 text-red-500"

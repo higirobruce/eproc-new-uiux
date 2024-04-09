@@ -33,6 +33,11 @@ export default function SystemLayout({ children }) {
   let [current, setCurrent] = useState("");
   let router = useRouter();
   let [noPermission, setNoPermissions] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
 
   const items = [
     {
@@ -156,7 +161,7 @@ export default function SystemLayout({ children }) {
 
                   <div className="fixed top-5 w-full h-screen flex gap-5">
                     <div
-                      className={`relative bg-white w-[420px] min-h-fit mb-10 rounded-lg ml-4`}
+                      className={`${isOpen ? `block absolute top-0 left-0` : `hidden lg:block`} relative bg-white w-[420px] min-h-fit mb-10 rounded-lg ml-4`}
                     >
                       <div className="payment-request flex flex-col justify-between h-full pl-8 pr-2 overflow-auto">
                         <div className="mt-12">
@@ -194,16 +199,48 @@ export default function SystemLayout({ children }) {
                     </div>
                     <div className="w-full h-screen">
                       <div className="flex justify-between items-center mr-5">
-                        <div></div>
+                        <div>
+                          <div className="-mr-2 flex lg:hidden">
+                            <button
+                              onClick={toggleMenu}
+                              type="button"
+                              className="inline-flex border-0 bg-transparent items-center justify-center p-2 rounded-md text-white hover:text-gray-200 hover:bg-transparent focus:outline-none focus:bg-transparent focus:text-white transition duration-150 ease-in-out"
+                            >
+                              <svg
+                                className="h-7 w-7"
+                                stroke="currentColor"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                              >
+                                {isOpen ? (
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M6 18L18 6M6 6l12 12"
+                                  />
+                                ) : (
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M4 6h16M4 12h16M4 18h16"
+                                  />
+                                )}
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
                         <div className="flex items-center gap-5">
                           {/* <div className="flex">
-                  <EnvelopeIcon className="h-5 w-5 text-white" />
-                  <div className="w-2.5 h-2.5 -ml-2 rounded-full bg-[#8CD0E8]" />
-                </div>
-                <div className="flex">
-                  <BellAlertIcon className="h-5 w-5 text-white" />
-                  <div className="w-2.5 h-2.5 -ml-2 rounded-full bg-[#FFD275]" />
-                </div> */}
+                              <EnvelopeIcon className="h-5 w-5 text-white" />
+                              <div className="w-2.5 h-2.5 -ml-2 rounded-full bg-[#8CD0E8]" />
+                            </div>
+                            <div className="flex">
+                              <BellAlertIcon className="h-5 w-5 text-white" />
+                              <div className="w-2.5 h-2.5 -ml-2 rounded-full bg-[#FFD275]" />
+                            </div> 
+                          */}
                           <div className="flex items-center gap-3 ml-3">
                             <div className="flex items-center gap-x-1">
                               <p className="text-[14px] font-medium text-white">

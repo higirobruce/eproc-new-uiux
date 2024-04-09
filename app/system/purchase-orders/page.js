@@ -999,7 +999,7 @@ export default function PurchaseOrders() {
   return (
     <>
       {dataLoaded && !submitting ? (
-        <div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-screen pb-10">
+        <div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-screen pb-10 px-4">
           {viewPOMOdal()}
 
           {previewAttachmentModal()}
@@ -1051,7 +1051,7 @@ export default function PurchaseOrders() {
             </Row>
           </Row> */}
 
-          <div className="flex items-center justify-between mr-6">
+          <div className="flex items-center justify-between lg:mr-6">
             <div />
             <div className="flex items-center gap-5">
               <Select
@@ -1088,8 +1088,8 @@ export default function PurchaseOrders() {
             </div>
           </div>
 
-          <div className="request mr-6 bg-white h-[calc(100vh-170px)] rounded-lg mb-10 px-5 overflow-y-auto">
-            <div className="flex justify-between items-center mb-5">
+          <div className="request lg:mr-6 bg-white h-[calc(100vh-170px)] rounded-lg mb-10 px-5 overflow-y-auto">
+            <div className="flex justify-between items-center space-x-10 mb-5">
               <h4 className="text-[19px] text-[#344767]">
                 Purchase Orders List
               </h4>

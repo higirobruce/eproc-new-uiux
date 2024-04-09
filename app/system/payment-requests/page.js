@@ -329,7 +329,7 @@ export default function UserRequests() {
     <>
       {contextHolder}
       {dataLoaded && !submitting ? (
-        <motion.div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-5 h-screen mt-6 pb-10">
+        <motion.div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-5 h-screen mt-6 pb-10 px-4">
           {/* <Row className="flex flex-col custom-sticky bg-white px-10 py-3 shadow space-y-2">
             <div className="flex flex-row items-center justify-between">
               <div className="text-xl font-semibold">Payment Requests</div>
@@ -422,10 +422,10 @@ export default function UserRequests() {
               )}
             </Row>
           </Row> */}
-          <div className="flex items-center justify-between mr-6">
+          <div className="flex items-center justify-between lg:mr-6">
             {user?.userType !== "VENDOR" ? (
               <Button
-                className="bg-white h-9 px-5 text-[11px] font-semibold rounded text-[#0063CF]"
+                className="md:block hidden bg-white h-9 px-5 text-[11px] font-semibold rounded text-[#0063CF]"
                 icon={<PlusOutlined />}
                 onClick={() => {
                   setSubmitting(true);
@@ -439,6 +439,7 @@ export default function UserRequests() {
             ) : (
               <div />
             )}
+            <div />
             <div className="flex items-center gap-5">
               {(user?.permissions?.canApproveAsHod ||
                 user?.permissions?.canApproveAsHof ||
@@ -451,7 +452,7 @@ export default function UserRequests() {
               )}
               <Select
                 // mode="tags"
-                className="text-[9px] w-32 rounded-sm"
+                className="text-[14px] text-[#2c6ad6] w-48 rounded-sm"
                 placeholder="Select status"
                 onChange={(value) => {
                   setPage(1);
@@ -487,11 +488,11 @@ export default function UserRequests() {
             </div>
           </div>
           {/* <RequestStats totalRequests={dataset?.length}/> */}
-          <div className="request mr-6 bg-white h-[calc(100vh-161px)] rounded-lg mb-10 px-5 overflow-y-auto">
-            <div className="flex justify-between items-center mb-5">
+          <div className="request lg:mr-6 bg-white h-[calc(100vh-161px)] rounded-lg mb-10 px-5 overflow-y-auto">
+            <div className="flex justify-between items-center space-x-10 mb-5">
               <h4 className="text-[19px] text-[#344767]">Payment Request</h4>
               <div className="flex items-center gap-5">
-                <div className="flex items-center space-x-5">
+                <div className="lg:flex hidden items-center space-x-5">
                   {user?.userType !== "VENDOR" &&
                     (currentUser?.permissions?.canApproveAsHod ||
                       currentUser?.permissions?.canApproveAsHof ||
