@@ -429,7 +429,7 @@ export default function Vendors() {
     <>
       {contextHolder}
       {
-        <div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 h-screen mt-6 pb-10">
+        <div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 h-screen mt-6 pb-10 px-4">
           {/* <Row className="flex flex-col custom-sticky space-y-2 bg-white px-10 py-3 shadow">
             <div className="flex flex-row justify-between items-center">
               <div className="text-xl font-semibold">Vendors List</div>
@@ -495,12 +495,12 @@ export default function Vendors() {
               <Button type="text" icon={<SettingOutlined />}></Button>
             </Row>
           </Row> */}
-          <div className="flex items-center justify-between mr-6">
+          <div className="flex items-center justify-between lg:mr-6">
             <div />
             <div className="flex items-center gap-5">
               <Select
                 // mode="tags"
-                className="text-[9px] w-32 rounded-sm"
+                className="text-[9px] w-48 rounded-sm"
                 placeholder="Select status"
                 onChange={(value) => {
                   setPage(1);
@@ -532,7 +532,7 @@ export default function Vendors() {
               ></Button>
             </div>
           </div>
-          <div className="request mr-6 bg-white rounded-lg h-[calc(100vh-175px)] mb-10 px-5 pb-2 overflow-y-auto">
+          <div className="request lg:mr-6 bg-white rounded-lg h-[calc(100vh-175px)] mb-10 px-5 pb-2 overflow-y-auto">
             <div className="flex justify-between items-center mb-5">
               <h4 className="text-[19px] text-[#344767]">Vendors List</h4>
               <div className="flex items-center rounded-lg bg-[#F5F7FA] p-1.5">
