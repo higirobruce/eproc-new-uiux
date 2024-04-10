@@ -274,6 +274,26 @@ const BidList = ({
                         </a>
                       </div>
                     )}
+                    {item?.otherDocIds && (
+                      item?.otherDocIds?.map(doc=><div>
+                        <a
+                          // href={`${url}/file/bidDocs/${item?.otherDocId}.pdf`}
+                          href={`${fendUrl}/api/?folder=bidDocs&name=${doc}`}
+                          target="_blank"
+                          // onClick={() => {
+                          //   // router.push(`bidDocs/${item?.otherDocId}.pdf`)
+                          //   // setAttachmentId(
+                          //   //   `bidDocs/${item?.otherDocId}.pdf`
+                          //   // );
+                          //   // setPreviewAttachment(true);
+                          // }}
+                          className="text-xs no-underline text-[#1677FF]"
+                        >
+                          {doc}
+                          <PaperClipIcon className="h-3 w-3" />
+                        </a>
+                      </div>)
+                    )}
                   </div>
                 </div>
                 <div className="flex flex-col gap-5">
