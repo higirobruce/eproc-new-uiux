@@ -92,8 +92,8 @@ export default function PurchaseOrders() {
   ];
 
   let [submitting, setSubmitting] = useState(false);
-  let [archiving, setArchiving] = useState(false);
-
+  let [withdrawing, setWithdrawing] = useState(false);
+  let [openWithdrawWarning, setOpenWithdrawWarning] = useState(false);
   const [previewAttachment, setPreviewAttachment] = useState(false);
   const [attachmentId, setAttachmentId] = useState("TOR-id.pdf");
 
@@ -263,6 +263,47 @@ export default function PurchaseOrders() {
 
   function getMyPOs() {}
 
+  function withdrawPOWarning() {
+    return (
+      <Modal
+        title="Are you sure?"
+        open={openWithdrawWarning}
+        onOk={() => {
+          setOpenWithdrawWarning(false);
+        }}
+        onCancel={() => {
+          setOpenWithdrawWarning(false);
+        }}
+        footer={[
+          <Button
+            key="back"
+            onClick={() => {
+              // setOpenViewPO(false);
+              setOpenWithdrawWarning(false);
+            }}
+          >
+            Cancel
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            danger={true}
+            loading={withdrawing}
+            onClick={()=>{
+              handleWithdrawPo()
+            }}
+          >
+            Yes, withdraw
+          </Button>,
+        ]}
+      >
+        Withdrawing this PO will inactivate indefinitely. You will need to
+        create a new PO or select a different sourcing method from the related
+        purchase request.
+      </Modal>
+    );
+  }
+
   function viewPOMOdal() {
     return (
       <Modal
@@ -287,21 +328,22 @@ export default function PurchaseOrders() {
                   Ok
                 </Button>,
                 po?.status !== "withdrawn" &&
+                  !documentFullySigned(po) &&
                   user?.permissions?.canApproveAsPM && (
-                    <Popconfirm
-                      title="Are you sure?"
-                      onConfirm={handleWithdrawPo}
+                    // <Popconfirm
+                    //   title="Are you sure? Withdrawing this PO will inactivate indefinitely. You will need to create a new PO or select a different sourcing method from the related purchase request."
+                    //   onConfirm={handleWithdrawPo}
+                    // >
+                    <Button
+                      key="submit"
+                      type="primary"
+                      danger={true}
+                      loading={withdrawing}
+                      onClick={() => setOpenWithdrawWarning(true)}
                     >
-                      <Button
-                        key="submit"
-                        type="primary"
-                        danger={true}
-                        loading={archiving}
-                        // onClick={() => handleArchivePo()}
-                      >
-                        Withdraw
-                      </Button>
-                    </Popconfirm>
+                      Withdraw
+                    </Button>
+                    // </Popconfirm>
                   ),
               ]
             : []
@@ -310,7 +352,7 @@ export default function PurchaseOrders() {
         bodyStyle={{ maxHeight: "700px", overflow: "scroll" }}
       >
         <div className="space-y-10 px-20 py-5 overflow-x-scroll">
-          <PrintPDF content={content} file={'PO'} />
+          <PrintPDF content={content} file={"PO"} />
           <div className="flex flex-row justify-between items-center">
             <Typography.Title level={4} className="flex flex-row items-center">
               PURCHASE ORDER #{po?.number}{" "}
@@ -616,7 +658,7 @@ export default function PurchaseOrders() {
   }
 
   function handleWithdrawPo() {
-    setArchiving(true);
+    setWithdrawing(true);
 
     let _po = { ...po };
 
@@ -639,8 +681,9 @@ export default function PurchaseOrders() {
         // setSections([{ title: "Set section title", body: "" }]);
         // setPO(res);
         setOpenViewPO(false);
-        setArchiving(false);
-        refresh()
+        setOpenWithdrawWarning(false);
+        setWithdrawing(false);
+        refresh();
       });
     //call API to sign
   }
@@ -1048,6 +1091,7 @@ export default function PurchaseOrders() {
       {dataLoaded && !submitting ? (
         <div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-screen pb-10 px-4">
           {viewPOMOdal()}
+          {withdrawPOWarning()}
 
           {previewAttachmentModal()}
           {/* <Row className="flex flex-col custom-sticky space-y-2 bg-white px-10 py-3 shadow">
