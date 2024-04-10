@@ -4071,12 +4071,12 @@ const TenderDetails = ({
       <contextHolder />
       <div className="flex items-center justify-between mr-6 mb-4">
         <div />
-        <button
+        {user?.userType !== "VENDOR" && <button
           onClick={() => setShow(true)}
           className="cursor-pointer bg-transparent px-1.5 py-1 rounded-full border-solid border-2 border-[#FFF]"
         >
           <TiInfoLarge className="text-[#FFF]" />
-        </button>
+        </button>}
       </div>
       <div className="flex flex-row justify-between items-start">
         <div className="flex-1">
