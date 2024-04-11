@@ -289,8 +289,8 @@ export default function PurchaseOrders() {
             type="primary"
             danger={true}
             loading={withdrawing}
-            onClick={()=>{
-              handleWithdrawPo()
+            onClick={() => {
+              handleWithdrawPo();
             }}
           >
             Yes, withdraw
@@ -501,7 +501,7 @@ export default function PurchaseOrders() {
                       <Typography.Text strong>{s.email}</Typography.Text>
                     </div>
 
-                    {s.signed && (
+                    {s.signed && po?.status != "withdrawn" && (
                       <>
                         {!signing && (
                           <div className="flex flex-col">
@@ -527,7 +527,7 @@ export default function PurchaseOrders() {
                       </>
                     )}
                   </div>
-                  {s?.signed && (
+                  {s?.signed && po?.status != "withdrawn" && (
                     <div className="flex flex-row justify-center space-x-10 items-center border-t-2 bg-blue-50 p-5">
                       <Image
                         width={40}
@@ -553,7 +553,8 @@ export default function PurchaseOrders() {
 
                   {(user?.email === s?.email || user?.tempEmail === s?.email) &&
                     !s?.signed &&
-                    previousSignatorySigned(po?.signatories, index) && (
+                    previousSignatorySigned(po?.signatories, index) &&
+                    po?.status != "withdrawn" && (
                       <Popconfirm
                         title="Confirm Contract Signature"
                         onConfirm={() => handleSignPo(s, index)}
@@ -577,20 +578,21 @@ export default function PurchaseOrders() {
                   {((user?.email !== s?.email &&
                     user?.tempEmail !== s?.email &&
                     !s.signed) ||
-                    !previousSignatorySigned(po?.signatories, index)) && (
-                    <div className="flex flex-row justify-center space-x-5 items-center border-t-2 bg-gray-50 p-5">
-                      <Image
-                        width={40}
-                        height={40}
-                        src="/icons/icons8-signature-80-2.png"
-                      />
-                      <div className="text-gray-400 text-lg">
-                        {s.signed
-                          ? "Signed"
-                          : `Waiting for ${yetToSign[0]?.names}'s signature`}
+                    !previousSignatorySigned(po?.signatories, index)) &&
+                    po?.status != "withdrawn" && (
+                      <div className="flex flex-row justify-center space-x-5 items-center border-t-2 bg-gray-50 p-5">
+                        <Image
+                          width={40}
+                          height={40}
+                          src="/icons/icons8-signature-80-2.png"
+                        />
+                        <div className="text-gray-400 text-lg">
+                          {s.signed
+                            ? "Signed"
+                            : `Waiting for ${yetToSign[0]?.names}'s signature`}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
               );
             })}

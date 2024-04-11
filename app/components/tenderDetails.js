@@ -2832,7 +2832,7 @@ const TenderDetails = ({
                       <Typography.Text strong>{s.email}</Typography.Text>
                     </div>
 
-                    {s.signed && (
+                    {s.signed && po?.status != "withdrawn" && (
                       <>
                         {!signing && (
                           <div className="flex flex-col">
@@ -2858,7 +2858,7 @@ const TenderDetails = ({
                       </>
                     )}
                   </div>
-                  {s?.signed && (
+                  {s?.signed && po?.status != "withdrawn" && (
                     <div className="flex flex-row justify-center space-x-10 items-center border-t-2 bg-blue-50 p-5">
                       <Image
                         width={40}
@@ -2880,7 +2880,8 @@ const TenderDetails = ({
 
                   {(user?.email === s?.email || user?.tempEmail === s?.email) &&
                     !s?.signed &&
-                    previousSignatorySigned(po?.signatories, index) && (
+                    previousSignatorySigned(po?.signatories, index) &&
+                    po?.status != "withdrawn" && (
                       <Popconfirm
                         title="Confirm Contract Signature"
                         onConfirm={() => handleSignPo(s, index)}
@@ -2902,20 +2903,21 @@ const TenderDetails = ({
                   {((user?.email !== s?.email &&
                     user?.tempEmail !== s?.email &&
                     !s.signed) ||
-                    !previousSignatorySigned(po?.signatories, index)) && (
-                    <div className="flex flex-row justify-center space-x-5 items-center border-t-2 bg-gray-50 p-5">
-                      <Image
-                        width={40}
-                        height={40}
-                        src="/icons/icons8-signature-80-2.png"
-                      />
-                      <div className="text-gray-400 text-lg">
-                        {s.signed
-                          ? "Signed"
-                          : `Waiting for ${yetToSign[0]?.names}'s signature`}
+                    !previousSignatorySigned(po?.signatories, index)) &&
+                    po?.status != "withdrawn" && (
+                      <div className="flex flex-row justify-center space-x-5 items-center border-t-2 bg-gray-50 p-5">
+                        <Image
+                          width={40}
+                          height={40}
+                          src="/icons/icons8-signature-80-2.png"
+                        />
+                        <div className="text-gray-400 text-lg">
+                          {s.signed
+                            ? "Signed"
+                            : `Waiting for ${yetToSign[0]?.names}'s signature`}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
               );
             })}
@@ -4071,12 +4073,14 @@ const TenderDetails = ({
       <contextHolder />
       <div className="flex items-center justify-between mr-6 mb-4">
         <div />
-        {user?.userType !== "VENDOR" && <button
-          onClick={() => setShow(true)}
-          className="cursor-pointer bg-transparent px-1.5 py-1 rounded-full border-solid border-2 border-[#FFF]"
-        >
-          <TiInfoLarge className="text-[#FFF]" />
-        </button>}
+        {user?.userType !== "VENDOR" && (
+          <button
+            onClick={() => setShow(true)}
+            className="cursor-pointer bg-transparent px-1.5 py-1 rounded-full border-solid border-2 border-[#FFF]"
+          >
+            <TiInfoLarge className="text-[#FFF]" />
+          </button>
+        )}
       </div>
       <div className="flex flex-row justify-between items-start">
         <div className="flex-1">
@@ -5026,26 +5030,27 @@ const TenderDetails = ({
                                         </a>
                                       </div>
                                     )}
-                                    {item?.otherDocIds && (
-                                      item?.otherDocIds?.map(doc=><div>
-                                        <a
-                                          // href={`${url}/file/bidDocs/${item?.otherDocId}.pdf`}
-                                          href={`${fendUrl}/api/?folder=bidDocs&name=${doc}`}
-                                          target="_blank"
-                                          // onClick={() => {
-                                          //   // router.push(`bidDocs/${item?.otherDocId}.pdf`)
-                                          //   // setAttachmentId(
-                                          //   //   `bidDocs/${item?.otherDocId}.pdf`
-                                          //   // );
-                                          //   // setPreviewAttachment(true);
-                                          // }}
-                                          className="text-xs no-underline text-[#1677FF]"
-                                        >
-                                          {doc}
-                                          <PaperClipIcon className="h-3 w-3" />
-                                        </a>
-                                      </div>)
-                                    )}
+                                    {item?.otherDocIds &&
+                                      item?.otherDocIds?.map((doc) => (
+                                        <div>
+                                          <a
+                                            // href={`${url}/file/bidDocs/${item?.otherDocId}.pdf`}
+                                            href={`${fendUrl}/api/?folder=bidDocs&name=${doc}`}
+                                            target="_blank"
+                                            // onClick={() => {
+                                            //   // router.push(`bidDocs/${item?.otherDocId}.pdf`)
+                                            //   // setAttachmentId(
+                                            //   //   `bidDocs/${item?.otherDocId}.pdf`
+                                            //   // );
+                                            //   // setPreviewAttachment(true);
+                                            // }}
+                                            className="text-xs no-underline text-[#1677FF]"
+                                          >
+                                            {doc}
+                                            <PaperClipIcon className="h-3 w-3" />
+                                          </a>
+                                        </div>
+                                      ))}
                                   </div>
                                 </div>
                                 <div className="flex flex-col gap-5">
