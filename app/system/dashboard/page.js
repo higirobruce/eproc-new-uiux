@@ -365,13 +365,129 @@ export default function page() {
           total: 2290,
         },
       ],
+      serviceData: [
+        {
+          name: "JAN",
+          Transport: 30,
+          Food: 20,
+          Electronics: 10,
+          Entertainment: null,
+          Electricity: null,
+          Furnitures: 5
+        },
+        {
+          name: "FEB",
+          Entertainment: 20,
+          Electricity: 50,
+          Transport: 10,
+          Others: 5
+        },
+        {
+          name: "MAR",
+          Entertainment: 30,
+          Electricity: 20,
+          Transport: 60,
+          Entertainment: null,
+          Electricity: 10,
+          Others: 10
+        },
+        {
+          name: "APR",
+          Transport: 30,
+          Food: 20,
+          Electronics: 10,
+          Entertainment: null,
+          Electricity: null,
+          Furnitures: 5
+        },
+        {
+          name: "MAY",
+          Entertainment: 20,
+          Electricity: 50,
+          Transport: 10,
+          Others: 5
+        },
+        {
+          name: "JUN",
+          Entertainment: 30,
+          Electricity: 20,
+          Transport: 60,
+          Entertainment: null,
+          Electricity: 10,
+          Others: 10
+        },
+        {
+          name: "JUL",
+          Transport: 30,
+          Food: 20,
+          Electronics: 10,
+          Entertainment: null,
+          Electricity: null,
+          Furnitures: 5
+        },
+        {
+          name: "AUG",
+          Entertainment: 20,
+          Electricity: 50,
+          Transport: 10,
+          Others: 5
+        },
+        {
+          name: "SEP",
+          Entertainment: 30,
+          Electricity: 20,
+          Transport: 60,
+          Entertainment: null,
+          Electricity: 10,
+          Others: 10
+        },
+        {
+          name: "SEP",
+          Transport: 30,
+          Food: 20,
+          Electronics: 10,
+          Entertainment: null,
+          Electricity: null,
+          Furnitures: 5
+        },
+        {
+          name: "OCT",
+          Entertainment: 20,
+          Electricity: 50,
+          Transport: 10,
+          Others: 5
+        },
+        {
+          name: "NOV",
+          Entertainment: 30,
+          Electricity: 20,
+          Transport: 60,
+          Entertainment: null,
+          Electricity: 10,
+          Others: 10
+        },
+        {
+          name: "DEC",
+          Transport: 30,
+          Food: 20,
+          Electronics: 10,
+          Entertainment: null,
+          Electricity: null,
+          Furnitures: 5
+        }
+      ],
       statusData: [
-        { name: "Pending approval", value: 400 },
-        { name: "Approved", value: 300 },
-        { name: "Denied", value: 700 },
-        { name: "Withdrawn", value: 700 },
+        { name: "Pending approval", value: 10 },
+        { name: "Approved", value: 20 },
+        { name: "Denied", value: 45 }
+      ],
+      sourcingData: [
+        { name: "Tendering", value: 20 },
+        { name: "Direct Contracting", value: 120 },
+        { name: "Sourcing from existing vendor", value: 35 }
       ],
       statusColor: ["#2C7BE5", "#D2DDEC", "#31D5A6", "#878FF6"],
+      serviceColors: ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', "#2C7BE5", "#D2DDEC", "#31D5A6", "#878FF6"]
     },
     {
       item: "Payment request",
@@ -406,10 +522,14 @@ export default function page() {
         },
       ],
       statusData: [
-        { name: "Pending approval", value: 400 },
-        { name: "Approved", value: 300 },
-        { name: "Denied", value: 700 },
-        { name: "Withdrawn", value: 700 },
+        { name: "Pending approval", value: 10 },
+        { name: "Approved", value: 20 },
+        { name: "Denied", value: 45 }
+      ],
+      sourcingData: [
+        { name: "Tendering", value: 20 },
+        { name: "Direct Contracting", value: 120 },
+        { name: "Sourcing from existing vendor", value: 35 }
       ],
       statusColor: ["#2C7BE5", "#D2DDEC", "#31D5A6", "#878FF6"],
     },
@@ -442,64 +562,64 @@ export default function page() {
       statusColor: [
         "#31D5A6", "#878FF6"],
     },
-    {
-      item: "Contracts",
-      labels: [
-        {
-          color: "#31D5A6",
-          name: "Total Value",
-        },
-      ],
-      data: [
-        {
-          name: "JAN",
-          value: 3
-        },
-        {
-          name: "FEB",
-          value: 4
-        },
-        {
-          name: "MAR",
-          value: 10
-        },
-      ],
-      statusData: [
-        { name: "Draft", value: 400 },
-        { name: "In-review", value: 400 },
-        { name: "Signed", value: 300 },
-        { name: "Terminated", value: 300 },
-      ],
-      statusColor: ["#31D5A6", "#878FF6", "#31D5A6", "#878FF6"],
-    },
-    {
-      item: "Purchase Orders",
-      labels: [
-        {
-          color: "#31D5A6",
-          name: "Total Value",
-        },
-      ],
-      data: [
-        {
-          name: "JAN",
-          value: 3
-        },
-        {
-          name: "FEB",
-          value: 4
-        },
-        {
-          name: "MAR",
-          value: 10
-        },
-      ],
-      statusData: [
-        { name: "Pending-signature", value: 400 },
-        { name: "Signed", value: 300 },
-      ],
-      statusColor: ["#31D5A6", "#878FF6"],
-    },
+    // {
+    //   item: "Contracts",
+    //   labels: [
+    //     {
+    //       color: "#31D5A6",
+    //       name: "Total Value",
+    //     },
+    //   ],
+    //   data: [
+    //     {
+    //       name: "JAN",
+    //       value: 3
+    //     },
+    //     {
+    //       name: "FEB",
+    //       value: 4
+    //     },
+    //     {
+    //       name: "MAR",
+    //       value: 10
+    //     },
+    //   ],
+    //   statusData: [
+    //     { name: "Draft", value: 400 },
+    //     { name: "In-review", value: 400 },
+    //     { name: "Signed", value: 300 },
+    //     { name: "Terminated", value: 300 },
+    //   ],
+    //   statusColor: ["#31D5A6", "#878FF6", "#31D5A6", "#878FF6"],
+    // },
+    // {
+    //   item: "Purchase Orders",
+    //   labels: [
+    //     {
+    //       color: "#31D5A6",
+    //       name: "Total Value",
+    //     },
+    //   ],
+    //   data: [
+    //     {
+    //       name: "JAN",
+    //       value: 3
+    //     },
+    //     {
+    //       name: "FEB",
+    //       value: 4
+    //     },
+    //     {
+    //       name: "MAR",
+    //       value: 10
+    //     },
+    //   ],
+    //   statusData: [
+    //     { name: "Pending-signature", value: 400 },
+    //     { name: "Signed", value: 300 },
+    //   ],
+    //   statusColor: ["#31D5A6", "#878FF6"],
+    // },
   ];
 
   const COLORS = ["#2C7BE5", "#D2DDEC"];
@@ -594,7 +714,7 @@ export default function page() {
                 // 'Purchase request', 'Payment request', 'Tenders', 'Contract', 'Purchase Orders', 'Vendors', 'Internal Users'
                 <div
                   key={key}
-                  className="grid grid-cols-3 gap-x-10 mt-5 pl-4 pr-10 bg-[#F9FAFD]"
+                  className="grid grid-cols-3 gap-x-10 mt-5 px-4 items-start"
                 >
                   <div className="col-span-2 py-8">
                     <span className="text-[14px] font-semibold text-[#12263F]">
@@ -659,24 +779,51 @@ export default function page() {
                         />
                       </LineChart>
                     </ResponsiveContainer>
+                    {el?.item == 'Purchase request' && <ResponsiveContainer width="100%" height={300}>
+                      <BarChart
+                        data={el?.serviceData}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                      >
+                        <XAxis
+                          dataKey="name"
+                          tickMargin={20}
+                          tick={{ fontSize: 11 }}
+                          tickSize={0}
+                          axisLine={{ strokeDasharray: "5 5" }}
+                        />
+                        <YAxis
+                          axisLine={false}
+                          tickMargin={30}
+                          tickSize={0}
+                          tick={<CustomYAxisTick />}
+                        />
+                        <Tooltip />
+                        {Object.keys(el?.serviceData[0]).map((key, index) => {
+                          if (key !== 'name') {
+                            return <Bar key={key} dataKey={key} stackId="a" fill={el?.serviceColors[index % el?.serviceColors.length]} barSize={20} />;
+                          }
+                          return null;
+                        })}
+                      </BarChart>
+                    </ResponsiveContainer>}
                   </div>
-                  <div className="col-span-1 flex flex-col justify-center">
-                    {/* <div className="m-5">
-                      <span className="text-[16px] text-[#12263F]">Budget Comparison</span>
-                    </div> */}
-                    <div className="flex items-center justify-between">
-                      <ResponsiveContainer width="60%" height={240}>
+                  <div className="col-span-1 flex flex-col px-4 bg-[#F9FAFD]">
+                    <div className="my-5">
+                      <span className="text-[15px] text-[#12263F]">Approval process</span>
+                    </div>
+                    <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
+                      <ResponsiveContainer width="97%" height={160}>
                         <PieChart
                           margin={{ top: 20, right: 0, left: 20, bottom: 5 }}
                         >
                           <Pie
-                            data={el?.statusData}
-                            cx={80}
-                            cy={90}
+                            data={el?.sourcingData}
+                            cx={50}
+                            cy={50}
                             startAngle={360}
                             endAngle={0}
-                            innerRadius={80}
-                            outerRadius={95}
+                            innerRadius={59}
+                            outerRadius={65}
                             fill="#8884d8"
                             paddingAngle={2}
                             dataKey="value"
@@ -690,37 +837,77 @@ export default function page() {
                           </Pie>
                         </PieChart>
                       </ResponsiveContainer>
-                      <div className="flex flex-col gap-y-5 -mt-10">
-                        {el?.statusData.map((item, key) => (
+                      <div className="flex flex-col gap-y-3 -mt-5">
+                        {el?.statusData?.map((item, key) => (
                           <div className="flex items-center gap-x-2">
                             <div
                               className={`w-2 h-2 rounded-full bg-[${el?.statusColor[key]}]`}
                             />
-                            <span className="text-[15px] text-[#6C757D]">
+                            <span className="text-[13px] text-[#6C757D]">
                               {item?.name}
                             </span>
-                            <span className="text-[15px] text-[#6C757D]">
+                            <span className="text-[13px] text-[#6C757D]">
                               {item?.value}
                             </span>
                           </div>
                         ))}
                       </div>
-                      {/* <div className="flex flex-col bg-white px-6 py-3.5 space-y-3 mr-12 -mt-10">
-                        <span className="text-[13px] text-[#A1A7AD]">Budgeted</span>
-                        <span className="text-[23px] text-[#12263F]"><b>72%</b></span>
-                        <span className="text-[13px] text-[#12263F]"><b>$864k</b>/3360k</span>
-                      </div> */}
                     </div>
-                    {/* <div className="w-full flex space-x-5 justify-center mb-4">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-4 h-4 bg-[#2C7BE5]" />
-                        <small className="text-[#A2B4D0] font-light">Budgeted</small>
+                    <div className="grid grid-cols-1 gap-x-3 mx-2 my-4">
+                      {[
+                        {name: "Approval Lead time", value: "12"}
+                      ].map((item, key) => (
+                        <div className="flex flex-col gap-y-4 bg-[#FFF] p-5 rounded">
+                          <small key={key} className="text-[#353535] text-[16px]">
+                            <b>{item.name}</b>
+                          </small>
+                          <h5 className="mt-2 mb-0 text-[#31D5A6]">{item.value} Days</h5>
+                          
+                        </div>
+                      ))}
+                    </div>
+                    {el?.item == "Purchase request" && <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
+                      <ResponsiveContainer width="97%" height={160}>
+                        <PieChart
+                          margin={{ top: 20, right: 0, left: 20, bottom: 5 }}
+                        >
+                          <Pie
+                            data={el?.sourcingData}
+                            cx={50}
+                            cy={50}
+                            startAngle={360}
+                            endAngle={0}
+                            innerRadius={59}
+                            outerRadius={65}
+                            fill="#8884d8"
+                            paddingAngle={2}
+                            dataKey="value"
+                          >
+                            {el?.sourcingData?.map((entry, index) => (
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={el?.statusColor[index]}
+                              />
+                            ))}
+                          </Pie>
+                        </PieChart>
+                      </ResponsiveContainer>
+                      <div className="flex flex-col gap-y-3 -mt-5">
+                        {el?.sourcingData?.map((item, key) => (
+                          <div className="flex items-center gap-x-2">
+                            <div
+                              className={`w-1.5 h-1.5 rounded-full bg-[${el?.statusColor[key]}]`}
+                            />
+                            <span className="text-[11px] text-[#6C757D]">
+                              {item?.name}
+                            </span>
+                            <span className="text-[11px] text-[#6C757D]">
+                              {item?.value}
+                            </span>
+                          </div>
+                        ))}
                       </div>
-                      <div className="flex items-center space-x-3">
-                        <div className="w-4 h-4 bg-[#D2DDEC]" />
-                        <small className="text-[#A2B4D0] font-light">Un-Budgeted</small>
-                      </div>
-                    </div> */}
+                    </div>}
                   </div>
                 </div>
               ))}
