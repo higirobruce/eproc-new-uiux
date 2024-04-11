@@ -9,12 +9,12 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@/app/context/UserContext";
 import UploadOtherFiles from "@/app/components/uploadOtherFiles";
 import useMobile from "@/app/hooks/useMobile";
-import { isMobile } from 'react-device-detect';
+import { isMobile } from "react-device-detect";
 
 export default function NewRequest() {
   let router = useRouter();
   const { user, login, logout } = useUser();
-  const {openNotificationWithIcon} = useMobile();
+  const { openNotificationWithIcon } = useMobile();
   const [open, setOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState("");
   let [confirmLoading, setConfirmLoading] = useState(false);
@@ -47,12 +47,14 @@ export default function NewRequest() {
   const [form] = Form.useForm();
 
   function getResultFromServer(res) {
-    isMobile ? messageApi.open({
-      type: "error",
-      content:
-        "We are sorry this app works only on Web Browser, browse on another device for better experience.",
-      duration: 9
-    }) : null
+    isMobile
+      ? messageApi.open({
+          type: "error",
+          content:
+            "We are sorry this app works only on Web Browser, browse on another device for better experience.",
+          duration: 9,
+        })
+      : null;
     if (res.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
@@ -229,7 +231,6 @@ export default function NewRequest() {
                 content: "Purchase Request created!",
               });
               setConfirmLoading(false);
-              
             })
             .catch((err) => {
               setConfirmLoading(false);
@@ -612,6 +613,7 @@ export default function NewRequest() {
                     <label>Purchase Request Currency</label>
                   </div>
                   <Form.Item
+                  initialValue={currency}
                     name="currency"
                     rules={[
                       {
@@ -623,6 +625,7 @@ export default function NewRequest() {
                     <Select
                       defaultValue="RWF"
                       // disabled={disable}
+                      value={currency}
                       size="large"
                       className="w-full"
                       onChange={(value) => setCurrency(value)}
@@ -657,7 +660,6 @@ export default function NewRequest() {
                 <h3 className="my-5 font-bold text-[15px]">
                   Request specifications
                 </h3>
-                
               </div>
 
               <ItemsTable
