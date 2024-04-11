@@ -990,9 +990,9 @@ export default function PaymentRequest({ params }) {
         >
           Return to List
         </Button>
-        <button onClick={() => setShow(true)} className="cursor-pointer bg-transparent px-1.5 py-1 rounded-full border-solid border-2 border-[#FFF]">
+        {user?.userType !== "VENDOR" && <button onClick={() => setShow(true)} className="cursor-pointer bg-transparent px-1.5 py-1 rounded-full border-solid border-2 border-[#FFF]">
           <TiInfoLarge className="text-[#FFF]" />
-        </button>
+        </button>}
       </div>
       <div className="request-details gap-4 mb-6 items-start h-[calc(100vh-200px)] overflow-y-auto">
         <div className="grid md:grid-cols-5 gap-1 items-start">
