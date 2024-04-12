@@ -60,6 +60,9 @@ export default function page() {
   const [openTenders, setOpenTenders] = useState(0);
   const [closedTenders, setClosedTenders] = useState(0);
   const [avgBids, setAvgBids] = useState(0);
+  const [totalOverview, setTotalOverview] = useState([]);
+  const [paymentOverview, setPaymentOverview] = useState('')
+  const [serviceCategories, setServiceCategories] = useState([]);
   const router = useRouter();
   const [tab, setTab] = useState(0);
 
@@ -70,6 +73,16 @@ export default function page() {
   const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
+    loadServiceCategories()
+      .then((res) => getResultFromServer(res))
+      .then((res) => setServiceCategories(res))
+      .catch((err) => {
+        messageApi.open({
+          type: "error",
+          content: "Something happened! Please try again.",
+        });
+      });
+
     loadTenders()
       .then((res) => getResultFromServer(res))
       .then((res) => {
@@ -146,6 +159,28 @@ export default function page() {
       .then((res) => getResultFromServer(res))
       .then((res) => {
         setVendors(res);
+      })
+      .catch((err) => {
+        messageApi.open({
+          type: "error",
+          content: "Something happened! Please try again.",
+        });
+      });
+    loadRequestOverview()
+      .then((res) => getResultFromServer(res))
+      .then((res) => {
+        setTotalOverview(res);
+      })
+      .catch((err) => {
+        messageApi.open({
+          type: "error",
+          content: "Something happened! Please try again.",
+        });
+      });
+    loadPaymentOverview()
+      .then((res) => getResultFromServer(res))
+      .then((res) => {
+        setPaymentOverview(res);
       })
       .catch((err) => {
         messageApi.open({
@@ -243,6 +278,39 @@ export default function page() {
     });
   }
 
+  async function loadServiceCategories() {
+    return fetch(`${url}/serviceCategories`, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json"
+      }
+    })
+  }
+
+  async function loadRequestOverview() {
+    return fetch(`${url}/requests/totalOverview`, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json"
+      }
+    })
+  }
+
+  async function loadPaymentOverview() {
+    return fetch(`${url}/paymentRequests/totalOverview`, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json"
+      }
+    })
+  }
+
   function getResultFromServer(res) {
     if (res.status === 401) {
       localStorage.removeItem("token");
@@ -332,235 +400,269 @@ export default function page() {
     { name: "Group B", value: 300 },
   ];
 
+  const statusColors = ["#27AFB8", "#53BAA1", "#237396"]
+
   const overviewData = [
+    // {
+    //   item: "Purchase request",
+    //   labels: [
+    //     {
+    //       color: "#31D5A6",
+    //       name: "Budgeted",
+    //     },
+    //     {
+    //       color: "#878FF6",
+    //       name: "Non-Budgeted",
+    //     },
+    //   ],
+    //   data: [
+    //     {
+    //       name: "JAN",
+    //       budgeted: 4000,
+    //       nonBudgeted: 2400,
+    //       total: 3000,
+    //     },
+    //     {
+    //       name: "FEB",
+    //       budgeted: 3000,
+    //       nonBudgeted: 1398,
+    //       total: 2210,
+    //     },
+    //     {
+    //       name: "MAR",
+    //       budgeted: 2000,
+    //       nonBudgeted: 9800,
+    //       total: 2290,
+    //     },
+    //   ],
+    //   serviceData: [
+    //     {
+    //       name: "JAN",
+    //       Transport: 30,
+    //       Food: 20,
+    //       Electronics: 10,
+    //       Entertainment: null,
+    //       Electricity: null,
+    //       Furnitures: 5
+    //     },
+    //     {
+    //       name: "JAN",
+    //       Transport: 40,
+    //       Food: 20,
+    //       Electronics: 10,
+    //       Entertainment: null,
+    //       Electricity: null,
+    //       Furnitures: 5
+    //     },
+    //     {
+    //       name: "FEB",
+    //       Entertainment: 20,
+    //       Electricity: 50,
+    //       Transport: 10,
+    //       Others: 5
+    //     },
+    //     {
+    //       name: "MAR",
+    //       Entertainment: 30,
+    //       Electricity: 20,
+    //       Transport: 60,
+    //       Entertainment: null,
+    //       Electricity: 10,
+    //       Others: 10
+    //     },
+    //     {
+    //       name: "APR",
+    //       Transport: 30,
+    //       Food: 20,
+    //       Electronics: 10,
+    //       Entertainment: null,
+    //       Electricity: null,
+    //       Furnitures: 5
+    //     },
+    //     {
+    //       name: "MAY",
+    //       Entertainment: 20,
+    //       Electricity: 50,
+    //       Transport: 10,
+    //       Others: 5
+    //     },
+    //     {
+    //       name: "JUN",
+    //       Entertainment: 30,
+    //       Electricity: 20,
+    //       Transport: 60,
+    //       Entertainment: null,
+    //       Electricity: 10,
+    //       Others: 10
+    //     },
+    //     {
+    //       name: "JUL",
+    //       Transport: 30,
+    //       Food: 20,
+    //       Electronics: 10,
+    //       Entertainment: null,
+    //       Electricity: null,
+    //       Furnitures: 5
+    //     },
+    //     {
+    //       name: "AUG",
+    //       Entertainment: 20,
+    //       Electricity: 50,
+    //       Transport: 10,
+    //       Others: 5
+    //     },
+    //     {
+    //       name: "SEP",
+    //       Entertainment: 30,
+    //       Electricity: 20,
+    //       Transport: 60,
+    //       Entertainment: null,
+    //       Electricity: 10,
+    //       Others: 10
+    //     },
+    //     {
+    //       name: "SEP",
+    //       Transport: 30,
+    //       Food: 20,
+    //       Electronics: 10,
+    //       Entertainment: null,
+    //       Electricity: null,
+    //       Furnitures: 5
+    //     },
+    //     {
+    //       name: "OCT",
+    //       Entertainment: 20,
+    //       Electricity: 50,
+    //       Transport: 10,
+    //       Others: 5
+    //     },
+    //     {
+    //       name: "NOV",
+    //       Entertainment: 30,
+    //       Electricity: 20,
+    //       Transport: 60,
+    //       Entertainment: null,
+    //       Electricity: 10,
+    //       Others: 10
+    //     },
+    //     {
+    //       name: "DEC",
+    //       Transport: 30,
+    //       Food: 20,
+    //       Electronics: 10,
+    //       Entertainment: null,
+    //       Electricity: null,
+    //       Furnitures: 5
+    //     }
+    //   ],
+    //   statusData: [
+    //     { name: "Pending approval", value: 10 },
+    //     { name: "Approved", value: 20 },
+    //     { name: "Denied", value: 45 }
+    //   ],
+    //   sourcingData: [
+    //     { name: "Tendering", value: 20 },
+    //     { name: "Direct Contracting", value: 120 },
+    //     { name: "Sourcing from existing vendor", value: 35 }
+    //   ],
+    //   statusColor: ["#2C7BE5", "#D2DDEC", "#31D5A6", "#878FF6"],
+    //   serviceColors: ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', "#2C7BE5", "#D2DDEC", "#31D5A6", "#878FF6"]
+    // },
+    // {
+    //   item: "Payment request",
+    //   labels: [
+    //     {
+    //       color: "#31D5A6",
+    //       name: "Budgeted",
+    //     },
+    //     {
+    //       color: "#878FF6",
+    //       name: "Non-Budgeted",
+    //     },
+    //   ],
+    //   data: [
+    //     {
+    //       name: "JAN",
+    //       budgeted: 4000,
+    //       nonBudgeted: 2400,
+    //       total: 3000,
+    //     },
+    //     {
+    //       name: "FEB",
+    //       budgeted: 3000,
+    //       nonBudgeted: 1398,
+    //       total: 2210,
+    //     },
+    //     {
+    //       name: "MAR",
+    //       budgeted: 2000,
+    //       nonBudgeted: 9800,
+    //       total: 2290,
+    //     },
+    //   ],
+    //   statusData: [
+    //     { name: "Pending approval", value: 10 },
+    //     { name: "Approved", value: 20 },
+    //     { name: "Denied", value: 45 }
+    //   ],
+    //   sourcingData: [
+    //     { name: "Tendering", value: 20 },
+    //     { name: "Direct Contracting", value: 120 },
+    //     { name: "Sourcing from existing vendor", value: 35 }
+    //   ],
+    //   statusColor: ["#2C7BE5", "#D2DDEC", "#31D5A6", "#878FF6"],
+    // },
     {
-      item: "Purchase request",
+      item: "PO, Contracts & Tenders",
       labels: [
         {
           color: "#31D5A6",
-          name: "Budgeted",
+          name: "PO",
         },
         {
-          color: "#878FF6",
-          name: "Non-Budgeted",
+          color: "#53BAA1",
+          name: "Contract",
+        },
+        {
+          color: "#237396",
+          name: "Tender",
         },
       ],
       data: [
         {
           name: "JAN",
-          budgeted: 4000,
-          nonBudgeted: 2400,
-          total: 3000,
+          tender: 3,
+          po: 8,
+          contract: 15
         },
         {
           name: "FEB",
-          budgeted: 3000,
-          nonBudgeted: 1398,
-          total: 2210,
+          tender: 4,
+          po: 5,
+          contract: 9
         },
         {
           name: "MAR",
-          budgeted: 2000,
-          nonBudgeted: 9800,
-          total: 2290,
+          tender: 10,
+          po: 14,
+          contract: 19
         },
       ],
-      serviceData: [
-        {
-          name: "JAN",
-          Transport: 30,
-          Food: 20,
-          Electronics: 10,
-          Entertainment: null,
-          Electricity: null,
-          Furnitures: 5
-        },
-        {
-          name: "FEB",
-          Entertainment: 20,
-          Electricity: 50,
-          Transport: 10,
-          Others: 5
-        },
-        {
-          name: "MAR",
-          Entertainment: 30,
-          Electricity: 20,
-          Transport: 60,
-          Entertainment: null,
-          Electricity: 10,
-          Others: 10
-        },
-        {
-          name: "APR",
-          Transport: 30,
-          Food: 20,
-          Electronics: 10,
-          Entertainment: null,
-          Electricity: null,
-          Furnitures: 5
-        },
-        {
-          name: "MAY",
-          Entertainment: 20,
-          Electricity: 50,
-          Transport: 10,
-          Others: 5
-        },
-        {
-          name: "JUN",
-          Entertainment: 30,
-          Electricity: 20,
-          Transport: 60,
-          Entertainment: null,
-          Electricity: 10,
-          Others: 10
-        },
-        {
-          name: "JUL",
-          Transport: 30,
-          Food: 20,
-          Electronics: 10,
-          Entertainment: null,
-          Electricity: null,
-          Furnitures: 5
-        },
-        {
-          name: "AUG",
-          Entertainment: 20,
-          Electricity: 50,
-          Transport: 10,
-          Others: 5
-        },
-        {
-          name: "SEP",
-          Entertainment: 30,
-          Electricity: 20,
-          Transport: 60,
-          Entertainment: null,
-          Electricity: 10,
-          Others: 10
-        },
-        {
-          name: "SEP",
-          Transport: 30,
-          Food: 20,
-          Electronics: 10,
-          Entertainment: null,
-          Electricity: null,
-          Furnitures: 5
-        },
-        {
-          name: "OCT",
-          Entertainment: 20,
-          Electricity: 50,
-          Transport: 10,
-          Others: 5
-        },
-        {
-          name: "NOV",
-          Entertainment: 30,
-          Electricity: 20,
-          Transport: 60,
-          Entertainment: null,
-          Electricity: 10,
-          Others: 10
-        },
-        {
-          name: "DEC",
-          Transport: 30,
-          Food: 20,
-          Electronics: 10,
-          Entertainment: null,
-          Electricity: null,
-          Furnitures: 5
-        }
+      tenderData: [
+        { name: "Opened", value: 20 },
+        { name: "Closed", value: 30 },
       ],
-      statusData: [
+      poData: [
         { name: "Pending approval", value: 10 },
         { name: "Approved", value: 20 },
         { name: "Denied", value: 45 }
       ],
-      sourcingData: [
-        { name: "Tendering", value: 20 },
-        { name: "Direct Contracting", value: 120 },
-        { name: "Sourcing from existing vendor", value: 35 }
-      ],
-      statusColor: ["#2C7BE5", "#D2DDEC", "#31D5A6", "#878FF6"],
-      serviceColors: ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', "#2C7BE5", "#D2DDEC", "#31D5A6", "#878FF6"]
-    },
-    {
-      item: "Payment request",
-      labels: [
-        {
-          color: "#31D5A6",
-          name: "Budgeted",
-        },
-        {
-          color: "#878FF6",
-          name: "Non-Budgeted",
-        },
-      ],
-      data: [
-        {
-          name: "JAN",
-          budgeted: 4000,
-          nonBudgeted: 2400,
-          total: 3000,
-        },
-        {
-          name: "FEB",
-          budgeted: 3000,
-          nonBudgeted: 1398,
-          total: 2210,
-        },
-        {
-          name: "MAR",
-          budgeted: 2000,
-          nonBudgeted: 9800,
-          total: 2290,
-        },
-      ],
-      statusData: [
+      contractData: [
         { name: "Pending approval", value: 10 },
         { name: "Approved", value: 20 },
         { name: "Denied", value: 45 }
       ],
-      sourcingData: [
-        { name: "Tendering", value: 20 },
-        { name: "Direct Contracting", value: 120 },
-        { name: "Sourcing from existing vendor", value: 35 }
-      ],
-      statusColor: ["#2C7BE5", "#D2DDEC", "#31D5A6", "#878FF6"],
-    },
-    {
-      item: "Tenders",
-      labels: [
-        {
-          color: "#31D5A6",
-          name: "Total Value",
-        },
-      ],
-      data: [
-        {
-          name: "JAN",
-          value: 3
-        },
-        {
-          name: "FEB",
-          value: 4
-        },
-        {
-          name: "MAR",
-          value: 10
-        },
-      ],
-      statusData: [
-        { name: "Opened", value: 400 },
-        { name: "Closed", value: 300 },
-      ],
-      statusColor: [
-        "#31D5A6", "#878FF6"],
+      statusColor: ["#31D5A6", "#878FF6", "#D2DDEC"],
     },
     // {
     //   item: "Contracts",
@@ -636,11 +738,45 @@ export default function page() {
         transform="rotate(0)"
         fontSize={11}
       >
-        {payload.value + "k"}
+        {payload.value}
       </text>
     </g>
   );
 
+  function combineWithDescriptions(serviceCatData, descriptionArray) {
+    // Get all unique keys from serviceCatData
+    const keys = new Set();
+    serviceCatData?.forEach(obj => {
+        Object.keys(obj).forEach(key => {
+            keys.add(key);
+        });
+    });
+
+    // Get all description values from descriptionArray
+    const descriptions = {};
+    descriptionArray?.forEach(obj => {
+        descriptions[obj.description] = obj._id;
+    });
+
+    // Create new objects with missing keys from descriptionArray
+    const result = serviceCatData?.map(obj => {
+        const newObj = { ...obj };
+        Object.keys(descriptions).forEach(key => {
+            if (!newObj.hasOwnProperty(key)) {
+                newObj[key] = null;
+            }
+        });
+        return newObj;
+    });
+
+    return result;
+  }
+
+  console.log('Total Overview ', totalOverview);
+  console.log('Service Categories ', serviceCategories)
+
+  const combinedData = combineWithDescriptions(totalOverview?.serviceCatData, [...serviceCategories, {description: 'Others', _id: "65a97c70ee824f3e8d2d2748"}, {description: '', _id: "65a97c70ee824f3e8d2d2jf8"}]);
+  console.log('Combined ', combinedData)
   return (
     <>
       {contextHolder}
@@ -710,6 +846,338 @@ export default function page() {
                   </div>
                 ))}
               </div>
+
+              {/* Purchase Request Graph Mapping */}
+
+              <div
+                className="grid grid-cols-3 gap-x-10 mt-5 px-4 items-start"
+              >
+                <div className="col-span-2 py-8">
+                  <span className="text-[17px] font-semibold text-[#12263F]">
+                    Purchase Request
+                  </span>
+                  {/* <div className="w-full py-5 flex justify-center items-center gap-x-8 mt-4">
+                    {el.labels.map((label, i) => (
+                      <div
+                        key={i}
+                        className="flex flex-col space-y-3 items-center"
+                      >
+                        <div className="flex items-center gap-x-2">
+                          <div
+                            className={`w-2 h-2 rounded-full bg-[${label?.color}]`}
+                          />
+                          <span className="text-[15px] text-[#6C757D]">
+                            {label?.name}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div> */}
+                  <div className="pt-8">
+                    <span className="text-[14px] font-semibold text-[#12263F] p-5 m-5">
+                      Budgeted Vs Non-Budgeted
+                    </span>
+                    <ResponsiveContainer width="100%" height={180}>
+                      <LineChart
+                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                        data={totalOverview?.data}
+                      >
+                        <XAxis
+                          dataKey="month"
+                          tickMargin={20}
+                          tick={{ fontSize: 11 }}
+                          tickSize={0}
+                          axisLine={{ strokeDasharray: "5 5" }}
+                        />
+                        <YAxis
+                          axisLine={false}
+                          tickMargin={20}
+                          tickSize={0}
+                          tick={<CustomYAxisTick />}
+                        />
+                        <Tooltip />
+                        <Line
+                          type="monotone"
+                          dataKey={"budgeted"}
+                          stroke="#34AEB3"
+                          dot={false}
+                          strokeWidth={3}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey={"nonbudgeted"}
+                          stroke="#53D084"
+                          dot={false}
+                          strokeWidth={3}
+                        />
+                        {/* <Line
+                          type="monotone"
+                          dataKey={"value"}
+                          stroke="#878FF6"
+                          dot={false}
+                          strokeWidth={3}
+                        /> */}
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="pt-8">
+                    <span className="text-[14px] font-semibold text-[#12263F] p-5 m-5">
+                      By Service Category
+                    </span>
+                    <ResponsiveContainer width="100%" height={180} className={'mt-5'}>
+                      <BarChart
+                        data={combinedData}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                      >
+                        <XAxis
+                          dataKey="name"
+                          tickMargin={20}
+                          tick={{ fontSize: 11 }}
+                          tickSize={0}
+                          axisLine={{ strokeDasharray: "5 5" }}
+                        />
+                        <YAxis
+                          axisLine={false}
+                          tickMargin={30}
+                          tickSize={0}
+                          tick={<CustomYAxisTick />}
+                        />
+                        <Tooltip />
+
+                        {Object.keys(combinedData[0]).map((key, index) => {
+                          if (key !== 'month' && key !== 'name') {
+                            return <Bar 
+                              key={key}
+                              dataKey={key} 
+                              stackId="a" 
+                              fill={statusColors[index % statusColors.length]} 
+                              barSize={20} 
+                            />;
+                          }
+                          return null;
+                        })}
+                      </BarChart>
+                    </ResponsiveContainer>
+
+                  </div>
+                </div>
+                <div className="col-span-1 flex flex-col px-4 bg-[#F9FAFD]">
+                  <div className="py-10">
+                    <span className="text-[16px] text-[#12263F]">Approval process</span>
+                  </div>
+                  <div className="flex xl:flex-row flex-col items-center xl:gap-x-5 mb-5">
+                    <ResponsiveContainer width="97%" height={160}>
+                      <PieChart
+                        margin={{ top: 20, right: 0, left: 20, bottom: 5 }}
+                      >
+                        <Pie
+                          data={totalOverview?.statusData}
+                          cx={50}
+                          cy={50}
+                          startAngle={360}
+                          endAngle={0}
+                          innerRadius={59}
+                          outerRadius={65}
+                          fill="#8884d8"
+                          paddingAngle={2}
+                          dataKey="total"
+                        >
+                          {totalOverview?.statusData?.map((entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={["#27AFB8", "#53BAA1", "#237396"][index]}
+                            />
+                          ))}
+                        </Pie>
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div className="flex flex-col gap-y-3 -mt-5">
+                      {totalOverview?.statusData?.map((item, key) => (
+                        <div className="flex items-center gap-x-2">
+                          <div
+                            className={`w-2 h-2 rounded-full bg-[${["#27AFB8", "#53BAA1", "#237396"][key]}]`}
+                          />
+                          <span className="text-[13px] text-[#6C757D]">
+                            {item?._id}
+                          </span>
+                          <span className="text-[13px] text-[#6C757D]">
+                            {item?.total}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="py-10">
+                    <span className="text-[16px] text-[#12263F]">Sourcing methods</span>
+                  </div>
+                  <div className="flex xl:flex-row flex-col items-center xl:gap-x-5 mb-5">
+                    <ResponsiveContainer width="97%" height={160}>
+                      <PieChart
+                        margin={{ top: 20, right: 0, left: 20, bottom: 5 }}
+                      >
+                        <Pie
+                          data={totalOverview?.sourcingData}
+                          cx={50}
+                          cy={50}
+                          startAngle={360}
+                          endAngle={0}
+                          innerRadius={59}
+                          outerRadius={65}
+                          fill="#8884d8"
+                          paddingAngle={2}
+                          dataKey="total"
+                        >
+                          {totalOverview?.sourcingData?.map((entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={["#27AFB8", "#53BAA1", "#237396"][index]}
+                            />
+                          ))}
+                        </Pie>
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div className="flex flex-col gap-y-3 -mt-5">
+                      {totalOverview?.sourcingData?.map((item, key) => (
+                        <div className="flex items-center gap-x-2">
+                          <div
+                            className={`w-1.5 h-1.5 rounded-full bg-[${["#237396", "#53BAA1", "#D2DDEC"][key]}]`}
+                          />
+                          <span className="text-[13px] text-[#6C757D]">
+                            {item?._id}
+                          </span>
+                          <span className="text-[13px] text-[#6C757D]">
+                            {item?.total}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                className="grid grid-cols-3 gap-x-10 mt-5 px-4 items-start"
+              >
+                <div className="col-span-2 py-8">
+                  <span className="text-[17px] font-semibold text-[#12263F]">
+                    Payment Request
+                  </span>
+                  {/* <div className="w-full py-5 flex justify-center items-center gap-x-8 mt-4">
+                    {el.labels.map((label, i) => (
+                      <div
+                        key={i}
+                        className="flex flex-col space-y-3 items-center"
+                      >
+                        <div className="flex items-center gap-x-2">
+                          <div
+                            className={`w-2 h-2 rounded-full bg-[${label?.color}]`}
+                          />
+                          <span className="text-[15px] text-[#6C757D]">
+                            {label?.name}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div> */}
+                  <ResponsiveContainer width="100%" height={180}>
+                    <LineChart
+                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                      data={paymentOverview?.data}
+                    >
+                      <XAxis
+                        dataKey="month"
+                        tickMargin={20}
+                        tick={{ fontSize: 11 }}
+                        tickSize={0}
+                        axisLine={{ strokeDasharray: "5 5" }}
+                      />
+                      <YAxis
+                        axisLine={false}
+                        tickMargin={20}
+                        tickSize={0}
+                        tick={<CustomYAxisTick />}
+                      />
+                      <Tooltip />
+                      <Line
+                        type="monotone"
+                        dataKey={"budgeted"}
+                        stroke="#34AEB3"
+                        dot={false}
+                        strokeWidth={3}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey={"nonbudgeted"}
+                        stroke="#53D084"
+                        dot={false}
+                        strokeWidth={3}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey={"total"}
+                        stroke="#FF5555"
+                        dot={false}
+                        strokeWidth={1}
+                        strokeDasharray="5 5"
+                      />
+                      {/* <Line
+                        type="monotone"
+                        dataKey={"value"}
+                        stroke="#878FF6"
+                        dot={false}
+                        strokeWidth={3}
+                      /> */}
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="col-span-1 flex flex-col px-4 bg-[#F9FAFD]">
+                  <div className="my-5">
+                    <span className="text-[15px] text-[#12263F]">Approval process</span>
+                  </div>
+                  <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
+                    <ResponsiveContainer width="97%" height={160}>
+                      <PieChart
+                        margin={{ top: 20, right: 0, left: 20, bottom: 5 }}
+                      >
+                        <Pie
+                          data={paymentOverview?.statusData}
+                          cx={50}
+                          cy={50}
+                          startAngle={360}
+                          endAngle={0}
+                          innerRadius={59}
+                          outerRadius={65}
+                          fill="#8884d8"
+                          paddingAngle={2}
+                          dataKey="total"
+                        >
+                          {paymentOverview?.statusData?.map((entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={["#27AFB8", "#53BAA1", "#237396"][index]}
+                            />
+                          ))}
+                        </Pie>
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div className="flex flex-col gap-y-3 -mt-5">
+                      {paymentOverview?.statusData?.map((item, key) => (
+                        <div className="flex items-center gap-x-2">
+                          <div
+                            className={`w-2 h-2 rounded-full bg-[${["#27AFB8", "#53BAA1", "#237396"][key]}]`}
+                          />
+                          <span className="text-[13px] text-[#6C757D]">
+                            {item?._id}
+                          </span>
+                          <span className="text-[13px] text-[#6C757D]">
+                            {item?.total}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {overviewData.map((el, key) => (
                 // 'Purchase request', 'Payment request', 'Tenders', 'Contract', 'Purchase Orders', 'Vendors', 'Internal Users'
                 <div
@@ -758,21 +1226,21 @@ export default function page() {
                         <Tooltip />
                         <Line
                           type="monotone"
-                          dataKey={"budgeted"}
+                          dataKey={"tender"}
                           stroke="#31D5A6"
                           dot={false}
                           strokeWidth={3}
                         />
                         <Line
                           type="monotone"
-                          dataKey={"nonBudgeted"}
+                          dataKey={"contract"}
                           stroke="#878FF6"
                           dot={false}
                           strokeWidth={3}
                         />
                         <Line
                           type="monotone"
-                          dataKey={"value"}
+                          dataKey={"po"}
                           stroke="#878FF6"
                           dot={false}
                           strokeWidth={3}
@@ -798,20 +1266,27 @@ export default function page() {
                           tick={<CustomYAxisTick />}
                         />
                         <Tooltip />
+
                         {Object.keys(el?.serviceData[0]).map((key, index) => {
                           if (key !== 'name') {
-                            return <Bar key={key} dataKey={key} stackId="a" fill={el?.serviceColors[index % el?.serviceColors.length]} barSize={20} />;
+                            return <Bar 
+                              key={key}
+                              dataKey={key} 
+                              stackId="a" 
+                              fill={el?.serviceColors[index % el?.serviceColors.length]} 
+                              barSize={20} 
+                            />;
                           }
                           return null;
                         })}
                       </BarChart>
                     </ResponsiveContainer>}
                   </div>
-                  <div className="col-span-1 flex flex-col px-4 bg-[#F9FAFD]">
-                    <div className="my-5">
+                  <div className="col-span-1 flex flex-col px-4 bg-[#F9FAFD] mt-7 pt-5">
+                    {el?.item != 'PO, Contracts & Tenders' && <div className="my-5">
                       <span className="text-[15px] text-[#12263F]">Approval process</span>
-                    </div>
-                    <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
+                    </div>}
+                    {el?.item == 'Purchase request' && <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
                       <ResponsiveContainer width="97%" height={160}>
                         <PieChart
                           margin={{ top: 20, right: 0, left: 20, bottom: 5 }}
@@ -828,7 +1303,7 @@ export default function page() {
                             paddingAngle={2}
                             dataKey="value"
                           >
-                            {el?.statusData.map((entry, index) => (
+                            {el?.statusData?.map((entry, index) => (
                               <Cell
                                 key={`cell-${index}`}
                                 fill={el?.statusColor[index]}
@@ -852,8 +1327,8 @@ export default function page() {
                           </div>
                         ))}
                       </div>
-                    </div>
-                    <div className="grid grid-cols-1 gap-x-3 mx-2 my-4">
+                    </div>}
+                    {el?.item == 'Purchase request' && <div className="grid grid-cols-1 gap-x-3 mx-2 my-4">
                       {[
                         {name: "Approval Lead time", value: "12"}
                       ].map((item, key) => (
@@ -865,7 +1340,7 @@ export default function page() {
                           
                         </div>
                       ))}
-                    </div>
+                    </div>}
                     {el?.item == "Purchase request" && <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
                       <ResponsiveContainer width="97%" height={160}>
                         <PieChart
@@ -898,16 +1373,146 @@ export default function page() {
                             <div
                               className={`w-1.5 h-1.5 rounded-full bg-[${el?.statusColor[key]}]`}
                             />
-                            <span className="text-[11px] text-[#6C757D]">
+                            <span className="text-[13px] text-[#6C757D]">
                               {item?.name}
                             </span>
-                            <span className="text-[11px] text-[#6C757D]">
+                            <span className="text-[13px] text-[#6C757D]">
                               {item?.value}
                             </span>
                           </div>
                         ))}
                       </div>
                     </div>}
+                    {el?.item == "PO, Contracts & Tenders" && 
+                      <div className="flex flex-col gap-y-10">
+                        <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
+                          <ResponsiveContainer width="97%" height={140}>
+                            <PieChart
+                              margin={{ top: 20, right: 0, left: 20, bottom: 5 }}
+                            >
+                              <Pie
+                                data={el?.tenderData}
+                                cx={50}
+                                cy={50}
+                                startAngle={360}
+                                endAngle={0}
+                                innerRadius={59}
+                                outerRadius={65}
+                                fill="#8884d8"
+                                paddingAngle={2}
+                                dataKey="value"
+                              >
+                                {el?.tenderData?.map((entry, index) => (
+                                  <Cell
+                                    key={`cell-${index}`}
+                                    fill={el?.statusColor[index]}
+                                  />
+                                ))}
+                              </Pie>
+                            </PieChart>
+                          </ResponsiveContainer>
+                          <div className="flex flex-col gap-y-3 -mt-5">
+                            {el?.tenderData?.map((item, key) => (
+                              <div className="flex items-center gap-x-2">
+                                <div
+                                  className={`w-1.5 h-1.5 rounded-full bg-[${el?.statusColor[key]}]`}
+                                />
+                                <span className="text-[13px] text-[#6C757D]">
+                                  {item?.name}
+                                </span>
+                                <span className="text-[13px] text-[#6C757D]">
+                                  {item?.value}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
+                          <ResponsiveContainer width="97%" height={140}>
+                            <PieChart
+                              margin={{ top: 20, right: 0, left: 20, bottom: 5 }}
+                            >
+                              <Pie
+                                data={el?.poData}
+                                cx={50}
+                                cy={50}
+                                startAngle={360}
+                                endAngle={0}
+                                innerRadius={59}
+                                outerRadius={65}
+                                fill="#8884d8"
+                                paddingAngle={2}
+                                dataKey="value"
+                              >
+                                {el?.poData?.map((entry, index) => (
+                                  <Cell
+                                    key={`cell-${index}`}
+                                    fill={el?.statusColor[index]}
+                                  />
+                                ))}
+                              </Pie>
+                            </PieChart>
+                          </ResponsiveContainer>
+                          <div className="flex flex-col gap-y-3 -mt-5">
+                            {el?.poData?.map((item, key) => (
+                              <div className="flex items-center gap-x-2">
+                                <div
+                                  className={`w-1.5 h-1.5 rounded-full bg-[${el?.statusColor[key]}]`}
+                                />
+                                <span className="text-[13px] text-[#6C757D]">
+                                  {item?.name}
+                                </span>
+                                <span className="text-[13px] text-[#6C757D]">
+                                  {item?.value}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
+                          <ResponsiveContainer width="97%" height={140}>
+                            <PieChart
+                              margin={{ top: 20, right: 0, left: 20, bottom: 5 }}
+                            >
+                              <Pie
+                                data={el?.contractData}
+                                cx={50}
+                                cy={50}
+                                startAngle={360}
+                                endAngle={0}
+                                innerRadius={59}
+                                outerRadius={65}
+                                fill="#8884d8"
+                                paddingAngle={2}
+                                dataKey="value"
+                              >
+                                {el?.contractData?.map((entry, index) => (
+                                  <Cell
+                                    key={`cell-${index}`}
+                                    fill={el?.statusColor[index]}
+                                  />
+                                ))}
+                              </Pie>
+                            </PieChart>
+                          </ResponsiveContainer>
+                          <div className="flex flex-col gap-y-3 -mt-5">
+                            {el?.contractData?.map((item, key) => (
+                              <div className="flex items-center gap-x-2">
+                                <div
+                                  className={`w-1.5 h-1.5 rounded-full bg-[${el?.statusColor[key]}]`}
+                                />
+                                <span className="text-[13px] text-[#6C757D]">
+                                  {item?.name}
+                                </span>
+                                <span className="text-[13px] text-[#6C757D]">
+                                  {item?.value}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    }
                   </div>
                 </div>
               ))}
