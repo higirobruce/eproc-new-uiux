@@ -54,6 +54,8 @@ import { FiSearch } from 'react-icons/fi'
 import { useUser } from "@/app/context/UserContext";
 import { useVendorContext } from "@/app/context/VendorContext";
 import { useSearchParams } from "next/navigation";
+import { isMobile } from "react-device-detect";
+import NotificationComponent from "@/app/hooks/useMobile";
 
 export default function Vendors() {
   const { user, login, logout } = useUser();
@@ -97,30 +99,8 @@ export default function Vendors() {
   }, [pagination, statusFilter])
 
   useEffect(() => {
-    loadVendors();
-    fetch(`${url}/serviceCategories`, {
-      method: "GET",
-      headers: {
-        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
-        token: token,
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        setServCategories(res);
-      })
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Connection Error!",
-        });
-      });
-  }, []);
-
-  useEffect(() => {
     if (searchText === "") {
-      refresh();
+      // refresh();
     } else {
       let _dataSet = [...dataset];
       let filtered = _dataSet.filter((d) => {
@@ -160,35 +140,6 @@ export default function Vendors() {
     }
   }, [rowData]);
 
-  useEffect(() => {
-    setDataLoaded(false);
-    let requestUrl = `${url}/users/vendors/byStatus/${filter ? filter : searchStatus}/`;
-    fetch(requestUrl, {
-      method: "GET",
-      headers: {
-        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
-        token: token,
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        setDataLoaded(true);
-        setDataset(res);
-        setTempDataset(res);
-      })
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Something happened! Please try again.",
-        });
-      });
-  }, [searchStatus]);
-
-  function refresh() {
-    loadVendors();
-  }
-
   function loadVendors() {
     setDataLoaded(false);
     fetch(`${url}/users/vendors`, {
@@ -220,6 +171,57 @@ export default function Vendors() {
         });
       });
   }
+
+  function refresh() {
+    loadVendors();
+  }
+
+  useEffect(() => {
+    fetch(`${url}/serviceCategories`, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setServCategories(res);
+      })
+      .catch((err) => {
+        messageApi.open({
+          type: "error",
+          content: "Connection Error!",
+        });
+      });
+  }, []);
+
+  useEffect(() => {
+    setDataLoaded(false);
+    let requestUrl = `${url}/users/vendors/byStatus/${filter ? filter : searchStatus}/`;
+    fetch(requestUrl, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setDataLoaded(true);
+        setDataset(res);
+        setTempDataset(res);
+      })
+      .catch((err) => {
+        messageApi.open({
+          type: "error",
+          content: "Something happened! Please try again.",
+        });
+      });
+  }, [filter, searchStatus]);
+
   useEffect(() => {
     setUpdatingId("");
   }, [dataset]);
@@ -427,6 +429,7 @@ export default function Vendors() {
 
   return (
     <>
+      {isMobile && <NotificationComponent />}
       {contextHolder}
       {
         <div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 h-screen mt-6 pb-10 px-4">

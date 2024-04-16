@@ -1,16 +1,22 @@
-import { message } from "antd";
+import { useEffect } from 'react';
+import { message } from 'antd';
 
-const useMobile = () => {
-    const [messageApi] = message.useMessage();
+function useNotification() {
+  const openNotificationWithIcon = (type, content) => {
+    return message[type]({
+      content: content,
+    });
+  };
 
-    const openNotificationWithIcon = (type) => {
-        messageApi.open({
-            type: type,
-            content: 'We are sorry this app works only on IOS & Android, browse on mobile and install it.'
-        })
-    };
-
-    return {openNotificationWithIcon}
+  return openNotificationWithIcon;
 }
 
-export default useMobile;
+export default function NotificationComponent() {
+  const openNotification = useNotification();
+
+  useEffect(() => {
+    openNotification('error', 'This section is best viewed on desktop. For an optimal experience and full feature access, try the app  on a computer.');
+  }, []);
+
+  return null;
+}

@@ -30,6 +30,8 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { FiSearch } from "react-icons/fi";
 import { useUser } from "@/app/context/UserContext";
+import { isMobile } from "react-device-detect";
+import NotificationComponent from "@/app/hooks/useMobile";
 
 export default function Tenders() {
   const { user, login, logout } = useUser();
@@ -277,6 +279,7 @@ export default function Tenders() {
   
   return (
     <>
+      {isMobile && <NotificationComponent />}
       {contextHolder}
       {dataLoaded ? (
         <motion.div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 h-screen mt-6 pb-10 px-4">

@@ -8,13 +8,12 @@ import { encode } from "base-64";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/app/context/UserContext";
 import UploadOtherFiles from "@/app/components/uploadOtherFiles";
-import useMobile from "@/app/hooks/useMobile";
 import { isMobile } from "react-device-detect";
+import NotificationComponent from "@/app/hooks/useMobile";
 
 export default function NewRequest() {
   let router = useRouter();
   const { user, login, logout } = useUser();
-  const { openNotificationWithIcon } = useMobile();
   const [open, setOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState("");
   let [confirmLoading, setConfirmLoading] = useState(false);
@@ -47,14 +46,6 @@ export default function NewRequest() {
   const [form] = Form.useForm();
 
   function getResultFromServer(res) {
-    isMobile
-      ? messageApi.open({
-          type: "error",
-          content:
-            "We are sorry this app works only on Web Browser, browse on another device for better experience.",
-          duration: 9,
-        })
-      : null;
     if (res.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
@@ -344,7 +335,7 @@ export default function NewRequest() {
 
   return (
     <>
-      {/* {isMobile && openNotificationWithIcon('error')} */}
+      {isMobile && <NotificationComponent />}
       {contextHolder}
       <div className="payment-request h-[calc(100vh-128px)] overflow-y-auto lg:mx-0 mx-4 lg:mr-4 rounded-lg mt-6 bg-white pb-5 px-7 pt-3">
         <div className="flex flex-col justify-between h-full">

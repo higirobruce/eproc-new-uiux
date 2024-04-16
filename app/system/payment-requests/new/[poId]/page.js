@@ -23,6 +23,8 @@ import { MdAccountBalance } from "react-icons/md";
 import { FaMobileAlt } from "react-icons/fa";
 import Link from "next/link";
 import { useUser } from "@/app/context/UserContext";
+import { isMobile } from "react-device-detect";
+import NotificationComponent from "@/app/hooks/useMobile";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
@@ -264,8 +266,9 @@ export default function NewPaymentRequest({ params }) {
       }}
       className="flex flex-col transition-opacity ease-in-out duration-1000 py-5 flex-1 space-y-3 mt-6 h-screen pb-10"
     >
+      {isMobile && <NotificationComponent />}
+      {contextHolder}
       {/* <div className="flex flex-row justify-between items-center">
-        {contextHolder}
         <div className="flex flex-row space-x-10 items-center">
           <div>
             <Button
@@ -283,6 +286,7 @@ export default function NewPaymentRequest({ params }) {
           </div>
         </div>
       </div> */}
+
       <div className="request mr-6 bg-white h-[calc(100vh-165px)] rounded-lg mb-10 px-5 overflow-y-auto py-2 flex flex-col justify-between pb-8 md:mr-5">
         <div className="flex flex-col">
           <div className="flex items-start gap-x-5">

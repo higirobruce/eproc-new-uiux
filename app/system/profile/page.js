@@ -58,6 +58,8 @@ import {
 import { PiBagSimpleBold } from "react-icons/pi";
 import { FaFirefoxBrowser } from "react-icons/fa6";
 import { useUser } from "@/app/context/UserContext";
+import { isMobile } from "react-device-detect";
+import NotificationComponent from "@/app/hooks/useMobile";
 
 export default function page() {
   let router = useRouter();
@@ -591,6 +593,7 @@ export default function page() {
   function buildVendor() {
     return (
       <div className="payment-request rounded-lg h-[calc(100vh-160px)] mb-10 pb-2 overflow-y-auto">
+        {isMobile && <NotificationComponent />}
         {contextHolder}
         <div className="grid md:grid-cols-3 gap-5 mb-16">
           <div className="flex flex-col space-y-5">

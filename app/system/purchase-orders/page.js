@@ -53,6 +53,8 @@ import { BiEnvelope } from "react-icons/bi";
 import { IoCheckmarkOutline } from "react-icons/io5";
 import { RiForbidLine } from "react-icons/ri";
 import { useUser } from "@/app/context/UserContext";
+import { isMobile } from "react-device-detect";
+import NotificationComponent from "@/app/hooks/useMobile";
 // import MyPdfViewer from "../common/pdfViewer";
 
 export default function PurchaseOrders() {
@@ -1090,6 +1092,8 @@ export default function PurchaseOrders() {
 
   return (
     <>
+      {isMobile && <NotificationComponent />}
+      {contextHolder}
       {dataLoaded && !submitting ? (
         <div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-screen pb-10 px-4">
           {viewPOMOdal()}

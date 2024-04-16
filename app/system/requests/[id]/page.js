@@ -15,8 +15,8 @@ import { motion } from "framer-motion";
 import moment from "moment";
 import { useUser } from "@/app/context/UserContext";
 import { TiInfoLarge } from "react-icons/ti";
-import { isMobile } from 'react-device-detect';
-import Link from 'next/link';
+import { isMobile } from "react-device-detect";
+import NotificationComponent from "@/app/hooks/useMobile";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
@@ -86,12 +86,6 @@ export default function page({ params }) {
   const [tab, setTab] = useState(0);
 
   useEffect(() => {
-    isMobile ? messageApi.open({
-      type: "error",
-      content:
-        "We are sorry this app works only on Web Browser, browse on another device for better experience.",
-      duration: 9
-    }) : null
     loadData();
   }, []);
 
@@ -621,6 +615,7 @@ export default function page({ params }) {
 
   return (
     <>
+      {isMobile && <NotificationComponent />}
       {contextHolder}
       {/* <h1>{rowData?.number}</h1> */}
       <motion.div

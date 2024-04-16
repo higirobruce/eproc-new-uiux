@@ -58,6 +58,8 @@ import { RiForbidLine } from "react-icons/ri";
 import { FaLink } from "react-icons/fa6";
 import { IoLink } from "react-icons/io5";
 import { useUser } from "@/app/context/UserContext";
+import { isMobile } from "react-device-detect";
+import NotificationComponent from "@/app/hooks/useMobile";
 
 let modules = {
   toolbar: [
@@ -2623,6 +2625,7 @@ export default function Contracts() {
 
   return (
     <>
+      {isMobile && <NotificationComponent />}
       {contextHolder}
       {previewAttachmentModal()}
       {createPOMOdal()}

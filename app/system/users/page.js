@@ -58,6 +58,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { FiSearch } from "react-icons/fi";
 import { useUser } from "@/app/context/UserContext";
 import { useInternalContext } from "@/app/context/InternalContext";
+import { isMobile } from "react-device-detect";
+import NotificationComponent from "@/app/hooks/useMobile";
 
 export default function Users() {
   const { user, login, logout } = useUser();
@@ -677,6 +679,7 @@ export default function Users() {
 
   return !row ? (
     <>
+      {isMobile && <NotificationComponent />}
       {contextHolder}
       {buildCreateUserScreen()}
       {dataLoaded ? (
@@ -801,6 +804,7 @@ export default function Users() {
   function buildUser() {
     return (
       <div className="flex flex-col  transition-opacity ease-in-out duration-1000 px-10 py-5 flex-1 space-y-3 overflow-x-scroll">
+        {isMobile && <NotificationComponent />}
         {contextHolder}
         <div className="flex flex-col space-y-5">
           <div className="flex flex-row justify-between">
