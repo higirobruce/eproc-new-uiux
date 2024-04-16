@@ -38,20 +38,20 @@ const SideMenu = ({ setScreen, screen, user }) => {
     let _items = [];
     if (user?.userType !== "VENDOR") {
       _items = [];
-      if (user?.permissions?.canViewDashboard) {
-        _items.push({
-          label: "Dashboard",
-          key: "system/dashboard",
-          icon: (
-            <PieChartOutlined
-              size={28}
-              className={`text-[${
-                current == `system/dashboard` ? `#1677FF` : `#95A1B3`
-              }]`}
-            />
-          ),
-        });
-      }
+      // if (user?.permissions?.canViewDashboard) {
+      //   _items.push({
+      //     label: "Dashboard",
+      //     key: "system/dashboard",
+      //     icon: (
+      //       <PieChartOutlined
+      //         size={28}
+      //         className={`text-[${
+      //           current == `system/dashboard` ? `#1677FF` : `#95A1B3`
+      //         }]`}
+      //       />
+      //     ),
+      //   });
+      // }
 
       if (user?.permissions?.canViewRequests) {
         _items.push({
