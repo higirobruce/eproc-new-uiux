@@ -32,6 +32,8 @@ import ReactDOMServer from "react-dom/server";
 import { useRouter } from "next/navigation";
 import { content } from "@/app/utils/requestContent";
 import { useUser } from "@/app/context/UserContext";
+import { isMobile } from "react-device-detect";
+import NotificationComponent from "@/app/hooks/useMobile";
 
 let modules = {
   toolbar: [
@@ -533,6 +535,7 @@ export default function page({ params }) {
 
   return (
     <div className="flex flex-col p-3">
+      {isMobile && <NotificationComponent />}
       {contextHolder}
       {/* <Button
         type="primary"

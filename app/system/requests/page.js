@@ -39,6 +39,8 @@ import { BsFiletypeCsv } from "react-icons/bs";
 import { useUser } from "@/app/context/UserContext";
 import { saveAs } from "file-saver";
 import { useRequestContext } from "@/app/context/RequestContext";
+import { isMobile } from "react-device-detect";
+import NotificationComponent from "@/app/hooks/useMobile";
 
 function exportToCSV(data, fileName) {
   const csvHeader = Object.keys(data[0]).join(",");
@@ -864,7 +866,7 @@ export default function UserRequests() {
   };
 
   const getMyPendingRequest = (value, tempData = []) => {
-    let filterData = tempData?.length > 0 ? tempData : tempDataset;
+    let filterData = tempDataset;
     setMyPendingRequest(value);
     setUserPendingRequest(value);
 
@@ -943,6 +945,7 @@ export default function UserRequests() {
 
   return !rowData ? (
     <>
+      {isMobile && <NotificationComponent />}
       {contextHolder}
       {dataLoaded ? (
         <motion.div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-screen pb-10 lg:px-0 px-4">

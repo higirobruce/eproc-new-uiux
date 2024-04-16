@@ -18,6 +18,8 @@ import UploadPaymentReq from "@/app/components/uploadPaymentReq";
 import { MdAccountBalance } from "react-icons/md";
 import { FaMobileAlt } from "react-icons/fa";
 import { useUser } from "@/app/context/UserContext";
+import NotificationComponent from "@/app/hooks/useMobile";
+import { isMobile } from "react-device-detect";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
@@ -222,6 +224,7 @@ export default function NewPaymentRequest() {
       }}
       className="flex flex-col transition-opacity ease-in-out duration-1000 py-5 flex-1 space-y-3 mt-6 h-screen pb-10"
     >
+      {isMobile && <NotificationComponent />}
       {contextHolder}
       {/* <div className="flex flex-row justify-between items-center">
         <div className="flex flex-row space-x-10 items-center">

@@ -36,6 +36,8 @@ import { LuUser } from "react-icons/lu";
 import { PiBagSimpleBold } from "react-icons/pi";
 import { MdOutlineAlternateEmail, MdPhoneAndroid } from "react-icons/md";
 import { useUser } from "@/app/context/UserContext";
+import { isMobile } from "react-device-detect";
+import NotificationComponent from "@/app/hooks/useMobile";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
@@ -499,6 +501,7 @@ export default function page({ params }) {
 
   return (
     <div className="payment-request flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-2 h-screen pb-1 mb-32 overflow-y-auto">
+      {isMobile && <NotificationComponent />}
       {contextHolder}
       <div className="flex items-center justify-between mr-6">
         <Button

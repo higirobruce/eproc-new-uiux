@@ -12,6 +12,8 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import moment from "moment";
 import { useUser } from "@/app/context/UserContext";
+import { isMobile } from "react-device-detect";
+import NotificationComponent from "@/app/hooks/useMobile";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
@@ -381,6 +383,7 @@ export default function page({ params }) {
       }}
       className="flex flex-col transition-opacity ease-in-out duration-1000 py-5 flex-1 space-y-3 h-screen mb-6 pb-10 mr-6"
     >
+      {isMobile && <NotificationComponent />}
       {contextHolder}
       {/* <div className="flex flex-row items-center">
         <div className="flex flex-row justify-between items-center w-full">
