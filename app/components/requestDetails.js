@@ -395,6 +395,7 @@ const RequestDetails = ({
   const [openConfirmDeliv, setOpenConfirmDeliv] = useState([]);
   const [openApprove, setOpenApprove] = useState(false);
   const [openWithdraw, setOpenWithdraw] = useState(false);
+  const [openArchive, setOpenArchive] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   let [reason, setReason] = useState("");
   const [messageApi, contextHolder] = message.useMessage();
@@ -445,6 +446,7 @@ const RequestDetails = ({
 
   const [users, setUsers] = useState([]);
 
+  const [poCurrency, setPoCurrency] = useState(null);
   const [assets, setAssets] = useState([]);
 
   let [tendor, setTendor] = useState("");
@@ -578,6 +580,7 @@ const RequestDetails = ({
     });
 
     setValues(data?.items);
+    setPoCurrency(data?.currency || "RWF");
 
     // let _p = data?.items?.map((item) => {
     //   let _files = [];
@@ -793,6 +796,7 @@ const RequestDetails = ({
     else if (code === 4) return "approved";
     else if (code === 5) return "withdrawn";
     else if (code === 6) return "declined";
+    else if (code === 7) return "archived";
     else return "pending for approval";
   }
 
@@ -805,6 +809,7 @@ const RequestDetails = ({
     else if (status === "approved") return 4;
     else if (status === "withdrawn") return 5;
     else if (status === "declined") return 6;
+    else if (status === "archived") return 7;
     else return -1;
   }
 
@@ -953,8 +958,9 @@ const RequestDetails = ({
     })
       .then((res) => res.json())
       .then((res) => {
+        alert(JSON.stringify(res));
         if (res?.length >= 1) {
-          setPO(res[0]);
+          setPO(res?.filter((p) => p?.status !== "withdrawn")[0]);
         } else {
           setPO(null);
         }
@@ -991,7 +997,8 @@ const RequestDetails = ({
     })
       .then((res) => res.json())
       .then((res) => {
-        if (res?.length >= 1) setPO(res[0]);
+        if (res?.length >= 1)
+          setPO(res?.filter((p) => p?.status !== "withdrawn")[0]);
         else setPO(null);
       });
   }
@@ -1585,7 +1592,7 @@ const RequestDetails = ({
           setCreatingPO(true);
           let assetItems = [];
           let nonAssetItems = [];
-          let docCurrency = (items && items[0]?.currency) || "RWF";
+          let docCurrency = poCurrency || "RWF";
           let assetsNeeded = false;
 
           items
@@ -1598,7 +1605,7 @@ const RequestDetails = ({
                   Quantity: i.quantity / i?.assetCodes?.length,
                   UnitPrice: i.estimatedUnitCost,
                   VatGroup: i.taxGroup ? i.taxGroup : "X1",
-                  Currency: i.currency ? i.currency : "RWF",
+                  Currency: poCurrency || "RWF",
                 });
               });
             });
@@ -1611,7 +1618,7 @@ const RequestDetails = ({
                 Quantity: i.quantity,
                 UnitPrice: i.estimatedUnitCost,
                 VatGroup: i.taxGroup ? i.taxGroup : "X1",
-                Currency: i.currency ? i.currency : "RWF",
+                Currency: poCurrency || "RWF",
               });
             });
 
@@ -1717,6 +1724,7 @@ const RequestDetails = ({
             PURCHASE ORDER: {vendor?.companyName}
           </Typography.Title>
           {/* header */}
+
           <div className="grid grid-cols-2 w-1/2">
             {/* PO Document date */}
             {/* <div>
@@ -1735,7 +1743,53 @@ const RequestDetails = ({
                   { value: "dDocument_Item", label: "Item" },
                 ]}
               />
+
             </div> */}
+            <div>
+              <div className="mb-3">
+                <label>Purchase Order Currency</label>
+              </div>
+              <Form.Item
+                name="currency"
+                rules={[
+                  {
+                    required: true,
+                    message: "Currency is required",
+                  },
+                ]}
+              >
+                <Select
+                  defaultValue={data?.currency}
+                  value={poCurrency}
+                  // disabled={disable}
+                  size="large"
+                  className="w-full"
+                  onChange={(value) => setPoCurrency(value)}
+                  options={[
+                    {
+                      value: "RWF",
+                      label: "RWF",
+                      key: "RWF",
+                    },
+                    {
+                      value: "USD",
+                      label: "USD",
+                      key: "USD",
+                    },
+                    {
+                      value: "EUR",
+                      label: "EUR",
+                      key: "EUR",
+                    },
+                    {
+                      value: "GBP",
+                      label: "GBP",
+                      key: "GBP",
+                    },
+                  ]}
+                />
+              </Form.Item>
+            </div>
           </div>
 
           {/* Parties */}
@@ -1837,17 +1891,16 @@ const RequestDetails = ({
               dataSource={items}
               setDataSource={setItems}
               assetOptions={assetOptions}
+              currency={poCurrency}
             />
             <Typography.Title level={5} className="self-end">
-              Total (Tax Excl.):{" "}
-              {items[0]?.currency + " " + totalVal?.toLocaleString()}
+              Total (Tax Excl.): {poCurrency + " " + totalVal?.toLocaleString()}
             </Typography.Title>
             <Typography.Title level={5} className="self-end">
-              Total Tax: {items[0]?.currency + " " + totalTax?.toLocaleString()}
+              Total Tax: {poCurrency + " " + totalTax?.toLocaleString()}
             </Typography.Title>
             <Typography.Title level={4} className="self-end">
-              Gross Total:{" "}
-              {items[0]?.currency + " " + grossTotal?.toLocaleString()}
+              Gross Total: {poCurrency + " " + grossTotal?.toLocaleString()}
             </Typography.Title>
 
             {/* Sections */}
@@ -2907,6 +2960,7 @@ const RequestDetails = ({
       data?.createdBy?._id === user?._id) &&
       data?.status.startsWith("approved")) ||
     data?.status === "withdrawn" ||
+    data?.status === "archived" ||
     data?.status === "approved" ||
     data?.status === "approved (pm)";
 
@@ -2930,14 +2984,16 @@ const RequestDetails = ({
     <div className="request-details grid lg:grid-cols-5 gap-4 items-start h-screen mb-2 overflow-y-auto">
       {contextHolder}
       <div className="lg:col-span-4">
-        <div className="flex flex-col ring-1 ring-gray-200 pl-5 pr-8 rounded-lg bg-white border-0">
+        <div className="flex flex-col ring-1 ring-gray-200 lg:pl-5 lg:pr-8 rounded-lg bg-white border-0">
           {data && (
             <Form form={form}>
               <div className="flex items-center justify-between ml-3 mb-2">
                 <h4>Request Details</h4>
                 <Tag
                   color={
-                    data?.status === "declined" || data?.status === "withdrawn"
+                    data?.status === "declined" ||
+                    data?.status === "withdrawn" ||
+                    data?.status === "archived"
                       ? "red"
                       : data?.status === "approved" ||
                         data?.status === "approved (pm)"
@@ -2948,7 +3004,8 @@ const RequestDetails = ({
                   {data?.status === "declined" ||
                   data?.status === "approved" ||
                   data?.status === "approved (pm)" ||
-                  data?.status === "withdrawn"
+                  data?.status === "withdrawn" ||
+                  data?.status === "archived"
                     ? data?.status
                     : "pending"}
                 </Tag>
@@ -3414,6 +3471,34 @@ const RequestDetails = ({
                   </Popconfirm>
                 </div>
               )}
+
+              {user?.permissions?.canApproveAsPM &&
+                data?.status == "approved (pm)" && (
+                  <div className="flex justify-end gap-5 mb-5">
+                    <Popconfirm
+                      title="Are you sure?"
+                      open={openArchive}
+                      icon={<QuestionCircleOutlined style={{ color: "red" }} />}
+                      onConfirm={() => {
+                        changeStatus(7);
+                        setOpenArchive(false);
+                      }}
+                      // okButtonProps={{
+                      //   loading: confirmRejectLoading,
+                      // }}
+                      onCancel={() => setOpenArchive(false)}
+                    >
+                      <Button
+                        type="primary"
+                        danger
+                        onClick={() => setOpenArchive(true)}
+                        className="rounded-lg px-5 pt-0.5s pb-6 bg-[#F5365C] border-none"
+                      >
+                        Archive request
+                      </Button>
+                    </Popconfirm>
+                  </div>
+                )}
             </Form>
           )}
           {createPOMOdal()}
@@ -3840,7 +3925,7 @@ const RequestDetails = ({
                           <button
                             type="button"
                             className="border-0 rounded-md bg-transparent text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
-                            onClick={() => setShow(false)}
+                            onClick={() => handleClose()}
                           >
                             <XMarkIcon
                               className="h-5 w-5 text-red-500"

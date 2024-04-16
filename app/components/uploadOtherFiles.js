@@ -33,6 +33,11 @@ function UploadOtherFiles({
       // console.log(_newFileList)
       setFiles(_files);
     },
+    onChange: (file) => {
+      console.log("from new", file.fileList);
+      // setFiles(file.fileList);
+    },
+
     beforeUpload: (file) => {
       let isPDF = file.type == "application/pdf";
       if (!isPDF) {
@@ -49,6 +54,9 @@ function UploadOtherFiles({
       if (f) {
         f.push(file);
       } else _f.push([file]);
+
+      console.log("from ollld", _f);
+
       setFiles(_f);
 
       // return isPDF || Upload.LIST_IGNORE;
@@ -62,17 +70,23 @@ function UploadOtherFiles({
   return (
     <>
       {contextHolder}
-      <Upload {...props} headers={{}} multiple defaultFileList={[...files]}>
+      <Upload
+        {...props}
+        headers={{}}
+        // maxCount={1}
+        // multiple
+        defaultFileList={[...files]}
+      >
         <Tooltip
           placement="top"
           title={`Upload limit: 12 MB. Supported formats: PDF.`}
         >
-          <div className=" rounded ring-1 ring-gray-300 px-3 items-center flex flex-row justify-center space-x-1 py-2 cursor-pointer shadow-md hover:shadow-sm active:bg-gray-50 transition-all ease-out duration-200">
+          {/* <div className=" rounded ring-1 ring-gray-300 px-3 items-center flex flex-row justify-center space-x-1 py-2 cursor-pointer shadow-md hover:shadow-sm active:bg-gray-50 transition-all ease-out duration-200">
             <CloudArrowUpIcon className="h-5 w-5 text-blue-500 " />
             <div className="text-sm">{label || "Select file(s)"}</div>
-          </div>
+          </div> */}
+          <Button icon={<UploadOutlined />}>{label ? label : "Upload"}</Button>
         </Tooltip>
-        {/* <Button icon={<UploadOutlined />}>{label ? label : "Upload"}</Button> */}
       </Upload>
     </>
   );

@@ -15,7 +15,8 @@ import { motion } from "framer-motion";
 import moment from "moment";
 import { useUser } from "@/app/context/UserContext";
 import { TiInfoLarge } from "react-icons/ti";
-import Link from 'next/link';
+import { isMobile } from "react-device-detect";
+import NotificationComponent from "@/app/hooks/useMobile";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
@@ -614,6 +615,7 @@ export default function page({ params }) {
 
   return (
     <>
+      {isMobile && <NotificationComponent />}
       {contextHolder}
       {/* <h1>{rowData?.number}</h1> */}
       <motion.div
@@ -626,9 +628,9 @@ export default function page({ params }) {
           type: "tween",
           ease: "circOut",
         }}
-        className="flex flex-col mr-5 transition-opacity ease-in-out duration-1000 py-5 flex-1 space-y-3 h-screen"
+        className="flex flex-col mr-5 transition-opacity ease-in-out duration-1000 py-5 flex-1 space-y-3 h-screen pl-4"
       >
-        <div className="flex items-center justify-between mr-6 mb-4">
+        <div className="flex items-center justify-between lg:mr-6 mb-4">
           <Button
             className="bg-white h-9 px-5 text-[13px] font-semibold rounded text-[#0063CF]"
             icon={<ArrowLeftOutlined className="font-[15px]" />}

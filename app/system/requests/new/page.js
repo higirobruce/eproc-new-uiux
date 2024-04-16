@@ -8,6 +8,8 @@ import { encode } from "base-64";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/app/context/UserContext";
 import UploadOtherFiles from "@/app/components/uploadOtherFiles";
+import { isMobile } from "react-device-detect";
+import NotificationComponent from "@/app/hooks/useMobile";
 
 export default function NewRequest() {
   let router = useRouter();
@@ -333,8 +335,9 @@ export default function NewRequest() {
 
   return (
     <>
+      {isMobile && <NotificationComponent />}
       {contextHolder}
-      <div className="payment-request h-[calc(100vh-128px)] overflow-y-auto mr-4 rounded-lg mt-6 bg-white pb-5 px-7 pt-3">
+      <div className="payment-request h-[calc(100vh-128px)] overflow-y-auto lg:mx-0 mx-4 lg:mr-4 rounded-lg mt-6 bg-white pb-5 px-7 pt-3">
         <div className="flex flex-col justify-between h-full">
           <div>
             <h4 className="mb-2.5 font-semibold text-[19px]">
@@ -601,6 +604,7 @@ export default function NewRequest() {
                     <label>Purchase Request Currency</label>
                   </div>
                   <Form.Item
+                  initialValue={currency}
                     name="currency"
                     rules={[
                       {
@@ -612,6 +616,7 @@ export default function NewRequest() {
                     <Select
                       defaultValue="RWF"
                       // disabled={disable}
+                      value={currency}
                       size="large"
                       className="w-full"
                       onChange={(value) => setCurrency(value)}
@@ -646,7 +651,6 @@ export default function NewRequest() {
                 <h3 className="my-5 font-bold text-[15px]">
                   Request specifications
                 </h3>
-                
               </div>
 
               <ItemsTable

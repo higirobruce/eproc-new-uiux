@@ -31,6 +31,7 @@ import {
   Input,
   Pagination,
   Col,
+  Form,
 } from "antd";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
@@ -57,6 +58,8 @@ import { RiForbidLine } from "react-icons/ri";
 import { FaLink } from "react-icons/fa6";
 import { IoLink } from "react-icons/io5";
 import { useUser } from "@/app/context/UserContext";
+import { isMobile } from "react-device-detect";
+import NotificationComponent from "@/app/hooks/useMobile";
 
 let modules = {
   toolbar: [
@@ -112,6 +115,7 @@ export default function Contracts() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [users, setUsers] = useState([]);
+  const [form] = Form.useForm();
 
   const onMenuClick = (e) => {
     setOpenViewContract(true);
@@ -134,11 +138,13 @@ export default function Contracts() {
   let [items, setItems] = useState(null);
   const [assetOptions, setAssetOptions] = useState([]);
   const [assets, setAssets] = useState([]);
+  const [poCurrency, setPoCurrency] = useState("RWF");
 
   useEffect(() => {
     getContracts();
     getInternalUsers();
     getFixedAssets();
+    setPoCurrency(contract?.request?.currency);
   }, []);
 
   useEffect(() => {
@@ -152,6 +158,8 @@ export default function Contracts() {
 
   useEffect(() => {
     setItems(contract?.request?.items);
+    // alert(contract?.request?.currency);
+
     let t = 0;
     let tax = 0;
     items?.map((i) => {
@@ -162,6 +170,7 @@ export default function Contracts() {
     setTotVal(t);
     setTotTax(tax);
     setGrossTotal(t + tax);
+    setPoCurrency(contract?.request?.currency);
   }, [contract]);
 
   useEffect(() => {
@@ -466,6 +475,53 @@ export default function Contracts() {
                 ]}
               />
             </div> */}
+            <div>
+              <div className="mb-3">
+                <label>Purchase Order Currency</label>
+              </div>
+              <Form form={form}>
+                <Form.Item
+                  name="currency"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Currency is required",
+                    },
+                  ]}
+                >
+                  <Select
+                    defaultValue={contract?.request?.currency}
+                    // value={poCurrency}
+                    // disabled={disable}
+                    size="large"
+                    className="w-full"
+                    onChange={(value) => setPoCurrency(value)}
+                    options={[
+                      {
+                        value: "RWF",
+                        label: "RWF",
+                        key: "RWF",
+                      },
+                      {
+                        value: "USD",
+                        label: "USD",
+                        key: "USD",
+                      },
+                      {
+                        value: "EUR",
+                        label: "EUR",
+                        key: "EUR",
+                      },
+                      {
+                        value: "GBP",
+                        label: "GBP",
+                        key: "GBP",
+                      },
+                    ]}
+                  />
+                </Form.Item>
+              </Form>
+            </div>
           </div>
 
           {/* Parties */}
@@ -572,6 +628,7 @@ export default function Contracts() {
               dataSource={items}
               setDataSource={setItems}
               assetOptions={assetOptions}
+              currency={poCurrency}
             />
             <Typography.Title level={5} className="self-end">
               Total (Tax Excl.):{" "}
@@ -1386,7 +1443,7 @@ export default function Contracts() {
         bodyStyle={{ maxHeight: "700px", overflow: "scroll" }}
       >
         <div className="space-y-10 px-20 py-5 overflow-x-scroll">
-          <PrintPDF content={content} />
+          <PrintPDF content={content} file={'Contract'} />
           {/* Header */}
           <div className="flex flex-row justify-between items-center">
             <Typography.Title level={4} className="flex flex-row items-center">
@@ -2568,14 +2625,15 @@ export default function Contracts() {
 
   return (
     <>
+      {isMobile && <NotificationComponent />}
       {contextHolder}
       {previewAttachmentModal()}
       {createPOMOdal()}
       {dataLoaded ? (
-        <div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-screen pb-10">
+        <div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-screen pb-10 px-4">
           {viewContractMOdal()}
 
-          <div className="flex items-center justify-between mr-6">
+          <div className="flex items-center justify-between lg:mr-6">
             <div />
             <div className="flex items-center gap-5">
               <Select
@@ -2611,7 +2669,7 @@ export default function Contracts() {
               ></Button>
             </div>
           </div>
-          <div className="request mr-6 bg-white h-[calc(100vh-170px)] rounded-lg mb-10 px-5 overflow-y-auto">
+          <div className="request lg:mr-6 bg-white h-[calc(100vh-170px)] rounded-lg mb-10 px-5 overflow-y-auto">
             <div className="flex justify-between items-center mb-5">
               <h4 className="text-[19px] text-[#344767]">Contracts List</h4>
               <div className="flex items-center gap-5">

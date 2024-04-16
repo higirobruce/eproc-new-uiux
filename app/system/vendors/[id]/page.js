@@ -57,6 +57,8 @@ import {
 } from "react-icons/md";
 import { FaFirefoxBrowser } from "react-icons/fa6";
 import { useUser } from "@/app/context/UserContext";
+import { isMobile } from "react-device-detect";
+import NotificationComponent from "@/app/hooks/useMobile";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let fendUrl = process.env.NEXT_PUBLIC_FTEND_URL;
@@ -437,7 +439,8 @@ export default function page({ params }) {
   };
 
   return (
-    <div className="payment-request flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-[calc(100vh-40px)] pb-1 overflow-y-auto">
+    <div className="payment-request flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-[calc(100vh-100px)] pb-1 overflow-y-auto">
+      {isMobile && <NotificationComponent />}
       {contextHolder}
       <div className="flex items-center justify-between mr-6 mb-2">
         <Button
@@ -560,7 +563,7 @@ export default function page({ params }) {
             )}
           </div>
         </div>
-        <div className="col-span-2 flex flex-col space-y-3 pr-5">
+        <div className="payment-request col-span-2 flex flex-col space-y-3 pr-5 overflow-y-auto">
           <div className="bg-white py-3 px-3 rounded my-1">
             <div className="flex items-center gap-x-14 px-7 bg-[#F5F5F5]">
               <button

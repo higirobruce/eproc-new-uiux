@@ -4,7 +4,7 @@ import ReactDOMServer from "react-dom/server";
 import { Button } from "antd";
 import { PrinterOutlined } from "@ant-design/icons";
 
-const generatePDF = (content) => {
+const generatePDF = (content, file) => {
   // const element = document.getElementById("pdf-content");
   const printElement = ReactDOMServer.renderToString(content());
   html2pdf()
@@ -17,7 +17,7 @@ const generatePDF = (content) => {
       // jsPDF: { unit: "pt", format: "letter", orientation: "portrait" },
 
       margin: [22, 10, 15, 10], //top, left, buttom, right
-      filename: "Contract.pdf",
+      filename: `${file}.pdf`,
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: { scale: 2, letterRendering: true },
       jsPDF: { unit: "mm", format: "A4", orientation: "portrait" },
@@ -27,12 +27,12 @@ const generatePDF = (content) => {
     .save();
 };
 
-export default function PrintPDF({ content }) {
+export default function PrintPDF({ content, file }) {
   return (
     <div className="flex w-full justify-end">
       <Button
         type="primary"
-        onClick={() => generatePDF(content)}
+        onClick={() => generatePDF(content, file)}
         icon={<PrinterOutlined />}
         className="self-end"
       ></Button>

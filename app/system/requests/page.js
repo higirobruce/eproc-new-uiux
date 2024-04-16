@@ -27,7 +27,7 @@ import {
 } from "antd";
 import moment from "moment/moment";
 import Image from "next/image";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import ItemsTable from "../../components/itemsTable";
 import RequestDetails from "../../components/requestDetails";
 import UsersRequestsTable from "../../components/userRequestsTable";
@@ -39,6 +39,8 @@ import { BsFiletypeCsv } from "react-icons/bs";
 import { useUser } from "@/app/context/UserContext";
 import { saveAs } from "file-saver";
 import { useRequestContext } from "@/app/context/RequestContext";
+import { isMobile } from "react-device-detect";
+import NotificationComponent from "@/app/hooks/useMobile";
 
 function exportToCSV(data, fileName) {
   const csvHeader = Object.keys(data[0]).join(",");
@@ -55,9 +57,20 @@ export default function UserRequests() {
   const pagination = searchParams.get("page");
   const search = searchParams.get("search");
   const statusFilter = searchParams.get("filter");
+  const ownPendingRequest = searchParams.get("myApproval");
+  const ownRequest = searchParams.get("myRequest");
 
   // Context
-  const { setPage, setFilter, filter, page } = useRequestContext();
+  const {
+    setPage,
+    setFilter,
+    filter,
+    page,
+    userPendingRequest,
+    setUserPendingRequest,
+    userRequest,
+    setUserRequest,
+  } = useRequestContext();
 
   const [serviceCategories, setServiceCategories] = useState([]);
   let [serviceCategory, setServiceCategory] = useState("");
@@ -111,7 +124,9 @@ export default function UserRequests() {
   useEffect(() => {
     setPage(pagination ? pagination : 1);
     setFilter(statusFilter ? statusFilter : "all");
-  }, [pagination, statusFilter]);
+    setUserPendingRequest(ownPendingRequest ? ownPendingRequest : false);
+    setUserRequest(ownRequest ? ownRequest : onlyMine);
+  }, [pagination, statusFilter, ownPendingRequest, ownRequest]);
 
   useEffect(() => {
     // loadRequests()
@@ -222,11 +237,12 @@ export default function UserRequests() {
 
   useEffect(() => {
     setDataLoaded(false);
-    let requestUrl = onlyMine
-      ? `${url}/requests/byStatus/${filter ? filter : searchStatus}/${
-          user?._id
-        }`
-      : `${url}/requests/byStatus/${filter ? filter : searchStatus}/${null}`;
+    let requestUrl =
+      onlyMine || userRequest
+        ? `${url}/requests/byStatus/${filter ? filter : searchStatus}/${
+            user?._id
+          }`
+        : `${url}/requests/byStatus/${filter ? filter : searchStatus}/${null}`;
     fetch(requestUrl, {
       method: "GET",
       headers: {
@@ -240,6 +256,8 @@ export default function UserRequests() {
         setDataLoaded(true);
         setDataset(res);
         setTempDataset(res);
+        getMyPendingRequest(userPendingRequest, res);
+        
       })
       .catch((err) => {
         messageApi.open({
@@ -247,7 +265,7 @@ export default function UserRequests() {
           content: "Something happened! Please try again.",
         });
       });
-  }, [searchStatus, onlyMine, search, filter]);
+  }, [searchStatus, onlyMine, userRequest, search, filter]);
 
   useEffect(() => {
     if (searchText === "") {
@@ -278,9 +296,9 @@ export default function UserRequests() {
     loadRequests()
       .then((res) => getResultFromServer(res))
       .then((res) => {
-        setDataLoaded(true);
         setDataset(res);
         setTempDataset(res);
+        setDataLoaded(true);
       })
       .catch((err) => {
         messageApi.open({
@@ -292,11 +310,12 @@ export default function UserRequests() {
 
   async function loadRequests() {
     // setDataLoaded(false);
-    let requestUrl = onlyMine
-      ? `${url}/requests/byStatus/${filter ? filter : searchStatus}/${
-          user?._id
-        }`
-      : `${url}/requests/byStatus/${filter ? filter : searchStatus}/${null}`;
+    let requestUrl =
+      onlyMine || userRequest
+        ? `${url}/requests/byStatus/${filter ? filter : searchStatus}/${
+            user?._id
+          }`
+        : `${url}/requests/byStatus/${filter ? filter : searchStatus}/${null}`;
     // let requestUrl =
     //   searchStatus === "mine"
     //     ? `${url}/requests/${user?._id}`
@@ -846,11 +865,13 @@ export default function UserRequests() {
     }
   };
 
-  const getMyPendingRequest = (value) => {
+  const getMyPendingRequest = (value, tempData = []) => {
+    let filterData = tempDataset;
     setMyPendingRequest(value);
+    setUserPendingRequest(value);
 
     if (value == true) {
-      const newFilter = tempDataset.filter(
+      const newFilter = filterData?.filter(
         (item) =>
           item?.level1Approver?._id == user._id ||
           (item?.status === "approved (hod)" &&
@@ -924,9 +945,10 @@ export default function UserRequests() {
 
   return !rowData ? (
     <>
+      {isMobile && <NotificationComponent />}
       {contextHolder}
       {dataLoaded ? (
-        <motion.div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-screen pb-10">
+        <motion.div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-screen pb-10 lg:px-0 px-4">
           {/* <Row className="flex flex-col custom-sticky bg-white px-10 py-3 shadow space-y-2">
             <div className="flex flex-row items-center justify-between">
               <div className="text-xl font-semibold">Purchase Requests</div>
@@ -1013,9 +1035,9 @@ export default function UserRequests() {
               )}
             </Row>
           </Row> */}
-          <div className="flex items-center justify-between mr-6">
+          <div className="flex items-center justify-between lg:mr-6">
             <Button
-              className="bg-white h-9 px-5 text-[13px] font-semibold rounded text-[#0063CF]"
+              className="md:block hidden bg-white h-9 px-5 text-[13px] font-semibold rounded text-[#0063CF]"
               icon={<PlusOutlined className="font-[15px]" />}
               onClick={() => {
                 form.resetFields();
@@ -1027,6 +1049,7 @@ export default function UserRequests() {
             >
               New request
             </Button>
+            <div />
             <div className="flex items-center gap-5">
               {(user?.permissions?.canApproveAsHod ||
                 user?.permissions?.canApproveAsHof ||
@@ -1070,20 +1093,20 @@ export default function UserRequests() {
             </div>
           </div>
           {/* <RequestStats totalRequests={dataset?.length}/> */}
-          <div className="request mr-6 bg-white h-[calc(100vh-165px)] rounded-lg mb-10 px-5 overflow-y-auto">
-            <div className="flex justify-between items-center mb-5">
+          <div className="request lg:mr-6 bg-white h-[calc(100vh-165px)] rounded-lg mb-10 px-5 overflow-y-auto">
+            <div className="flex justify-between items-center space-x-10 mb-5">
               <h4 className="text-[19px] text-[#344767]">Purchase Request</h4>
               <div className="flex items-center gap-5">
                 {(currentUser?.permissions?.canApproveAsHod ||
                   currentUser?.permissions?.canApproveAsHof ||
                   currentUser?.permissions?.canApproveAsPM) && (
-                  <div className="flex items-center space-x-5">
+                  <div className="lg:flex hidden items-center space-x-5">
                     <div className="flex flex-row items-center space-x-1">
                       <Checkbox
                         checked={myPendingRequest}
-                        disabled={onlyMine}
+                        disabled={onlyMine || userRequest}
                         onChange={(e) => {
-                          getMyPendingRequest(e.target.checked);
+                          getMyPendingRequest(e.target.checked, []);
                         }}
                       />
                       <div className="text-[13px] text-[#344767]">
@@ -1092,9 +1115,10 @@ export default function UserRequests() {
                     </div>
                     <div className="flex flex-row items-center space-x-1">
                       <Checkbox
-                        checked={onlyMine}
+                        checked={onlyMine || userRequest}
                         disabled={myPendingRequest}
                         onChange={(e) => {
+                          setUserRequest(e.target.checked);
                           setOnlyMine(e.target.checked);
                         }}
                       />

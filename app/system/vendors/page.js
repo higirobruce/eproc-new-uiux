@@ -54,6 +54,8 @@ import { FiSearch } from 'react-icons/fi'
 import { useUser } from "@/app/context/UserContext";
 import { useVendorContext } from "@/app/context/VendorContext";
 import { useSearchParams } from "next/navigation";
+import { isMobile } from "react-device-detect";
+import NotificationComponent from "@/app/hooks/useMobile";
 
 export default function Vendors() {
   const { user, login, logout } = useUser();
@@ -97,30 +99,8 @@ export default function Vendors() {
   }, [pagination, statusFilter])
 
   useEffect(() => {
-    loadVendors();
-    fetch(`${url}/serviceCategories`, {
-      method: "GET",
-      headers: {
-        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
-        token: token,
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        setServCategories(res);
-      })
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Connection Error!",
-        });
-      });
-  }, []);
-
-  useEffect(() => {
     if (searchText === "") {
-      refresh();
+      // refresh();
     } else {
       let _dataSet = [...dataset];
       let filtered = _dataSet.filter((d) => {
@@ -160,35 +140,6 @@ export default function Vendors() {
     }
   }, [rowData]);
 
-  useEffect(() => {
-    setDataLoaded(false);
-    let requestUrl = `${url}/users/vendors/byStatus/${filter ? filter : searchStatus}/`;
-    fetch(requestUrl, {
-      method: "GET",
-      headers: {
-        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
-        token: token,
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        setDataLoaded(true);
-        setDataset(res);
-        setTempDataset(res);
-      })
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Something happened! Please try again.",
-        });
-      });
-  }, [searchStatus]);
-
-  function refresh() {
-    loadVendors();
-  }
-
   function loadVendors() {
     setDataLoaded(false);
     fetch(`${url}/users/vendors`, {
@@ -220,6 +171,57 @@ export default function Vendors() {
         });
       });
   }
+
+  function refresh() {
+    loadVendors();
+  }
+
+  useEffect(() => {
+    fetch(`${url}/serviceCategories`, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setServCategories(res);
+      })
+      .catch((err) => {
+        messageApi.open({
+          type: "error",
+          content: "Connection Error!",
+        });
+      });
+  }, []);
+
+  useEffect(() => {
+    setDataLoaded(false);
+    let requestUrl = `${url}/users/vendors/byStatus/${filter ? filter : searchStatus}/`;
+    fetch(requestUrl, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setDataLoaded(true);
+        setDataset(res);
+        setTempDataset(res);
+      })
+      .catch((err) => {
+        messageApi.open({
+          type: "error",
+          content: "Something happened! Please try again.",
+        });
+      });
+  }, [filter, searchStatus]);
+
   useEffect(() => {
     setUpdatingId("");
   }, [dataset]);
@@ -427,9 +429,10 @@ export default function Vendors() {
 
   return (
     <>
+      {isMobile && <NotificationComponent />}
       {contextHolder}
       {
-        <div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 h-screen mt-6 pb-10">
+        <div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 h-screen mt-6 pb-10 px-4">
           {/* <Row className="flex flex-col custom-sticky space-y-2 bg-white px-10 py-3 shadow">
             <div className="flex flex-row justify-between items-center">
               <div className="text-xl font-semibold">Vendors List</div>
@@ -495,12 +498,12 @@ export default function Vendors() {
               <Button type="text" icon={<SettingOutlined />}></Button>
             </Row>
           </Row> */}
-          <div className="flex items-center justify-between mr-6">
+          <div className="flex items-center justify-between lg:mr-6">
             <div />
             <div className="flex items-center gap-5">
               <Select
                 // mode="tags"
-                className="text-[9px] w-32 rounded-sm"
+                className="text-[9px] w-48 rounded-sm"
                 placeholder="Select status"
                 onChange={(value) => {
                   setPage(1);
@@ -532,7 +535,7 @@ export default function Vendors() {
               ></Button>
             </div>
           </div>
-          <div className="request mr-6 bg-white rounded-lg h-[calc(100vh-175px)] mb-10 px-5 pb-2 overflow-y-auto">
+          <div className="request lg:mr-6 bg-white rounded-lg h-[calc(100vh-175px)] mb-10 px-5 pb-2 overflow-y-auto">
             <div className="flex justify-between items-center mb-5">
               <h4 className="text-[19px] text-[#344767]">Vendors List</h4>
               <div className="flex items-center rounded-lg bg-[#F5F7FA] p-1.5">

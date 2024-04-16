@@ -20,7 +20,7 @@ export default function LoginPage() {
     //   </div>
     // </div>
     <main className="overflow-hidden h-screen mb-10">
-      <div className="grid lg:grid-cols-2 p-10 ml-20 h-[calc(100%-60px)]">
+      <div className="grid lg:grid-cols-2 p-10 lg:ml-20 h-[calc(100%-60px)]">
         <div className="my-20 flex flex-col justify-between">
           <Image src={Logo} alt="" className="w-[180px] h-auto" />
           <LoginForm goTo={searchParams.get('goTo')}/>

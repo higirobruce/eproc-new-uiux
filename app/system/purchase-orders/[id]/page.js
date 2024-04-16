@@ -32,6 +32,8 @@ import ReactDOMServer from "react-dom/server";
 import { useRouter } from "next/navigation";
 import { content } from "@/app/utils/requestContent";
 import { useUser } from "@/app/context/UserContext";
+import { isMobile } from "react-device-detect";
+import NotificationComponent from "@/app/hooks/useMobile";
 
 let modules = {
   toolbar: [
@@ -66,7 +68,7 @@ let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
 
 async function getPODetails(id, router) {
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const res = await fetch(`${url}/purchaseOrders/${id}`, {
     headers: {
       Authorization: "Basic " + `${encode(`${apiUsername}:${apiPassword}`)}`,
@@ -97,10 +99,11 @@ export default function page({ params }) {
   // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
   let router = useRouter();
   let [messageApi, contextHolder] = message.useMessage();
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
 
   let [po, setPO] = useState(null);
   const [signing, setSigning] = useState(false);
+  const [archiving, setArchiving] = useState(false);
 
   useEffect(() => {
     getPODetails(params?.id, router).then((res) => setPO(res));
@@ -124,22 +127,19 @@ export default function page({ params }) {
       key: "estimatedUnitCost",
 
       render: (_, item) => (
-        <>{item?.currency + ' ' +(item?.estimatedUnitCost).toLocaleString()}</>
+        <>{item?.currency + " " + (item?.estimatedUnitCost).toLocaleString()}</>
       ),
-
     },
     {
       title: "Total Amount",
       dataIndex: "totalAmount",
       key: "totalAmount",
       render: (_, item) => (
-
         <>
-          {item
-            ?.currency+' '+(item?.quantity * item?.estimatedUnitCost)
-            .toLocaleString()}
+          {item?.currency +
+            " " +
+            (item?.quantity * item?.estimatedUnitCost).toLocaleString()}
         </>
-
       ),
     },
   ];
@@ -199,6 +199,30 @@ export default function page({ params }) {
         setSigning(false);
       });
 
+    //call API to sign
+  }
+
+  function handleWithdrawPo() {
+    setArchiving(true);
+
+    fetch(`${url}/purchaseOrders/status/${po?._id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        status: po?.status === "withdrawn",
+      }),
+    })
+      .then((res) => getResultFromServer(res))
+      .then((res) => {
+        setArchiving(false);
+        // setSignatories([]);
+        // setSections([{ title: "Set section title", body: "" }]);
+        // setPO(res);
+      });
     //call API to sign
   }
 
@@ -317,13 +341,16 @@ export default function page({ params }) {
             pagination={false}
           />
           <Typography.Title level={5} className="self-end">
-            Total (Tax Excl.): {getPoTotalVal().totalVal?.toLocaleString()} {po?.items[0]?.currency}
+            Total (Tax Excl.): {getPoTotalVal().totalVal?.toLocaleString()}{" "}
+            {po?.items[0]?.currency}
           </Typography.Title>
           <Typography.Title level={5} className="self-end">
-            Tax: {getPoTotalVal().totalTax?.toLocaleString()} {po?.items[0]?.currency}
+            Tax: {getPoTotalVal().totalTax?.toLocaleString()}{" "}
+            {po?.items[0]?.currency}
           </Typography.Title>
           <Typography.Title level={5} className="self-end">
-            Gross Total: {getPoTotalVal().grossTotal?.toLocaleString()} {po?.items[0]?.currency}
+            Gross Total: {getPoTotalVal().grossTotal?.toLocaleString()}{" "}
+            {po?.items[0]?.currency}
           </Typography.Title>
           <Typography.Title level={3}>Details</Typography.Title>
           {po?.sections?.map((section) => {
@@ -471,7 +498,9 @@ export default function page({ params }) {
 
   const generatePDF = () => {
     // const element = document.getElementById("pdf-content");
-    const printElement = ReactDOMServer.renderToString(content(po, signing, user));
+    const printElement = ReactDOMServer.renderToString(
+      content(po, signing, user)
+    );
     html2pdf()
       .set({
         // pagebreak: { mode: "avoid-all", before: "#page2el" },
@@ -501,11 +530,12 @@ export default function page({ params }) {
   const handleGoBack = () => {
     const queryParams = window.location.href.split("?")[1];
 
-    router.push('/system/payment-requests?' + queryParams);
+    router.push("/system/payment-requests?" + queryParams);
   };
 
   return (
     <div className="flex flex-col p-3">
+      {isMobile && <NotificationComponent />}
       {contextHolder}
       {/* <Button
         type="primary"
@@ -514,19 +544,22 @@ export default function page({ params }) {
         className="self-end"
       ></Button> */}
       <div className="flex items-center justify-between mr-6 mb-4">
-          <Button
-            className="bg-white h-9 px-5 text-[13px] font-semibold rounded text-[#0063CF]"
-            icon={<ArrowLeftOutlined className="font-[15px]" />}
-            onClick={handleGoBack}
-          >
-            Return to List
-          </Button>
-          <div className="gap-5" />
-        </div>
+        <Button
+          className="bg-white h-9 px-5 text-[13px] font-semibold rounded text-[#0063CF]"
+          icon={<ArrowLeftOutlined className="font-[15px]" />}
+          onClick={handleGoBack}
+        >
+          Return to List
+        </Button>
+        <div className="gap-5" />
+      </div>
       <div className="request space-y-10 px-20 overflow-auto h-[calc(100vh-165px)] bg-white mr-6 py-10 shadow-md">
         <div className="flex flex-row justify-between items-center">
           <Typography.Title level={4} className="flex flex-row items-center">
-            PURCHASE ORDER #{po?.number}{" "} <span className=" ml-2 text-blue-600"><PrinterOutlined onClick={() => generatePDF()} /></span>
+            PURCHASE ORDER #{po?.number}{" "}
+            <span className=" ml-2 text-blue-600">
+              <PrinterOutlined onClick={() => generatePDF()} />
+            </span>
           </Typography.Title>
           {/* <Button icon={<PrinterOutlined />}>Print</Button> */}
         </div>
@@ -603,13 +636,16 @@ export default function page({ params }) {
             pagination={false}
           />
           <Typography.Title level={5} className="self-end">
-            Total (Tax Excl.): {getPoTotalVal().totalVal?.toLocaleString()} {po?.items[0]?.currency}
+            Total (Tax Excl.): {getPoTotalVal().totalVal?.toLocaleString()}{" "}
+            {po?.items[0]?.currency}
           </Typography.Title>
           <Typography.Title level={5} className="self-end">
-            Tax: {getPoTotalVal().totalTax?.toLocaleString()} {po?.items[0]?.currency}
+            Tax: {getPoTotalVal().totalTax?.toLocaleString()}{" "}
+            {po?.items[0]?.currency}
           </Typography.Title>
           <Typography.Title level={5} className="self-end">
-            Gross Total: {getPoTotalVal().grossTotal?.toLocaleString()} {po?.items[0]?.currency}
+            Gross Total: {getPoTotalVal().grossTotal?.toLocaleString()}{" "}
+            {po?.items[0]?.currency}
           </Typography.Title>
           <Typography.Title level={3}>Details</Typography.Title>
           {po?.sections?.map((section) => {

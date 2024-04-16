@@ -30,6 +30,8 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { FiSearch } from "react-icons/fi";
 import { useUser } from "@/app/context/UserContext";
+import { isMobile } from "react-device-detect";
+import NotificationComponent from "@/app/hooks/useMobile";
 
 export default function Tenders() {
   const { user, login, logout } = useUser();
@@ -277,9 +279,10 @@ export default function Tenders() {
   
   return (
     <>
+      {isMobile && <NotificationComponent />}
       {contextHolder}
       {dataLoaded ? (
-        <motion.div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 h-screen mt-6 pb-10">
+        <motion.div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 h-screen mt-6 pb-10 px-4">
           {/* <Row className="flex flex-col custom-sticky space-y-2 bg-white px-10 py-3 shadow">
             <div className="flex flex-row justify-between items-center">
               <div className="text-xl font-semibold">Tenders</div>
@@ -320,7 +323,7 @@ export default function Tenders() {
               ></Button>
             </Row>
           </Row> */}
-          <div className="flex items-center justify-between mr-6">
+          <div className="flex items-center justify-between lg:mr-6">
             <div />
             <div className="flex items-center gap-5">
               <Select
@@ -347,8 +350,8 @@ export default function Tenders() {
               ></Button>
             </div>
           </div>
-          <div className="request mr-6 bg-white rounded-lg h-[calc(100vh-170px)] mb-10 px-5 pb-2 overflow-y-auto">
-            <div className="flex justify-between items-center mb-5">
+          <div className="request lg:mr-6 bg-white rounded-lg h-[calc(100vh-170px)] mb-10 px-5 pb-2 overflow-y-auto">
+            <div className="flex justify-between space-x-10 items-center mb-5">
               <h4 className="text-[19px] text-[#344767]">Tenders</h4>
               <div className="flex items-center rounded-lg bg-[#F5F7FA] p-1.5">
                 <FiSearch size={18} className="text-[#E4E4E4] ml-2" />

@@ -70,6 +70,7 @@ import { MdOutlineAccountBalance } from "react-icons/md";
 import { LuHash, LuUser } from "react-icons/lu";
 import { Dialog, Transition } from "@headlessui/react";
 import { TiInfoLarge } from "react-icons/ti";
+import UploadOtherFiles from "./uploadOtherFiles";
 
 const PrintPDF = dynamic(() => import("@/app/components/printPDF"), {
   srr: false,
@@ -135,6 +136,7 @@ const TenderDetails = ({
   let [discount, setDiscount] = useState(0);
   let [comment, setComment] = useState("");
   let [currency, setCurrency] = useState("RWF");
+  let [poCurrency, setPoCurrency] = useState("RWF");
   let [iSubmitted, setISubmitted] = useState(false);
   let [checkingSubmission, setCheckingSubmission] = useState(false);
   let [refresh, setRefresh] = useState(1);
@@ -170,6 +172,7 @@ const TenderDetails = ({
   let [sections, setSections] = useState([
     { title: "Set section title", body: "" },
   ]);
+  let [otherFiles, setOtherFiles] = useState([]);
   const [tab, setTab] = useState(0);
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -671,7 +674,44 @@ const TenderDetails = ({
     handleCreateSubmission(submissionData);
   }
 
-  function submitSubmissionData() {
+  const handleUpload = () => {
+    // setSaving(true);
+    let _files = [];
+    _files = [...otherFiles];
+
+    const formData = new FormData();
+    _files.forEach((fileToSave, rowIndex) => {
+      formData.append("files[]", fileToSave);
+    });
+
+    // You can use any AJAX library you like
+    fetch(`${url}/uploads/bidOtherDocs/`, {
+      method: "POST",
+      body: formData,
+      headers: {
+        Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+        token: token,
+        // "Content-Type": "multipart/form-data",
+      },
+    })
+      .then((res) => res.json())
+      .then((savedFiles) => {
+        let _filenames = savedFiles?.map((f) => {
+          return f?.filename;
+        });
+
+        submitSubmissionData(_filenames);
+      })
+      .catch((err) => {
+        console.log(err);
+        messageApi.error("upload failed.");
+      })
+      .finally(() => {
+        // setSaving(false);
+      });
+  };
+
+  function submitSubmissionData(files) {
     let subData = {
       proposalUrls,
       deliveryDate,
@@ -689,6 +729,7 @@ const TenderDetails = ({
       bankAccountName,
       proposalDocId: proposalSelected ? proposalDocId : null,
       otherDocId: otherDocSelected ? otherDocId : null,
+      otherDocIds: files,
       deliveryTimeFrame,
       deliveryTimeFrameDuration,
     };
@@ -845,7 +886,7 @@ const TenderDetails = ({
   );
 
   const buildSubmissionForm = (
-    <div className="">
+    <div className="overflow-scroll">
       <h6 className="text-[14px] text-[#263238] mt-5 mb-3 p-0">Bid Overview</h6>
       <div className="grid md:grid-cols-4 gap-x-5">
         <div className="flex flex-col">
@@ -1059,7 +1100,12 @@ const TenderDetails = ({
             <label>Other documents</label>
           </div>
           <Form.Item name="otherDocs">
-            <UploadBidDoc uuid={otherDocId} setSelected={setOtherDocSelected} />
+            {/* <UploadBidDoc uuid={otherDocId} setSelected={setOtherDocSelected} /> */}
+            <UploadOtherFiles
+              files={otherFiles}
+              setFiles={setOtherFiles}
+              // label="Select"
+            />
           </Form.Item>
         </div>
         <div className="flex flex-col">
@@ -1088,7 +1134,7 @@ const TenderDetails = ({
           setCreatingPo(true);
           let assetItems = [];
           let nonAssetItems = [];
-          let docCurrency = (items && items[0]?.currency) || "RWF";
+          let docCurrency = poCurrency || "RWF";
 
           items
             .filter((i) => i.itemType === "asset")
@@ -1099,7 +1145,7 @@ const TenderDetails = ({
                   Quantity: i.quantity / i?.assetCodes?.length,
                   UnitPrice: i.estimatedUnitCost,
                   VatGroup: i.taxGroup ? i.taxGroup : "X1",
-                  Currency: i.currency ? i.currency : "RWF",
+                  Currency: poCurrency || "RWF",
                 });
               });
             });
@@ -1112,7 +1158,7 @@ const TenderDetails = ({
                 Quantity: i.quantity,
                 UnitPrice: i.estimatedUnitCost,
                 VatGroup: i.taxGroup ? i.taxGroup : "X1",
-                Currency: i.currency ? i.currency : "RWF",
+                Currency: poCurrency || "RWF",
               });
             });
 
@@ -1124,7 +1170,7 @@ const TenderDetails = ({
           //         Quantity: i.quantity / assets[index]?.length,
           //         UnitPrice: i.estimatedUnitCost,
           //         VatGroup: i.taxGroup ? i.taxGroup : "X1",
-          // Currency: i.currency ? i.currency : "RWF"
+          // Currency: poCurrency || "RWF"
           //       });
           //     });
           //   });
@@ -1195,7 +1241,8 @@ const TenderDetails = ({
                 B1Data_Assets,
                 B1Data_NonAssets,
               },
-              signatories
+              signatories,
+              poCurrency
             );
             setCreatingPo(false);
             setOpenCreatePO(false);
@@ -1231,6 +1278,51 @@ const TenderDetails = ({
                 ]}
               />
             </div> */}
+            <div>
+              <div className="mb-3">
+                <label>Purchase Order Currency</label>
+              </div>
+              <Form.Item
+                name="currency"
+                rules={[
+                  {
+                    required: true,
+                    message: "Currency is required",
+                  },
+                ]}
+              >
+                <Select
+                  defaultValue={poCurrency}
+                  value={poCurrency}
+                  // disabled={disable}
+                  size="large"
+                  className="w-full"
+                  onChange={(value) => setPoCurrency(value)}
+                  options={[
+                    {
+                      value: "RWF",
+                      label: "RWF",
+                      key: "RWF",
+                    },
+                    {
+                      value: "USD",
+                      label: "USD",
+                      key: "USD",
+                    },
+                    {
+                      value: "EUR",
+                      label: "EUR",
+                      key: "EUR",
+                    },
+                    {
+                      value: "GBP",
+                      label: "GBP",
+                      key: "GBP",
+                    },
+                  ]}
+                />
+              </Form.Item>
+            </div>
           </div>
 
           {/* Parties */}
@@ -1336,18 +1428,17 @@ const TenderDetails = ({
                 dataSource={items}
                 setDataSource={setItems}
                 assetOptions={assetOptions}
+                currency={poCurrency}
               />
               <Typography.Title level={5} className="self-end">
                 Total (Tax Excl.):{" "}
-                {items[0]?.currency + " " + totalVal?.toLocaleString()}
+                {poCurrency + " " + totalVal?.toLocaleString()}
               </Typography.Title>
               <Typography.Title level={5} className="self-end">
-                Total Tax:{" "}
-                {items[0]?.currency + " " + totalTax?.toLocaleString()}
+                Total Tax: {poCurrency + " " + totalTax?.toLocaleString()}
               </Typography.Title>
               <Typography.Title level={4} className="self-end">
-                Gross Total:{" "}
-                {items[0]?.currency + " " + grossTotal?.toLocaleString()}
+                Gross Total: {poCurrency + " " + grossTotal?.toLocaleString()}
               </Typography.Title>
 
               {/* Sections */}
@@ -2673,19 +2764,19 @@ const TenderDetails = ({
             />
             <Typography.Title level={5} className="self-end">
               Total (Tax Excl.):{" "}
-              {po?.items[0]?.currency +
+              {po?.poCurrency +
                 " " +
                 getPoTotalVal().totalVal?.toLocaleString()}{" "}
             </Typography.Title>
             <Typography.Title level={5} className="self-end">
               Tax:{" "}
-              {po?.items[0]?.currency +
+              {po?.poCurrency +
                 " " +
                 getPoTotalVal().totalTax?.toLocaleString()}
             </Typography.Title>
             <Typography.Title level={5} className="self-end">
               Gross Total:{" "}
-              {po?.items[0]?.currency +
+              {po?.poCurrency +
                 " " +
                 getPoTotalVal().grossTotal?.toLocaleString()}
             </Typography.Title>
@@ -2741,7 +2832,7 @@ const TenderDetails = ({
                       <Typography.Text strong>{s.email}</Typography.Text>
                     </div>
 
-                    {s.signed && (
+                    {s.signed && po?.status != "withdrawn" && (
                       <>
                         {!signing && (
                           <div className="flex flex-col">
@@ -2767,7 +2858,7 @@ const TenderDetails = ({
                       </>
                     )}
                   </div>
-                  {s?.signed && (
+                  {s?.signed && po?.status != "withdrawn" && (
                     <div className="flex flex-row justify-center space-x-10 items-center border-t-2 bg-blue-50 p-5">
                       <Image
                         width={40}
@@ -2789,7 +2880,8 @@ const TenderDetails = ({
 
                   {(user?.email === s?.email || user?.tempEmail === s?.email) &&
                     !s?.signed &&
-                    previousSignatorySigned(po?.signatories, index) && (
+                    previousSignatorySigned(po?.signatories, index) &&
+                    po?.status != "withdrawn" && (
                       <Popconfirm
                         title="Confirm Contract Signature"
                         onConfirm={() => handleSignPo(s, index)}
@@ -2811,20 +2903,21 @@ const TenderDetails = ({
                   {((user?.email !== s?.email &&
                     user?.tempEmail !== s?.email &&
                     !s.signed) ||
-                    !previousSignatorySigned(po?.signatories, index)) && (
-                    <div className="flex flex-row justify-center space-x-5 items-center border-t-2 bg-gray-50 p-5">
-                      <Image
-                        width={40}
-                        height={40}
-                        src="/icons/icons8-signature-80-2.png"
-                      />
-                      <div className="text-gray-400 text-lg">
-                        {s.signed
-                          ? "Signed"
-                          : `Waiting for ${yetToSign[0]?.names}'s signature`}
+                    !previousSignatorySigned(po?.signatories, index)) &&
+                    po?.status != "withdrawn" && (
+                      <div className="flex flex-row justify-center space-x-5 items-center border-t-2 bg-gray-50 p-5">
+                        <Image
+                          width={40}
+                          height={40}
+                          src="/icons/icons8-signature-80-2.png"
+                        />
+                        <div className="text-gray-400 text-lg">
+                          {s.signed
+                            ? "Signed"
+                            : `Waiting for ${yetToSign[0]?.names}'s signature`}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
               );
             })}
@@ -3844,13 +3937,17 @@ const TenderDetails = ({
     "not awarded": { bgColor: "#FEE", color: "#F5365C", status: "Not Awarded" },
   };
 
-  const [referenceTab, setReferenceTab] = useState(0)
+  const [referenceTab, setReferenceTab] = useState(0);
   const [show, setShow] = useState(false);
 
   return (
     <div className="flex flex-col p-3 rounded mb-6">
       <Transition.Root show={show} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={() => setShow(false)}>
+        <Dialog
+          as="div"
+          className="relative z-10"
+          onClose={() => setShow(false)}
+        >
           <Transition.Child
             as={Fragment}
             enter="ease-in-out duration-500"
@@ -3918,50 +4015,52 @@ const TenderDetails = ({
                         </div>
                       </div>
                       {contract && (
-                          <>
-                            <h4 className="mb-2 mt-4 font-semibold ml-6">
-                              Contract Reference
-                            </h4>
-                            <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
-                              <Link
-                                href={`/system/contracts/${contract?._id}`}
-                                className="font-bold text-[16px] no-underline text-blue-600"
-                              >
-                                {contract?.number}
-                              </Link>
-                            </div>
-                          </>
-                        )}
-                        {po && (
-                            <>
-                              <h4 className="mb-2 mt-4 font-semibold ml-6">
-                                PO Reference
-                              </h4>
-                              <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
-                                <Link
-                                  href={`/system/purchase-orders/${po?._id}`}
-                                  className="font-bold text-[16px] no-underline text-blue-600"
-                                >
-                                  {po?.number}
-                                </Link>
-                              </div>
-                            </>
-                          )}
-                        {data?.purchaseRequest && (
-                          <>
-                            <h4 className="mb-2 mt-4 font-semibold ml-6">
-                              Requests Reference
-                            </h4>
-                            <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
-                              <Link
-                                href={`/system/requests/${data?.purchaseRequest?._id}/?page=${1}&filter=${'all'}`}
-                                className="font-bold text-[16px] no-underline text-blue-600"
-                              >
-                                {data?.purchaseRequest?.number}
-                              </Link>
-                            </div>
-                          </>
-                        )}
+                        <>
+                          <h4 className="mb-2 mt-4 font-semibold ml-6">
+                            Contract Reference
+                          </h4>
+                          <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                            <Link
+                              href={`/system/contracts/${contract?._id}`}
+                              className="font-bold text-[16px] no-underline text-blue-600"
+                            >
+                              {contract?.number}
+                            </Link>
+                          </div>
+                        </>
+                      )}
+                      {po && (
+                        <>
+                          <h4 className="mb-2 mt-4 font-semibold ml-6">
+                            PO Reference
+                          </h4>
+                          <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                            <Link
+                              href={`/system/purchase-orders/${po?._id}`}
+                              className="font-bold text-[16px] no-underline text-blue-600"
+                            >
+                              {po?.number}
+                            </Link>
+                          </div>
+                        </>
+                      )}
+                      {data?.purchaseRequest && (
+                        <>
+                          <h4 className="mb-2 mt-4 font-semibold ml-6">
+                            Requests Reference
+                          </h4>
+                          <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                            <Link
+                              href={`/system/requests/${
+                                data?.purchaseRequest?._id
+                              }/?page=${1}&filter=${"all"}`}
+                              className="font-bold text-[16px] no-underline text-blue-600"
+                            >
+                              {data?.purchaseRequest?.number}
+                            </Link>
+                          </div>
+                        </>
+                      )}
                       <div />
                     </div>
                   </Dialog.Panel>
@@ -3974,9 +4073,14 @@ const TenderDetails = ({
       <contextHolder />
       <div className="flex items-center justify-between mr-6 mb-4">
         <div />
-        <button onClick={() => setShow(true)} className="cursor-pointer bg-transparent px-1.5 py-1 rounded-full border-solid border-2 border-[#FFF]">
-          <TiInfoLarge className="text-[#FFF]" />
-        </button>
+        {user?.userType !== "VENDOR" && (
+          <button
+            onClick={() => setShow(true)}
+            className="cursor-pointer bg-transparent px-1.5 py-1 rounded-full border-solid border-2 border-[#FFF]"
+          >
+            <TiInfoLarge className="text-[#FFF]" />
+          </button>
+        )}
       </div>
       <div className="flex flex-row justify-between items-start">
         <div className="flex-1">
@@ -4037,7 +4141,7 @@ const TenderDetails = ({
                   spinning={loading || checkingSubmission}
                   indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />}
                 >
-                  <div className="payment-request py-3 space-y-5 h-[calc(100vh-200px)] overflow-y-auto">
+                  <div className="payment-request py-3 space-y-5 h-[calc(100vh-280px)] overflow-y-auto">
                     {/* TItle */}
                     {buildTabHeader(false)}
 
@@ -4058,45 +4162,46 @@ const TenderDetails = ({
                         </h6>
 
                         <div className="flex flex-col">
-                          {data?.purchaseRequest?.supportingDocs?.map(
-                            (p, i) => {
-                              return (
-                                <div key={p}>
-                                  {
-                                    <Link
-                                      // href={`${url}/file/termsOfReference/${p}`}
-                                      href={`${fendUrl}/api?folder=termsOfReference&name=${p}`}
-                                      target="_blank"
-                                    >
-                                      <Typography.Link
-                                        className="flex flex-row items-center space-x-2"
-                                        // onClick={() => {
-                                        //   setPreviewAttachment(!previewAttachment);
-                                        //   setAttachmentId(p);
-                                        // }}
+                          {data?.purchaseRequest?.supportingDocs &&
+                            data?.purchaseRequest?.supportingDocs?.map(
+                              (p, i) => {
+                                return (
+                                  <div key={p}>
+                                    {
+                                      <Link
+                                        // href={`${url}/file/termsOfReference/${p}`}
+                                        href={`${fendUrl}/api?folder=termsOfReference&name=${p}`}
+                                        target="_blank"
                                       >
-                                        <div>{p} </div>{" "}
-                                        <div>
-                                          <PaperClipIcon className="h-4 w-4" />
-                                        </div>
-                                      </Typography.Link>
-                                    </Link>
-                                  }
-                                </div>
-                              );
-                            }
-                          )}
+                                        <Typography.Link
+                                          className="flex flex-row items-center space-x-2"
+                                          // onClick={() => {
+                                          //   setPreviewAttachment(!previewAttachment);
+                                          //   setAttachmentId(p);
+                                          // }}
+                                        >
+                                          <div>{p} </div>{" "}
+                                          <div>
+                                            <PaperClipIcon className="h-4 w-4" />
+                                          </div>
+                                        </Typography.Link>
+                                      </Link>
+                                    }
+                                  </div>
+                                );
+                              }
+                            )}
                         </div>
                       </div>
                     </div>
 
-                    <div className="bg-white px-5 rounded-xl flex flex-col">
+                    <div className="bg-white px-5 rounded-xl flex flex-col overflow-y-scroll">
                       {user?.userType === "VENDOR" &&
                         moment().isBefore(moment(data?.submissionDeadLine)) &&
                         data?.status === "open" &&
                         !iSubmitted && (
                           <>
-                            <Form form={form} onFinish={submitSubmissionData}>
+                            <Form form={form} onFinish={handleUpload}>
                               <div className="ml-3 mt-5 items-center">
                                 {/* <Divider></Divider> */}
                                 <h6 className="text-[#263238] text-[16px] m-0 p-0">
@@ -4925,6 +5030,27 @@ const TenderDetails = ({
                                         </a>
                                       </div>
                                     )}
+                                    {item?.otherDocIds &&
+                                      item?.otherDocIds?.map((doc) => (
+                                        <div>
+                                          <a
+                                            // href={`${url}/file/bidDocs/${item?.otherDocId}.pdf`}
+                                            href={`${fendUrl}/api/?folder=bidDocs&name=${doc}`}
+                                            target="_blank"
+                                            // onClick={() => {
+                                            //   // router.push(`bidDocs/${item?.otherDocId}.pdf`)
+                                            //   // setAttachmentId(
+                                            //   //   `bidDocs/${item?.otherDocId}.pdf`
+                                            //   // );
+                                            //   // setPreviewAttachment(true);
+                                            // }}
+                                            className="text-xs no-underline text-[#1677FF]"
+                                          >
+                                            {doc}
+                                            <PaperClipIcon className="h-3 w-3" />
+                                          </a>
+                                        </div>
+                                      ))}
                                   </div>
                                 </div>
                                 <div className="flex flex-col gap-5">

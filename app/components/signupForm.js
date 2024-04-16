@@ -2173,7 +2173,7 @@ const SignupForm = () => {
     // </div>
     <main className="overflow-hidden h-screen mb-10">
       {contextHolder}
-      <div className="grid xl:grid-cols-2 items-start px-10 pt-5 h-[calc(100%-80px)] gap-x-10">
+      <div className="grid xl:grid-cols-2 items-start lg:px-10 pt-5 h-[calc(100%-80px)] xl:gap-x-10">
         <div className="hidden bg-[#0065DD] w-[calc(100%-45px)] h-[calc(100vh-25px)] rounded-lg text-center xl:flex flex-col justify-center items-center">
           <Image src={Login} className="w-[calc(100%-350px)] h-auto" />
           <h1 className="text-white text-[36px] mb-0 font-bold">

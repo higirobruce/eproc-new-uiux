@@ -62,6 +62,8 @@ import { TiInfoLarge } from "react-icons/ti";
 import { useUser } from "@/app/context/UserContext";
 import { Dialog, Transition } from "@headlessui/react";
 import { usePaymentContext } from "@/app/context/PaymentContext";
+import { isMobile } from "react-device-detect";
+import NotificationComponent from "@/app/hooks/useMobile";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let fend_url = process.env.NEXT_PUBLIC_FTEND_URL;
@@ -889,6 +891,7 @@ export default function PaymentRequest({ params }) {
       }}
       className="flex flex-col mr-5 transition-opacity ease-in-out duration-1000 py-5 flex-1 space-y-3 h-screen mb-10"
     >
+      {isMobile && <NotificationComponent />}
       <Transition.Root show={show || false} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={() => setShow(false)}>
           <Transition.Child
@@ -990,9 +993,9 @@ export default function PaymentRequest({ params }) {
         >
           Return to List
         </Button>
-        <button onClick={() => setShow(true)} className="cursor-pointer bg-transparent px-1.5 py-1 rounded-full border-solid border-2 border-[#FFF]">
+        {user?.userType !== "VENDOR" && <button onClick={() => setShow(true)} className="cursor-pointer bg-transparent px-1.5 py-1 rounded-full border-solid border-2 border-[#FFF]">
           <TiInfoLarge className="text-[#FFF]" />
-        </button>
+        </button>}
       </div>
       <div className="request-details gap-4 mb-6 items-start h-[calc(100vh-200px)] overflow-y-auto">
         <div className="grid md:grid-cols-5 gap-1 items-start">

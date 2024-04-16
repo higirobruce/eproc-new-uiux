@@ -33,6 +33,11 @@ import React, { useEffect, useRef, useState } from "react";
 import parse from "html-react-parser";
 import * as _ from "lodash";
 import moment from "moment-timezone";
+import dynamic from "next/dynamic";
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+const PrintPDF = dynamic(() => import("@/app/components/printPDF"), {
+  srr: false,
+});
 import { LockClosedIcon, LockOpenIcon } from "@heroicons/react/24/solid";
 import { PaperClipIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
@@ -48,6 +53,8 @@ import { BiEnvelope } from "react-icons/bi";
 import { IoCheckmarkOutline } from "react-icons/io5";
 import { RiForbidLine } from "react-icons/ri";
 import { useUser } from "@/app/context/UserContext";
+import { isMobile } from "react-device-detect";
+import NotificationComponent from "@/app/hooks/useMobile";
 // import MyPdfViewer from "../common/pdfViewer";
 
 export default function PurchaseOrders() {
@@ -87,7 +94,8 @@ export default function PurchaseOrders() {
   ];
 
   let [submitting, setSubmitting] = useState(false);
-
+  let [withdrawing, setWithdrawing] = useState(false);
+  let [openWithdrawWarning, setOpenWithdrawWarning] = useState(false);
   const [previewAttachment, setPreviewAttachment] = useState(false);
   const [attachmentId, setAttachmentId] = useState("TOR-id.pdf");
 
@@ -257,6 +265,47 @@ export default function PurchaseOrders() {
 
   function getMyPOs() {}
 
+  function withdrawPOWarning() {
+    return (
+      <Modal
+        title="Are you sure?"
+        open={openWithdrawWarning}
+        onOk={() => {
+          setOpenWithdrawWarning(false);
+        }}
+        onCancel={() => {
+          setOpenWithdrawWarning(false);
+        }}
+        footer={[
+          <Button
+            key="back"
+            onClick={() => {
+              // setOpenViewPO(false);
+              setOpenWithdrawWarning(false);
+            }}
+          >
+            Cancel
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            danger={true}
+            loading={withdrawing}
+            onClick={() => {
+              handleWithdrawPo();
+            }}
+          >
+            Yes, withdraw
+          </Button>,
+        ]}
+      >
+        Withdrawing this PO will inactivate indefinitely. You will need to
+        create a new PO or select a different sourcing method from the related
+        purchase request.
+      </Modal>
+    );
+  }
+
   function viewPOMOdal() {
     return (
       <Modal
@@ -280,6 +329,24 @@ export default function PurchaseOrders() {
                 >
                   Ok
                 </Button>,
+                po?.status !== "withdrawn" &&
+                  !documentFullySigned(po) &&
+                  user?.permissions?.canApproveAsPM && (
+                    // <Popconfirm
+                    //   title="Are you sure? Withdrawing this PO will inactivate indefinitely. You will need to create a new PO or select a different sourcing method from the related purchase request."
+                    //   onConfirm={handleWithdrawPo}
+                    // >
+                    <Button
+                      key="submit"
+                      type="primary"
+                      danger={true}
+                      loading={withdrawing}
+                      onClick={() => setOpenWithdrawWarning(true)}
+                    >
+                      Withdraw
+                    </Button>
+                    // </Popconfirm>
+                  ),
               ]
             : []
         }
@@ -287,6 +354,7 @@ export default function PurchaseOrders() {
         bodyStyle={{ maxHeight: "700px", overflow: "scroll" }}
       >
         <div className="space-y-10 px-20 py-5 overflow-x-scroll">
+          <PrintPDF content={content} file={"PO"} />
           <div className="flex flex-row justify-between items-center">
             <Typography.Title level={4} className="flex flex-row items-center">
               PURCHASE ORDER #{po?.number}{" "}
@@ -435,7 +503,7 @@ export default function PurchaseOrders() {
                       <Typography.Text strong>{s.email}</Typography.Text>
                     </div>
 
-                    {s.signed && (
+                    {s.signed && po?.status != "withdrawn" && (
                       <>
                         {!signing && (
                           <div className="flex flex-col">
@@ -461,7 +529,7 @@ export default function PurchaseOrders() {
                       </>
                     )}
                   </div>
-                  {s?.signed && (
+                  {s?.signed && po?.status != "withdrawn" && (
                     <div className="flex flex-row justify-center space-x-10 items-center border-t-2 bg-blue-50 p-5">
                       <Image
                         width={40}
@@ -487,7 +555,8 @@ export default function PurchaseOrders() {
 
                   {(user?.email === s?.email || user?.tempEmail === s?.email) &&
                     !s?.signed &&
-                    previousSignatorySigned(po?.signatories, index) && (
+                    previousSignatorySigned(po?.signatories, index) &&
+                    po?.status != "withdrawn" && (
                       <Popconfirm
                         title="Confirm Contract Signature"
                         onConfirm={() => handleSignPo(s, index)}
@@ -511,20 +580,21 @@ export default function PurchaseOrders() {
                   {((user?.email !== s?.email &&
                     user?.tempEmail !== s?.email &&
                     !s.signed) ||
-                    !previousSignatorySigned(po?.signatories, index)) && (
-                    <div className="flex flex-row justify-center space-x-5 items-center border-t-2 bg-gray-50 p-5">
-                      <Image
-                        width={40}
-                        height={40}
-                        src="/icons/icons8-signature-80-2.png"
-                      />
-                      <div className="text-gray-400 text-lg">
-                        {s.signed
-                          ? "Signed"
-                          : `Waiting for ${yetToSign[0]?.names}'s signature`}
+                    !previousSignatorySigned(po?.signatories, index)) &&
+                    po?.status != "withdrawn" && (
+                      <div className="flex flex-row justify-center space-x-5 items-center border-t-2 bg-gray-50 p-5">
+                        <Image
+                          width={40}
+                          height={40}
+                          src="/icons/icons8-signature-80-2.png"
+                        />
+                        <div className="text-gray-400 text-lg">
+                          {s.signed
+                            ? "Signed"
+                            : `Waiting for ${yetToSign[0]?.names}'s signature`}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
               );
             })}
@@ -591,6 +661,36 @@ export default function PurchaseOrders() {
     //call API to sign
   }
 
+  function handleWithdrawPo() {
+    setWithdrawing(true);
+
+    let _po = { ...po };
+
+    fetch(`${url}/purchaseOrders/status/${po?._id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        status: "withdrawn",
+      }),
+    })
+      .then((res) => getResultFromServer(res))
+      .then((res) => {
+        _po.status = "withdrawn";
+        setPO(_po);
+        // setSignatories([]);
+        // setSections([{ title: "Set section title", body: "" }]);
+        // setPO(res);
+        setOpenViewPO(false);
+        setOpenWithdrawWarning(false);
+        setWithdrawing(false);
+        refresh();
+      });
+    //call API to sign
+  }
   function getPoTotalVal() {
     let t = 0;
     let tax = 0;
@@ -712,6 +812,252 @@ export default function PurchaseOrders() {
     setActiveIndex((prevIndex) => (prevIndex === value ? "" : value));
   };
 
+  const content = () => {
+    return (
+      <div className="space-y-5 p-3 overflow-x-scroll bg-white mx-11 my-10 shadow-md">
+        <div className="flex flex-row justify-between items-center">
+          <Typography.Title level={4} className="flex flex-row items-center">
+            PURCHASE ORDER #{po?.number}{" "}
+          </Typography.Title>
+          {/* <Button icon={<PrinterOutlined />}>Print</Button> */}
+        </div>
+        <div className="grid grid-cols-2 gap-5 ">
+          <div className="flex flex-col ring-1 ring-gray-300 rounded p-5 space-y-3">
+            <div className="flex flex-col">
+              <Typography.Text type="secondary">
+                <div className="text-xs">Company Name</div>
+              </Typography.Text>
+              <Typography.Text strong>Irembo ltd</Typography.Text>
+            </div>
+
+            <div className="flex flex-col">
+              <Typography.Text type="secondary">
+                <div className="text-xs">Company Address</div>
+              </Typography.Text>
+              <Typography.Text strong>
+                Irembo Campass Nyarutarama KG 9 Ave
+              </Typography.Text>
+            </div>
+
+            <div className="flex flex-col">
+              <Typography.Text type="secondary">
+                <div className="text-xs">Company TIN no.</div>
+              </Typography.Text>
+              <Typography.Text strong>102911562</Typography.Text>
+            </div>
+
+            <div className="flex flex-col">
+              <Typography.Text type="secondary">
+                <div className="text-xs">Hereinafter refferd to as</div>
+              </Typography.Text>
+              <Typography.Text strong>Sender</Typography.Text>
+            </div>
+          </div>
+
+          <div className="flex flex-col ring-1 ring-gray-300 rounded p-5 space-y-3">
+            <div className="flex flex-col">
+              <Typography.Text type="secondary">
+                <div className="text-xs">Company Name</div>
+              </Typography.Text>
+              <Typography.Text strong>
+                {po?.vendor?.companyName}
+              </Typography.Text>
+            </div>
+
+            <div className="flex flex-col">
+              <Typography.Text type="secondary">
+                <div className="text-xs">Company Address</div>
+              </Typography.Text>
+              <Typography.Text strong>
+                {po?.vendor?.building}-{po?.vendor?.street}-{po?.vendor?.avenue}
+              </Typography.Text>
+            </div>
+            <div className="flex flex-col">
+              <Typography.Text type="secondary">
+                <div className="text-xs">Company TIN no.</div>
+              </Typography.Text>
+              <Typography.Text strong>{po?.vendor?.tin}</Typography.Text>
+            </div>
+            <div className="flex flex-col">
+              <Typography.Text type="secondary">
+                <div className="text-xs">Hereinafter refferd to as</div>
+              </Typography.Text>
+              <Typography.Text strong>Receiver</Typography.Text>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col space-y-5">
+          <Table
+            size="small"
+            dataSource={po?.items}
+            columns={columns}
+            pagination={false}
+          />
+          <Typography.Title level={5} className="self-end">
+            Total (Tax Excl.):{" "}
+            {po?.items[0]?.currency +
+              " " +
+              getPoTotalVal().totalVal?.toLocaleString()}{" "}
+          </Typography.Title>
+          <Typography.Title level={5} className="self-end">
+            Tax:{" "}
+            {po?.items[0]?.currency +
+              " " +
+              getPoTotalVal().totalTax?.toLocaleString()}
+          </Typography.Title>
+          <Typography.Title level={5} className="self-end">
+            Gross Total:{" "}
+            {po?.items[0]?.currency +
+              " " +
+              getPoTotalVal().grossTotal?.toLocaleString()}
+          </Typography.Title>
+          <Typography.Title level={3}>Details</Typography.Title>
+          {po?.sections?.map((section) => {
+            return (
+              <>
+                <Typography.Title level={4}>{section.title}</Typography.Title>
+                <div>{parse(section?.body)}</div>
+              </>
+            );
+          })}
+        </div>
+
+        {/* Signatories */}
+        <div className="grid grid-cols-3 gap-5">
+          {po?.signatories?.map((s, index) => {
+            let yetToSign = po?.signatories?.filter((notS) => {
+              return !notS.signed;
+            });
+            return (
+              <div
+                key={s?.email}
+                className="flex flex-col ring-1 ring-gray-300 rounded pt-5 space-y-3 justify-between"
+              >
+                <div className="px-5 flex flex-col space-y-6">
+                  <div className="flex flex-col">
+                    <Typography.Text type="secondary">
+                      <div className="text-xs">On Behalf of</div>
+                    </Typography.Text>
+                    <Typography.Text strong>{s.onBehalfOf}</Typography.Text>
+                  </div>
+
+                  <div className="flex flex-col">
+                    <Typography.Text type="secondary">
+                      <div className="text-xs">Representative Title</div>
+                    </Typography.Text>
+                    <Typography.Text strong>{s.title}</Typography.Text>
+                  </div>
+
+                  <div className="flex flex-col">
+                    <Typography.Text type="secondary">
+                      <div className="text-xs">Company Representative</div>
+                    </Typography.Text>
+                    <Typography.Text strong>{s.names}</Typography.Text>
+                  </div>
+
+                  <div className="flex flex-col">
+                    <Typography.Text type="secondary">
+                      <div className="text-xs">Email</div>
+                    </Typography.Text>
+                    <Typography.Text strong>{s.email}</Typography.Text>
+                  </div>
+
+                  {s.signed && (
+                    <>
+                      {!signing && (
+                        <div className="flex flex-col">
+                          <Typography.Text type="secondary">
+                            <div className="text-xs">IP address</div>
+                          </Typography.Text>
+                          <Typography.Text strong>
+                            {s?.ipAddress}
+                          </Typography.Text>
+                        </div>
+                      )}
+                      {signing && (
+                        <Spin
+                          indicator={
+                            <LoadingOutlined
+                              className="text-gray-500"
+                              style={{ fontSize: 20 }}
+                              spin
+                            />
+                          }
+                        />
+                      )}
+                    </>
+                  )}
+                </div>
+                {s?.signed && (
+                  <div className="flex flex-row justify-center space-x-10 items-center border-t-2 bg-blue-50 p-5">
+                    <Image
+                      width={40}
+                      height={40}
+                      src="/icons/icons8-signature-80.png"
+                    />
+
+                    {!signing && (
+                      <div className="text-blue-500 flex flex-col">
+                        <div className="text-lg">Signed digitally</div>
+                        <div>{moment(s.signedAt).format("DD MMM YYYY")} at</div>
+                        <div>
+                          {moment(s.signedAt)
+                            .tz("Africa/Kigali")
+                            .format("h:mm a z")}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {(user?.email === s?.email || user?.tempEmail === s?.email) &&
+                  !s?.signed &&
+                  previousSignatorySigned(po?.signatories, index) && (
+                    <Popconfirm
+                      title="Confirm Contract Signature"
+                      onConfirm={() => handleSignPo(s, index)}
+                      onOpenChange={() =>
+                        setReadyToSign((prevState) => !prevState)
+                      }
+                    >
+                      <div className="flex flex-row justify-center space-x-5 items-center border-t-2 bg-blue-50 p-5 cursor-pointer hover:opacity-75">
+                        <Image
+                          width={40}
+                          height={40}
+                          src="/icons/icons8-signature-80.png"
+                        />
+
+                        <div className="text-blue-400 text-lg">
+                          It is your turn, sign with one click
+                        </div>
+                      </div>
+                    </Popconfirm>
+                  )}
+                {((user?.email !== s?.email &&
+                  user?.tempEmail !== s?.email &&
+                  !s.signed) ||
+                  !previousSignatorySigned(po?.signatories, index)) && (
+                  <div className="flex flex-row justify-center space-x-5 items-center border-t-2 bg-gray-50 p-5">
+                    <Image
+                      width={40}
+                      height={40}
+                      src="/icons/icons8-signature-80-2.png"
+                    />
+                    <div className="text-gray-400 text-lg">
+                      {s.signed
+                        ? "Signed"
+                        : `Waiting for ${yetToSign[0]?.names}'s signature`}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
   function getResultFromServer(res) {
     if (res.status === 401) {
       localStorage.removeItem("token");
@@ -746,9 +1092,12 @@ export default function PurchaseOrders() {
 
   return (
     <>
+      {isMobile && <NotificationComponent />}
+      {contextHolder}
       {dataLoaded && !submitting ? (
-        <div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-screen pb-10">
+        <div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-screen pb-10 px-4">
           {viewPOMOdal()}
+          {withdrawPOWarning()}
 
           {previewAttachmentModal()}
           {/* <Row className="flex flex-col custom-sticky space-y-2 bg-white px-10 py-3 shadow">
@@ -799,7 +1148,7 @@ export default function PurchaseOrders() {
             </Row>
           </Row> */}
 
-          <div className="flex items-center justify-between mr-6">
+          <div className="flex items-center justify-between lg:mr-6">
             <div />
             <div className="flex items-center gap-5">
               <Select
@@ -836,8 +1185,8 @@ export default function PurchaseOrders() {
             </div>
           </div>
 
-          <div className="request mr-6 bg-white h-[calc(100vh-170px)] rounded-lg mb-10 px-5 overflow-y-auto">
-            <div className="flex justify-between items-center mb-5">
+          <div className="request lg:mr-6 bg-white h-[calc(100vh-170px)] rounded-lg mb-10 px-5 overflow-y-auto">
+            <div className="flex justify-between items-center space-x-10 mb-5">
               <h4 className="text-[19px] text-[#344767]">
                 Purchase Orders List
               </h4>
@@ -956,8 +1305,19 @@ export default function PurchaseOrders() {
                           <div>
                             <Tooltip placement="top" title={po?.status}>
                               {/* <IoCheckmarkOutline className="text-[#00CE82]" /> */}
-                              <div className="bg-[#F9BB01] capitalize rounded-xl text-[#FFF] text-[14px] font-medium px-3 py-1">
-                                {po?.status?.length > 6
+                              <div
+                                className={`
+                              ${
+                                po?.status == "withdrawn"
+                                  ? "bg-[#ef554d]"
+                                  : po?.status == "signed" ||
+                                    po?.status == "started"
+                                  ? "bg-[#71d054]"
+                                  : "bg-[#F9BB01]"
+                              } 
+                              capitalize rounded-xl text-[#FFF] text-[14px] font-medium px-3 py-1`}
+                              >
+                                {po?.status?.length > 8
                                   ? (po?.status?.slice(0, 5) + "..").toString()
                                   : po?.status || "Pending"}
                               </div>
