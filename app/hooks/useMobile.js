@@ -5,6 +5,7 @@ function useNotification() {
   const openNotificationWithIcon = (type, content) => {
     return message[type]({
       content: content,
+      duration: 20
     });
   };
 

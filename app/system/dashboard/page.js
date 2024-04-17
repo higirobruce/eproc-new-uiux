@@ -18,7 +18,7 @@ import TendersByDep from "@/app/components/tendersByDep";
 import { LoadingOutlined } from "@ant-design/icons";
 import { encode } from "base-64";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { color, motion } from "framer-motion";
 import {
   MdFileCopy,
   MdAttachFile,
@@ -46,6 +46,8 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { isMobile } from "react-device-detect";
+import NotificationComponent from "@/app/hooks/useMobile";
 
 export default function page() {
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -61,7 +63,8 @@ export default function page() {
   const [closedTenders, setClosedTenders] = useState(0);
   const [avgBids, setAvgBids] = useState(0);
   const [totalOverview, setTotalOverview] = useState([]);
-  const [paymentOverview, setPaymentOverview] = useState('')
+  const [paymentOverview, setPaymentOverview] = useState("");
+  const [dashboardOverview, setDashboardOverview] = useState([]);
   const [serviceCategories, setServiceCategories] = useState([]);
   const router = useRouter();
   const [tab, setTab] = useState(0);
@@ -188,6 +191,18 @@ export default function page() {
           content: "Something happened! Please try again.",
         });
       });
+    loadDashboardOverview()
+      .then((res) => getResultFromServer(res))
+      .then((res) => {
+        setDashboardOverview(res);
+        console.log("Dasboard Overview ", res);
+      })
+      .catch((err) => {
+        messageApi.open({
+          type: "error",
+          content: "Something happened! Please try again.",
+        });
+      });
   }, []);
 
   async function loadTenders() {
@@ -284,9 +299,9 @@ export default function page() {
       headers: {
         Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
         token: token,
-        "Content-Type": "application/json"
-      }
-    })
+        "Content-Type": "application/json",
+      },
+    });
   }
 
   async function loadRequestOverview() {
@@ -295,9 +310,9 @@ export default function page() {
       headers: {
         Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
         token: token,
-        "Content-Type": "application/json"
-      }
-    })
+        "Content-Type": "application/json",
+      },
+    });
   }
 
   async function loadPaymentOverview() {
@@ -306,9 +321,20 @@ export default function page() {
       headers: {
         Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
         token: token,
-        "Content-Type": "application/json"
-      }
-    })
+        "Content-Type": "application/json",
+      },
+    });
+  }
+
+  async function loadDashboardOverview() {
+    return fetch(`${url}/dashboards`, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    });
   }
 
   function getResultFromServer(res) {
@@ -400,7 +426,7 @@ export default function page() {
     { name: "Group B", value: 300 },
   ];
 
-  const statusColors = ["#27AFB8", "#53BAA1", "#237396"]
+  const statusColors = ["#27AFB8", "#53BAA1", "#237396"];
 
   const overviewData = [
     // {
@@ -633,19 +659,19 @@ export default function page() {
           name: "JAN",
           tender: 3,
           po: 8,
-          contract: 15
+          contract: 15,
         },
         {
           name: "FEB",
           tender: 4,
           po: 5,
-          contract: 9
+          contract: 9,
         },
         {
           name: "MAR",
           tender: 10,
           po: 14,
-          contract: 19
+          contract: 19,
         },
       ],
       tenderData: [
@@ -655,12 +681,12 @@ export default function page() {
       poData: [
         { name: "Pending approval", value: 10 },
         { name: "Approved", value: 20 },
-        { name: "Denied", value: 45 }
+        { name: "Denied", value: 45 },
       ],
       contractData: [
         { name: "Pending approval", value: 10 },
         { name: "Approved", value: 20 },
-        { name: "Denied", value: 45 }
+        { name: "Denied", value: 45 },
       ],
       statusColor: ["#31D5A6", "#878FF6", "#D2DDEC"],
     },
@@ -746,39 +772,96 @@ export default function page() {
   function combineWithDescriptions(serviceCatData, descriptionArray) {
     // Get all unique keys from serviceCatData
     const keys = new Set();
-    serviceCatData?.forEach(obj => {
-        Object.keys(obj).forEach(key => {
-            keys.add(key);
-        });
+    serviceCatData?.forEach((obj) => {
+      Object.keys(obj).forEach((key) => {
+        keys.add(key);
+      });
     });
 
     // Get all description values from descriptionArray
     const descriptions = {};
-    descriptionArray?.forEach(obj => {
-        descriptions[obj.description] = obj._id;
+    descriptionArray?.forEach((obj) => {
+      descriptions[obj.description] = obj._id;
     });
 
     // Create new objects with missing keys from descriptionArray
-    const result = serviceCatData?.map(obj => {
-        const newObj = { ...obj };
-        Object.keys(descriptions).forEach(key => {
-            if (!newObj.hasOwnProperty(key)) {
-                newObj[key] = null;
-            }
-        });
-        return newObj;
+    const result = serviceCatData?.map((obj) => {
+      const newObj = { ...obj };
+      Object.keys(descriptions).forEach((key) => {
+        if (!newObj.hasOwnProperty(key)) {
+          newObj[key] = null;
+        }
+      });
+      return newObj;
     });
 
     return result;
   }
 
-  console.log('Total Overview ', totalOverview);
-  console.log('Service Categories ', serviceCategories)
+  const combinedData = combineWithDescriptions(totalOverview?.serviceCatData, [
+    ...serviceCategories,
+    { description: "Others", _id: "65a97c70ee824f3e8d2d2748" },
+    { description: "", _id: "65a97c70ee824f3e8d2d2jf8" },
+  ]);
 
-  const combinedData = combineWithDescriptions(totalOverview?.serviceCatData, [...serviceCategories, {description: 'Others', _id: "65a97c70ee824f3e8d2d2748"}, {description: '', _id: "65a97c70ee824f3e8d2d2jf8"}]);
-  console.log('Combined ', combinedData)
+  function getMonthsUpToCurrentMonth() {
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth(); // 0-indexed, so January is 0
+    const currentYear = currentDate.getFullYear();
+
+    const months = [];
+
+    for (let month = 0; month <= currentMonth; month++) {
+      const monthName = new Date(currentYear, month)
+        .toLocaleString("default", { month: "long" })
+        .toUpperCase()
+        .slice(0, 3);
+      months.push(monthName);
+      // If you prefer to push month numbers instead:
+      // months.push(month + 1);
+    }
+
+    return months;
+  }
+
+  function transformData(data) {
+    const months = [
+      "JAN",
+      "FEB",
+      "MAR",
+      "APR"
+    ];
+
+    const result = months.map((month) => ({
+      name: month,
+      contracts: 0,
+      tenders: 0,
+      purchaseOrders: 0,
+    }));
+
+    if(data) {
+      for (const [key, value] of Object?.entries(data)) {
+        const monthIndex = months.indexOf(key);
+        if (monthIndex !== -1) {
+          for (const entry of value) {
+            for (const prop in entry) {
+              if (prop !== "_id" && prop !== "month") {
+                result[monthIndex][prop] = entry[prop];
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return result;
+  }
+
+  const dashboardOverviewData = transformData(dashboardOverview.data);
+
   return (
     <>
+      {isMobile && <NotificationComponent />}
       {contextHolder}
 
       {dataLoaded ? (
@@ -829,29 +912,26 @@ export default function page() {
             <>
               <div className="grid grid-cols-7 gap-x-3 mx-2 my-4">
                 {[
-                  {name: "Purchase request", value: "12,400"},
-                  {name: "Payment request", value: "22,560,000"},
-                  {name: "Tenders", value: "120"},
-                  {name: "Contract", value: "46"},
-                  {name: "Purchase Orders", value: "88"},
-                  {name: "Vendors", value: "33"},
-                  {name: "Internal Users", value: "11"}
+                  { name: "Purchase request", value: "12,400" },
+                  { name: "Payment request", value: "22,560,000" },
+                  { name: "Tenders", value: "120" },
+                  { name: "Contract", value: "46" },
+                  { name: "Purchase Orders", value: "88" },
+                  { name: "Vendors", value: "33" },
+                  { name: "Internal Users", value: "11" },
                 ].map((item, key) => (
                   <div className="flex flex-col gap-y-4 bg-[#EFF6FFAA] py-3 px-4 rounded">
                     <small key={key} className="text-[#353535]">
                       <b>{item.name}</b>
                     </small>
                     <h3 className="mt-2 mb-0 text-[#31D5A6]">{item.value}</h3>
-                    
                   </div>
                 ))}
               </div>
 
               {/* Purchase Request Graph Mapping */}
 
-              <div
-                className="grid grid-cols-3 gap-x-10 mt-5 px-4 items-start"
-              >
+              <div className="grid grid-cols-3 gap-x-10 mt-5 px-4 items-start">
                 <div className="col-span-2 py-8">
                   <span className="text-[17px] font-semibold text-[#12263F]">
                     Purchase Request
@@ -924,7 +1004,11 @@ export default function page() {
                     <span className="text-[14px] font-semibold text-[#12263F] p-5 m-5">
                       By Service Category
                     </span>
-                    <ResponsiveContainer width="100%" height={180} className={'mt-5'}>
+                    <ResponsiveContainer
+                      width="100%"
+                      height={180}
+                      className={"mt-5"}
+                    >
                       <BarChart
                         data={combinedData}
                         margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
@@ -945,25 +1029,28 @@ export default function page() {
                         <Tooltip />
 
                         {Object.keys(combinedData[0]).map((key, index) => {
-                          if (key !== 'month' && key !== 'name') {
-                            return <Bar 
-                              key={key}
-                              dataKey={key} 
-                              stackId="a" 
-                              fill={statusColors[index % statusColors.length]} 
-                              barSize={20} 
-                            />;
+                          if (key !== "month" && key !== "name") {
+                            return (
+                              <Bar
+                                key={key}
+                                dataKey={key}
+                                stackId="a"
+                                fill={statusColors[index % statusColors.length]}
+                                barSize={20}
+                              />
+                            );
                           }
                           return null;
                         })}
                       </BarChart>
                     </ResponsiveContainer>
-
                   </div>
                 </div>
                 <div className="col-span-1 flex flex-col px-4 bg-[#F9FAFD]">
                   <div className="py-10">
-                    <span className="text-[16px] text-[#12263F]">Approval process</span>
+                    <span className="text-[16px] text-[#12263F]">
+                      Approval process
+                    </span>
                   </div>
                   <div className="flex xl:flex-row flex-col items-center xl:gap-x-5 mb-5">
                     <ResponsiveContainer width="97%" height={160}>
@@ -995,7 +1082,9 @@ export default function page() {
                       {totalOverview?.statusData?.map((item, key) => (
                         <div className="flex items-center gap-x-2">
                           <div
-                            className={`w-2 h-2 rounded-full bg-[${["#27AFB8", "#53BAA1", "#237396"][key]}]`}
+                            className={`w-2 h-2 rounded-full bg-[${
+                              ["#27AFB8", "#53BAA1", "#237396"][key]
+                            }]`}
                           />
                           <span className="text-[13px] text-[#6C757D]">
                             {item?._id}
@@ -1008,7 +1097,9 @@ export default function page() {
                     </div>
                   </div>
                   <div className="py-10">
-                    <span className="text-[16px] text-[#12263F]">Sourcing methods</span>
+                    <span className="text-[16px] text-[#12263F]">
+                      Sourcing methods
+                    </span>
                   </div>
                   <div className="flex xl:flex-row flex-col items-center xl:gap-x-5 mb-5">
                     <ResponsiveContainer width="97%" height={160}>
@@ -1040,7 +1131,9 @@ export default function page() {
                       {totalOverview?.sourcingData?.map((item, key) => (
                         <div className="flex items-center gap-x-2">
                           <div
-                            className={`w-1.5 h-1.5 rounded-full bg-[${["#237396", "#53BAA1", "#D2DDEC"][key]}]`}
+                            className={`w-1.5 h-1.5 rounded-full bg-[${
+                              ["#237396", "#53BAA1", "#D2DDEC"][key]
+                            }]`}
                           />
                           <span className="text-[13px] text-[#6C757D]">
                             {item?._id}
@@ -1054,9 +1147,7 @@ export default function page() {
                   </div>
                 </div>
               </div>
-              <div
-                className="grid grid-cols-3 gap-x-10 mt-5 px-4 items-start"
-              >
+              <div className="grid grid-cols-3 gap-x-10 mt-5 px-4 items-start">
                 <div className="col-span-2 py-8">
                   <span className="text-[17px] font-semibold text-[#12263F]">
                     Payment Request
@@ -1131,7 +1222,9 @@ export default function page() {
                 </div>
                 <div className="col-span-1 flex flex-col px-4 bg-[#F9FAFD]">
                   <div className="my-5">
-                    <span className="text-[15px] text-[#12263F]">Approval process</span>
+                    <span className="text-[15px] text-[#12263F]">
+                      Approval process
+                    </span>
                   </div>
                   <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
                     <ResponsiveContainer width="97%" height={160}>
@@ -1163,7 +1256,9 @@ export default function page() {
                       {paymentOverview?.statusData?.map((item, key) => (
                         <div className="flex items-center gap-x-2">
                           <div
-                            className={`w-2 h-2 rounded-full bg-[${["#27AFB8", "#53BAA1", "#237396"][key]}]`}
+                            className={`w-2 h-2 rounded-full bg-[${
+                              ["#27AFB8", "#53BAA1", "#237396"][key]
+                            }]`}
                           />
                           <span className="text-[13px] text-[#6C757D]">
                             {item?._id}
@@ -1177,122 +1272,94 @@ export default function page() {
                   </div>
                 </div>
               </div>
-
-              {overviewData.map((el, key) => (
-                // 'Purchase request', 'Payment request', 'Tenders', 'Contract', 'Purchase Orders', 'Vendors', 'Internal Users'
-                <div
-                  key={key}
-                  className="grid grid-cols-3 gap-x-10 mt-5 px-4 items-start"
-                >
-                  <div className="col-span-2 py-8">
-                    <span className="text-[14px] font-semibold text-[#12263F]">
-                      {el?.item}
-                    </span>
-                    <div className="w-full py-5 flex justify-center items-center gap-x-8 mt-4">
-                      {el.labels.map((label, i) => (
-                        <div
-                          key={i}
-                          className="flex flex-col space-y-3 items-center"
-                        >
-                          <div className="flex items-center gap-x-2">
-                            <div
-                              className={`w-2 h-2 rounded-full bg-[${label?.color}]`}
-                            />
-                            <span className="text-[15px] text-[#6C757D]">
-                              {label?.name}
-                            </span>
-                          </div>
+              <div className="grid grid-cols-3 gap-x-10 mt-5 px-4 items-start">
+                <div className="col-span-2 py-8">
+                  <span className="text-[14px] font-semibold text-[#12263F]">
+                    PO, Contracts & Tenders
+                  </span>
+                  <div className="w-full py-5 flex justify-center items-center gap-x-8 mt-4">
+                    {[
+                      { name: "Tenders", color: "#31D5A6" },
+                      { name: "Contracts", color: "#F5B50F" },
+                      { name: "Purchase Orders", color: "#878FF6" },
+                    ].map((label, i) => (
+                      <div
+                        key={i}
+                        className="flex flex-col space-y-3 items-center"
+                      >
+                        <div className="flex items-center gap-x-2">
+                          <div
+                            className={`w-2 h-2 rounded-full bg-[${label?.color}]`}
+                          />
+                          <span className="text-[15px] text-[#6C757D]">
+                            {label?.name}
+                          </span>
                         </div>
-                      ))}
-                    </div>
-                    <ResponsiveContainer width="100%" height={180}>
-                      <LineChart
-                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                        data={el?.data}
-                      >
-                        <XAxis
-                          dataKey="name"
-                          tickMargin={20}
-                          tick={{ fontSize: 11 }}
-                          tickSize={0}
-                          axisLine={{ strokeDasharray: "5 5" }}
-                        />
-                        <YAxis
-                          axisLine={false}
-                          tickMargin={20}
-                          tickSize={0}
-                          tick={<CustomYAxisTick />}
-                        />
-                        <Tooltip />
-                        <Line
-                          type="monotone"
-                          dataKey={"tender"}
-                          stroke="#31D5A6"
-                          dot={false}
-                          strokeWidth={3}
-                        />
-                        <Line
-                          type="monotone"
-                          dataKey={"contract"}
-                          stroke="#878FF6"
-                          dot={false}
-                          strokeWidth={3}
-                        />
-                        <Line
-                          type="monotone"
-                          dataKey={"po"}
-                          stroke="#878FF6"
-                          dot={false}
-                          strokeWidth={3}
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
-                    {el?.item == 'Purchase request' && <ResponsiveContainer width="100%" height={300}>
-                      <BarChart
-                        data={el?.serviceData}
-                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                      >
-                        <XAxis
-                          dataKey="name"
-                          tickMargin={20}
-                          tick={{ fontSize: 11 }}
-                          tickSize={0}
-                          axisLine={{ strokeDasharray: "5 5" }}
-                        />
-                        <YAxis
-                          axisLine={false}
-                          tickMargin={30}
-                          tickSize={0}
-                          tick={<CustomYAxisTick />}
-                        />
-                        <Tooltip />
-
-                        {Object.keys(el?.serviceData[0]).map((key, index) => {
-                          if (key !== 'name') {
-                            return <Bar 
-                              key={key}
-                              dataKey={key} 
-                              stackId="a" 
-                              fill={el?.serviceColors[index % el?.serviceColors.length]} 
-                              barSize={20} 
-                            />;
-                          }
-                          return null;
-                        })}
-                      </BarChart>
-                    </ResponsiveContainer>}
+                      </div>
+                    ))}
                   </div>
-                  <div className="col-span-1 flex flex-col px-4 bg-[#F9FAFD] mt-7 pt-5">
-                    {el?.item != 'PO, Contracts & Tenders' && <div className="my-5">
-                      <span className="text-[15px] text-[#12263F]">Approval process</span>
+                  <ResponsiveContainer width="100%" height={180}>
+                    <LineChart
+                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                      data={dashboardOverviewData}
+                    >
+                      <XAxis
+                        dataKey="name"
+                        tickMargin={20}
+                        tick={{ fontSize: 11 }}
+                        tickSize={0}
+                        axisLine={{ strokeDasharray: "5 5" }}
+                      />
+                      <YAxis
+                        axisLine={false}
+                        tickMargin={20}
+                        tickSize={0}
+                        tick={<CustomYAxisTick />}
+                      />
+                      <Tooltip />
+                      <Line
+                        type="monotone"
+                        dataKey={"tenders"}
+                        stroke="#31D5A6"
+                        dot={false}
+                        strokeWidth={3}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey={"contracts"}
+                        stroke="#F5B50F"
+                        dot={false}
+                        strokeWidth={3}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey={"purchaseOrders"}
+                        stroke="#878FF6"
+                        dot={false}
+                        strokeWidth={3}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="col-span-1 flex flex-col px-4 bg-[#F9FAFD] mt-7 pt-5">
+                  <div className="flex flex-col gap-y-10">
+                    {dashboardOverview?.statusData?.tenders?.length > 0 && <div>
+                      <span className="text-[16px] text-[#12263F]">
+                        Tenders
+                      </span>
                     </div>}
-                    {el?.item == 'Purchase request' && <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
-                      <ResponsiveContainer width="97%" height={160}>
+                    <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
+                      <ResponsiveContainer width="97%" height={140}>
                         <PieChart
-                          margin={{ top: 20, right: 0, left: 20, bottom: 5 }}
+                          margin={{
+                            top: 20,
+                            right: 0,
+                            left: 20,
+                            bottom: 5,
+                          }}
                         >
                           <Pie
-                            data={el?.sourcingData}
+                            data={dashboardOverview?.statusData?.tenders}
                             cx={50}
                             cy={50}
                             startAngle={360}
@@ -1301,53 +1368,50 @@ export default function page() {
                             outerRadius={65}
                             fill="#8884d8"
                             paddingAngle={2}
-                            dataKey="value"
+                            dataKey="total"
                           >
-                            {el?.statusData?.map((entry, index) => (
+                            {dashboardOverview?.statusData?.tenders?.map((entry, index) => (
                               <Cell
                                 key={`cell-${index}`}
-                                fill={el?.statusColor[index]}
+                                fill={["#27AFB8", "#53BAA1", "#237396"][index]}
                               />
                             ))}
                           </Pie>
                         </PieChart>
                       </ResponsiveContainer>
                       <div className="flex flex-col gap-y-3 -mt-5">
-                        {el?.statusData?.map((item, key) => (
+                        {dashboardOverview?.statusData?.tenders?.map((item, key) => (
                           <div className="flex items-center gap-x-2">
                             <div
-                              className={`w-2 h-2 rounded-full bg-[${el?.statusColor[key]}]`}
+                              className={`w-1.5 h-1.5 rounded-full bg-[${["#27AFB8", "#53BAA1", "#237396"][key]}]`}
                             />
                             <span className="text-[13px] text-[#6C757D]">
-                              {item?.name}
+                              {item?._id}
                             </span>
                             <span className="text-[13px] text-[#6C757D]">
-                              {item?.value}
+                              {item?.total}
                             </span>
                           </div>
                         ))}
                       </div>
+                    </div>
+                    {dashboardOverview?.statusData?.contracts?.length > 0 && <div>
+                      <span className="text-[16px] text-[#12263F]">
+                        Contracts
+                      </span>
                     </div>}
-                    {el?.item == 'Purchase request' && <div className="grid grid-cols-1 gap-x-3 mx-2 my-4">
-                      {[
-                        {name: "Approval Lead time", value: "12"}
-                      ].map((item, key) => (
-                        <div className="flex flex-col gap-y-4 bg-[#FFF] p-5 rounded">
-                          <small key={key} className="text-[#353535] text-[16px]">
-                            <b>{item.name}</b>
-                          </small>
-                          <h5 className="mt-2 mb-0 text-[#31D5A6]">{item.value} Days</h5>
-                          
-                        </div>
-                      ))}
-                    </div>}
-                    {el?.item == "Purchase request" && <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
-                      <ResponsiveContainer width="97%" height={160}>
+                    <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
+                      <ResponsiveContainer width="97%" height={140}>
                         <PieChart
-                          margin={{ top: 20, right: 0, left: 20, bottom: 5 }}
+                          margin={{
+                            top: 20,
+                            right: 0,
+                            left: 20,
+                            bottom: 5,
+                          }}
                         >
                           <Pie
-                            data={el?.sourcingData}
+                            data={dashboardOverview?.statusData?.contracts}
                             cx={50}
                             cy={50}
                             startAngle={360}
@@ -1356,166 +1420,88 @@ export default function page() {
                             outerRadius={65}
                             fill="#8884d8"
                             paddingAngle={2}
-                            dataKey="value"
+                            dataKey="total"
                           >
-                            {el?.sourcingData?.map((entry, index) => (
+                            {dashboardOverview?.statusData?.contracts?.map((entry, index) => (
                               <Cell
                                 key={`cell-${index}`}
-                                fill={el?.statusColor[index]}
+                                fill={["#27AFB8", "#53BAA1", "#237396"][index]}
                               />
                             ))}
                           </Pie>
                         </PieChart>
                       </ResponsiveContainer>
                       <div className="flex flex-col gap-y-3 -mt-5">
-                        {el?.sourcingData?.map((item, key) => (
+                        {dashboardOverview?.statusData?.contracts?.map((item, key) => (
                           <div className="flex items-center gap-x-2">
                             <div
-                              className={`w-1.5 h-1.5 rounded-full bg-[${el?.statusColor[key]}]`}
+                              className={`w-1.5 h-1.5 rounded-full bg-[${["#27AFB8", "#53BAA1", "#237396"][key]}]`}
                             />
                             <span className="text-[13px] text-[#6C757D]">
-                              {item?.name}
+                              {item?._id}
                             </span>
                             <span className="text-[13px] text-[#6C757D]">
-                              {item?.value}
+                              {item?.total}
                             </span>
                           </div>
                         ))}
                       </div>
+                    </div>
+                    {dashboardOverview?.statusData?.purchaseOrders.length > 0 && <div>
+                      <span className="text-[16px] text-[#12263F]">
+                        Purchase Orders
+                      </span>
                     </div>}
-                    {el?.item == "PO, Contracts & Tenders" && 
-                      <div className="flex flex-col gap-y-10">
-                        <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
-                          <ResponsiveContainer width="97%" height={140}>
-                            <PieChart
-                              margin={{ top: 20, right: 0, left: 20, bottom: 5 }}
-                            >
-                              <Pie
-                                data={el?.tenderData}
-                                cx={50}
-                                cy={50}
-                                startAngle={360}
-                                endAngle={0}
-                                innerRadius={59}
-                                outerRadius={65}
-                                fill="#8884d8"
-                                paddingAngle={2}
-                                dataKey="value"
-                              >
-                                {el?.tenderData?.map((entry, index) => (
-                                  <Cell
-                                    key={`cell-${index}`}
-                                    fill={el?.statusColor[index]}
-                                  />
-                                ))}
-                              </Pie>
-                            </PieChart>
-                          </ResponsiveContainer>
-                          <div className="flex flex-col gap-y-3 -mt-5">
-                            {el?.tenderData?.map((item, key) => (
-                              <div className="flex items-center gap-x-2">
-                                <div
-                                  className={`w-1.5 h-1.5 rounded-full bg-[${el?.statusColor[key]}]`}
-                                />
-                                <span className="text-[13px] text-[#6C757D]">
-                                  {item?.name}
-                                </span>
-                                <span className="text-[13px] text-[#6C757D]">
-                                  {item?.value}
-                                </span>
-                              </div>
+                    <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
+                      <ResponsiveContainer width="97%" height={140}>
+                        <PieChart
+                          margin={{
+                            top: 20,
+                            right: 0,
+                            left: 20,
+                            bottom: 5,
+                          }}
+                        >
+                          <Pie
+                            data={dashboardOverview?.statusData?.purchaseOrders}
+                            cx={50}
+                            cy={50}
+                            startAngle={360}
+                            endAngle={0}
+                            innerRadius={59}
+                            outerRadius={65}
+                            fill="#8884d8"
+                            paddingAngle={2}
+                            dataKey="total"
+                          >
+                            {dashboardOverview?.statusData?.purchaseOrders?.map((entry, index) => (
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={["#27AFB8", "#53BAA1", "#237396"][index]}
+                              />
                             ))}
+                          </Pie>
+                        </PieChart>
+                      </ResponsiveContainer>
+                      <div className="flex flex-col gap-y-3 -mt-5">
+                        {dashboardOverview?.statusData?.purchaseOrders?.map((item, key) => (
+                          <div className="flex items-center gap-x-2">
+                            <div
+                              className={`w-1.5 h-1.5 rounded-full bg-[${["#27AFB8", "#53BAA1", "#237396"][key]}]`}
+                            />
+                            <span className="text-[13px] text-[#6C757D]">
+                              {item?._id}
+                            </span>
+                            <span className="text-[13px] text-[#6C757D]">
+                              {item?.total}
+                            </span>
                           </div>
-                        </div>
-                        <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
-                          <ResponsiveContainer width="97%" height={140}>
-                            <PieChart
-                              margin={{ top: 20, right: 0, left: 20, bottom: 5 }}
-                            >
-                              <Pie
-                                data={el?.poData}
-                                cx={50}
-                                cy={50}
-                                startAngle={360}
-                                endAngle={0}
-                                innerRadius={59}
-                                outerRadius={65}
-                                fill="#8884d8"
-                                paddingAngle={2}
-                                dataKey="value"
-                              >
-                                {el?.poData?.map((entry, index) => (
-                                  <Cell
-                                    key={`cell-${index}`}
-                                    fill={el?.statusColor[index]}
-                                  />
-                                ))}
-                              </Pie>
-                            </PieChart>
-                          </ResponsiveContainer>
-                          <div className="flex flex-col gap-y-3 -mt-5">
-                            {el?.poData?.map((item, key) => (
-                              <div className="flex items-center gap-x-2">
-                                <div
-                                  className={`w-1.5 h-1.5 rounded-full bg-[${el?.statusColor[key]}]`}
-                                />
-                                <span className="text-[13px] text-[#6C757D]">
-                                  {item?.name}
-                                </span>
-                                <span className="text-[13px] text-[#6C757D]">
-                                  {item?.value}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
-                          <ResponsiveContainer width="97%" height={140}>
-                            <PieChart
-                              margin={{ top: 20, right: 0, left: 20, bottom: 5 }}
-                            >
-                              <Pie
-                                data={el?.contractData}
-                                cx={50}
-                                cy={50}
-                                startAngle={360}
-                                endAngle={0}
-                                innerRadius={59}
-                                outerRadius={65}
-                                fill="#8884d8"
-                                paddingAngle={2}
-                                dataKey="value"
-                              >
-                                {el?.contractData?.map((entry, index) => (
-                                  <Cell
-                                    key={`cell-${index}`}
-                                    fill={el?.statusColor[index]}
-                                  />
-                                ))}
-                              </Pie>
-                            </PieChart>
-                          </ResponsiveContainer>
-                          <div className="flex flex-col gap-y-3 -mt-5">
-                            {el?.contractData?.map((item, key) => (
-                              <div className="flex items-center gap-x-2">
-                                <div
-                                  className={`w-1.5 h-1.5 rounded-full bg-[${el?.statusColor[key]}]`}
-                                />
-                                <span className="text-[13px] text-[#6C757D]">
-                                  {item?.name}
-                                </span>
-                                <span className="text-[13px] text-[#6C757D]">
-                                  {item?.value}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
+                        ))}
                       </div>
-                    }
+                    </div>
                   </div>
                 </div>
-              ))}
+              </div>
             </>
           ) : tab == 1 ? (
             <>
