@@ -83,6 +83,7 @@ import { IoMdCheckboxOutline } from "react-icons/io";
 import { MdFileCopy, MdAttachFile } from "react-icons/md";
 import { BiPurchaseTagAlt } from "react-icons/bi";
 import { TbTruckDelivery } from "react-icons/tb";
+import { TiInfoLarge } from "react-icons/ti";
 import { useUser } from "../context/UserContext";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -2980,6 +2981,8 @@ const RequestDetails = ({
     },
   };
 
+  {console.log('Request ', data)}
+
   return (
     <div className="request-details grid lg:grid-cols-5 gap-4 items-start h-screen mb-2 overflow-y-auto">
       {contextHolder}
@@ -2987,28 +2990,33 @@ const RequestDetails = ({
         <div className="flex flex-col ring-1 ring-gray-200 lg:pl-5 lg:pr-8 rounded-lg bg-white border-0">
           {data && (
             <Form form={form}>
-              <div className="flex items-center justify-between ml-3 mb-2">
+              <div className="flex items-center justify-between m-3 mb-2">
                 <h4>Request Details</h4>
-                <Tag
-                  color={
-                    data?.status === "declined" ||
+                <div className="flex gap-x-2">
+                  <Tag
+                    color={
+                      data?.status === "declined" ||
+                      data?.status === "withdrawn" ||
+                      data?.status === "archived"
+                        ? "red"
+                        : data?.status === "approved" ||
+                          data?.status === "approved (pm)"
+                        ? "geekblue"
+                        : "orange"
+                    }
+                  >
+                    {data?.status === "declined" ||
+                    data?.status === "approved" ||
+                    data?.status === "approved (pm)" ||
                     data?.status === "withdrawn" ||
                     data?.status === "archived"
-                      ? "red"
-                      : data?.status === "approved" ||
-                        data?.status === "approved (pm)"
-                      ? "geekblue"
-                      : "orange"
-                  }
-                >
-                  {data?.status === "declined" ||
-                  data?.status === "approved" ||
-                  data?.status === "approved (pm)" ||
-                  data?.status === "withdrawn" ||
-                  data?.status === "archived"
-                    ? data?.status
-                    : "pending"}
-                </Tag>
+                      ? data?.status
+                      : "pending"}
+                  </Tag>
+                  {data?.status == 'declined' && <Tooltip title={data?.reasonForRejection} className="cursor-pointer bg-transparent p-0.5 rounded-full mt-0.5">
+                    <TiInfoLarge className="text-[#344767] w-6 h-6" />
+                  </Tooltip>}
+                </div>
               </div>
               <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-5 ml-3">
                 <div>
