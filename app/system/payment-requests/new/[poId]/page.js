@@ -161,7 +161,7 @@ export default function NewPaymentRequest({ params }) {
     return {
       totalVal: t,
       totalTax: tax,
-      grossTotal: t + tax,
+      grossTotal: _.round(t + tax),
     };
   }
 
@@ -426,7 +426,7 @@ export default function NewPaymentRequest({ params }) {
                                       (poVal == -1 &&
                                         value > getPoTotalVal()?.grossTotal)
                                     ) {
-                                      reject(
+                                       reject(
                                         "Requested amount should not exceed the PO Value!"
                                       );
                                     } else {
@@ -806,7 +806,9 @@ export default function NewPaymentRequest({ params }) {
               <button
                 onClick={() => {
                   if (files?.length <= 0)
-                    message.error("Please provide atleast one supporting document!");
+                    message.error(
+                      "Please provide atleast one supporting document!"
+                    );
                   form.validateFields().then(() => {
                     if (files?.length <= 0)
                       message.error(
@@ -824,8 +826,8 @@ export default function NewPaymentRequest({ params }) {
                 <SaveOutlined className="font-[19px]" />
                 Submit
               </button>
-        </div>
-        {/* <div className="flex w-full justify-end items-end self-end">
+            </div>
+            {/* <div className="flex w-full justify-end items-end self-end">
           <button
             onClick={() => {
               if (files?.length <= 0)
@@ -848,10 +850,9 @@ export default function NewPaymentRequest({ params }) {
             Save
           </button>
         </div> */}
-        
+          </div>
+        </div>
       </div>
-    </div>
-    </div>
     </motion.div>
   );
 }
