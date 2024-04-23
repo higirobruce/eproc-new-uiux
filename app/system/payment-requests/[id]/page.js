@@ -1042,7 +1042,7 @@ export default function PaymentRequest({ params }) {
                 <h5 className="text-[18px] text-[#344767] mb-4">
                   Request Details
                 </h5>
-                <div className="flex items-center gap-x-4">
+                <div className="flex items-center gap-x-2">
                   <div>
                     <Tag
                       className="shadow"
@@ -1063,6 +1063,9 @@ export default function PaymentRequest({ params }) {
                       {paymentRequest?.status}
                     </Tag>
                   </div>
+                  {paymentRequest?.status == 'declined' && <Tooltip title={paymentRequest?.reasonForRejection} className="cursor-pointer bg-transparent p-0.5 rounded-full mt-0.5">
+                    <TiInfoLarge className="text-[#344767] w-6 h-6" />
+                  </Tooltip>}
                   {/* <div className="space-x-3 ">
                     {!paymentRequest?.status?.includes("approved") &&
                       paymentRequest?.status !== "declined" &&
@@ -2272,13 +2275,13 @@ export default function PaymentRequest({ params }) {
 
                   {!paymentRequest?.approver &&
                     user?.userType !== "VENDOR" &&
-                    user?.permissions?.canEditPaymentRequests && (
+                    user?.permissions?.canReviewPaymentRequests && (
                       <div className="flex flex-col space-y-2">
                         {/* <div className="text-xs text-gray-500">
                     {showAddApproverForm ? "" : "No approver selected yet"}
                   </div> */}
                         {!showAddApproverForm &&
-                          user?.permissions?.canEditPaymentRequests &&
+                          user?.permissions?.canReviewPaymentRequests &&
                           !user?.approver && (
                             <div className="flex flex-row items-center space-x-1">
                               <Button
@@ -2652,7 +2655,7 @@ export default function PaymentRequest({ params }) {
                             </div>
                           )} */}
 
-                          <div className="mt-10">
+                          <div className="pt-10">
                             <Button
                               loading={saving}
                               onClick={() => {

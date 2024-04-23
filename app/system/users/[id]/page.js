@@ -315,6 +315,32 @@ export default function page({ params }) {
       });
   }
 
+  function setCanReviewPaymentRequests(can){
+    let newUser = { ...row };
+    let permissionLable = "canReviewPaymentRequests";
+    newUser.permissions[permissionLable] = can;
+
+    fetch(`${url}/users/${row?._id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ newUser }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        loadUsers();
+      })
+      .catch((err) => {
+        messageApi.open({
+          type: "error",
+          content: "Something happened! Please try again.",
+        });
+      });
+  }
+
   function setCanApprove(canApprove, module) {
     let newUser = { ...row };
     let permissionLable = "canApprove" + module;
@@ -943,6 +969,28 @@ export default function page({ params }) {
                             checked={row?.permissions?.canApproveAsLegal}
                             onChange={(checked) => {
                               setCanApproveAsLegal(checked);
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </Form.Item>
+
+
+                    <Form.Item name="canReviewPaymentRequests">
+                      <div className="permission flex w-full items-center justify-between">
+                        <div>
+                          <h6 className="text-[13px] text-[#707C95] my-2">
+                            Can review payment requests
+                          </h6>
+                          <small className="text-[12px] text-[#95A1B3]">
+                            Allows user to review payment requests
+                          </small>
+                        </div>
+                        <div className="permission">
+                          <Switch
+                            checked={row?.permissions?.canReviewPaymentRequests}
+                            onChange={(checked) => {
+                              setCanReviewPaymentRequests(checked);
                             }}
                           />
                         </div>
