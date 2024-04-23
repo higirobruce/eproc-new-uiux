@@ -28,7 +28,7 @@ import {
 } from "react-icons/md";
 import { FiUsers } from "react-icons/fi";
 import { PiCurrencyCircleDollarFill } from "react-icons/pi";
-import { FaCaretUp } from "react-icons/fa";
+import { FaCaretUp,  } from "react-icons/fa";
 import {
   Pie,
   Label,
@@ -48,6 +48,7 @@ import {
 } from "recharts";
 import { isMobile } from "react-device-detect";
 import NotificationComponent from "@/app/hooks/useMobile";
+import { formatAmount } from "@/app/utils/helpers";
 
 export default function page() {
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -65,6 +66,7 @@ export default function page() {
   const [totalOverview, setTotalOverview] = useState([]);
   const [paymentOverview, setPaymentOverview] = useState("");
   const [dashboardOverview, setDashboardOverview] = useState([]);
+  const [spendOverview, setSpendOverview] = useState("")
   const [serviceCategories, setServiceCategories] = useState([]);
   const router = useRouter();
   const [tab, setTab] = useState(0);
@@ -195,7 +197,6 @@ export default function page() {
       .then((res) => getResultFromServer(res))
       .then((res) => {
         setDashboardOverview(res);
-        console.log("Dasboard Overview ", res);
       })
       .catch((err) => {
         messageApi.open({
@@ -203,6 +204,18 @@ export default function page() {
           content: "Something happened! Please try again.",
         });
       });
+    loadSpendTrackingOverview()
+      .then((res) => getResultFromServer(res))
+      .then((res) => {
+        setSpendOverview(res)
+      })
+      .catch((err) => {
+        messageApi.open({
+          type: "error",
+          content: "Something happened! Please try again.",
+        });
+      });
+    
   }, []);
 
   async function loadTenders() {
@@ -337,6 +350,17 @@ export default function page() {
     });
   }
 
+  async function loadSpendTrackingOverview() {
+    return fetch(`${url}/paymentRequests/spendTracking`, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    });
+  }
+
   function getResultFromServer(res) {
     if (res.status === 401) {
       localStorage.removeItem("token");
@@ -427,328 +451,6 @@ export default function page() {
   ];
 
   const statusColors = ["#27AFB8", "#53BAA1", "#237396"];
-
-  const overviewData = [
-    // {
-    //   item: "Purchase request",
-    //   labels: [
-    //     {
-    //       color: "#31D5A6",
-    //       name: "Budgeted",
-    //     },
-    //     {
-    //       color: "#878FF6",
-    //       name: "Non-Budgeted",
-    //     },
-    //   ],
-    //   data: [
-    //     {
-    //       name: "JAN",
-    //       budgeted: 4000,
-    //       nonBudgeted: 2400,
-    //       total: 3000,
-    //     },
-    //     {
-    //       name: "FEB",
-    //       budgeted: 3000,
-    //       nonBudgeted: 1398,
-    //       total: 2210,
-    //     },
-    //     {
-    //       name: "MAR",
-    //       budgeted: 2000,
-    //       nonBudgeted: 9800,
-    //       total: 2290,
-    //     },
-    //   ],
-    //   serviceData: [
-    //     {
-    //       name: "JAN",
-    //       Transport: 30,
-    //       Food: 20,
-    //       Electronics: 10,
-    //       Entertainment: null,
-    //       Electricity: null,
-    //       Furnitures: 5
-    //     },
-    //     {
-    //       name: "JAN",
-    //       Transport: 40,
-    //       Food: 20,
-    //       Electronics: 10,
-    //       Entertainment: null,
-    //       Electricity: null,
-    //       Furnitures: 5
-    //     },
-    //     {
-    //       name: "FEB",
-    //       Entertainment: 20,
-    //       Electricity: 50,
-    //       Transport: 10,
-    //       Others: 5
-    //     },
-    //     {
-    //       name: "MAR",
-    //       Entertainment: 30,
-    //       Electricity: 20,
-    //       Transport: 60,
-    //       Entertainment: null,
-    //       Electricity: 10,
-    //       Others: 10
-    //     },
-    //     {
-    //       name: "APR",
-    //       Transport: 30,
-    //       Food: 20,
-    //       Electronics: 10,
-    //       Entertainment: null,
-    //       Electricity: null,
-    //       Furnitures: 5
-    //     },
-    //     {
-    //       name: "MAY",
-    //       Entertainment: 20,
-    //       Electricity: 50,
-    //       Transport: 10,
-    //       Others: 5
-    //     },
-    //     {
-    //       name: "JUN",
-    //       Entertainment: 30,
-    //       Electricity: 20,
-    //       Transport: 60,
-    //       Entertainment: null,
-    //       Electricity: 10,
-    //       Others: 10
-    //     },
-    //     {
-    //       name: "JUL",
-    //       Transport: 30,
-    //       Food: 20,
-    //       Electronics: 10,
-    //       Entertainment: null,
-    //       Electricity: null,
-    //       Furnitures: 5
-    //     },
-    //     {
-    //       name: "AUG",
-    //       Entertainment: 20,
-    //       Electricity: 50,
-    //       Transport: 10,
-    //       Others: 5
-    //     },
-    //     {
-    //       name: "SEP",
-    //       Entertainment: 30,
-    //       Electricity: 20,
-    //       Transport: 60,
-    //       Entertainment: null,
-    //       Electricity: 10,
-    //       Others: 10
-    //     },
-    //     {
-    //       name: "SEP",
-    //       Transport: 30,
-    //       Food: 20,
-    //       Electronics: 10,
-    //       Entertainment: null,
-    //       Electricity: null,
-    //       Furnitures: 5
-    //     },
-    //     {
-    //       name: "OCT",
-    //       Entertainment: 20,
-    //       Electricity: 50,
-    //       Transport: 10,
-    //       Others: 5
-    //     },
-    //     {
-    //       name: "NOV",
-    //       Entertainment: 30,
-    //       Electricity: 20,
-    //       Transport: 60,
-    //       Entertainment: null,
-    //       Electricity: 10,
-    //       Others: 10
-    //     },
-    //     {
-    //       name: "DEC",
-    //       Transport: 30,
-    //       Food: 20,
-    //       Electronics: 10,
-    //       Entertainment: null,
-    //       Electricity: null,
-    //       Furnitures: 5
-    //     }
-    //   ],
-    //   statusData: [
-    //     { name: "Pending approval", value: 10 },
-    //     { name: "Approved", value: 20 },
-    //     { name: "Denied", value: 45 }
-    //   ],
-    //   sourcingData: [
-    //     { name: "Tendering", value: 20 },
-    //     { name: "Direct Contracting", value: 120 },
-    //     { name: "Sourcing from existing vendor", value: 35 }
-    //   ],
-    //   statusColor: ["#2C7BE5", "#D2DDEC", "#31D5A6", "#878FF6"],
-    //   serviceColors: ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', "#2C7BE5", "#D2DDEC", "#31D5A6", "#878FF6"]
-    // },
-    // {
-    //   item: "Payment request",
-    //   labels: [
-    //     {
-    //       color: "#31D5A6",
-    //       name: "Budgeted",
-    //     },
-    //     {
-    //       color: "#878FF6",
-    //       name: "Non-Budgeted",
-    //     },
-    //   ],
-    //   data: [
-    //     {
-    //       name: "JAN",
-    //       budgeted: 4000,
-    //       nonBudgeted: 2400,
-    //       total: 3000,
-    //     },
-    //     {
-    //       name: "FEB",
-    //       budgeted: 3000,
-    //       nonBudgeted: 1398,
-    //       total: 2210,
-    //     },
-    //     {
-    //       name: "MAR",
-    //       budgeted: 2000,
-    //       nonBudgeted: 9800,
-    //       total: 2290,
-    //     },
-    //   ],
-    //   statusData: [
-    //     { name: "Pending approval", value: 10 },
-    //     { name: "Approved", value: 20 },
-    //     { name: "Denied", value: 45 }
-    //   ],
-    //   sourcingData: [
-    //     { name: "Tendering", value: 20 },
-    //     { name: "Direct Contracting", value: 120 },
-    //     { name: "Sourcing from existing vendor", value: 35 }
-    //   ],
-    //   statusColor: ["#2C7BE5", "#D2DDEC", "#31D5A6", "#878FF6"],
-    // },
-    {
-      item: "PO, Contracts & Tenders",
-      labels: [
-        {
-          color: "#31D5A6",
-          name: "PO",
-        },
-        {
-          color: "#53BAA1",
-          name: "Contract",
-        },
-        {
-          color: "#237396",
-          name: "Tender",
-        },
-      ],
-      data: [
-        {
-          name: "JAN",
-          tender: 3,
-          po: 8,
-          contract: 15,
-        },
-        {
-          name: "FEB",
-          tender: 4,
-          po: 5,
-          contract: 9,
-        },
-        {
-          name: "MAR",
-          tender: 10,
-          po: 14,
-          contract: 19,
-        },
-      ],
-      tenderData: [
-        { name: "Opened", value: 20 },
-        { name: "Closed", value: 30 },
-      ],
-      poData: [
-        { name: "Pending approval", value: 10 },
-        { name: "Approved", value: 20 },
-        { name: "Denied", value: 45 },
-      ],
-      contractData: [
-        { name: "Pending approval", value: 10 },
-        { name: "Approved", value: 20 },
-        { name: "Denied", value: 45 },
-      ],
-      statusColor: ["#31D5A6", "#878FF6", "#D2DDEC"],
-    },
-    // {
-    //   item: "Contracts",
-    //   labels: [
-    //     {
-    //       color: "#31D5A6",
-    //       name: "Total Value",
-    //     },
-    //   ],
-    //   data: [
-    //     {
-    //       name: "JAN",
-    //       value: 3
-    //     },
-    //     {
-    //       name: "FEB",
-    //       value: 4
-    //     },
-    //     {
-    //       name: "MAR",
-    //       value: 10
-    //     },
-    //   ],
-    //   statusData: [
-    //     { name: "Draft", value: 400 },
-    //     { name: "In-review", value: 400 },
-    //     { name: "Signed", value: 300 },
-    //     { name: "Terminated", value: 300 },
-    //   ],
-    //   statusColor: ["#31D5A6", "#878FF6", "#31D5A6", "#878FF6"],
-    // },
-    // {
-    //   item: "Purchase Orders",
-    //   labels: [
-    //     {
-    //       color: "#31D5A6",
-    //       name: "Total Value",
-    //     },
-    //   ],
-    //   data: [
-    //     {
-    //       name: "JAN",
-    //       value: 3
-    //     },
-    //     {
-    //       name: "FEB",
-    //       value: 4
-    //     },
-    //     {
-    //       name: "MAR",
-    //       value: 10
-    //     },
-    //   ],
-    //   statusData: [
-    //     { name: "Pending-signature", value: 400 },
-    //     { name: "Signed", value: 300 },
-    //   ],
-    //   statusColor: ["#31D5A6", "#878FF6"],
-    // },
-  ];
 
   const COLORS = ["#2C7BE5", "#D2DDEC"];
   const COLORS_OVERVIEW = ["#878FF6", "#dfe1fc", "#b3b8ff"];
@@ -912,19 +614,27 @@ export default function page() {
             <>
               <div className="grid grid-cols-7 gap-x-3 mx-2 my-4">
                 {[
-                  { name: "Purchase request", value: "12,400" },
-                  { name: "Payment request", value: "22,560,000" },
-                  { name: "Tenders", value: "120" },
-                  { name: "Contract", value: "46" },
-                  { name: "Purchase Orders", value: "88" },
-                  { name: "Vendors", value: "33" },
-                  { name: "Internal Users", value: "11" },
+                  { name: "Purchase request", value: "12,400", color: '#4B59D4' },
+                  { name: "Payment request", value: "22,560,000", color: '#7EC2C6' },
+                  { name: "Tenders", value: "120", color: '#5A58CB' },
+                  { name: "Contract", value: "46", color: '#679AF3' },
+                  { name: "Purchase Orders", value: "88", color: '#E4C1A0' },
+                  { name: "Vendors", value: "33", color: '#6A76D7' },
+                  { name: "Internal Users", value: "11", color: '#D25C8D' },
                 ].map((item, key) => (
-                  <div className="flex flex-col gap-y-4 bg-[#EFF6FFAA] py-3 px-4 rounded">
-                    <small key={key} className="text-[#353535]">
-                      <b>{item.name}</b>
-                    </small>
-                    <h3 className="mt-2 mb-0 text-[#31D5A6]">{item.value}</h3>
+                  <div className="flex gap-x-4 bg-[#EFF6FFAA] py-3 px-2 rounded">
+                    {/* <div className={`border-l-0 border-3 border-solid border-[${item.color}] rounded-xxl`} /> */}
+                    <div className="flex flex-grow flex-col gap-y-2">
+                      <div className="w-full flex justify-between">
+                        <small key={key} className="text-[#bcbec0] font-medium">
+                          {item.name}
+                        </small>
+                        <div className={`flex justify-center items-center bg-[${item?.color + '22'}] rounded-lg p-2.5`}>
+                          <DocumentIcon color={item.color} className={`h-4 w-4 text-{${item.color}}`} />
+                        </div>
+                      </div>
+                      <h4 className="mt-2 mb-0 text-[#040518]">{item.value}</h4>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1076,6 +786,7 @@ export default function page() {
                             />
                           ))}
                         </Pie>
+                        <Tooltip />
                       </PieChart>
                     </ResponsiveContainer>
                     <div className="flex flex-col gap-y-3 -mt-5">
@@ -1125,6 +836,7 @@ export default function page() {
                             />
                           ))}
                         </Pie>
+                        <Tooltip />
                       </PieChart>
                     </ResponsiveContainer>
                     <div className="flex flex-col gap-y-3 -mt-5">
@@ -1250,6 +962,7 @@ export default function page() {
                             />
                           ))}
                         </Pie>
+                        <Tooltip />
                       </PieChart>
                     </ResponsiveContainer>
                     <div className="flex flex-col gap-y-3 -mt-5">
@@ -1377,6 +1090,7 @@ export default function page() {
                               />
                             ))}
                           </Pie>
+                          <Tooltip />
                         </PieChart>
                       </ResponsiveContainer>
                       <div className="flex flex-col gap-y-3 -mt-5">
@@ -1429,6 +1143,7 @@ export default function page() {
                               />
                             ))}
                           </Pie>
+                          <Tooltip />
                         </PieChart>
                       </ResponsiveContainer>
                       <div className="flex flex-col gap-y-3 -mt-5">
@@ -1481,6 +1196,7 @@ export default function page() {
                               />
                             ))}
                           </Pie>
+                          <Tooltip />
                         </PieChart>
                       </ResponsiveContainer>
                       <div className="flex flex-col gap-y-3 -mt-5">
@@ -1513,7 +1229,7 @@ export default function page() {
                   <div className="bg-white w-full py-3 grid grid-cols-2 justify-center mt-4">
                     <div className="flex flex-col space-y-2 items-center">
                       <div className="flex items-center gap-x-2">
-                        <div className="w-2 h-2 rounded-full bg-[#2C7BE5]" />
+                        <div className="w-2 h-2 rounded-full bg-[#D2DDEC]" />
                         <span className="text-[15px] text-[#6C757D]">
                           Amount Paid
                         </span>
@@ -1521,7 +1237,7 @@ export default function page() {
                     </div>
                     <div className="flex flex-col space-y-2 items-center">
                       <div className="flex items-center gap-x-2">
-                        <div className="w-2 h-2 rounded-full bg-[#D2DDEC]" />
+                        <div className="w-2 h-2 rounded-full bg-[#2C7BE5]" />
                         <span className="text-[15px] text-[#6C757D]">
                           Payment Request
                         </span>
@@ -1530,11 +1246,11 @@ export default function page() {
                   </div>
                   <ResponsiveContainer width="100%" height={260}>
                     <BarChart
-                      data={purchaseData}
+                      data={spendOverview?.data}
                       margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                     >
                       <XAxis
-                        dataKey="name"
+                        dataKey="month"
                         tickMargin={20}
                         tick={{ fontSize: 11 }}
                         tickSize={0}
@@ -1559,14 +1275,14 @@ export default function page() {
                       <Tooltip />
                       <Bar
                         yAxisId="left"
-                        dataKey="value"
+                        dataKey="requests"
                         fill="#2C7BE5"
                         barSize={20}
                         radius={0}
                       />
                       <Bar
                         yAxisId="right"
-                        dataKey="current"
+                        dataKey="total_paid"
                         fill="#D2DDEC"
                         barSize={20}
                         radius={0}
@@ -1581,7 +1297,7 @@ export default function page() {
                         Total Amount
                       </h6>
                       <h2 className="text-[#6C757D] text-[20px] font-semibold mt-0">
-                        $1,200,000
+                        ${formatAmount(spendOverview?.totals[0]?.total_amount)}
                       </h2>
                     </div>
                     <PiCurrencyCircleDollarFill
@@ -1595,7 +1311,7 @@ export default function page() {
                         Total Requests
                       </h6>
                       <h2 className="text-[#6C757D] text-[20px] font-semibold mt-4">
-                        1,870
+                        {spendOverview?.totals[0]?.total_requests}
                       </h2>
                     </div>
                     <MdOutlinePendingActions
@@ -1609,7 +1325,7 @@ export default function page() {
                         Average
                       </h6>
                       <h2 className="text-[#6C757D] text-[20px] font-semibold mt-4">
-                        $640 / requests
+                        ${formatAmount(spendOverview?.totals[0]?.average_request)} / requests
                       </h2>
                     </div>
                     <MdOutlinePayments size={24} className="text-[#95AAC9]" />
@@ -1629,7 +1345,7 @@ export default function page() {
                         margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                       >
                         <Pie
-                          data={budgetData}
+                          data={spendOverview?.budgetData}
                           cx={130}
                           cy={120}
                           startAngle={360}
@@ -1640,13 +1356,14 @@ export default function page() {
                           paddingAngle={2}
                           dataKey="value"
                         >
-                          {data.map((entry, index) => (
+                          {spendOverview?.budgetData?.map((entry, index) => (
                             <Cell
                               key={`cell-${index}`}
                               fill={COLORS[index % COLORS.length]}
                             />
                           ))}
                         </Pie>
+                        <Tooltip />
                       </PieChart>
                     </ResponsiveContainer>
                     <div className="flex flex-col bg-white px-6 py-3.5 space-y-3 mr-12 -mt-10">
@@ -1654,10 +1371,10 @@ export default function page() {
                         Budgeted
                       </span>
                       <span className="text-[23px] text-[#12263F]">
-                        <b>72%</b>
+                        <b>{formatAmount((spendOverview?.totals[0]?.total_amount / spendOverview?.budgetData[0]?.value) * 100)}%</b>
                       </span>
                       <span className="text-[13px] text-[#12263F]">
-                        <b>$864k</b>/3360k
+                        <b>${formatAmount(spendOverview?.budgetData[0]?.value)}</b>/{formatAmount(spendOverview?.budgetData[1]?.value)}
                       </span>
                     </div>
                   </div>
