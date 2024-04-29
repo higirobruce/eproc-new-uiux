@@ -626,7 +626,7 @@ export default function page() {
                     {/* <div className={`border-l-0 border-3 border-solid border-[${item.color}] rounded-xxl`} /> */}
                     <div className="flex flex-grow flex-col gap-y-2">
                       <div className="w-full flex justify-between">
-                        <small key={key} className="text-[#bcbec0] font-medium">
+                        <small key={key} className="text-[#505152] font-medium">
                           {item.name}
                         </small>
                         <div className={`flex justify-center items-center bg-[${item?.color + '22'}] rounded-lg p-2.5`}>
@@ -691,14 +691,14 @@ export default function page() {
                           dataKey={"budgeted"}
                           stroke="#34AEB3"
                           dot={false}
-                          strokeWidth={3}
+                          strokeWidth={4}
                         />
                         <Line
                           type="monotone"
                           dataKey={"nonbudgeted"}
                           stroke="#53D084"
                           dot={false}
-                          strokeWidth={3}
+                          strokeWidth={4}
                         />
                         {/* <Line
                           type="monotone"
@@ -738,7 +738,7 @@ export default function page() {
                         />
                         <Tooltip />
 
-                        {Object.keys(combinedData[0]).map((key, index) => {
+                        {Object.keys(combinedData && combinedData[0]).map((key, index) => {
                           if (key !== "month" && key !== "name") {
                             return (
                               <Bar
@@ -746,7 +746,8 @@ export default function page() {
                                 dataKey={key}
                                 stackId="a"
                                 fill={statusColors[index % statusColors.length]}
-                                barSize={20}
+                                barSize={40}
+                                
                               />
                             );
                           }
@@ -774,9 +775,10 @@ export default function page() {
                           startAngle={360}
                           endAngle={0}
                           innerRadius={59}
-                          outerRadius={65}
+                          outerRadius={69}
                           fill="#8884d8"
-                          paddingAngle={2}
+                          paddingAngle={5}
+                          cornerRadius={10}
                           dataKey="total"
                         >
                           {totalOverview?.statusData?.map((entry, index) => (
@@ -807,7 +809,7 @@ export default function page() {
                       ))}
                     </div>
                   </div>
-                  <div className="py-10">
+                  <div className="pb-10">
                     <span className="text-[16px] text-[#12263F]">
                       Sourcing methods
                     </span>
@@ -824,9 +826,10 @@ export default function page() {
                           startAngle={360}
                           endAngle={0}
                           innerRadius={59}
-                          outerRadius={65}
+                          outerRadius={69}
                           fill="#8884d8"
-                          paddingAngle={2}
+                          paddingAngle={5}
+                          cornerRadius={10}
                           dataKey="total"
                         >
                           {totalOverview?.sourcingData?.map((entry, index) => (
@@ -905,14 +908,14 @@ export default function page() {
                         dataKey={"budgeted"}
                         stroke="#34AEB3"
                         dot={false}
-                        strokeWidth={3}
+                        strokeWidth={4}
                       />
                       <Line
                         type="monotone"
                         dataKey={"nonbudgeted"}
                         stroke="#53D084"
                         dot={false}
-                        strokeWidth={3}
+                        strokeWidth={4}
                       />
                       <Line
                         type="monotone"
@@ -950,9 +953,10 @@ export default function page() {
                           startAngle={360}
                           endAngle={0}
                           innerRadius={59}
-                          outerRadius={65}
+                          outerRadius={69}
                           fill="#8884d8"
-                          paddingAngle={2}
+                          paddingAngle={5}
+                          cornerRadius={10}
                           dataKey="total"
                         >
                           {paymentOverview?.statusData?.map((entry, index) => (
@@ -1011,7 +1015,7 @@ export default function page() {
                       </div>
                     ))}
                   </div>
-                  <ResponsiveContainer width="100%" height={180}>
+                  <ResponsiveContainer width="100%" height={280}>
                     <LineChart
                       margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                       data={dashboardOverviewData}
@@ -1035,21 +1039,21 @@ export default function page() {
                         dataKey={"tenders"}
                         stroke="#31D5A6"
                         dot={false}
-                        strokeWidth={3}
+                        strokeWidth={4}
                       />
                       <Line
                         type="monotone"
                         dataKey={"contracts"}
                         stroke="#F5B50F"
                         dot={false}
-                        strokeWidth={3}
+                        strokeWidth={4}
                       />
                       <Line
                         type="monotone"
                         dataKey={"purchaseOrders"}
                         stroke="#878FF6"
                         dot={false}
-                        strokeWidth={3}
+                        strokeWidth={4}
                       />
                     </LineChart>
                   </ResponsiveContainer>
@@ -1078,9 +1082,10 @@ export default function page() {
                             startAngle={360}
                             endAngle={0}
                             innerRadius={59}
-                            outerRadius={65}
+                            outerRadius={69}
                             fill="#8884d8"
-                            paddingAngle={2}
+                            paddingAngle={5}
+                            cornerRadius={10}
                             dataKey="total"
                           >
                             {dashboardOverview?.statusData?.tenders?.map((entry, index) => (
@@ -1131,9 +1136,10 @@ export default function page() {
                             startAngle={360}
                             endAngle={0}
                             innerRadius={59}
-                            outerRadius={65}
+                            outerRadius={69}
                             fill="#8884d8"
-                            paddingAngle={2}
+                            paddingAngle={5}
+                            cornerRadius={10}
                             dataKey="total"
                           >
                             {dashboardOverview?.statusData?.contracts?.map((entry, index) => (
@@ -1167,7 +1173,7 @@ export default function page() {
                         Purchase Orders
                       </span>
                     </div>}
-                    <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
+                    {dashboardOverview?.statusData?.purchaseOrders.length > 0 && <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
                       <ResponsiveContainer width="97%" height={140}>
                         <PieChart
                           margin={{
@@ -1184,9 +1190,10 @@ export default function page() {
                             startAngle={360}
                             endAngle={0}
                             innerRadius={59}
-                            outerRadius={65}
+                            outerRadius={69}
                             fill="#8884d8"
-                            paddingAngle={2}
+                            paddingAngle={5}
+                            cornerRadius={10}
                             dataKey="total"
                           >
                             {dashboardOverview?.statusData?.purchaseOrders?.map((entry, index) => (
@@ -1214,7 +1221,7 @@ export default function page() {
                           </div>
                         ))}
                       </div>
-                    </div>
+                    </div>}
                   </div>
                 </div>
               </div>
@@ -1371,7 +1378,7 @@ export default function page() {
                         Budgeted
                       </span>
                       <span className="text-[23px] text-[#12263F]">
-                        <b>{formatAmount((spendOverview?.totals[0]?.total_amount / spendOverview?.budgetData[0]?.value) * 100)}%</b>
+                        <b>{formatAmount(((spendOverview?.totals[0]?.total_amount / spendOverview?.budgetData[0]?.value) * 100).toFixed(2))}%</b>
                       </span>
                       <span className="text-[13px] text-[#12263F]">
                         <b>${formatAmount(spendOverview?.budgetData[0]?.value)}</b>/{formatAmount(spendOverview?.budgetData[1]?.value)}
