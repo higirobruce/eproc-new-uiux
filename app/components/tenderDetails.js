@@ -59,6 +59,7 @@ import {
   CheckIcon,
   LockClosedIcon,
   LockOpenIcon,
+  PencilIcon,
 } from "@heroicons/react/24/solid";
 import Link from "next/link";
 import { AiOutlineFileSync } from "react-icons/ai";
@@ -118,6 +119,7 @@ const TenderDetails = ({
   handleSendInvitation,
   user,
   handleSendEvalApproval,
+  handleEditSubmission,
 }) => {
   const [form] = Form.useForm();
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
@@ -382,6 +384,9 @@ const TenderDetails = ({
   const [otherDocSelected, setOtherDocSelected] = useState(false);
   const [extending, setExtending] = useState(false);
   const [submittingExtensionRe, setSubmittingExtension] = useState(false);
+  const [editingBid, setEditingBid] = useState(false);
+  const [editBid, setEditBid] = useState(false);
+  const [proposalFiles, setProposalFiles] = useState([]);
 
   useEffect(() => {
     let statusCode = getRequestStatusCode(data?.status);
@@ -433,6 +438,42 @@ const TenderDetails = ({
     }
   }, [editContract]);
 
+  // useEffect(() => {
+  //   if (editingBid) updateProposalFiles();
+  // }, [editingBid]);
+
+  async function updateProposalFiles(editBid) {
+    let uid = `rc-upload-${moment().milliseconds()}-1`;
+    let _url = `${url}/file/bidDocs/${encodeURI(editBid?.proposalDocId)}.pdf`;
+    let status = "done";
+    let name = `${editBid?.proposalDocId}`;
+
+    let response = await fetch(_url);
+    let data = await response.blob();
+    getBase64(data).then((res) => {
+      let newFile = new File([data], name, {
+        uid,
+        url: _url,
+        status,
+        name,
+        // type:'pdf'
+      });
+      proposalFiles.push(newFile);
+      setProposalDocId(editBid?.proposalDocId);
+      setProposalFiles(proposalFiles);
+      if (newFile?.name) setProposalSelected(true);
+      setTab(0);
+      setEditingBid(true);
+    });
+  }
+
+  const getBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
   function handleCreateContract(
     vendor,
     tender,
@@ -674,6 +715,10 @@ const TenderDetails = ({
     handleCreateSubmission(submissionData);
   }
 
+  function editSubmission(submissionData) {
+    handleEditSubmission(submissionData, editBid?._id);
+  }
+
   const handleUpload = () => {
     // setSaving(true);
     let _files = [];
@@ -700,7 +745,9 @@ const TenderDetails = ({
           return f?.filename;
         });
 
-        submitSubmissionData(_filenames);
+        editingBid
+          ? submitEditSubmissionData(_filenames)
+          : submitSubmissionData(_filenames);
       })
       .catch((err) => {
         console.log(err);
@@ -734,6 +781,31 @@ const TenderDetails = ({
       deliveryTimeFrameDuration,
     };
     createSubmission(subData);
+  }
+  function submitEditSubmissionData(files) {
+    let subData = {
+      proposalUrls,
+      deliveryDate: deliveryDate || editBid?.deliveryDate,
+      price: price || editBid?.price,
+      currency: currency || editBid?.currency,
+      warranty: warranty || editBid?.warranty,
+      discount: discount || editBid?.discount,
+      status: "pending",
+      comment: comment || editBid?.comment,
+      createdBy: user?._id,
+      tender: data._id,
+      warrantyDuration: warrantyDuration || editBid?.warrantyDuration,
+      bankName: bankName || editBid?.bankName,
+      bankAccountNumber: bankAccountNumber || editBid?.bankAccountNumber,
+      bankAccountName: bankAccountName || editBid?.bankAccountName,
+      proposalDocId: proposalSelected ? proposalDocId : null,
+      otherDocId: otherDocSelected ? otherDocId : null,
+      otherDocIds: files,
+      deliveryTimeFrame: deliveryTimeFrame || editBid?.deliveryTimeFrame,
+      deliveryTimeFrameDuration:
+        deliveryTimeFrameDuration || editBid?.deliveryTimeFrameDuration,
+    };
+    editSubmission(subData, editBid?._id);
   }
 
   function handleSelectBid(bidId, evaluationReportId) {
@@ -830,8 +902,9 @@ const TenderDetails = ({
             <div className="mb-3">
               <label>Bank Name</label>
             </div>
-            <Form.Item name="bankName" noStyle>
+            <Form.Item name="bankName" noStyle initialValue={editBid?.bankName}>
               <Input
+                // defaultValue={editBid?.bankName}
                 required
                 placeholder="ABCX Bank"
                 style={{ width: "100%" }}
@@ -849,8 +922,13 @@ const TenderDetails = ({
             <div className="mb-3">
               <label>Bank Account Name</label>
             </div>
-            <Form.Item name="bankAccountName" noStyle>
+            <Form.Item
+              name="bankAccountName"
+              noStyle
+              initialValue={editBid?.bankAccountName}
+            >
               <Input
+                // defaultValue={editBid?.bankAccountName}
                 required
                 placeholder="John Doe"
                 style={{ width: "100%" }}
@@ -868,8 +946,13 @@ const TenderDetails = ({
             <div className="mb-3">
               <label>Account Number</label>
             </div>
-            <Form.Item name="bankAccountNumber" noStyle>
+            <Form.Item
+              name="bankAccountNumber"
+              noStyle
+              initialValue={editBid?.bankAccountNumber}
+            >
               <Input
+                // defaultValue={editBid?.bankAccountNumber}
                 required
                 placeholder="1892-0092-0900"
                 style={{ width: "100%" }}
@@ -894,6 +977,7 @@ const TenderDetails = ({
             <label> Delivery TimeFrame</label>
           </div>
           <Form.Item
+            initialValue={editBid?.deliveryTimeFrame}
             name="deliveryTimeFrame"
             noStyle
             rules={[
@@ -904,6 +988,8 @@ const TenderDetails = ({
             ]}
           >
             <InputNumber
+              // defaultValue={editBid?.deliveryTimeFrame}
+              // value={editingBid && editBid?.deliveryTimeFrame}
               style={{ width: "100%" }}
               className="h-11 pt-1"
               onChange={(value) => setDeliveryTimeFrame(value)}
@@ -965,6 +1051,7 @@ const TenderDetails = ({
           </div>
           <Form.Item>
             <Form.Item
+              initialValue={editBid?.price}
               name="price"
               noStyle
               rules={[
@@ -975,6 +1062,7 @@ const TenderDetails = ({
               ]}
             >
               <InputNumber
+                // defaultValue={editBid?.price}
                 style={{ width: "100%" }}
                 className="h-11 pt-1"
                 addonBefore={
@@ -1017,8 +1105,9 @@ const TenderDetails = ({
           <div className="mb-2">
             <label> Warranty (where applicable)</label>
           </div>
-          <Form.Item name="warranty" noStyle>
+          <Form.Item name="warranty" noStyle initialValue={editBid?.warranty}>
             <InputNumber
+              // defaultValue={editBid?.warranty}
               style={{ width: "100%" }}
               className="h-11 pt-1"
               addonBefore={
@@ -1053,8 +1142,9 @@ const TenderDetails = ({
           <div className="mb-3">
             <label>Discount (%)</label>
           </div>
-          <Form.Item name="discount">
+          <Form.Item name="discount" initialValue={editBid?.discount}>
             <InputNumber
+              // defaultValue={editBid?.discount}
               style={{ width: "100%" }}
               className="h-11"
               onChange={(value) => setDiscount(value)}
@@ -1090,6 +1180,7 @@ const TenderDetails = ({
             ]}
           >
             <UploadBidDoc
+              files={proposalFiles}
               uuid={proposalDocId}
               setSelected={setProposalSelected}
             />
@@ -1114,6 +1205,7 @@ const TenderDetails = ({
           </div>
           <Form.Item name="comment">
             <Input.TextArea
+              defaultValue={editBid?.comment}
               onChange={(e) => setComment(e.target.value)}
               rows={4}
             />
@@ -4196,30 +4288,51 @@ const TenderDetails = ({
                     </div>
 
                     <div className="bg-white px-5 rounded-xl flex flex-col overflow-y-scroll">
-                      {user?.userType === "VENDOR" &&
+                      {((user?.userType === "VENDOR" &&
                         moment().isBefore(moment(data?.submissionDeadLine)) &&
                         data?.status === "open" &&
-                        !iSubmitted && (
-                          <>
-                            <Form form={form} onFinish={handleUpload}>
-                              <div className="ml-3 mt-5 items-center">
-                                {/* <Divider></Divider> */}
-                                <h6 className="text-[#263238] text-[16px] m-0 p-0">
-                                  Bid Submission
-                                </h6>
+                        !iSubmitted) ||
+                        editingBid) && (
+                        <>
+                          <Form
+                            form={form}
+                            onFinish={handleUpload}
+                            initialValues={{
+                              deliveryTimeFrame: editBid?.deliveryTimeFrame,
+                              currency: editBid?.currency,
+                              warranty: editBid?.warranty,
+                              warrantyDuration: editBid?.warrantyDuration,
+                              discount: editBid?.discount,
+                              comment: editBid?.comment,
+                              deliveryTimeFrameDuration:
+                                editBid?.deliveryTimeFrameDuration,
+                              deliveryTimeFrame: editBid?.deliveryTimeFrame,
+                              price: editBid?.price,
+                              bankName: editBid?.bankName,
+                              bankAccountNumber: editBid?.bankAccountNumber,
+                              bankAccountName: editBid?.bankAccountName,
+                            }}
+                          >
+                            <div className="ml-3 mt-5 items-center">
+                              {/* <Divider></Divider> */}
+                              <h6 className="text-[#263238] text-[16px] m-0 p-0">
+                                Bid Submission
+                              </h6>
 
-                                <div className="gap-10">
-                                  {buildSubmissionForm}
-                                </div>
+                              <div className="gap-10">
+                                {buildSubmissionForm}
                               </div>
-                              <div className="flex flex-row justify-end space-x-1 ml-3 mt-2 mb-3 items-center">
-                                <button
-                                  type="submit"
-                                  className="bg-[#1677FF] py-3 px-6 rounded-lg text-white text-[15px] font-semibold border-none cursor-pointer"
-                                >
-                                  Submit Proposal
-                                </button>
-                                {/* <Form.Item>
+                            </div>
+                            <div className="flex flex-row justify-end space-x-1 ml-3 mt-2 mb-3 items-center">
+                              <button
+                                type="submit"
+                                className="bg-[#1677FF] py-3 px-6 rounded-lg text-white text-[15px] font-semibold border-none cursor-pointer"
+                              >
+                                {editingBid
+                                  ? "Save changed"
+                                  : "Submit Proposal"}
+                              </button>
+                              {/* <Form.Item>
                                   <Button
                                     type="primary"
                                     htmlType="submit"
@@ -4228,10 +4341,10 @@ const TenderDetails = ({
                                     Submit
                                   </Button>
                                 </Form.Item> */}
-                              </div>
-                            </Form>
-                          </>
-                        )}
+                            </div>
+                          </Form>
+                        </>
+                      )}
                     </div>
                   </div>
                 </Spin>
@@ -4899,6 +5012,21 @@ const TenderDetails = ({
                       ?.map((item, key) => {
                         return (
                           <>
+                            {(moment().isBefore(
+                              moment(data?.submissionDeadLine)
+                            ) ||
+                              data?.status === "open") && (
+                              <Button
+                                className="self-end"
+                                type="primary"
+                                onClick={async () => {
+                                  setEditBid(item);
+                                  await updateProposalFiles(item);
+                                }}
+                              >
+                                Edit Bid
+                              </Button>
+                            )}
                             <button
                               className={`cursor-pointer w-full pr-5 mt-4 pt-1 -pb-4 flex justify-evenly items-center border-b-0 border-[#f5f2f2] border-t border-x-0 ${
                                 activeIndex == key

@@ -3,7 +3,8 @@ import React, { useState } from "react";
 import { LoadingOutlined, UploadOutlined } from "@ant-design/icons";
 import { Button, Upload, message, UploadFile, Spin, Tooltip } from "antd";
 
-function UploadBidDoc({ label, uuid, setSelected, iconOnly }) {
+function UploadBidDoc({ label, uuid, setSelected, iconOnly, files }) {
+  // alert(JSON.stringify(files))
   const [messageApi, contextHolder] = message.useMessage();
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
@@ -69,7 +70,7 @@ function UploadBidDoc({ label, uuid, setSelected, iconOnly }) {
   return (
     <>
       {contextHolder}
-      <Upload {...props} headers={{}} maxCount={1} showUploadList={!iconOnly}>
+      <Upload {...props} headers={{}} maxCount={1} showUploadList={!iconOnly} defaultFileList={[...files]}>
         {/* <Button icon={<UploadOutlined />}>{label ? label : "Upload"}</Button> */}
         {iconOnly && (
           <div className="text-grey-500 hover:text-blue-500 cursor-pointer flex flex-row items-center space-x-1">
