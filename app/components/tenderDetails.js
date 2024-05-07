@@ -161,6 +161,8 @@ const TenderDetails = ({
   let [contractStartDate, setContractStartDate] = useState(null);
   let [contractEndDate, setContractEndDate] = useState(null);
 
+  let [saving, setSaving] = useState(false);
+
   let [vendor, setVendor] = useState("");
   let [tendor, setTendor] = useState("");
   let [paymentTerms, setPaymentTerms] = useState("");
@@ -720,7 +722,7 @@ const TenderDetails = ({
   }
 
   const handleUpload = () => {
-    // setSaving(true);
+    setSaving(true);
     let _files = [];
     _files = [...otherFiles];
 
@@ -4326,7 +4328,12 @@ const TenderDetails = ({
                             <div className="flex flex-row justify-end space-x-1 ml-3 mt-2 mb-3 items-center">
                               <button
                                 type="submit"
-                                className="bg-[#1677FF] py-3 px-6 rounded-lg text-white text-[15px] font-semibold border-none cursor-pointer"
+                                disabled={saving}
+                                className={` py-3 px-6 rounded-lg text-white text-[15px] font-semibold border-none ${
+                                  saving
+                                    ? "cursor-not-allowed bg-[#76adfb]"
+                                    : "cursor-pointer bg-[#1677FF]"
+                                }`}
                               >
                                 {editingBid
                                   ? "Save changed"
