@@ -57,6 +57,34 @@ import { isMobile } from "react-device-detect";
 import NotificationComponent from "@/app/hooks/useMobile";
 // import MyPdfViewer from "../common/pdfViewer";
 
+let url = process.env.NEXT_PUBLIC_BKEND_URL;
+let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
+let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
+async function getPoPaidRequests(id, router) {
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
+  const res = await fetch(`${url}/purchaseOrders/paymentsDone/${id}`, {
+    method: "GET",
+    headers: {
+      Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+      token: token,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    if (res.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      router.push("/auth");
+    }
+    // This will activate the closest `error.js` Error Boundary
+    return null;
+    // throw new Error("Failed to fetch data");
+  }
+
+  return res.json();
+}
+
 export default function PurchaseOrders() {
   const { user, login, logout } = useUser();
   // let user = JSON.parse(
@@ -72,7 +100,9 @@ export default function PurchaseOrders() {
   let [pOs, setPOs] = useState(null);
   let [tempPOs, setTempPOs] = useState(null);
   let [po, setPO] = useState(null);
+  let [totalPaid, setTotalPaid] = useState(0);
   let [totalValue, setTotalValue] = useState(0);
+  let [poFullyPaid, setPoFullyPaid] = useState(false);
   let [openViewPO, setOpenViewPO] = useState(false);
   let [startingDelivery, setStartingDelivery] = useState(false);
   let [readyToSign, setReadyToSign] = useState(false);
@@ -96,6 +126,8 @@ export default function PurchaseOrders() {
   let [submitting, setSubmitting] = useState(false);
   let [withdrawing, setWithdrawing] = useState(false);
   let [openWithdrawWarning, setOpenWithdrawWarning] = useState(false);
+  let [openTerminatingWarning, setOpenTerminatingWarning] = useState(false);
+  // let [openTerminatingWarning, setOpenTerminatingWarning] = useState(false);
   const [previewAttachment, setPreviewAttachment] = useState(false);
   const [attachmentId, setAttachmentId] = useState("TOR-id.pdf");
 
@@ -175,6 +207,19 @@ export default function PurchaseOrders() {
     }
   }, [searchText]);
 
+  useEffect(() => {
+    if (po) {
+      getPoPaidRequests(po?._id, router).then((res) => {
+        // setPoVal(res?.poVal);
+        let gross = getPoTotalVal2(po).grossTotal?.toLocaleString();
+        setTotalPaid(res?.totalPaymentVal);
+
+        setPoFullyPaid(gross === res?.totalPaymentVal);
+
+        // console.log("Paid:", res?.totalPaymentVal, "Value:", gross);
+      });
+    }
+  }, [po]);
   function refresh() {
     setDataLoaded(false);
     if (user?.userType === "VENDOR") {
@@ -240,10 +285,12 @@ export default function PurchaseOrders() {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res);
         let { totalPaymentVal, poVal } = res;
 
-        let purchaseOrderStillOpen = poVal > totalPaymentVal;
+        let grossTotal = getPoTotalVal2(po);
+
+        let purchaseOrderStillOpen = grossTotal?.grossTotal > totalPaymentVal;
+        console.log(purchaseOrderStillOpen);
 
         (purchaseOrderStillOpen || poVal == -1) &&
           router.push(`/system/payment-requests/new/${po?._id}`);
@@ -306,6 +353,47 @@ export default function PurchaseOrders() {
     );
   }
 
+  function cancelPOWarning() {
+    return (
+      <Modal
+        title="Are you sure?"
+        open={openTerminatingWarning}
+        onOk={() => {
+          setOpenTerminatingWarning(false);
+        }}
+        onCancel={() => {
+          setOpenTerminatingWarning(false);
+        }}
+        footer={[
+          <Button
+            key="back"
+            onClick={() => {
+              // setOpenViewPO(false);
+              setOpenTerminatingWarning(false);
+            }}
+          >
+            No
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            danger={true}
+            loading={withdrawing}
+            onClick={() => {
+              handleTerminatePo();
+            }}
+          >
+            Yes, terminate the PO
+          </Button>,
+        ]}
+      >
+        Terminatting this PO will inactivate indefinitely. You will need to
+        create a new PO or select a different sourcing method from the related
+        purchase request.
+      </Modal>
+    );
+  }
+
   function viewPOMOdal() {
     return (
       <Modal
@@ -319,18 +407,19 @@ export default function PurchaseOrders() {
         footer={
           !readyToSign
             ? [
-                <Button key="back" onClick={() => setOpenViewPO(false)}>
-                  Cancel
-                </Button>,
-                <Button
-                  key="submit"
-                  type="primary"
-                  onClick={() => setOpenViewPO(false)}
-                >
-                  Ok
-                </Button>,
+                // <Button key="back" onClick={() => setOpenViewPO(false)}>
+                //   Cancel
+                // </Button>,
+                // <Button
+                //   key="submit"
+                //   type="primary"
+                //   onClick={() => setOpenViewPO(false)}
+                // >
+                //   Ok
+                // </Button>,
                 po?.status !== "withdrawn" &&
                   !documentFullySigned(po) &&
+                  !poFullyPaid &&
                   user?.permissions?.canApproveAsPM && (
                     // <Popconfirm
                     //   title="Are you sure? Withdrawing this PO will inactivate indefinitely. You will need to create a new PO or select a different sourcing method from the related purchase request."
@@ -344,6 +433,45 @@ export default function PurchaseOrders() {
                       onClick={() => setOpenWithdrawWarning(true)}
                     >
                       Withdraw
+                    </Button>
+                    // </Popconfirm>
+                  ),
+
+                // documentFullySigned(po) &&
+                //   !poFullyPaid &&
+                //   user?.permissions?.canApproveAsPM && (
+                //     // <Popconfirm
+                //     //   title="Are you sure? Withdrawing this PO will inactivate indefinitely. You will need to create a new PO or select a different sourcing method from the related purchase request."
+                //     //   onConfirm={handleWithdrawPo}
+                //     // >
+                //     <Button
+                //       key="submit"
+                //       type="primary"
+                //       danger={true}
+                //       loading={withdrawing}
+                //       onClick={() => setOpenCancellingWarning(true)}
+                //     >
+                //       Cancel PO
+                //     </Button>
+                //     // </Popconfirm>
+                //   ),
+
+                documentFullySigned(po) &&
+                  !poFullyPaid &&
+                  po?.status !== "terminated" &&
+                  user?.permissions?.canApproveAsPM && (
+                    // <Popconfirm
+                    //   title="Are you sure? Withdrawing this PO will inactivate indefinitely. You will need to create a new PO or select a different sourcing method from the related purchase request."
+                    //   onConfirm={handleWithdrawPo}
+                    // >
+                    <Button
+                      key="submit"
+                      type="primary"
+                      danger={true}
+                      loading={withdrawing}
+                      onClick={() => setOpenTerminatingWarning(true)}
+                    >
+                      Terminate PO
                     </Button>
                     // </Popconfirm>
                   ),
@@ -691,6 +819,38 @@ export default function PurchaseOrders() {
       });
     //call API to sign
   }
+
+  function handleTerminatePo() {
+    setWithdrawing(true);
+
+    let _po = { ...po };
+
+    fetch(`${url}/purchaseOrders/status/${po?._id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        status: "terminated",
+      }),
+    })
+      .then((res) => getResultFromServer(res))
+      .then((res) => {
+        _po.status = "terminated";
+        setPO(_po);
+        // setSignatories([]);
+        // setSections([{ title: "Set section title", body: "" }]);
+        // setPO(res);
+        setOpenViewPO(false);
+        setOpenTerminatingWarning(false);
+        setWithdrawing(false);
+        refresh();
+      });
+    //call API to sign
+  }
+
   function getPoTotalVal() {
     let t = 0;
     let tax = 0;
@@ -1098,6 +1258,7 @@ export default function PurchaseOrders() {
         <div className="flex flex-col transition-opacity ease-in-out duration-1000 flex-1 space-y-6 mt-6 h-screen pb-10 px-4">
           {viewPOMOdal()}
           {withdrawPOWarning()}
+          {cancelPOWarning()}
 
           {previewAttachmentModal()}
           {/* <Row className="flex flex-col custom-sticky space-y-2 bg-white px-10 py-3 shadow">
@@ -1293,22 +1454,29 @@ export default function PurchaseOrders() {
                                 ))}
                           </p>
                         </div>
-                        {documentFullySigned(po) && (
-                          <div>
-                            <div className="bg-[#D2FBD0] rounded-xl text-[#0D4A26] text-[14px] font-medium px-3 py-1">
-                              Signed
+                        {documentFullySigned(po) &&
+                          (po?.status == "signed" ||
+                            po?.status == "started") && (
+                            <div>
+                              <div className="bg-[#D2FBD0] rounded-xl text-[#0D4A26] text-[14px] font-medium px-3 py-1">
+                                Signed
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
 
-                        {!documentFullySigned(po) && (
+                        {(!documentFullySigned(po) ||
+                          (po?.status !== "signed" &&
+                            po?.status !== "started")) && (
                           <div>
                             <Tooltip placement="top" title={po?.status}>
                               {/* <IoCheckmarkOutline className="text-[#00CE82]" /> */}
                               <div
                                 className={`
                               ${
-                                po?.status == "withdrawn"
+                                po?.status == "withdrawn" ||
+                                po?.status == "cancelled" ||
+                                po?.status == "terminated" ||
+                                po?.status == "archived"
                                   ? "bg-[#ef554d]"
                                   : po?.status == "signed" ||
                                     po?.status == "started"
@@ -1326,9 +1494,15 @@ export default function PurchaseOrders() {
                         )}
 
                         <button
-                          disabled={!documentFullySigned(po)}
+                          disabled={
+                            !documentFullySigned(po) ||
+                            (po?.status !== "signed" &&
+                              po?.status !== "started")
+                          }
                           className={`${
-                            !documentFullySigned(po)
+                            !documentFullySigned(po) ||
+                            (po?.status !== "signed" &&
+                              po?.status !== "started")
                               ? `bg-gray-50 text-gray-400`
                               : `bg-[#1677FF] text-white cursor-pointer`
                           } border-none px-3 py-2 rounded-lg text-[13px] font-semibold`}

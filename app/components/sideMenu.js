@@ -11,6 +11,7 @@ import {
   SolutionOutlined,
   UsergroupAddOutlined,
   UserOutlined,
+  DatabaseOutlined
 } from "@ant-design/icons";
 import { Menu } from "antd";
 import { useRouter, usePathname } from "next/navigation";
@@ -126,9 +127,6 @@ const SideMenu = ({ setScreen, screen, user }) => {
         ),
       });
 
-      if (user?.permissions?.canViewPurchaseOrders) {
-      }
-
       if (user?.permissions?.canViewVendors) {
         _items.push({
           label: "Vendors",
@@ -157,6 +155,25 @@ const SideMenu = ({ setScreen, screen, user }) => {
               size={28}
               className={`text-[${
                 current == `system/dashboard` ? `#1677FF` : `#95A1B3`
+              }]`}
+            />
+          ),
+        });
+      }
+
+
+      if (user?.permissions?.canApproveAsPM) {
+        _items.push({
+          type: "divider",
+        });
+        _items.push({
+          label: "Master data",
+          key: "system/master-data",
+          icon: (
+            <DatabaseOutlined
+              size={28}
+              className={`text-[${
+                current == `system/tenders` ? `#1677FF` : `#95A1B3`
               }]`}
             />
           ),
