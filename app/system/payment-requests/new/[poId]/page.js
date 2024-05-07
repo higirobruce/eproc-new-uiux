@@ -247,10 +247,11 @@ export default function NewPaymentRequest({ params }) {
       })
       .catch((err) => {
         console.log(err);
-      })
-      .finally(() => {
         setSubmitting(false);
-      });
+      })
+      // .finally(() => {
+      //   setSubmitting(false);
+      // });
   };
 
   return (
@@ -806,11 +807,13 @@ export default function NewPaymentRequest({ params }) {
               <button
                 onClick={() => {
                   if (files?.length <= 0)
-                    message.error("Please provide atleast one supporting document!");
+                    message.error(
+                      "Please provide atleast one supporting document!"
+                    );
                   form.validateFields().then(() => {
                     if (files?.length <= 0)
                       message.error(
-                        "Please provid atlease one supporting document!"
+                        "Please provide at least one supporting document!"
                       );
                     else {
                       setSubmitting(true);
@@ -819,13 +822,36 @@ export default function NewPaymentRequest({ params }) {
                   });
                 }}
                 disabled={submitting}
-                className="flex item-center cursor-pointer border-none text-[16px] text-white gap-x-4 bg-[#0065DD] rounded-lg py-3 px-6"
+                className={`flex item-center cursor-pointer border-none text-[16px] text-white gap-x-4 ${submitting?'bg-[#8dc0fe]':'bg-[#0065DD]'} rounded-lg py-3 px-6`}
               >
                 <SaveOutlined className="font-[19px]" />
                 Submit
               </button>
-        </div>
-        {/* <div className="flex w-full justify-end items-end self-end">
+              {/* <Button
+                type="primary"
+                loading={submitting}
+                onClick={() => {
+                  if (files?.length <= 0)
+                    message.error(
+                      "Please provide atleast one supporting document!"
+                    );
+                  form.validateFields().then(() => {
+                    if (files?.length <= 0)
+                      message.error(
+                        "Please provide at least one supporting document!"
+                      );
+                    else {
+                      setSubmitting(true);
+                      handleUpload();
+                    }
+                  });
+                }}
+              >
+                <SaveOutlined className="font-[19px]" />
+                Submit
+              </Button> */}
+            </div>
+            {/* <div className="flex w-full justify-end items-end self-end">
           <button
             onClick={() => {
               if (files?.length <= 0)
@@ -848,10 +874,9 @@ export default function NewPaymentRequest({ params }) {
             Save
           </button>
         </div> */}
-        
+          </div>
+        </div>
       </div>
-    </div>
-    </div>
     </motion.div>
   );
 }
