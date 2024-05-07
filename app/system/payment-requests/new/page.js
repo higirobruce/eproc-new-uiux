@@ -704,23 +704,29 @@ export default function NewPaymentRequest() {
             <div className="flex w-full mt-10">
               <button
                 onClick={() => {
-                  if (files?.length <= 0)
+                  setSubmitting(true);
+                  if (files?.length <= 0) {
                     message.error(
                       "Please provide atleast one supporting document!"
                     );
+                    setSubmitting(false);
+                  }
                   form.validateFields().then(() => {
-                    if (files?.length <= 0)
+                    if (files?.length <= 0) {
                       message.error(
                         "Please provid atlease one supporting document!"
                       );
-                    else {
+                      setSubmitting(false);
+                    } else {
                       setSubmitting(true);
                       handleUpload();
                     }
                   });
                 }}
                 disabled={submitting}
-                className="flex item-center cursor-pointer border-none text-[16px] text-white gap-x-4 bg-[#0065DD] rounded-lg py-3 px-6"
+                className={`flex item-center cursor-pointer border-none text-[16px] text-white gap-x-4 ${
+                  submitting ? "bg-[#9fcaff] " : "bg-[#0065DD] "
+                } rounded-lg py-3 px-6`}
               >
                 <SaveOutlined className="font-[19px]" />
                 Submit
