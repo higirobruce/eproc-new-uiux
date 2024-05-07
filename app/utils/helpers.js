@@ -18,6 +18,6 @@ export const formatAmount = (value) => {
   } else if (value >= 1000) {
     return Math.round(value / 1000) + "K";
   } else {
-    return value.toString();
+    return value;
   }
 };
