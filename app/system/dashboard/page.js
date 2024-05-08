@@ -12,7 +12,7 @@ import {
 import RequestStats from "@/app/components/requestsStatistics";
 import RequestsByDep from "@/app/components/requestsByDep";
 import RequestsByStatus from "@/app/components/requestsByStatus";
-import { Divider, message, Spin } from "antd";
+import { Divider, message, Spin, Select } from "antd";
 import TendersStats from "@/app/components/tendersStatistics";
 import TendersByDep from "@/app/components/tendersByDep";
 import { LoadingOutlined } from "@ant-design/icons";
@@ -56,6 +56,9 @@ export default function page() {
   const [requests, setRequests] = useState([]);
   const [tenders, setTenders] = useState([]);
   const [contracts, setContracts] = useState([]);
+  const [payments, setPayments] = useState([]);
+  const [year, setYear] = useState(new Date().getFullYear())
+  const [internalUsers, setInternalUsers] = useState([]);
   const [purchaseOrders, setPurchaseOrders] = useState([]);
   const [vendors, setVendors] = useState([]);
   const [budgeted, setBudgeted] = useState(0);
@@ -78,145 +81,181 @@ export default function page() {
   const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
-    loadServiceCategories()
-      .then((res) => getResultFromServer(res))
-      .then((res) => setServiceCategories(res))
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Something happened! Please try again.",
-        });
-      });
-
-    loadTenders()
-      .then((res) => getResultFromServer(res))
-      .then((res) => {
-        setTenders(res);
-        loadAvgBidsPerTender()
-          .then((res) => getResultFromServer(res))
-          .then((res) => {
-            // alert(JSON.stringify(res))
-            setAvgBids(Math.round(res[0]?.avg * 100) / 100);
+    try {
+      setDataLoaded(true);
+      loadServiceCategories()
+        .then((res) => getResultFromServer(res))
+        .then((res) => setServiceCategories(res))
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
           });
-        loadTendersStats()
-          .then((res) => getResultFromServer(res))
-          .then((res) => {
-            setOpenTenders(Math.round((res?.open / res?.total) * 100) / 100);
-            setClosedTenders(
-              Math.round((res?.closed / res?.total) * 100) / 100
-            );
+        });
+  
+      loadTenders()
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          setTenders(res);
+          loadAvgBidsPerTender()
+            .then((res) => getResultFromServer(res))
+            .then((res) => {
+              // alert(JSON.stringify(res))
+              setAvgBids(Math.round(res[0]?.avg * 100) / 100);
+            });
+          loadTendersStats()
+            .then((res) => getResultFromServer(res))
+            .then((res) => {
+              setOpenTenders(Math.round((res?.open / res?.total) * 100) / 100);
+              setClosedTenders(
+                Math.round((res?.closed / res?.total) * 100) / 100
+              );
+            });
+        })
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
           });
-      })
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Something happened! Please try again.",
         });
-      });
-
-    loadRequests()
-      .then((res) => getResultFromServer(res))
-      .then((res) => {
-        setRequests(res);
-        loadRequestsByBudgetStatus()
-          .then((res) => getResultFromServer(res))
-          .then((resBudg) => {
-            let _budgeted = resBudg?.filter((r) => r._id === true);
-            let _unbudgeted = resBudg?.filter((r) => r._id === false);
-            let _total = _budgeted[0]?.count + _unbudgeted[0]?.count;
-            setBudgeted(Math.round((_budgeted[0]?.count / _total) * 100));
-            setUnbudgeted(Math.round((_unbudgeted[0]?.count / _total) * 100));
-            setDataLoaded(true);
+  
+      loadRequests()
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          setRequests(res);
+          loadRequestsByBudgetStatus()
+            .then((res) => getResultFromServer(res))
+            .then((resBudg) => {
+              let _budgeted = resBudg?.filter((r) => r._id === true);
+              let _unbudgeted = resBudg?.filter((r) => r._id === false);
+              let _total = _budgeted[0]?.count + _unbudgeted[0]?.count;
+              setBudgeted(Math.round((_budgeted[0]?.count / _total) * 100));
+              setUnbudgeted(Math.round((_unbudgeted[0]?.count / _total) * 100));
+              setDataLoaded(true);
+            });
+        })
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
           });
-      })
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Something happened! Please try again.",
         });
-      });
+  
+      loadContracts()
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          setContracts(res);
+        })
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
+          });
+        });
+  
+      loadPurchaseOrders()
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          setPurchaseOrders(res?.data);
+        })
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
+          });
+        });
+  
+      loadVendors()
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          setVendors(res);
+        })
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
+          });
+        });
+  
+      
+      loadRequestOverview()
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          setTotalOverview(res);
+        })
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
+          });
+        });
+  
+      loadPayment()
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          setPayments(res)
+        })
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
+          });
+        });
+  
+      loadInternalUsers()
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          setInternalUsers(res)
+        })
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
+          });
+        })
+  
+      loadPaymentOverview()
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          setPaymentOverview(res);
+        })
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
+          });
+        });
+      loadDashboardOverview()
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          setDashboardOverview(res);
+        })
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
+          });
+        });
+      loadSpendTrackingOverview()
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          setSpendOverview(res)
+        })
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
+          });
+        });
 
-    loadContracts()
-      .then((res) => getResultFromServer(res))
-      .then((res) => {
-        setContracts(res);
-      })
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Something happened! Please try again.",
-        });
+      setDataLoaded(false)
+    } catch (error) {
+      messageApi.open({
+        type: "error",
+        content: "Something happened! Please try again.",
       });
-
-    loadPurchaseOrders()
-      .then((res) => getResultFromServer(res))
-      .then((res) => {
-        setPurchaseOrders(res?.data);
-      })
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Something happened! Please try again.",
-        });
-      });
-
-    loadVendors()
-      .then((res) => getResultFromServer(res))
-      .then((res) => {
-        setVendors(res);
-      })
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Something happened! Please try again.",
-        });
-      });
-    loadRequestOverview()
-      .then((res) => getResultFromServer(res))
-      .then((res) => {
-        setTotalOverview(res);
-      })
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Something happened! Please try again.",
-        });
-      });
-    loadPaymentOverview()
-      .then((res) => getResultFromServer(res))
-      .then((res) => {
-        setPaymentOverview(res);
-      })
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Something happened! Please try again.",
-        });
-      });
-    loadDashboardOverview()
-      .then((res) => getResultFromServer(res))
-      .then((res) => {
-        setDashboardOverview(res);
-      })
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Something happened! Please try again.",
-        });
-      });
-    loadSpendTrackingOverview()
-      .then((res) => getResultFromServer(res))
-      .then((res) => {
-        setSpendOverview(res)
-      })
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Something happened! Please try again.",
-        });
-      });
-    
-  }, []);
+    }
+  }, [year]);
 
   async function loadTenders() {
     return fetch(`${url}/tenders/`, {
@@ -253,6 +292,28 @@ export default function page() {
 
   async function loadPurchaseOrders() {
     return fetch(`${url}/purchaseOrders/`, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    });
+  }
+
+  async function loadPayment() {
+    return fetch(`${url}/paymentRequests`, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    });
+  }
+
+  async function loadInternalUsers() {
+    return fetch(`${url}/users`, {
       method: "GET",
       headers: {
         Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
@@ -318,7 +379,7 @@ export default function page() {
   }
 
   async function loadRequestOverview() {
-    return fetch(`${url}/requests/totalOverview`, {
+    return fetch(`${url}/requests/totalOverview?year=${year}`, {
       method: "GET",
       headers: {
         Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
@@ -329,7 +390,7 @@ export default function page() {
   }
 
   async function loadPaymentOverview() {
-    return fetch(`${url}/paymentRequests/totalOverview`, {
+    return fetch(`${url}/paymentRequests/totalOverview?year=${year}`, {
       method: "GET",
       headers: {
         Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
@@ -340,7 +401,7 @@ export default function page() {
   }
 
   async function loadDashboardOverview() {
-    return fetch(`${url}/dashboards`, {
+    return fetch(`${url}/dashboards?year=${year}`, {
       method: "GET",
       headers: {
         Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
@@ -351,7 +412,7 @@ export default function page() {
   }
 
   async function loadSpendTrackingOverview() {
-    return fetch(`${url}/paymentRequests/spendTracking`, {
+    return fetch(`${url}/paymentRequests/spendTracking?year=${year}`, {
       method: "GET",
       headers: {
         Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
@@ -450,9 +511,9 @@ export default function page() {
     { name: "Group B", value: 300 },
   ];
 
-  const statusColors = ["#27AFB8", "#53BAA1", "#237396"];
+  const statusColors = ["#7B2CBF", "#E76F51", "#277DA1", "#1677FF", "#E76F51"];
 
-  const COLORS = ["#2C7BE5", "#D2DDEC"];
+  const COLORS = ["#14445C", "#F3B700"];
   const COLORS_OVERVIEW = ["#878FF6", "#dfe1fc", "#b3b8ff"];
 
   const CustomYAxisTick = ({ x, y, payload }) => (
@@ -559,6 +620,18 @@ export default function page() {
     return result;
   }
 
+  function generateYearsArray() {
+    const currentYear = new Date().getFullYear();
+    const startYear = 2023;
+    const yearsArray = [];
+
+    for (let year = startYear; year <= currentYear; year++) {
+        yearsArray.push({value: year, label: `${year}`});
+    }
+
+    return yearsArray;
+  }
+
   const dashboardOverviewData = transformData(dashboardOverview.data);
 
   return (
@@ -567,16 +640,41 @@ export default function page() {
       {contextHolder}
 
       {dataLoaded ? (
-        <div className="request mr-6 bg-white h-[calc(100vh-81px)] rounded-lg mb-10 px-5 overflow-y-auto">
-          <div className="mt-5 flex justify-between w-full">
+        <div className="request mr-6 mb-10 px-5 mt-5">
+          {/* <div className="mt-5 flex justify-between w-full">
             <div>
-              {/* <small className="text-[#97ABCA] text-[10px]">Overview</small> */}
               <h5 className="text-[#12263F] text-[22px] mb-2 mx-0 mt-0">
                 Dashboards
               </h5>
             </div>
+          </div> */}
+          <div className="grid grid-cols-7 gap-x-3 my-4">
+            {[
+              { name: "Purchase request", value: requests?.length, color: '#4B59D4' },
+              { name: "Payment request", value: payments?.length, color: '#7EC2C6' },
+              { name: "Tenders", value: tenders?.length, color: '#5A58CB' },
+              { name: "Contract", value: contracts?.length, color: '#679AF3' },
+              { name: "Purchase Orders", value: purchaseOrders?.length, color: '#E4C1A0' },
+              { name: "Vendors", value: vendors?.length, color: '#6A76D7' },
+              { name: "Internal Users", value: internalUsers?.length, color: '#D25C8D' },
+            ].map((item, key) => (
+              <div className="flex gap-x-4 bg-[#FFF] py-3 px-4 rounded-lg">
+                {/* <div className={`border-l-0 border-3 border-solid border-[${item.color}] rounded-xxl`} /> */}
+                <div className="flex flex-grow flex-col gap-y-2">
+                  <div className="w-full flex justify-between">
+                    <h4 className="mt-2 mb-0 text-[#040518]">{item.value}</h4>
+                    <div className={`flex justify-center items-center bg-[${item?.color + '22'}] rounded-lg p-2.5`}>
+                      <DocumentIcon color={item.color} className={`h-4 w-4 text-{${item.color}}`} />
+                    </div>
+                  </div>
+                  <small key={key} className="text-[#505152] font-medium">
+                    {item.name}
+                  </small>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="bg-white py-3 rounded my-1">
+          <div className="bg-white rounded-lg p-3 my-1">
             <div className="flex items-center gap-x-14 px-5 bg-[#F5F5F5]">
               <button
                 className={`bg-transparent py-3 my-3 ${
@@ -610,38 +708,21 @@ export default function page() {
               </button>
             </div>
           </div>
+          <div className="flex justify-end mt-4 mr-1">
+            <Select
+              defaultValue={year}
+              style={{ width: 120 }}
+              size="large"
+              className="border-0"
+              onChange={(value) => setYear(value)}
+              options={generateYearsArray()}
+            />
+          </div>
           {tab == 0 ? (
-            <>
-              <div className="grid grid-cols-7 gap-x-3 mx-2 my-4">
-                {[
-                  { name: "Purchase request", value: "12,400", color: '#4B59D4' },
-                  { name: "Payment request", value: "22,560,000", color: '#7EC2C6' },
-                  { name: "Tenders", value: "120", color: '#5A58CB' },
-                  { name: "Contract", value: "46", color: '#679AF3' },
-                  { name: "Purchase Orders", value: "88", color: '#E4C1A0' },
-                  { name: "Vendors", value: "33", color: '#6A76D7' },
-                  { name: "Internal Users", value: "11", color: '#D25C8D' },
-                ].map((item, key) => (
-                  <div className="flex gap-x-4 bg-[#EFF6FFAA] py-3 px-2 rounded">
-                    {/* <div className={`border-l-0 border-3 border-solid border-[${item.color}] rounded-xxl`} /> */}
-                    <div className="flex flex-grow flex-col gap-y-2">
-                      <div className="w-full flex justify-between">
-                        <small key={key} className="text-[#505152] font-medium">
-                          {item.name}
-                        </small>
-                        <div className={`flex justify-center items-center bg-[${item?.color + '22'}] rounded-lg p-2.5`}>
-                          <DocumentIcon color={item.color} className={`h-4 w-4 text-{${item.color}}`} />
-                        </div>
-                      </div>
-                      <h4 className="mt-2 mb-0 text-[#040518]">{item.value}</h4>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
+            <div className="payment-request bg-white h-[calc(100vh-310px)] pb-10 rounded-lg mt-3 overflow-y-auto px-5 py-3">
               {/* Purchase Request Graph Mapping */}
 
-              <div className="grid grid-cols-3 gap-x-10 mt-5 px-4 items-start">
+              <div className="grid grid-cols-3 gap-x-10 px-4 items-start">
                 <div className="col-span-2 py-8">
                   <span className="text-[17px] font-semibold text-[#12263F]">
                     Purchase Request
@@ -689,14 +770,14 @@ export default function page() {
                         <Line
                           type="monotone"
                           dataKey={"budgeted"}
-                          stroke="#34AEB3"
+                          stroke="#E76F51"
                           dot={false}
                           strokeWidth={4}
                         />
                         <Line
                           type="monotone"
                           dataKey={"nonbudgeted"}
-                          stroke="#53D084"
+                          stroke="#F3B700"
                           dot={false}
                           strokeWidth={4}
                         />
@@ -738,7 +819,7 @@ export default function page() {
                         />
                         <Tooltip />
 
-                        {Object.keys(combinedData && combinedData[0]).map((key, index) => {
+                        {Object?.keys(combinedData && combinedData[0]).map((key, index) => {
                           if (key !== "month" && key !== "name") {
                             return (
                               <Bar
@@ -784,7 +865,7 @@ export default function page() {
                           {totalOverview?.statusData?.map((entry, index) => (
                             <Cell
                               key={`cell-${index}`}
-                              fill={["#27AFB8", "#53BAA1", "#237396"][index]}
+                              fill={["#0B7A75", "#277DA1", "#FFF1D0"][index]}
                             />
                           ))}
                         </Pie>
@@ -796,7 +877,7 @@ export default function page() {
                         <div className="flex items-center gap-x-2">
                           <div
                             className={`w-2 h-2 rounded-full bg-[${
-                              ["#27AFB8", "#53BAA1", "#237396"][key]
+                              ["#0B7A75", "#277DA1", "#FFF1D0"][key]
                             }]`}
                           />
                           <span className="text-[13px] text-[#6C757D]">
@@ -835,7 +916,7 @@ export default function page() {
                           {totalOverview?.sourcingData?.map((entry, index) => (
                             <Cell
                               key={`cell-${index}`}
-                              fill={["#27AFB8", "#53BAA1", "#237396"][index]}
+                              fill={["#0B7A75", "#FFF1D0", "#BC4749"][index]}
                             />
                           ))}
                         </Pie>
@@ -847,7 +928,7 @@ export default function page() {
                         <div className="flex items-center gap-x-2">
                           <div
                             className={`w-1.5 h-1.5 rounded-full bg-[${
-                              ["#237396", "#53BAA1", "#D2DDEC"][key]
+                              ["#0B7A75", "#FFF1D0", "#BC4749"][key]
                             }]`}
                           />
                           <span className="text-[13px] text-[#6C757D]">
@@ -962,7 +1043,7 @@ export default function page() {
                           {paymentOverview?.statusData?.map((entry, index) => (
                             <Cell
                               key={`cell-${index}`}
-                              fill={["#27AFB8", "#53BAA1", "#237396"][index]}
+                              fill={["#BC4749", "#53BAA1", "#237396"][index]}
                             />
                           ))}
                         </Pie>
@@ -974,7 +1055,7 @@ export default function page() {
                         <div className="flex items-center gap-x-2">
                           <div
                             className={`w-2 h-2 rounded-full bg-[${
-                              ["#27AFB8", "#53BAA1", "#237396"][key]
+                              ["#BC4749", "#53BAA1", "#237396"][key]
                             }]`}
                           />
                           <span className="text-[13px] text-[#6C757D]">
@@ -1083,7 +1164,7 @@ export default function page() {
                             endAngle={0}
                             innerRadius={59}
                             outerRadius={69}
-                            fill="#8884d8"
+                            fill="#31D5A6"
                             paddingAngle={5}
                             cornerRadius={10}
                             dataKey="total"
@@ -1091,7 +1172,7 @@ export default function page() {
                             {dashboardOverview?.statusData?.tenders?.map((entry, index) => (
                               <Cell
                                 key={`cell-${index}`}
-                                fill={["#27AFB8", "#53BAA1", "#237396"][index]}
+                                fill={["#F3B700", "#0065DD", "#7B2CBF"][index]}
                               />
                             ))}
                           </Pie>
@@ -1102,7 +1183,7 @@ export default function page() {
                         {dashboardOverview?.statusData?.tenders?.map((item, key) => (
                           <div className="flex items-center gap-x-2">
                             <div
-                              className={`w-1.5 h-1.5 rounded-full bg-[${["#27AFB8", "#53BAA1", "#237396"][key]}]`}
+                              className={`w-1.5 h-1.5 rounded-full bg-[${["#F3B700", "#0065DD", "#7B2CBF"][key]}]`}
                             />
                             <span className="text-[13px] text-[#6C757D]">
                               {item?._id}
@@ -1137,7 +1218,7 @@ export default function page() {
                             endAngle={0}
                             innerRadius={59}
                             outerRadius={69}
-                            fill="#8884d8"
+                            fill="#F5B50F"
                             paddingAngle={5}
                             cornerRadius={10}
                             dataKey="total"
@@ -1145,7 +1226,7 @@ export default function page() {
                             {dashboardOverview?.statusData?.contracts?.map((entry, index) => (
                               <Cell
                                 key={`cell-${index}`}
-                                fill={["#27AFB8", "#53BAA1", "#237396"][index]}
+                                fill={["#F3B700", "#0065DD", "#7B2CBF"][index]}
                               />
                             ))}
                           </Pie>
@@ -1156,7 +1237,7 @@ export default function page() {
                         {dashboardOverview?.statusData?.contracts?.map((item, key) => (
                           <div className="flex items-center gap-x-2">
                             <div
-                              className={`w-1.5 h-1.5 rounded-full bg-[${["#27AFB8", "#53BAA1", "#237396"][key]}]`}
+                              className={`w-1.5 h-1.5 rounded-full bg-[${["#F3B700", "#0065DD", "#7B2CBF"][key]}]`}
                             />
                             <span className="text-[13px] text-[#6C757D]">
                               {item?._id}
@@ -1191,7 +1272,7 @@ export default function page() {
                             endAngle={0}
                             innerRadius={59}
                             outerRadius={69}
-                            fill="#8884d8"
+                            fill="#878FF6"
                             paddingAngle={5}
                             cornerRadius={10}
                             dataKey="total"
@@ -1199,7 +1280,7 @@ export default function page() {
                             {dashboardOverview?.statusData?.purchaseOrders?.map((entry, index) => (
                               <Cell
                                 key={`cell-${index}`}
-                                fill={["#27AFB8", "#53BAA1", "#237396"][index]}
+                                fill={["#F3B700", "#0065DD", "#7B2CBF"][index]}
                               />
                             ))}
                           </Pie>
@@ -1210,7 +1291,7 @@ export default function page() {
                         {dashboardOverview?.statusData?.purchaseOrders?.map((item, key) => (
                           <div className="flex items-center gap-x-2">
                             <div
-                              className={`w-1.5 h-1.5 rounded-full bg-[${["#27AFB8", "#53BAA1", "#237396"][key]}]`}
+                              className={`w-1.5 h-1.5 rounded-full bg-[${["#F3B700", "#0065DD", "#7B2CBF"][key]}]`}
                             />
                             <span className="text-[13px] text-[#6C757D]">
                               {item?._id}
@@ -1225,9 +1306,9 @@ export default function page() {
                   </div>
                 </div>
               </div>
-            </>
+            </div>
           ) : tab == 1 ? (
-            <>
+            <div className="payment-request bg-white h-[calc(100vh-310px)] pb-10 rounded-lg mt-3 overflow-y-auto px-5 py-3">
               <div className="grid grid-cols-7 gap-x-8 bg-[#F9FAFD] p-4">
                 <div className="col-span-5">
                   <span className="text-[16px] text-[#12263F]">
@@ -1251,7 +1332,7 @@ export default function page() {
                       </div>
                     </div>
                   </div>
-                  <ResponsiveContainer width="100%" height={260}>
+                  <ResponsiveContainer width="100%" height={360}>
                     <BarChart
                       data={spendOverview?.data}
                       margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
@@ -1283,14 +1364,14 @@ export default function page() {
                       <Bar
                         yAxisId="left"
                         dataKey="requests"
-                        fill="#2C7BE5"
+                        fill="#277DA1"
                         barSize={20}
                         radius={0}
                       />
                       <Bar
                         yAxisId="right"
                         dataKey="total_paid"
-                        fill="#D2DDEC"
+                        fill="#4C956C"
                         barSize={20}
                         radius={0}
                       />
@@ -1408,7 +1489,7 @@ export default function page() {
                   </div>
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart
-                      data={departmentExpanditure}
+                      data={dashboardOverview?.departmentExpanditure}
                       margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                     >
                       <XAxis
@@ -1426,16 +1507,16 @@ export default function page() {
                       />
                       <Tooltip />
                       <Bar
-                        dataKey="value"
+                        dataKey="budgeted"
                         stackId="a"
-                        fill="#6786F5"
+                        fill="#277DA1"
                         barSize={20}
                         radius={0}
                       />
                       <Bar
-                        dataKey="current"
+                        dataKey="nonBudgeted"
                         stackId="a"
-                        fill="#D2DDEC"
+                        fill="#FFF1D0"
                         barSize={20}
                         radius={0}
                       />
@@ -1443,10 +1524,10 @@ export default function page() {
                   </ResponsiveContainer>
                 </div>
               </div>
-            </>
+            </div>
           ) : (
-            <>
-              <div className="grid grid-cols-5 gap-x-8 bg-[#F9FAFD] py-4 my-4">
+            <div className="payment-request bg-white h-[calc(100vh-310px)] pb-10 rounded-lg mt-3 overflow-y-auto px-5 py-3">
+              <div className="grid grid-cols-5 gap-x-8 bg-[#F9FAFD] py-4 px-3 my-4">
                 <div className="col-span-4">
                   <span className="text-[16px] text-[#12263F]">
                     Expense Planning
@@ -1614,7 +1695,7 @@ export default function page() {
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-            </>
+            </div>
           )}
 
           {/* <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4 mr-6 my-5">
