@@ -4336,7 +4336,7 @@ const TenderDetails = ({
                                 }`}
                               >
                                 {editingBid
-                                  ? "Save changed"
+                                  ? "Save changes"
                                   : "Submit Proposal"}
                               </button>
                               {/* <Form.Item>
