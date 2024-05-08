@@ -70,7 +70,8 @@ export default function page() {
   const [paymentOverview, setPaymentOverview] = useState("");
   const [dashboardOverview, setDashboardOverview] = useState([]);
   const [spendOverview, setSpendOverview] = useState("")
-  const [serviceCategories, setServiceCategories] = useState([]);
+  const [expenseOverview, setExpenseOverview] = useState([]);
+  const [serviceCategories, setServiceCategories] = useState("");
   const router = useRouter();
   const [tab, setTab] = useState(0);
 
@@ -247,7 +248,17 @@ export default function page() {
             content: "Something happened! Please try again.",
           });
         });
-
+      loadExpensePlanning()
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          setExpenseOverview(res)
+        })
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
+          });
+        });
       setDataLoaded(false)
     } catch (error) {
       messageApi.open({
@@ -422,6 +433,17 @@ export default function page() {
     });
   }
 
+  async function loadExpensePlanning() {
+    return fetch(`${url}/paymentRequests/expensePlanning?year=${year}`, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    });
+  }
+
   function getResultFromServer(res) {
     if (res.status === 401) {
       localStorage.removeItem("token");
@@ -466,43 +488,36 @@ export default function page() {
       name: "JAN",
       value: 4000,
       current: 2400,
-      amt: 2400,
     },
     {
       name: "FEB",
       value: 3000,
       current: 1398,
-      amt: 2210,
     },
     {
       name: "MAR",
       value: 2000,
       current: 9800,
-      amt: 2290,
     },
     {
       name: "APR",
       value: 2780,
       current: 3908,
-      amt: 2000,
     },
     {
       name: "MAY",
       value: 1890,
       current: 4800,
-      amt: 2181,
     },
     {
       name: "JUN",
       value: 2390,
       current: 3800,
-      amt: 2500,
     },
     {
       name: "JULY",
       value: 3490,
       current: 4300,
-      amt: 2100,
     },
   ];
 
@@ -1070,7 +1085,7 @@ export default function page() {
                   </div>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-x-10 mt-5 px-4 items-start">
+              <div className="grid grid-cols-3 gap-x-10 mt-5 pb-20 px-4 items-start">
                 <div className="col-span-2 py-8">
                   <span className="text-[14px] font-semibold text-[#12263F]">
                     PO, Contracts & Tenders
@@ -1420,7 +1435,7 @@ export default function page() {
                   </div>
                 </div>
               </div>
-              <div className="grid grid-cols-3 space-x-4 mt-5">
+              <div className="grid grid-cols-3 space-x-4 pb-20 mt-5">
                 <div className="col-span-1 bg-[#F9FAFD] flex flex-col justify-between">
                   <div className="m-5">
                     <span className="text-[16px] text-[#12263F]">
@@ -1526,7 +1541,7 @@ export default function page() {
               </div>
             </div>
           ) : (
-            <div className="payment-request bg-white h-[calc(100vh-310px)] pb-10 rounded-lg mt-3 overflow-y-auto px-5 py-3">
+            <div className="payment-request bg-white h-[calc(100vh-310px)] rounded-lg mt-3 overflow-y-auto px-5 py-3">
               <div className="grid grid-cols-5 gap-x-8 bg-[#F9FAFD] py-4 px-3 my-4">
                 <div className="col-span-4">
                   <span className="text-[16px] text-[#12263F]">
@@ -1535,7 +1550,7 @@ export default function page() {
                   <div className="bg-white w-full py-5 grid grid-cols-2 justify-center mt-4">
                     <div className="flex flex-col space-y-3 items-center">
                       <div className="flex items-center gap-x-2">
-                        <div className="w-2 h-2 rounded-full bg-[#31D5A6]" />
+                        <div className="w-2 h-2 rounded-full bg-[#E76F51]" />
                         <span className="text-[15px] text-[#6C757D]">
                           Internal Requests
                         </span>
@@ -1543,7 +1558,7 @@ export default function page() {
                     </div>
                     <div className="flex flex-col space-y-3 items-center">
                       <div className="flex items-center gap-x-2">
-                        <div className="w-2 h-2 rounded-full bg-[#878FF6]" />
+                        <div className="w-2 h-2 rounded-full bg-[#277DA1]" />
                         <span className="text-[15px] text-[#6C757D]">
                           External Requests
                         </span>
@@ -1553,10 +1568,10 @@ export default function page() {
                   <ResponsiveContainer width="100%" height={280}>
                     <LineChart
                       margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                      data={data}
+                      data={expenseOverview?.data}
                     >
                       <XAxis
-                        dataKey="name"
+                        dataKey="month"
                         tickMargin={20}
                         tick={{ fontSize: 11 }}
                         tickSize={0}
@@ -1571,15 +1586,15 @@ export default function page() {
                       <Tooltip />
                       <Line
                         type="monotone"
-                        dataKey="value"
-                        stroke="#31D5A6"
+                        dataKey="internal_requests"
+                        stroke="#E76F51"
                         dot={false}
                         strokeWidth={3}
                       />
                       <Line
                         type="monotone"
-                        dataKey="current"
-                        stroke="#878FF6"
+                        dataKey="external_requests"
+                        stroke="#277DA1"
                         dot={false}
                         strokeWidth={3}
                       />
@@ -1593,7 +1608,7 @@ export default function page() {
                         Total Requests Amount
                       </h6>
                       <h2 className="text-[#6C757D] text-[20px] font-semibold mt-0">
-                        $1,200,000
+                        ${formatAmount(expenseOverview?.totals[0]?.total_requests_amount)}
                       </h2>
                     </div>
                     <PiCurrencyCircleDollarFill
@@ -1610,7 +1625,7 @@ export default function page() {
                         {/* <span className="text-[#95AAC9] font-light text-[12px] mt-0 mb-0"> (this week)</span> */}
                       </div>
                       <h2 className="text-[#6C757D] text-[20px] font-semibold mt-4">
-                        $85,000
+                        ${formatAmount(expenseOverview?.totals[0]?.total_pending_payments)}
                       </h2>
                     </div>
                     <MdOutlinePendingActions
@@ -1626,33 +1641,33 @@ export default function page() {
                         </h6>
                         <span className="text-[#95AAC9] font-light text-[12px] mt-0 mb-0">
                           {" "}
-                          (this week)
+                          {/* (this week) */}
                         </span>
                       </div>
                       <h2 className="text-[#6C757D] text-[20px] font-semibold mt-4">
-                        10
+                        {expenseOverview?.totals[0]?.count_pending_payments}
                       </h2>
                     </div>
                     <MdOutlinePayments size={24} className="text-[#95AAC9]" />
                   </div>
                 </div>
               </div>
-              <div className="w-full col-span-2 pt-3 bg-[#F9FAFD]">
+              <div className="w-full col-span-2 pt-5 bg-[#F9FAFD] pb-16 px-3 my-4">
                 <span className="text-[16px] text-[#12263F]">
                   Department Expenditures
                 </span>
                 <div className="bg-white w-full py-5 grid grid-cols-2 justify-center mt-4">
                   <div className="flex flex-col space-y-3 items-center mx-5">
                     <div className="flex items-center gap-x-2">
-                      <div className="w-2 h-2 rounded-full bg-[#6786F5]" />
-                      <span className="text-[15px] text-[#6C757D]">
+                      <div className="w-2 h-2 rounded-full bg-[#797774]" />
+                      <span className="text-[15px] text-[#cccecf]">
                         Internal Requests
                       </span>
                     </div>
                   </div>
                   <div className="flex flex-col space-y-3 items-center">
                     <div className="flex items-center gap-x-2">
-                      <div className="w-2 h-2 rounded-full bg-[#D2DDEC]" />
+                      <div className="w-2 h-2 rounded-full bg-[#277DA1]" />
                       <span className="text-[15px] text-[#6C757D]">
                         External Requests
                       </span>
@@ -1661,7 +1676,7 @@ export default function page() {
                 </div>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart
-                    data={departmentExpanditure}
+                    data={expenseOverview?.dapartmentalExpenses}
                     margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                   >
                     <XAxis
@@ -1679,16 +1694,16 @@ export default function page() {
                     />
                     <Tooltip />
                     <Bar
-                      dataKey="value"
+                      dataKey="external_requests"
                       stackId="a"
-                      fill="#6786F5"
+                      fill="#277DA1"
                       barSize={20}
                       radius={0}
                     />
                     <Bar
-                      dataKey="current"
+                      dataKey="internal_requests"
                       stackId="a"
-                      fill="#D2DDEC"
+                      fill="#cccecf"
                       barSize={20}
                       radius={0}
                     />
