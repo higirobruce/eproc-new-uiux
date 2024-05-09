@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Children } from "react";
 import _ from "lodash";
 import {
   Typography,
@@ -15,6 +15,7 @@ import {
   Spin,
   Switch,
   message,
+  Timeline,
 } from "antd";
 import {
   ArrowLeftOutlined,
@@ -33,8 +34,10 @@ import { useRouter } from "next/navigation";
 import { encode } from "base-64";
 import { motion } from "framer-motion";
 import { LuUser } from "react-icons/lu";
+import { CgLogOff } from "react-icons/cg";
 import { PiBagSimpleBold } from "react-icons/pi";
 import { MdOutlineAlternateEmail, MdPhoneAndroid } from "react-icons/md";
+import { MdCreateNewFolder } from "react-icons/md";
 import { useUser } from "@/app/context/UserContext";
 import { isMobile } from "react-device-detect";
 import NotificationComponent from "@/app/hooks/useMobile";
@@ -315,7 +318,7 @@ export default function page({ params }) {
       });
   }
 
-  function setCanReviewPaymentRequests(can){
+  function setCanReviewPaymentRequests(can) {
     let newUser = { ...row };
     let permissionLable = "canReviewPaymentRequests";
     newUser.permissions[permissionLable] = can;
@@ -696,6 +699,16 @@ export default function page({ params }) {
                   } text-[14px] cursor-pointer`}
                   onClick={() => setTab(3)}
                 >
+                  Activity Logs
+                </button>
+                <button
+                  className={`bg-transparent py-3 my-3 ${
+                    tab == 4
+                      ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238]`
+                      : `border-none text-[#8392AB]`
+                  } text-[14px] cursor-pointer`}
+                  onClick={() => setTab(4)}
+                >
                   Reset Password
                 </button>
               </div>
@@ -703,7 +716,9 @@ export default function page({ params }) {
             {tab == 0 && row ? (
               <>
                 <div className="mb-1 bg-white rounded-xl px-5 pb-7">
-                <h6 className="mb-3 pb-0 text-[15px] text-[#263238]">Basic Info</h6>
+                  <h6 className="mb-3 pb-0 text-[15px] text-[#263238]">
+                    Basic Info
+                  </h6>
                   <div className="grid lg:grid-cols-2 md:grid-cols-2 grid-cols-1 items-center gap-x-5 mt-7">
                     <div>
                       <div className="pb-3 text-[13px] text-[#344767]">
@@ -889,8 +904,15 @@ export default function page({ params }) {
               </>
             ) : tab == 2 ? (
               <div className="bg-white rounded-lg px-5 pb-10">
-                <h6 className="mb-3 pb-0 text-[15px] text-[#263238]">Approval permissions</h6>
-                <small className="text-[#95A1B3] text-[14px]">Configure and manage approval workflows by defining who can approve requests, documents or actions within the application. Assign approval rights to ensure efficient and secure processing of tasks.</small>
+                <h6 className="mb-3 pb-0 text-[15px] text-[#263238]">
+                  Approval permissions
+                </h6>
+                <small className="text-[#95A1B3] text-[14px]">
+                  Configure and manage approval workflows by defining who can
+                  approve requests, documents or actions within the application.
+                  Assign approval rights to ensure efficient and secure
+                  processing of tasks.
+                </small>
                 {row && row?.permissions && (
                   <Form className="w-full mt-3">
                     <Form.Item name="canApproveAsHod">
@@ -900,7 +922,8 @@ export default function page({ params }) {
                             Can approve as a Head of department
                           </h6>
                           <small className="text-[12px] text-[#95A1B3]">
-                            Allows user to review submitted department request and make approval decision
+                            Allows user to review submitted department request
+                            and make approval decision
                           </small>
                         </div>
                         <div className="permission">
@@ -920,7 +943,9 @@ export default function page({ params }) {
                             Can approve as a Head of finance
                           </h6>
                           <small className="text-[12px] text-[#95A1B3]">
-                            Allows user to manage financial compliance and approve requests previously endorsed by Heads of Departments.
+                            Allows user to manage financial compliance and
+                            approve requests previously endorsed by Heads of
+                            Departments.
                           </small>
                         </div>
                         <div className="permission">
@@ -940,7 +965,8 @@ export default function page({ params }) {
                             Can approve as a Procurement manager
                           </h6>
                           <small className="text-[12px] text-[#95A1B3]">
-                            Provides oversight of this tool and allows user to manage sourcing process
+                            Provides oversight of this tool and allows user to
+                            manage sourcing process
                           </small>
                         </div>
                         <div className="permission">
@@ -961,7 +987,8 @@ export default function page({ params }) {
                             Can approve as a Legal officer
                           </h6>
                           <small className="text-[12px] text-[#95A1B3]">
-                            Allows user to review, update and submit contracts for signature
+                            Allows user to review, update and submit contracts
+                            for signature
                           </small>
                         </div>
                         <div className="permission">
@@ -974,7 +1001,6 @@ export default function page({ params }) {
                         </div>
                       </div>
                     </Form.Item>
-
 
                     <Form.Item name="canReviewPaymentRequests">
                       <div className="permission flex w-full items-center justify-between">
@@ -999,8 +1025,69 @@ export default function page({ params }) {
                   </Form>
                 )}
               </div>
+            ) : tab == 3 ? (
+              <div className="bg-white rounded-lg pb-4 px-5">
+                <Timeline
+                  className="mt-8"
+                  // mode="alternate"
+                  items={[
+                    {
+                      children: (
+                        <div className="flex flex-col mb-1">
+                          <h6 className="m-0 py-0.5 px-0 text-[14px] text-[#344767]">
+                            Logged In
+                          </h6>
+                          <small className="text-[#80878b]">3 days ago</small>
+                        </div>
+                      ),
+                      color: "blue",
+                      dot: <CgLogOff size={20} className=" text-[#01AF65]" />
+                    },
+                    {
+                      children: (
+                        <div className="flex flex-col mb-1">
+                          <h6 className="m-0 py-0.5 px-0 text-[14px] text-[#344767]">
+                            Created a Purchase Request
+                          </h6>
+                          <small className="text-[#80878b]">2 days ago</small>
+                          <div className="bg-[#F4F8F9] py-4 px-5 rounded-lg">
+                            <h6 className="m-0 py-0.5 px-0 text-[14px] text-[#344767]">
+                              Desks for Finance, and new employees
+                            </h6>
+                            <small className="text-[#80878b]">
+                              We need new desks for room 102 & 110 for both
+                              finances and new expected employees
+                            </small>
+                          </div>
+                        </div>
+                      ),
+                      color: "blue",
+                      dot: <MdCreateNewFolder size={20} className="text-[#01AF65]" />
+                    },
+                  ]}
+                />
+                {/* <Timeline
+                  items={[
+                    {
+                      Children: (
+                        <div>
+                          <div className="flex flex-col mb-1">
+                            <h4 className="text-[#0D1C2B]">Logged In</h4>
+                            <small className="text-[#A3AEB4]">
+                              3 days ago
+                            </small>
+                            <div className="">
+
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    }
+                  ]}
+                /> */}
+              </div>
             ) : (
-              tab == 3 && (
+              tab == 4 && (
                 <div className="bg-white rounded-lg pb-4 px-5">
                   <div className="flex justify-between">
                     <h6 className="mb-3 pb-0 text-[15px] text-[#263238]">
