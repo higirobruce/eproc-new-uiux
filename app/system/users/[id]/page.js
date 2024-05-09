@@ -19,12 +19,18 @@ import {
 } from "antd";
 import {
   ArrowLeftOutlined,
+  UserOutlined,
+  MessageOutlined,
   BarsOutlined,
   EditOutlined,
   EyeOutlined,
   FieldTimeOutlined,
   FileTextOutlined,
   LoadingOutlined,
+  SolutionOutlined,
+  FileDoneOutlined,
+  DollarOutlined,
+  OrderedListOutlined,
   PhoneOutlined,
   SaveOutlined,
 } from "@ant-design/icons";
@@ -41,6 +47,8 @@ import { MdCreateNewFolder } from "react-icons/md";
 import { useUser } from "@/app/context/UserContext";
 import { isMobile } from "react-device-detect";
 import NotificationComponent from "@/app/hooks/useMobile";
+import Link from 'next/link';
+import moment from "moment";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
@@ -69,6 +77,15 @@ async function getUserDetails(id, router) {
   return res.json();
 }
 
+const activityUser = {
+  'users': {path: '/system/users', icon: <UserOutlined size={24} className="text-[#01AF65]" />},
+  'requests': {path: '/system/requests', icon: <SolutionOutlined size={24} className="text-[#01AF65]" />},
+  'tenders': {path: '/system/tenders', icon: <MessageOutlined size={24} className="text-[#01AF65]" />},
+  'contracts': {path: '/system/contracts', icon: <FileDoneOutlined size={24} className="text-[#01AF65]" />},
+  'purchase-orders': {path: '/system/purchase-orders', icon: <OrderedListOutlined size={24} className="text-[#01AF65]" />},
+  'payment-requests': {path: '/system/payment-requests', icon: <DollarOutlined size={24} className="text-[#01AF65]" />},
+}
+
 export default function page({ params }) {
   const { user, login, logout } = useUser();
   // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
@@ -83,7 +100,7 @@ export default function page({ params }) {
   let [row, setRow] = useState(null);
   let [segment, setSegment] = useState("Permissions");
   let [usersRequests, setUsersRequests] = useState([]);
-
+  let [userActivityData, setUserActivityData] = useState([]);
   let [submitting, setSubmitting] = useState(false);
   let [type, setType] = useState("VENDOR");
   let [dpts, setDpts] = useState([]);
@@ -101,6 +118,8 @@ export default function page({ params }) {
     getUserDetails(params?.id, router).then((res) => {
       setRow(res);
     });
+
+    userActivity(params?.id)
 
     fetch(`${url}/dpts`, {
       method: "GET",
@@ -156,9 +175,9 @@ export default function page({ params }) {
     })
       .then((res) => res.json())
       .then((res) => {
-        setDataLoaded(true);
         setDataset(res);
         setTempDataset(res);
+        setDataLoaded(true);
       })
       .catch((err) => {
         messageApi.open({
@@ -166,6 +185,28 @@ export default function page({ params }) {
           content: "Something happened! Please try again.",
         });
       });
+  }
+
+  function userActivity(id) {
+    fetch(`${url}/users/activity/${id}`, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((res) => res.json())
+    .then((res) => {
+      setUserActivityData(res);
+    })
+    .catch((err) => {
+      messageApi.open({
+        type: "error",
+        content: "Something happened! Please try again.",
+      });
+    });
+
   }
 
   function setCanView(canView, module) {
@@ -1027,44 +1068,32 @@ export default function page({ params }) {
               </div>
             ) : tab == 3 ? (
               <div className="bg-white rounded-lg pb-4 px-5">
+                {contextHolder}
                 <Timeline
                   className="mt-8"
                   // mode="alternate"
-                  items={[
-                    {
-                      children: (
-                        <div className="flex flex-col mb-1">
-                          <h6 className="m-0 py-0.5 px-0 text-[14px] text-[#344767]">
-                            Logged In
-                          </h6>
-                          <small className="text-[#80878b]">3 days ago</small>
-                        </div>
-                      ),
-                      color: "blue",
-                      dot: <CgLogOff size={20} className=" text-[#01AF65]" />
-                    },
-                    {
-                      children: (
-                        <div className="flex flex-col mb-1">
-                          <h6 className="m-0 py-0.5 px-0 text-[14px] text-[#344767]">
-                            Created a Purchase Request
-                          </h6>
-                          <small className="text-[#80878b]">2 days ago</small>
-                          <div className="bg-[#F4F8F9] py-4 px-5 rounded-lg">
-                            <h6 className="m-0 py-0.5 px-0 text-[14px] text-[#344767]">
-                              Desks for Finance, and new employees
-                            </h6>
-                            <small className="text-[#80878b]">
-                              We need new desks for room 102 & 110 for both
-                              finances and new expected employees
-                            </small>
+                  items={
+                    userActivityData?.map((item, k) => (
+                      {
+                        children: (
+                          <div className="flex flex-col mb-1">
+                            <div className="flex gap-x-3 items-center">
+                              <h6 className="m-0 py-0.5 px-0 text-[14px] text-[#344767]">{row?.firstName + ' ' + row?.lastName}</h6>
+                              <span className="text-[13px] text-[#80878b]"> {item?.action}</span>
+                              <Link className="text-blue-600" href={activityUser[item?.module]?.path + `/${item?.referenceId}`}>{item?.referenceId}</Link>
+                            </div>
+                            <Tooltip title={moment(item?.doneAt).format('MMMM Do YYYY, h:mm:ss a')}>
+                              <small className="text-[#80878b]">
+                                {moment(item?.doneAt).endOf().fromNow()}
+                              </small>
+                            </Tooltip>
                           </div>
-                        </div>
-                      ),
-                      color: "blue",
-                      dot: <MdCreateNewFolder size={20} className="text-[#01AF65]" />
-                    },
-                  ]}
+                        ),
+                        color: "blue",
+                        dot: activityUser[item?.module].icon
+                      }
+                    ))
+                    }
                 />
                 {/* <Timeline
                   items={[

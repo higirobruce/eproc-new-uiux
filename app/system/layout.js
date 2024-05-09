@@ -161,7 +161,7 @@ export default function SystemLayout({ children }) {
 
                   <div className="fixed top-5 w-full h-screen flex gap-5">
                     <div
-                      className={`${isOpen ? `block absolute top-0 left-0` : `hidden lg:block`} relative bg-white w-[420px] min-h-fit mb-10 rounded-lg ml-4`}
+                      className={`${isOpen ? `block absolute top-0 left-0` : `hidden xl:block`} relative bg-white w-[420px] min-h-fit mb-10 rounded-lg ml-4`}
                     >
                       <div className="payment-request flex flex-col justify-between h-full pl-8 pr-2 overflow-auto">
                         <div className="mt-12">
@@ -200,7 +200,7 @@ export default function SystemLayout({ children }) {
                     <div className="w-full h-screen">
                       <div className="flex justify-between items-center mr-5">
                         <div>
-                          <div className="-mr-2 flex lg:hidden">
+                          <div className="-mr-2 flex xl:hidden">
                             <button
                               onClick={toggleMenu}
                               type="button"
