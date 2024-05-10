@@ -655,7 +655,7 @@ export default function page() {
       {contextHolder}
 
       {dataLoaded ? (
-        <div className="request mr-6 mb-10 px-5 mt-5">
+        <div className="request lg:mr-6 mb-10 px-5 mt-5 overflow-x-auto">
           {/* <div className="mt-5 flex justify-between w-full">
             <div>
               <h5 className="text-[#12263F] text-[22px] mb-2 mx-0 mt-0">
@@ -663,7 +663,17 @@ export default function page() {
               </h5>
             </div>
           </div> */}
-          <div className="grid grid-cols-7 gap-x-3 my-4">
+          <div className="flex justify-end my-4 mr-1">
+            <Select
+              defaultValue={year}
+              style={{ width: 120 }}
+              size="large"
+              className="border-0"
+              onChange={(value) => setYear(value)}
+              options={generateYearsArray()}
+            />
+          </div>
+          <div className="grid xl:grid-cols-7 md:grid-cols-4 gap-3 my-4">
             {[
               { name: "Purchase request", value: requests?.length, color: '#4B59D4' },
               { name: "Payment request", value: payments?.length, color: '#7EC2C6' },
@@ -723,47 +733,65 @@ export default function page() {
               </button>
             </div>
           </div>
-          <div className="flex justify-end mt-4 mr-1">
-            <Select
-              defaultValue={year}
-              style={{ width: 120 }}
-              size="large"
-              className="border-0"
-              onChange={(value) => setYear(value)}
-              options={generateYearsArray()}
-            />
-          </div>
           {tab == 0 ? (
-            <div className="payment-request bg-white h-[calc(100vh-310px)] pb-10 rounded-lg mt-3 overflow-y-auto px-5 py-3">
+            <div className="payment-request bg-white h-[calc(100vh-310px)] pb-10 rounded-lg p mt-3 pt-6 overflow-y-auto lg:px-5 py-3">
               {/* Purchase Request Graph Mapping */}
-
-              <div className="grid grid-cols-3 gap-x-10 px-4 items-start">
-                <div className="col-span-2 py-8">
+              {/* <span className="text-[17px] font-semibold text-[#12263F] mt-10 pt-10">
+                Module Lead time
+              </span> */}
+              {/* <div className="grid xl:grid-cols-3 grid-cols-1 items-start gap-x-8 my-5">
+                <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
+                  <small className="text-[#242426] text-[15px] font-medium">Purchase Requests</small>
+                  <div className="flex items-center w-5/6 mt-5">
+                    <div className="bg-white flex-grow py-3 px-5">
+                      <small className="text-[#848CA1]">Avg. Approval time</small>
+                    </div>
+                    <div className="px-8 py-3">
+                      <small className="text-[14.5px] font-semibold">{totalOverview?.leadTimeDays} <small> Days</small></small>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
+                  <small className="text-[#242426] text-[15px] font-medium">Payments Requests</small>
+                  <div className="flex items-center w-5/6 mt-5">
+                    <div className="bg-white flex-grow py-3 px-5">
+                      <small className="text-[#848CA1]">Avg. Approval time</small>
+                    </div>
+                    <div className="px-8 py-3">
+                      <small className="text-[14.5px] font-semibold">{paymentOverview?.leadTimeDays} <small> Days</small></small>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
+                  <small className="text-[#242426] text-[15px] font-medium">PO's, Contracts</small>
+                  <div className="flex items-center w-5/6 mt-5">
+                    <div className="bg-white flex-grow py-3 px-5">
+                      <small className="text-[#848CA1]"><b>PO</b> lead time</small>
+                    </div>
+                    <div className="px-8 py-3">
+                      <small className="text-[14.5px] font-semibold">{dashboardOverview?.posLeadTime} <small> Days</small></small>
+                    </div>
+                  </div>
+                  <div className="flex items-center w-5/6 mt-3">
+                    <div className="bg-white flex-grow py-3 px-5">
+                      <small className="text-[#848CA1]"><b>Contract</b> lead time</small>
+                    </div>
+                    <div className="px-8 py-3">
+                      <small className="text-[14.5px] font-semibold">{dashboardOverview?.contractsLeadTime} <small> Days</small></small>
+                    </div>
+                  </div>
+                </div>
+              </div> */}
+              <div className="grid grid-cols-3 gap-y-10 px-4 items-start">
+                <div className="col-span-2 pb-8">
                   <span className="text-[17px] font-semibold text-[#12263F]">
                     Purchase Request
                   </span>
-                  {/* <div className="w-full py-5 flex justify-center items-center gap-x-8 mt-4">
-                    {el.labels.map((label, i) => (
-                      <div
-                        key={i}
-                        className="flex flex-col space-y-3 items-center"
-                      >
-                        <div className="flex items-center gap-x-2">
-                          <div
-                            className={`w-2 h-2 rounded-full bg-[${label?.color}]`}
-                          />
-                          <span className="text-[15px] text-[#6C757D]">
-                            {label?.name}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div> */}
                   <div className="pt-8">
                     <span className="text-[14px] font-semibold text-[#12263F] p-5 m-5">
                       Budgeted Vs Non-Budgeted
                     </span>
-                    <ResponsiveContainer width="100%" height={180}>
+                    <ResponsiveContainer width="100%" height={220}>
                       <LineChart
                         margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                         data={totalOverview?.data}
@@ -796,13 +824,6 @@ export default function page() {
                           dot={false}
                           strokeWidth={4}
                         />
-                        {/* <Line
-                          type="monotone"
-                          dataKey={"value"}
-                          stroke="#878FF6"
-                          dot={false}
-                          strokeWidth={3}
-                        /> */}
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
@@ -812,7 +833,7 @@ export default function page() {
                     </span>
                     <ResponsiveContainer
                       width="100%"
-                      height={180}
+                      height={220}
                       className={"mt-5"}
                     >
                       <BarChart
@@ -853,13 +874,13 @@ export default function page() {
                     </ResponsiveContainer>
                   </div>
                 </div>
-                <div className="col-span-1 flex flex-col px-4 bg-[#F9FAFD]">
-                  <div className="py-10">
+                <div className="col-span-1 flex flex-col px-4 pt-5 bg-[#F9FAFD]">
+                  <div className="py-3">
                     <span className="text-[16px] text-[#12263F]">
                       Approval process
                     </span>
                   </div>
-                  <div className="flex xl:flex-row flex-col items-center xl:gap-x-5 mb-5">
+                  <div className="flex xl:flex-row flex-col xl:items-center xl:gap-x-5 gap-y-4 mb-5">
                     <ResponsiveContainer width="97%" height={160}>
                       <PieChart
                         margin={{ top: 20, right: 0, left: 20, bottom: 5 }}
@@ -887,7 +908,7 @@ export default function page() {
                         <Tooltip />
                       </PieChart>
                     </ResponsiveContainer>
-                    <div className="flex flex-col gap-y-3 -mt-5">
+                    <div className="flex flex-col gap-y-3 xl:-mt-5">
                       {totalOverview?.statusData?.map((item, key) => (
                         <div className="flex items-center gap-x-2">
                           <div
@@ -905,12 +926,12 @@ export default function page() {
                       ))}
                     </div>
                   </div>
-                  <div className="pb-10">
+                  <div className="pb-3">
                     <span className="text-[16px] text-[#12263F]">
                       Sourcing methods
                     </span>
                   </div>
-                  <div className="flex xl:flex-row flex-col items-center xl:gap-x-5 mb-5">
+                  <div className="flex xl:flex-row flex-col xl:items-center xl:gap-x-5 gap-y-4 mb-5">
                     <ResponsiveContainer width="97%" height={160}>
                       <PieChart
                         margin={{ top: 20, right: 0, left: 20, bottom: 5 }}
@@ -956,6 +977,14 @@ export default function page() {
                       ))}
                     </div>
                   </div>
+                  <div className="flex items-center w-full mt-5 mb-10 border-t border-b-0 border-x-0 border-solid border-[#F1F3FF] pt-5">
+                    <div className="bg-white flex-grow py-3 px-5">
+                      <small className="text-[15px] text-[#555b69]">Avg. Approval time</small>
+                    </div>
+                    <div className="px-8 py-3">
+                      <small className="text-[14.5px] font-semibold">{totalOverview?.leadTimeDays} <small> Days</small></small>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-x-10 mt-5 px-4 items-start">
@@ -980,7 +1009,7 @@ export default function page() {
                       </div>
                     ))}
                   </div> */}
-                  <ResponsiveContainer width="100%" height={180}>
+                  <ResponsiveContainer width="100%" height={300}>
                     <LineChart
                       margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                       data={paymentOverview?.data}
@@ -1031,7 +1060,7 @@ export default function page() {
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="col-span-1 flex flex-col px-4 bg-[#F9FAFD]">
+                <div className="col-span-1 flex flex-col px-4 pt-5 bg-[#F9FAFD]">
                   <div className="my-5">
                     <span className="text-[15px] text-[#12263F]">
                       Approval process
@@ -1083,9 +1112,17 @@ export default function page() {
                       ))}
                     </div>
                   </div>
+                  <div className="flex items-center w-full mt-5 mb-10 border-t border-b-0 border-x-0 border-solid border-[#F1F3FF] pt-5">
+                    <div className="bg-white flex-grow py-3 px-5">
+                      <small className="text-[15px] text-[#555b69]">Avg. Approval time</small>
+                    </div>
+                    <div className="px-8 py-3">
+                      <small className="text-[14.5px] font-semibold">{paymentOverview?.leadTimeDays} <small> Days</small></small>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-x-10 mt-5 pb-20 px-4 items-start">
+              <div className="grid grid-cols-3 gap-x-10 mt-5 pb-28 px-4 items-start">
                 <div className="col-span-2 py-8">
                   <span className="text-[14px] font-semibold text-[#12263F]">
                     PO, Contracts & Tenders
@@ -1111,7 +1148,7 @@ export default function page() {
                       </div>
                     ))}
                   </div>
-                  <ResponsiveContainer width="100%" height={280}>
+                  <ResponsiveContainer width="100%" height={380}>
                     <LineChart
                       margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                       data={dashboardOverviewData}
@@ -1155,13 +1192,13 @@ export default function page() {
                   </ResponsiveContainer>
                 </div>
                 <div className="col-span-1 flex flex-col px-4 bg-[#F9FAFD] mt-7 pt-5">
-                  <div className="flex flex-col gap-y-10">
-                    {dashboardOverview?.statusData?.tenders?.length > 0 && <div>
+                  <div className="flex flex-col">
+                    {dashboardOverview?.statusData?.tenders?.length > 0 && <div className="py-3">
                       <span className="text-[16px] text-[#12263F]">
                         Tenders
                       </span>
                     </div>}
-                    <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
+                    <div className="flex xl:flex-row flex-col xl:items-center xl:gap-x-5 gap-y-4 mb-5">
                       <ResponsiveContainer width="97%" height={140}>
                         <PieChart
                           margin={{
@@ -1210,12 +1247,12 @@ export default function page() {
                         ))}
                       </div>
                     </div>
-                    {dashboardOverview?.statusData?.contracts?.length > 0 && <div>
+                    {dashboardOverview?.statusData?.contracts?.length > 0 && <div className="py-3">
                       <span className="text-[16px] text-[#12263F]">
                         Contracts
                       </span>
                     </div>}
-                    <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
+                    <div className="flex xl:flex-row flex-col items-center xl:gap-x-5 gap-y-4 mb-5">
                       <ResponsiveContainer width="97%" height={140}>
                         <PieChart
                           margin={{
@@ -1264,12 +1301,12 @@ export default function page() {
                         ))}
                       </div>
                     </div>
-                    {dashboardOverview?.statusData?.purchaseOrders.length > 0 && <div>
+                    {dashboardOverview?.statusData?.purchaseOrders.length > 0 && <div className="py-3">
                       <span className="text-[16px] text-[#12263F]">
                         Purchase Orders
                       </span>
                     </div>}
-                    {dashboardOverview?.statusData?.purchaseOrders.length > 0 && <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
+                    {dashboardOverview?.statusData?.purchaseOrders.length > 0 && <div className="flex xl:flex-row flex-col items-center xl:gap-x-5 gap-y-4 mb-5">
                       <ResponsiveContainer width="97%" height={140}>
                         <PieChart
                           margin={{
@@ -1318,6 +1355,22 @@ export default function page() {
                         ))}
                       </div>
                     </div>}
+                    <div className="flex items-center w-full mt-5">
+                      <div className="bg-white flex-grow py-3 px-5">
+                        <small className="text-[15px] text-[#555b69]"><b>PO</b> lead time</small>
+                      </div>
+                      <div className="px-8 py-3">
+                        <small className="text-[14.5px] font-semibold">{dashboardOverview?.posLeadTime} <small> Days</small></small>
+                      </div>
+                    </div>
+                    <div className="flex items-center w-full mt-3">
+                      <div className="bg-white flex-grow py-3 px-5">
+                        <small className="text-[15px] text-[#555b69]"><b>Contract</b> lead time</small>
+                      </div>
+                      <div className="px-8 py-3">
+                        <small className="text-[14.5px] font-semibold">{dashboardOverview?.contractsLeadTime} <small> Days</small></small>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
