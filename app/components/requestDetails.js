@@ -959,7 +959,7 @@ const RequestDetails = ({
     })
       .then((res) => res.json())
       .then((res) => {
-        alert(JSON.stringify(res));
+        // alert(JSON.stringify(res));
         if (res?.length >= 1) {
           setPO(res?.filter((p) => p?.status !== "withdrawn")[0]);
         } else {
@@ -2981,8 +2981,6 @@ const RequestDetails = ({
     },
   };
 
-  {console.log('Request ', data)}
-
   return (
     <div className="request-details grid lg:grid-cols-5 gap-4 items-start h-screen mb-2 overflow-y-auto">
       {contextHolder}
@@ -3013,9 +3011,14 @@ const RequestDetails = ({
                       ? data?.status
                       : "pending"}
                   </Tag>
-                  {data?.status == 'declined' && <Tooltip title={data?.reasonForRejection} className="cursor-pointer bg-transparent p-0.5 rounded-full mt-0.5">
-                    <TiInfoLarge className="text-[#344767] w-6 h-6" />
-                  </Tooltip>}
+                  {data?.status == "declined" && (
+                    <Tooltip
+                      title={data?.reasonForRejection}
+                      className="cursor-pointer bg-transparent p-0.5 rounded-full mt-0.5"
+                    >
+                      <TiInfoLarge className="text-[#344767] w-6 h-6" />
+                    </Tooltip>
+                  )}
                 </div>
               </div>
               <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-5 ml-3">
@@ -3152,6 +3155,11 @@ const RequestDetails = ({
                         onChange={(value, option) => {
                           let r = { ...data };
                           r.currency = value;
+                          let items = r.items.map((i) => {
+                            i.currency = value;
+                            return i;
+                          });
+                          r.items = items;
                           handleUpdateRequest(r);
                         }}
                         // filterSort={(optionA, optionB) =>
@@ -3946,67 +3954,82 @@ const RequestDetails = ({
                             <button
                               className={`bg-transparent py-3 my-3 ${
                                 tab == 0
-                                  ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238] px-4`
+                                  ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 border-solid text-[#263238] px-4`
                                   : `border-none text-[#8392AB]`
                               } text-[14px] cursor-pointer`}
                               onClick={() => setTab(0)}
                             >
                               Related Docs
                             </button>
+                            <button
+                              className={`bg-transparent py-3 my-3 ${
+                                tab == 1
+                                  ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 border-solid text-[#263238] px-4`
+                                  : `border-none text-[#8392AB]`
+                              } text-[14px] cursor-pointer`}
+                              onClick={() => setTab(1)}
+                            >
+                              Audit Tracking
+                            </button>
                           </div>
                         </div>
-                        {tender && data?.sourcingMethod === "Tendering" && (
-                          <>
-                            <h4 className="mb-2 mt-4 font-semibold ml-6">
-                              Tender Reference
-                            </h4>
-                            <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
-                              <Link
-                                href={`/system/tenders/${tender?._id}`}
-                                className="font-bold text-[16px] no-underline text-blue-600"
-                              >
-                                {tender?.number}
-                              </Link>
-                            </div>
-                          </>
+                        {tab == 0 ? (
+                          <div>
+                            {tender && data?.sourcingMethod === "Tendering" && (
+                              <>
+                                <h4 className="mb-2 mt-4 font-semibold ml-6">
+                                  Tender Reference
+                                </h4>
+                                <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                                  <Link
+                                    href={`/system/tenders/${tender?._id}`}
+                                    className="font-bold text-[16px] no-underline text-blue-600"
+                                  >
+                                    {tender?.number}
+                                  </Link>
+                                </div>
+                              </>
+                            )}
+                            {contract &&
+                              (data?.sourcingMethod === "Direct Contracting" ||
+                                data?.sourcingMethod ===
+                                  "From Existing Contract") && (
+                                <>
+                                  <h4 className="mb-2 mt-4 font-semibold ml-6">
+                                    Contract Reference
+                                  </h4>
+                                  <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                                    <Link
+                                      href={`/system/contracts/${contract?._id}`}
+                                      className="font-bold text-[16px] no-underline text-blue-600"
+                                    >
+                                      {contract?.number}
+                                    </Link>
+                                  </div>
+                                </>
+                              )}
+                            {po &&
+                              (data?.sourcingMethod === "Direct Contracting" ||
+                                data?.sourcingMethod ===
+                                  "From Existing Contract") && (
+                                <>
+                                  <h4 className="mb-2 mt-4 font-semibold ml-6">
+                                    PO Reference
+                                  </h4>
+                                  <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                                    <Link
+                                      href={`/system/purchase-orders/${po?._id}`}
+                                      className="font-bold text-[16px] no-underline text-blue-600"
+                                    >
+                                      {po?.number}
+                                    </Link>
+                                  </div>
+                                </>
+                              )}
+                          </div>
+                        ) : (
+                          <div />
                         )}
-                        {contract &&
-                          (data?.sourcingMethod === "Direct Contracting" ||
-                            data?.sourcingMethod ===
-                              "From Existing Contract") && (
-                            <>
-                              <h4 className="mb-2 mt-4 font-semibold ml-6">
-                                Contract Reference
-                              </h4>
-                              <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
-                                <Link
-                                  href={`/system/contracts/${contract?._id}`}
-                                  className="font-bold text-[16px] no-underline text-blue-600"
-                                >
-                                  {contract?.number}
-                                </Link>
-                              </div>
-                            </>
-                          )}
-                        {po &&
-                          (data?.sourcingMethod === "Direct Contracting" ||
-                            data?.sourcingMethod ===
-                              "From Existing Contract") && (
-                            <>
-                              <h4 className="mb-2 mt-4 font-semibold ml-6">
-                                PO Reference
-                              </h4>
-                              <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
-                                <Link
-                                  href={`/system/purchase-orders/${po?._id}`}
-                                  className="font-bold text-[16px] no-underline text-blue-600"
-                                >
-                                  {po?.number}
-                                </Link>
-                              </div>
-                            </>
-                          )}
-                        <div />
                       </div>
                     </Dialog.Panel>
                   </Transition.Child>
