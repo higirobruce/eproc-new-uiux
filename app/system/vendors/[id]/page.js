@@ -100,12 +100,12 @@ async function getVendorDetails(id, router) {
 
 const activityUser = {
   'users': {path: '/system/users', icon: <UserOutlined size={24} className="text-[#01AF65]" />},
+  'vendors': {path: '/system/vendors', icon: <UserOutlined size={24} className="text-[#01AF65]" />},
   'requests': {path: '/system/requests', icon: <SolutionOutlined size={24} className="text-[#01AF65]" />},
   'tenders': {path: '/system/tenders', icon: <MessageOutlined size={24} className="text-[#01AF65]" />},
   'contracts': {path: '/system/contracts', icon: <FileDoneOutlined size={24} className="text-[#01AF65]" />},
   'purchase-orders': {path: '/system/purchase-orders', icon: <OrderedListOutlined size={24} className="text-[#01AF65]" />},
   'payment-requests': {path: '/system/payment-requests', icon: <DollarOutlined size={24} className="text-[#01AF65]" />},
-  
 }
 
 export default function page({ params }) {
@@ -1032,7 +1032,7 @@ export default function page({ params }) {
                     <div className="flex flex-col mb-1">
                       <div className="flex gap-x-3 items-center">
                         <h6 className="m-0 py-0.5 px-0 text-[14px] text-[#344767]">
-                          {/* {row?.firstName + " " + row?.lastName} */}
+                          {rowData?.contactPersonNames}
                         </h6>
                         <span className="text-[13px] text-[#80878b]">
                           {" "}
@@ -1062,7 +1062,7 @@ export default function page({ params }) {
                     </div>
                   ),
                   color: "blue",
-                  dot: activityUser[item?.module].icon,
+                  dot: activityUser[item?.module]?.icon,
                 }))}
               />
             </div>

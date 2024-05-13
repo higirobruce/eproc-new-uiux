@@ -1529,7 +1529,7 @@ export default function page() {
                             />
                           ))}
                         </Pie>
-                        <Tooltip content={<CustomTooltip />} />
+                        <Tooltip  />
                       </PieChart>
                     </ResponsiveContainer>
                     <div className="flex flex-col bg-white px-6 py-3.5 space-y-3 mr-12 -mt-10">
