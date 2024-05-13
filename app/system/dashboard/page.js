@@ -649,13 +649,23 @@ export default function page() {
 
   const dashboardOverviewData = transformData(dashboardOverview.data);
 
+  const CustomTooltip = ({active, payload, label}) => {
+    if(active && payload && payload?.length) {
+      return (
+        <div className="bg-white px-3 py-1.5 rounded-md shadow-lg">
+          <p>{`${payload[0]?.payload?.payload?._id}: ${payload[0]?.value}`}</p>
+        </div>
+      )
+    }
+  }
+
   return (
     <>
       {isMobile && <NotificationComponent />}
       {contextHolder}
 
       {dataLoaded ? (
-        <div className="request lg:mr-6 mb-10 px-5 mt-5 overflow-x-auto">
+        <div className="payment-request lg:mr-6 mb-10 pl-5 h-screen overflow-x-auto">
           {/* <div className="mt-5 flex justify-between w-full">
             <div>
               <h5 className="text-[#12263F] text-[22px] mb-2 mx-0 mt-0">
@@ -663,7 +673,7 @@ export default function page() {
               </h5>
             </div>
           </div> */}
-          <div className="flex justify-end my-4 mr-1">
+          <div className="flex justify-end mb-4 mr-1">
             <Select
               defaultValue={year}
               style={{ width: 120 }}
@@ -683,9 +693,9 @@ export default function page() {
               { name: "Vendors", value: vendors?.length, color: '#6A76D7' },
               { name: "Internal Users", value: internalUsers?.length, color: '#D25C8D' },
             ].map((item, key) => (
-              <div className="flex gap-x-4 bg-[#FFF] py-3 px-4 rounded-lg">
+              <div className="flex gap-x-4 bg-[#FFF] py-2 px-4 rounded-lg">
                 {/* <div className={`border-l-0 border-3 border-solid border-[${item.color}] rounded-xxl`} /> */}
-                <div className="flex flex-grow flex-col gap-y-2">
+                <div className="flex flex-grow flex-col gap-y-1">
                   <div className="w-full flex justify-between">
                     <h4 className="mt-2 mb-0 text-[#040518]">{item.value}</h4>
                     <div className={`flex justify-center items-center bg-[${item?.color + '22'}] rounded-lg p-2.5`}>
@@ -875,59 +885,8 @@ export default function page() {
                   </div>
                 </div>
                 <div className="col-span-1 flex flex-col px-4 pt-5 bg-[#F9FAFD]">
-                  <div className="py-3">
-                    <span className="text-[16px] text-[#12263F]">
-                      Approval process
-                    </span>
-                  </div>
-                  <div className="flex xl:flex-row flex-col xl:items-center xl:gap-x-5 gap-y-4 mb-5">
-                    <ResponsiveContainer width="97%" height={160}>
-                      <PieChart
-                        margin={{ top: 20, right: 0, left: 20, bottom: 5 }}
-                      >
-                        <Pie
-                          data={totalOverview?.statusData}
-                          cx={50}
-                          cy={50}
-                          startAngle={360}
-                          endAngle={0}
-                          innerRadius={59}
-                          outerRadius={69}
-                          fill="#8884d8"
-                          paddingAngle={5}
-                          cornerRadius={10}
-                          dataKey="total"
-                        >
-                          {totalOverview?.statusData?.map((entry, index) => (
-                            <Cell
-                              key={`cell-${index}`}
-                              fill={["#0B7A75", "#277DA1", "#FFF1D0"][index]}
-                            />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
-                    <div className="flex flex-col gap-y-3 xl:-mt-5">
-                      {totalOverview?.statusData?.map((item, key) => (
-                        <div className="flex items-center gap-x-2">
-                          <div
-                            className={`w-2 h-2 rounded-full bg-[${
-                              ["#0B7A75", "#277DA1", "#FFF1D0"][key]
-                            }]`}
-                          />
-                          <span className="text-[13px] text-[#6C757D]">
-                            {item?._id}
-                          </span>
-                          <span className="text-[13px] text-[#6C757D]">
-                            {item?.total}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
                   <div className="pb-3">
-                    <span className="text-[16px] text-[#12263F]">
+                    <span className="text-[14px] font-semibold text-[#12263F]">
                       Sourcing methods
                     </span>
                   </div>
@@ -956,15 +915,66 @@ export default function page() {
                             />
                           ))}
                         </Pie>
-                        <Tooltip />
+                        <Tooltip content={<CustomTooltip />} />
                       </PieChart>
                     </ResponsiveContainer>
-                    <div className="flex flex-col gap-y-3 -mt-5">
+                    <div className="xl:flex hidden flex-col gap-y-3 -mt-5">
                       {totalOverview?.sourcingData?.map((item, key) => (
                         <div className="flex items-center gap-x-2">
                           <div
                             className={`w-1.5 h-1.5 rounded-full bg-[${
                               ["#0B7A75", "#FFF1D0", "#BC4749"][key]
+                            }]`}
+                          />
+                          <span className="text-[13px] text-[#6C757D]">
+                            {item?._id}
+                          </span>
+                          <span className="text-[13px] text-[#6C757D]">
+                            {item?.total}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="py-3">
+                    <span className="text-[14px] font-semibold text-[#12263F]">
+                      Approval process
+                    </span>
+                  </div>
+                  <div className="flex xl:flex-row flex-col xl:items-center xl:gap-x-5 gap-y-4 mb-5">
+                    <ResponsiveContainer width="97%" height={160}>
+                      <PieChart
+                        margin={{ top: 20, right: 0, left: 20, bottom: 5 }}
+                      >
+                        <Pie
+                          data={totalOverview?.statusData}
+                          cx={50}
+                          cy={50}
+                          startAngle={360}
+                          endAngle={0}
+                          innerRadius={59}
+                          outerRadius={69}
+                          fill="#8884d8"
+                          paddingAngle={5}
+                          cornerRadius={10}
+                          dataKey="total"
+                        >
+                          {totalOverview?.statusData?.map((entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={["#0B7A75", "#277DA1", "#FFF1D0"][index]}
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip  content={<CustomTooltip />} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div className="xl:flex hidden flex-col gap-y-3 xl:-mt-5">
+                      {totalOverview?.statusData?.map((item, key) => (
+                        <div className="flex items-center gap-x-2">
+                          <div
+                            className={`w-2 h-2 rounded-full bg-[${
+                              ["#0B7A75", "#277DA1", "#FFF1D0"][key]
                             }]`}
                           />
                           <span className="text-[13px] text-[#6C757D]">
@@ -1062,7 +1072,7 @@ export default function page() {
                 </div>
                 <div className="col-span-1 flex flex-col px-4 pt-5 bg-[#F9FAFD]">
                   <div className="my-5">
-                    <span className="text-[15px] text-[#12263F]">
+                    <span className="text-[14px] font-semibold text-[#12263F]">
                       Approval process
                     </span>
                   </div>
@@ -1087,19 +1097,19 @@ export default function page() {
                           {paymentOverview?.statusData?.map((entry, index) => (
                             <Cell
                               key={`cell-${index}`}
-                              fill={["#BC4749", "#53BAA1", "#237396"][index]}
+                              fill={["#0B7A75", "#FFF1D0", "#277DA1"][index]}
                             />
                           ))}
                         </Pie>
-                        <Tooltip />
+                        <Tooltip content={<CustomTooltip />} />
                       </PieChart>
                     </ResponsiveContainer>
-                    <div className="flex flex-col gap-y-3 -mt-5">
+                    <div className="xl:flex hidden flex-col gap-y-3 -mt-5">
                       {paymentOverview?.statusData?.map((item, key) => (
                         <div className="flex items-center gap-x-2">
                           <div
                             className={`w-2 h-2 rounded-full bg-[${
-                              ["#BC4749", "#53BAA1", "#237396"][key]
+                              ["#0B7A75", "#FFF1D0", "#277DA1"][key]
                             }]`}
                           />
                           <span className="text-[13px] text-[#6C757D]">
@@ -1148,7 +1158,7 @@ export default function page() {
                       </div>
                     ))}
                   </div>
-                  <ResponsiveContainer width="100%" height={380}>
+                  <ResponsiveContainer width="100%" height={480}>
                     <LineChart
                       margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                       data={dashboardOverviewData}
@@ -1191,10 +1201,10 @@ export default function page() {
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="col-span-1 flex flex-col px-4 bg-[#F9FAFD] mt-7 pt-5">
+                <div className="col-span-1 flex flex-col px-4 bg-[#F9FAFD] mt-7 py-5">
                   <div className="flex flex-col">
                     {dashboardOverview?.statusData?.tenders?.length > 0 && <div className="py-3">
-                      <span className="text-[16px] text-[#12263F]">
+                      <span className="text-[14px] font-semibold text-[#12263F]">
                         Tenders
                       </span>
                     </div>}
@@ -1224,16 +1234,16 @@ export default function page() {
                             {dashboardOverview?.statusData?.tenders?.map((entry, index) => (
                               <Cell
                                 key={`cell-${index}`}
-                                fill={["#F3B700", "#0065DD", "#7B2CBF"][index]}
+                                fill={["#0B7A75", "#FFF1D0", "#277DA1"][index]}
                               />
                             ))}
                           </Pie>
-                          <Tooltip />
+                          <Tooltip content={<CustomTooltip />} />
                         </PieChart>
                       </ResponsiveContainer>
                       <div className="flex flex-col gap-y-3 -mt-5">
                         {dashboardOverview?.statusData?.tenders?.map((item, key) => (
-                          <div className="flex items-center gap-x-2">
+                          <div className="xl:flex hidden items-center gap-x-2">
                             <div
                               className={`w-1.5 h-1.5 rounded-full bg-[${["#F3B700", "#0065DD", "#7B2CBF"][key]}]`}
                             />
@@ -1248,7 +1258,7 @@ export default function page() {
                       </div>
                     </div>
                     {dashboardOverview?.statusData?.contracts?.length > 0 && <div className="py-3">
-                      <span className="text-[16px] text-[#12263F]">
+                      <span className="text-[14px] font-semibold text-[#12263F]">
                         Contracts
                       </span>
                     </div>}
@@ -1278,14 +1288,14 @@ export default function page() {
                             {dashboardOverview?.statusData?.contracts?.map((entry, index) => (
                               <Cell
                                 key={`cell-${index}`}
-                                fill={["#F3B700", "#0065DD", "#7B2CBF"][index]}
+                                fill={["#0B7A75", "#FFF1D0", "#277DA1"][index]}
                               />
                             ))}
                           </Pie>
-                          <Tooltip />
+                          <Tooltip content={<CustomTooltip />} />
                         </PieChart>
                       </ResponsiveContainer>
-                      <div className="flex flex-col gap-y-3 -mt-5">
+                      <div className="xl:flex hidden flex-col gap-y-3 -mt-5">
                         {dashboardOverview?.statusData?.contracts?.map((item, key) => (
                           <div className="flex items-center gap-x-2">
                             <div
@@ -1302,7 +1312,7 @@ export default function page() {
                       </div>
                     </div>
                     {dashboardOverview?.statusData?.purchaseOrders.length > 0 && <div className="py-3">
-                      <span className="text-[16px] text-[#12263F]">
+                      <span className="text-[14px] font-semibold text-[#12263F]">
                         Purchase Orders
                       </span>
                     </div>}
@@ -1332,14 +1342,14 @@ export default function page() {
                             {dashboardOverview?.statusData?.purchaseOrders?.map((entry, index) => (
                               <Cell
                                 key={`cell-${index}`}
-                                fill={["#F3B700", "#0065DD", "#7B2CBF"][index]}
+                                fill={["#0B7A75", "#FFF1D0", "#277DA1"][index]}
                               />
                             ))}
                           </Pie>
-                          <Tooltip />
+                          <Tooltip content={<CustomTooltip />} />
                         </PieChart>
                       </ResponsiveContainer>
-                      <div className="flex flex-col gap-y-3 -mt-5">
+                      <div className="xl:flex hidden flex-col gap-y-3 -mt-5">
                         {dashboardOverview?.statusData?.purchaseOrders?.map((item, key) => (
                           <div className="flex items-center gap-x-2">
                             <div
@@ -1519,7 +1529,7 @@ export default function page() {
                             />
                           ))}
                         </Pie>
-                        <Tooltip />
+                        <Tooltip content={<CustomTooltip />} />
                       </PieChart>
                     </ResponsiveContainer>
                     <div className="flex flex-col bg-white px-6 py-3.5 space-y-3 mr-12 -mt-10">

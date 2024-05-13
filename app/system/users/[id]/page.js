@@ -1080,7 +1080,7 @@ export default function page({ params }) {
                             <div className="flex gap-x-3 items-center">
                               <h6 className="m-0 py-0.5 px-0 text-[14px] text-[#344767]">{row?.firstName + ' ' + row?.lastName}</h6>
                               <span className="text-[13px] text-[#80878b]"> {item?.action}</span>
-                              <Link className="text-blue-600" href={activityUser[item?.module]?.path + `/${item?.referenceId}`}>{item?.referenceId}</Link>
+                              {item?.doneBy && <Link className="text-blue-600" href={activityUser[item?.module]?.path + `/${item?.referenceId}`}>{item?.referenceId}</Link>}
                             </div>
                             <Tooltip title={moment(item?.doneAt).format('MMMM Do YYYY, h:mm:ss a')}>
                               <small className="text-[#80878b]">
@@ -1095,25 +1095,7 @@ export default function page({ params }) {
                     ))
                     }
                 />
-                {/* <Timeline
-                  items={[
-                    {
-                      Children: (
-                        <div>
-                          <div className="flex flex-col mb-1">
-                            <h4 className="text-[#0D1C2B]">Logged In</h4>
-                            <small className="text-[#A3AEB4]">
-                              3 days ago
-                            </small>
-                            <div className="">
-
-                            </div>
-                          </div>
-                        </div>
-                      )
-                    }
-                  ]}
-                /> */}
+                
               </div>
             ) : (
               tab == 4 && (
