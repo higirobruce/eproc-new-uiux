@@ -15,6 +15,7 @@ import {
   Input,
   Form,
   message,
+  Timeline,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import _ from "lodash";
@@ -39,6 +40,13 @@ import {
   UploadOutlined,
   UserOutlined,
   QuestionCircleOutlined,
+  MessageOutlined,
+  BarsOutlined,
+  FieldTimeOutlined,
+  SolutionOutlined,
+  FileDoneOutlined,
+  DollarOutlined,
+  OrderedListOutlined
 } from "@ant-design/icons";
 import moment from "moment";
 import { encode } from "base-64";
@@ -90,6 +98,16 @@ async function getVendorDetails(id, router) {
   return res.json();
 }
 
+const activityUser = {
+  'users': {path: '/system/users', icon: <UserOutlined size={24} className="text-[#01AF65]" />},
+  'vendors': {path: '/system/vendors', icon: <UserOutlined size={24} className="text-[#01AF65]" />},
+  'requests': {path: '/system/requests', icon: <SolutionOutlined size={24} className="text-[#01AF65]" />},
+  'tenders': {path: '/system/tenders', icon: <MessageOutlined size={24} className="text-[#01AF65]" />},
+  'contracts': {path: '/system/contracts', icon: <FileDoneOutlined size={24} className="text-[#01AF65]" />},
+  'purchase-orders': {path: '/system/purchase-orders', icon: <OrderedListOutlined size={24} className="text-[#01AF65]" />},
+  'payment-requests': {path: '/system/payment-requests', icon: <DollarOutlined size={24} className="text-[#01AF65]" />},
+}
+
 export default function page({ params }) {
   const { user, login, logout } = useUser();
   // let user = JSON.parse(typeof window !== "undefined" && localStorage.getItem("user"));
@@ -114,6 +132,7 @@ export default function page({ params }) {
   const [vatCertId, setVatCertId] = useState(null);
   const [rdbSelected, setRDBSelected] = useState(false);
   const [vatSelected, setVatSelected] = useState(false);
+  let [userActivityData, setUserActivityData] = useState([]);
   const [fileUploadStatus, setFileUploadStatus] = useState("");
   const [tab, setTab] = useState(0);
 
@@ -131,6 +150,8 @@ export default function page({ params }) {
         res[0]?.vendor?.vatCertId ? res[0]?.vendor?.vatCertId : vatUuid
       );
     });
+
+    userActivity(params?.id)
 
     fetch(`${url}/serviceCategories`, {
       method: "GET",
@@ -374,6 +395,28 @@ export default function page({ params }) {
       });
   }
 
+  function userActivity(id) {
+    fetch(`${url}/users/activity/${id}`, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((res) => res.json())
+    .then((res) => {
+      setUserActivityData(res);
+    })
+    .catch((err) => {
+      messageApi.open({
+        type: "error",
+        content: "Something happened! Please try again.",
+      });
+    });
+
+  }
+
   function updateVATCert(id) {
     rowData.vatCertId = id;
     fetch(`${url}/users/${rowData?._id}`, {
@@ -576,7 +619,7 @@ export default function page({ params }) {
               >
                 Account Info
               </button>
-              {/* <button
+              <button
                 className={`bg-transparent py-3 my-3 ${
                   tab == 1
                     ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238]`
@@ -585,7 +628,7 @@ export default function page({ params }) {
                 onClick={() => setTab(1)}
               >
                 Activities
-              </button> */}
+              </button>
               <button
                 className={`bg-transparent py-3 my-3 ${
                   tab == 2
@@ -844,7 +887,7 @@ export default function page({ params }) {
                         </div> */}
                         <div className="mt-2 ">
                           <Link
-                          className="text-blue-500 text-sm"
+                            className="text-blue-500 text-sm"
                             href={`${fendUrl}/api/?folder=rdbCerts&name=${rowData?.rdbCertId}.pdf`}
                             target="_blank"
                           >
@@ -908,7 +951,7 @@ export default function page({ params }) {
                       </div> */}
                         <div className="mt-2">
                           <Link
-                          className="text-blue-500 text-sm"
+                            className="text-blue-500 text-sm"
                             href={`${fendUrl}/api/?folder=vatCerts&name=${rowData?.vatCertId}.pdf`}
                             target="_blank"
                           >
@@ -979,7 +1022,50 @@ export default function page({ params }) {
               </div>
             </>
           ) : tab == 1 ? (
-            <></>
+            <div className="bg-white rounded-lg pb-4 px-5">
+              {contextHolder}
+              <Timeline
+                className="mt-8"
+                // mode="alternate"
+                items={userActivityData?.map((item, k) => ({
+                  children: (
+                    <div className="flex flex-col mb-1">
+                      <div className="flex gap-x-3 items-center">
+                        <h6 className="m-0 py-0.5 px-0 text-[14px] text-[#344767]">
+                          {rowData?.contactPersonNames}
+                        </h6>
+                        <span className="text-[13px] text-[#80878b]">
+                          {" "}
+                          {item?.action}
+                        </span>
+                        {item?.doneBy && (
+                          <Link
+                            className="text-blue-600"
+                            href={
+                              activityUser[item?.module]?.path +
+                              `/${item?.referenceId}`
+                            }
+                          >
+                            {item?.referenceId}
+                          </Link>
+                        )}
+                      </div>
+                      <Tooltip
+                        title={moment(item?.doneAt).format(
+                          "MMMM Do YYYY, h:mm:ss a"
+                        )}
+                      >
+                        <small className="text-[#80878b]">
+                          {moment(item?.doneAt).endOf().fromNow()}
+                        </small>
+                      </Tooltip>
+                    </div>
+                  ),
+                  color: "blue",
+                  dot: activityUser[item?.module]?.icon,
+                }))}
+              />
+            </div>
           ) : (
             <div className="bg-white rounded-lg pb-4 px-8">
               <div className="flex items-center justify-between">
