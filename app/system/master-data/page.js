@@ -2,7 +2,9 @@
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { encode } from "base-64";
-import { Card } from "antd";
+import { Card, Typography } from "antd";
+import DepartmentsTable from "@/app/components/departmentsTable";
+import BudgetLinesTable from "@/app/components/budgetLinesTable";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
@@ -32,17 +34,68 @@ async function getAllDepartments(router) {
   return res.json();
 }
 
+async function getAllBudgetLines(router) {
+  const res = await fetch(`${url}/masterData/budgetlines/`, {
+    headers: {
+      Authorization: "Basic " + `${encode(`${apiUsername}:${apiPassword}`)}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    alert(JSON.stringify(res));
+    if (res.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      router.push("/auth");
+    }
+    // This will activate the closest `error.js` Error Boundary
+    // console.log(id);
+    return null;
+    // throw new Error("Failed to fetch data");
+  }
+  // console.log(res.json())
+  return res.json();
+}
+
 function page() {
   const [tab, setTab] = useState(0);
   let token = typeof window !== "undefined" && localStorage.getItem("token");
   let router = useRouter();
   let [list, setList] = useState([]);
+  let [description, setDescription] = useState("");
+  let [depId, setDepId] = useState(null);
 
   useEffect(() => {
     getAllDepartments(router).then((res) => {
       setList(res);
     });
   }, []);
+
+  useEffect(() => {
+    switch (tab) {
+      case 0:
+        getAllDepartments(router).then((res) => {
+          setList([]);
+          setList(res);
+        });
+        break;
+      case 1:
+        getAllBudgetLines(router).then((res) => {
+          setList([]);
+          setList(res);
+        });
+        break;
+      default:
+        break;
+    }
+  }, [tab]);
+
+  useEffect(() => {
+    updateDepartment(depId, description);
+  }, [description]);
+
+  async function updateDepartment(id, newDescription) {}
 
   return (
     <div className="request mr-6 bg-white h-[calc(100vh-81px)] rounded-lg mb-10 px-5 overflow-y-auto">
@@ -86,50 +139,65 @@ function page() {
           >
             Service Categories
           </button>
-
-          <button
-            className={`bg-transparent py-3 my-3 ${
-              tab == 3
-                ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238] px-4`
-                : `border-none text-[#8392AB]`
-            } text-[14px] cursor-pointer`}
-            onClick={() => setTab(3)}
-          >
-            Currencies
-          </button>
         </div>
       </div>
-      <div>
+      {/* <div>
         {list && (
-          <div className="grid md:grid-cols-3 gap-3">
-            {list.map((l) => {
-              return (
-                <Card className="shadow">
-                  <Card.Meta
-                    // avatar={<Avatar src="https://joesch.moe/api/v1/random?key=1" />}
-                    title={l.description}
-                    // description={
-                    //   <div
-                    //     className={`flex flex-row items-center justify-between text-blue-400`}
-                    //   >
-                    //     <div>{icon}</div>
-                    //     <div className="text-xl">{count.toLocaleString()}</div>
-                    //   </div>
-                    // }
-                  />
-                  {/* <Statistic
-            title={title}
-            value={count}
-            valueStyle={{
-              color: "#2299FF",
-            }}
-          /> */}
-                </Card>
-              );
-            })}
+          <div className="grid md:grid-cols-3 gap-3 py-4">
+            {tab == 0 &&
+              list.map((l) => {
+                return (
+                  <Card className="shadow">
+                    <Card.Meta
+                      description={
+                        <Typography.Text
+                          editable={{
+                            onStart: () => {
+                              setDepId(l._id);
+                            },
+                            onChange: setDescription,
+                          }}
+                          style={{ margin: 0, paddingLeft: 3 }}
+                        >
+                          {l.description}
+                        </Typography.Text>
+                      }
+                    />
+                  </Card>
+                );
+              })}
+
+            {tab == 1 &&
+              list.map((l) => {
+                return (
+                  <Card className="shadow">
+                    <Card.Meta
+                      description={
+                        <Typography.Text
+                          editable={{
+                            onStart: () => {
+                              setDepId(l._id);
+                            },
+                            onChange: setDescription,
+                          }}
+                          style={{ margin: 0, paddingLeft: 3 }}
+                        >
+                          {l.description}
+                        </Typography.Text>
+                      }
+                    />
+                  </Card>
+                );
+              })}
           </div>
         )}
-      </div>
+      </div> */}
+      {tab == 0 && (
+        <DepartmentsTable dataSource={list} setDataSource={setList} />
+      )}
+      {tab == 1 && (
+        <BudgetLinesTable dataSource={list} setDataSource={setList} />
+      )}
     </div>
   );
 }
