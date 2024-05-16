@@ -861,7 +861,7 @@ export default function page({ params }) {
                       >
                         {dpts?.map((dpt) => {
                           return (
-                            <Select.Option key={dpt._id} value={dpt._id}>
+                            dpt?.visible &&<Select.Option key={dpt._id} value={dpt._id}>
                               {dpt.description}
                             </Select.Option>
                           );

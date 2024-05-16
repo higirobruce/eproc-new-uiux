@@ -232,13 +232,23 @@ const DepartmentsTable = ({
       ...item,
       ...row,
     });
+    handleUpdateRow(row,'department')
     setDataSource(newData);
   };
 
   const handleHide = (row) => {
-    row.visible = false;
-    handleUpdateRow(row)
+    row.visible = !row?.visible;
+    const newData = [...dataSource];
+    const index = newData.findIndex((item) => row.key === item.key);
+    const item = newData[index];
+    newData.splice(index, 1, {
+      ...item,
+      ...row,
+    });
+    handleUpdateRow(row, 'department')
+    setDataSource(newData);
   };
+
   const components = {
     body: {
       row: EditableRow,

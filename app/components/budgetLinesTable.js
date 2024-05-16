@@ -131,14 +131,8 @@ const EditableCell = ({
 const BudgetLinesTable = ({
   setDataSource,
   dataSource,
-  setFileList,
-  fileList,
-  files,
-  setFiles,
-  editingRequest,
   disable,
-  noItemDocs = true,
-  currency = "RWF",
+  handleUpdateRow,
 }) => {
   const [count, setCount] = useState(dataSource?.length + 1);
   const [rowForm] = Form.useForm();
@@ -206,7 +200,7 @@ const BudgetLinesTable = ({
             ) : (
               <Popconfirm
                 title="Are you sure?"
-                onConfirm={() => handleDelete(record.key)}
+                onConfirm={() => handleHide(record)}
               >
                 <a>
                   {/* <MdDeleteOutline
@@ -217,7 +211,7 @@ const BudgetLinesTable = ({
                     }`}
                     size={24}
                   /> */}
-                  Hide
+                  {record?.visible ? "Hide" : "Unhide"}
                 </a>
               </Popconfirm>
             )}
@@ -249,6 +243,20 @@ const BudgetLinesTable = ({
       ...item,
       ...row,
     });
+    handleUpdateRow(row, 'budgetLine')
+    setDataSource(newData);
+  };
+
+  const handleHide = (row) => {
+    row.visible = !row?.visible;
+    const newData = [...dataSource];
+    const index = newData.findIndex((item) => row.key === item.key);
+    const item = newData[index];
+    newData.splice(index, 1, {
+      ...item,
+      ...row,
+    });
+    handleUpdateRow(row, 'budgetLine')
     setDataSource(newData);
   };
   const components = {

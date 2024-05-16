@@ -91,11 +91,54 @@ function page() {
     }
   }, [tab]);
 
-  useEffect(() => {
-    updateDepartment(depId, description);
-  }, [description]);
+  async function updateRow(row, type) {
+    switch (type) {
+      case "department":
+        await updateDepartment(row);
+        break;
+      case "budgetLine":
+        await updateBudgetLine(row);
+        break;
+      default:
+        break;
+    }
+  }
 
-  async function updateDepartment(id, newDescription) {}
+  async function updateDepartment(row) {
+    fetch(`${url}/dpts/${row?._id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: "Basic " + `${encode(`${apiUsername}:${apiPassword}`)}`,
+        "Content-Type": "application/json",
+        token: token,
+      },
+      body: JSON.stringify({
+        update: row,
+      }),
+    }).then((res) => {
+      getAllDepartments(router).then((deps) => {
+        setList(deps);
+      });
+    });
+  }
+
+  async function updateBudgetLine(row) {
+    fetch(`${url}/budgetLines/${row?._id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: "Basic " + `${encode(`${apiUsername}:${apiPassword}`)}`,
+        "Content-Type": "application/json",
+        token: token,
+      },
+      body: JSON.stringify({
+        update: row,
+      }),
+    }).then((res) => {
+      getAllBudgetLines(router).then((deps) => {
+        setList(deps);
+      });
+    });
+  }
 
   return (
     <div className="request mr-6 bg-white h-[calc(100vh-81px)] rounded-lg mb-10 px-5 overflow-y-auto">
@@ -193,10 +236,18 @@ function page() {
         )}
       </div> */}
       {tab == 0 && (
-        <DepartmentsTable dataSource={list} setDataSource={setList} />
+        <DepartmentsTable
+          dataSource={list}
+          setDataSource={setList}
+          handleUpdateRow={updateRow}
+        />
       )}
       {tab == 1 && (
-        <BudgetLinesTable dataSource={list} setDataSource={setList} />
+        <BudgetLinesTable
+          dataSource={list}
+          setDataSource={setList}
+          handleUpdateRow={updateRow}
+        />
       )}
     </div>
   );
