@@ -3,7 +3,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { Button, Divider, Empty, Layout, Spin } from "antd";
 import SideMenu from "../components/sideMenu";
 import TopMenu from "../components/topMenu";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname,useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { LockClosedIcon } from "@heroicons/react/24/solid";
 import {
@@ -25,6 +25,7 @@ import { InternalProvider } from "../context/InternalContext";
 
 export default function SystemLayout({ children }) {
   // let user = JSON.parse(typeof window !== 'undefined' && localStorage?.getItem("user"));
+  let pathName = usePathname();
   const { user, login, logout } = useUser();
   let [screen, setScreen] = useState("");
   let [loggedInUser, setLoggedInUser] = useState(null);
@@ -33,7 +34,7 @@ export default function SystemLayout({ children }) {
   let [current, setCurrent] = useState("");
   let router = useRouter();
   let [noPermission, setNoPermissions] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(pathName?.includes('/system/dashboard') ? false : true);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -71,7 +72,6 @@ export default function SystemLayout({ children }) {
     },
   ];
 
-  let pathName = usePathname();
   useEffect(() => {
     setLoggedInUser(user);
     // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
@@ -161,7 +161,7 @@ export default function SystemLayout({ children }) {
 
                   <div className="fixed top-5 w-full h-screen flex gap-5">
                     <div
-                      className={`${isOpen ? `block absolute top-0 left-0` : `hidden xl:block`} relative bg-white w-[420px] min-h-fit mb-10 rounded-lg ml-4`}
+                      className={`${isOpen ? `block absolute top-0 left-0` : `${pathName.includes('/system/dashboard') ? `hidden` : `hidden xl:block`}`} relative bg-white w-[420px] min-h-fit mb-10 rounded-lg ml-4`}
                     >
                       <div className="payment-request flex flex-col justify-between h-full pl-8 pr-2 overflow-auto">
                         <div className="mt-12">
@@ -200,7 +200,7 @@ export default function SystemLayout({ children }) {
                     <div className="w-full h-screen">
                       <div className="flex justify-between items-center mr-5">
                         <div>
-                          <div className="-mr-2 flex xl:hidden">
+                          <div className={`"-mr-2 ${pathName.includes('/system/dashboard') ? `flex` : `flex xl:hidden`}`}>
                             <button
                               onClick={toggleMenu}
                               type="button"
