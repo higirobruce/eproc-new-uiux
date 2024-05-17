@@ -4251,41 +4251,45 @@ const TenderDetails = ({
                           pagination={false}
                         />
 
-                        <h6 className="text-[17px] text-[#263238] font-semibold mt-5">
-                          Supporting Documents
-                        </h6>
+                        {user?.userType !== "VENDOR" && (
+                          <>
+                            <h6 className="text-[17px] text-[#263238] font-semibold mt-5">
+                              Supporting Documents
+                            </h6>
 
-                        <div className="flex flex-col">
-                          {data?.purchaseRequest?.supportingDocs &&
-                            data?.purchaseRequest?.supportingDocs?.map(
-                              (p, i) => {
-                                return (
-                                  <div key={p}>
-                                    {
-                                      <Link
-                                        // href={`${url}/file/termsOfReference/${p}`}
-                                        href={`${fendUrl}/api?folder=termsOfReference&name=${p}`}
-                                        target="_blank"
-                                      >
-                                        <Typography.Link
-                                          className="flex flex-row items-center space-x-2"
-                                          // onClick={() => {
-                                          //   setPreviewAttachment(!previewAttachment);
-                                          //   setAttachmentId(p);
-                                          // }}
-                                        >
-                                          <div>{p} </div>{" "}
-                                          <div>
-                                            <PaperClipIcon className="h-4 w-4" />
-                                          </div>
-                                        </Typography.Link>
-                                      </Link>
-                                    }
-                                  </div>
-                                );
-                              }
-                            )}
-                        </div>
+                            <div className="flex flex-col">
+                              {data?.purchaseRequest?.supportingDocs &&
+                                data?.purchaseRequest?.supportingDocs?.map(
+                                  (p, i) => {
+                                    return (
+                                      <div key={p}>
+                                        {
+                                          <Link
+                                            // href={`${url}/file/termsOfReference/${p}`}
+                                            href={`${fendUrl}/api?folder=termsOfReference&name=${p}`}
+                                            target="_blank"
+                                          >
+                                            <Typography.Link
+                                              className="flex flex-row items-center space-x-2"
+                                              // onClick={() => {
+                                              //   setPreviewAttachment(!previewAttachment);
+                                              //   setAttachmentId(p);
+                                              // }}
+                                            >
+                                              <div>{p} </div>{" "}
+                                              <div>
+                                                <PaperClipIcon className="h-4 w-4" />
+                                              </div>
+                                            </Typography.Link>
+                                          </Link>
+                                        }
+                                      </div>
+                                    );
+                                  }
+                                )}
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
 
