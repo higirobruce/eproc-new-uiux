@@ -170,6 +170,7 @@ export default function page({ params }) {
             });
             setRowData(r[0]);
             setLoadingRowData(false);
+            setEditing(false)
           })
           .catch((err) => {
             console.error(err);
