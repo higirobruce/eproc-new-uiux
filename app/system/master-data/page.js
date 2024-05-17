@@ -5,6 +5,7 @@ import { encode } from "base-64";
 import { Card, Typography } from "antd";
 import DepartmentsTable from "@/app/components/departmentsTable";
 import BudgetLinesTable from "@/app/components/budgetLinesTable";
+import ServiceCategoriesTable from "@/app/components/serviceCategoriesTable";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
@@ -58,6 +59,30 @@ async function getAllBudgetLines(router) {
   return res.json();
 }
 
+async function getAllServiceCategories(router) {
+  const res = await fetch(`${url}/serviceCategories/`, {
+    headers: {
+      Authorization: "Basic " + `${encode(`${apiUsername}:${apiPassword}`)}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    alert(JSON.stringify(res));
+    if (res.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      router.push("/auth");
+    }
+    // This will activate the closest `error.js` Error Boundary
+    // console.log(id);
+    return null;
+    // throw new Error("Failed to fetch data");
+  }
+  // console.log(res.json())
+  return res.json();
+}
+
 function page() {
   const [tab, setTab] = useState(0);
   let token = typeof window !== "undefined" && localStorage.getItem("token");
@@ -86,6 +111,12 @@ function page() {
           setList(res);
         });
         break;
+      case 2:
+        getAllServiceCategories(router).then((res) => {
+          setList([]);
+          setList(res);
+        });
+        break;
       default:
         break;
     }
@@ -98,6 +129,9 @@ function page() {
         break;
       case "budgetLine":
         await updateBudgetLine(row);
+        break;
+      case "serviceCategory":
+        await updateServiceCategory(row);
         break;
       default:
         break;
@@ -136,6 +170,24 @@ function page() {
     }).then((res) => {
       getAllBudgetLines(router).then((deps) => {
         setList(deps);
+      });
+    });
+  }
+
+  async function updateServiceCategory(row) {
+    fetch(`${url}/serviceCategories/${row?._id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: "Basic " + `${encode(`${apiUsername}:${apiPassword}`)}`,
+        "Content-Type": "application/json",
+        token: token,
+      },
+      body: JSON.stringify({
+        update: row,
+      }),
+    }).then((res) => {
+      getAllServiceCategories(router).then((servs) => {
+        setList(servs);
       });
     });
   }
@@ -244,6 +296,14 @@ function page() {
       )}
       {tab == 1 && (
         <BudgetLinesTable
+          dataSource={list}
+          setDataSource={setList}
+          handleUpdateRow={updateRow}
+        />
+      )}
+
+      {tab == 2 && (
+        <ServiceCategoriesTable
           dataSource={list}
           setDataSource={setList}
           handleUpdateRow={updateRow}
