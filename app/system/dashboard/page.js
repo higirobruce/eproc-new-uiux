@@ -925,7 +925,7 @@ export default function page() {
               </div>
               <div className="xl:col-span-1 col-span-2 px-4 pt-5 bg-[#F9FAFD] grid grid-cols-3">
                 <div>
-                  <div className="pb-3">
+                  <div className="">
                     <span className="text-[14px] font-semibold text-[#12263F]">
                       Sourcing methods
                     </span>
@@ -996,7 +996,7 @@ export default function page() {
                 </div>
 
                 <div>
-                  <div className="py-3">
+                  <div className="">
                     <span className="text-[14px] font-semibold text-[#12263F]">
                       Approval process
                     </span>
