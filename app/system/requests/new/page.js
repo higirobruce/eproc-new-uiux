@@ -69,7 +69,7 @@ export default function NewRequest() {
     //       content: "Something happened! Please try again.",
     //     });
     //   });
-    fetch(`${url}/serviceCategories`, {
+    fetch(`${url}/serviceCategories/?visible=1`, {
       method: "GET",
       headers: {
         Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
@@ -604,7 +604,7 @@ export default function NewRequest() {
                     <label>Purchase Request Currency</label>
                   </div>
                   <Form.Item
-                  initialValue={currency}
+                    initialValue={currency}
                     name="currency"
                     rules={[
                       {

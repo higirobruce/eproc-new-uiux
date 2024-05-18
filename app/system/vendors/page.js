@@ -177,7 +177,7 @@ export default function Vendors() {
   }
 
   useEffect(() => {
-    fetch(`${url}/serviceCategories`, {
+    fetch(`${url}/serviceCategories/?visible=1`, {
       method: "GET",
       headers: {
         Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
