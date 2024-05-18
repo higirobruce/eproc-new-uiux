@@ -2,7 +2,8 @@
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { encode } from "base-64";
-import { Card, Typography } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
+import { Card, message, Spin, Typography } from "antd";
 import DepartmentsTable from "@/app/components/departmentsTable";
 import BudgetLinesTable from "@/app/components/budgetLinesTable";
 import ServiceCategoriesTable from "@/app/components/serviceCategoriesTable";
@@ -91,6 +92,8 @@ function page() {
   let [departmentOptions, setDepartmentOptions] = useState([]);
   let [description, setDescription] = useState("");
   let [depId, setDepId] = useState(null);
+  const [messageApi, contextHolder] = message.useMessage();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     getAllDepartments(router).then((res) => {
@@ -101,6 +104,7 @@ function page() {
   useEffect(() => {
     switch (tab) {
       case 0:
+        setLoading(true);
         getAllDepartments(router).then((res) => {
           setList([]);
           setList(res);
@@ -111,20 +115,24 @@ function page() {
               label: option?.description,
             };
           });
-
+          setLoading(false);
           setDepartmentOptions(options);
         });
         break;
       case 1:
+        setLoading(true);
         getAllBudgetLines(router).then((res) => {
           setList([]);
           setList(res);
+          setLoading(false);
         });
         break;
       case 2:
+        setLoading(true);
         getAllServiceCategories(router).then((res) => {
           setList([]);
           setList(res);
+          setLoading(false);
         });
         break;
       default:
@@ -135,13 +143,19 @@ function page() {
   async function updateRow(row, type) {
     switch (type) {
       case "department":
+        setLoading(true);
         await updateDepartment(row);
+        setLoading(false);
         break;
       case "budgetLine":
+        setLoading(true);
         await updateBudgetLine(row);
+        setLoading(false);
         break;
       case "serviceCategory":
+        setLoading(true);
         await updateServiceCategory(row);
+        setLoading(false);
         break;
       default:
         break;
@@ -159,11 +173,20 @@ function page() {
       body: JSON.stringify({
         update: row,
       }),
-    }).then((res) => {
-      getAllDepartments(router).then((deps) => {
-        setList(deps);
+    })
+      .then((res) => res.json())
+
+      .then((res) => {
+        if (res?.error) {
+          messageApi.open({
+            type: "error",
+            content: res?.message,
+          });
+        }
+        getAllDepartments(router).then((deps) => {
+          setList(deps);
+        });
       });
-    });
   }
 
   async function updateBudgetLine(row) {
@@ -203,9 +226,11 @@ function page() {
   }
 
   async function refreshDepartments() {
+    setLoading(true);
     getAllDepartments(router).then((res) => {
       setList([]);
       setList(res);
+      setLoading(false);
       let options = res?.map((option) => {
         return {
           key: option?._id,
@@ -219,21 +244,26 @@ function page() {
   }
 
   async function refreshBudgetLines() {
+    setLoading(true);
     getAllBudgetLines(router).then((res) => {
       setList([]);
       setList(res);
+      setLoading(false);
     });
   }
 
   async function refreshServiceCategories() {
+    setLoading(true);
     getAllServiceCategories(router).then((res) => {
       setList([]);
       setList(res);
+      setLoading(false);
     });
   }
 
   return (
     <div className="request mr-6 bg-white h-[calc(100vh-81px)] rounded-lg mb-10 px-5 overflow-y-auto">
+      {contextHolder}
       <div className="mt-5 flex justify-between w-full">
         <div>
           {/* <small className="text-[#97ABCA] text-[10px]">Overview</small> */}
@@ -327,7 +357,7 @@ function page() {
           </div>
         )}
       </div> */}
-      {tab == 0 && (
+      {tab == 0 && !loading && (
         <DepartmentsTable
           dataSource={list}
           setDataSource={setList}
@@ -335,7 +365,7 @@ function page() {
           handleRefresh={refreshDepartments}
         />
       )}
-      {tab == 1 && (
+      {tab == 1 && !loading && (
         <BudgetLinesTable
           dataSource={list}
           setDataSource={setList}
@@ -345,13 +375,27 @@ function page() {
         />
       )}
 
-      {tab == 2 && (
+      {tab == 2 && !loading && (
         <ServiceCategoriesTable
           dataSource={list}
           setDataSource={setList}
           handleUpdateRow={updateRow}
           handleRefresh={refreshServiceCategories}
         />
+      )}
+
+      {loading && (
+        <div className="flex items-center justify-center flex-1 h-screen">
+          <Spin
+            indicator={
+              <LoadingOutlined
+                className="text-gray-500"
+                style={{ fontSize: 42 }}
+                spin
+              />
+            }
+          />
+        </div>
       )}
     </div>
   );
