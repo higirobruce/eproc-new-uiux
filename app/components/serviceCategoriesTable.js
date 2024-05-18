@@ -5,6 +5,7 @@ import {
   Form,
   Input,
   InputNumber,
+  Modal,
   Popconfirm,
   Select,
   Table,
@@ -19,6 +20,7 @@ import UploadTORs from "./uploadTORs";
 import { FaPlus } from "react-icons/fa6";
 import Link from "next/link";
 import { MdDeleteOutline } from "react-icons/md";
+import { encode } from "base-64";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let fendUrl = process.env.NEXT_PUBLIC_FTEND_URL;
@@ -133,9 +135,14 @@ const ServiceCategoriesTable = ({
   dataSource,
   disable,
   handleUpdateRow,
+  handleRefresh
 }) => {
   const [count, setCount] = useState(dataSource?.length + 1);
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const [rowForm] = Form.useForm();
+  const [openCreateServiceCategory, setOpenCreateServiceCategory] =
+    useState(false);
+  let [form] = Form.useForm();
 
   const handleDelete = (key) => {
     const newData = dataSource.filter((item) => item.key !== key && item.key);
@@ -243,7 +250,7 @@ const ServiceCategoriesTable = ({
       ...item,
       ...row,
     });
-    handleUpdateRow(row, 'serviceCategory')
+    handleUpdateRow(row, "serviceCategory");
     setDataSource(newData);
   };
 
@@ -256,7 +263,7 @@ const ServiceCategoriesTable = ({
       ...item,
       ...row,
     });
-    handleUpdateRow(row, 'serviceCategory')
+    handleUpdateRow(row, "serviceCategory");
     setDataSource(newData);
   };
   const components = {
@@ -282,14 +289,70 @@ const ServiceCategoriesTable = ({
     };
   });
 
+  async function createServiceCategory(value) {
+    fetch(`${url}/serviceCategories/`, {
+      method: "POST",
+      headers: {
+        Authorization: "Basic " + `${encode(`${apiUsername}:${apiPassword}`)}`,
+        "Content-Type": "application/json",
+        token: token,
+      },
+      body: JSON.stringify(value),
+    }).then((res) => {
+      handleRefresh();
+    });
+  }
+
+  function buildNewServiceCategoryModel() {
+    return (
+      <Modal
+        centered
+        open={openCreateServiceCategory}
+        onOk={() => {
+          form.validateFields().then(
+            (value) => {
+              createServiceCategory(value);
+              setOpenCreateServiceCategory(false);
+            },
+            (reason) => {}
+          );
+
+          // setOpenCreateServiceCategory(false);
+        }}
+        title="New Service Category"
+        okText={"Save"}
+        onCancel={() => setOpenCreateServiceCategory(false)}
+        width={"30%"}
+        bodyStyle={{ maxHeight: "700px", overflow: "hidden" }}
+      >
+        <div className="p-10">
+          <Form form={form} name="name">
+            <Form.Item
+              label="Service Category name"
+              name="description"
+              rules={[
+                {
+                  required: true,
+                  message: "Can not be empty!",
+                },
+              ]}
+            >
+              <Input size="large" />
+            </Form.Item>
+          </Form>
+        </div>
+      </Modal>
+    );
+  }
   return (
     <>
+      {buildNewServiceCategoryModel()}
       <div className="flex flex-col gap-2 request-empty">
         <div className="flex items-center justify-between w-full">
           <div className="flex justify-between items-center">
             {!disable ? (
               <Button
-                onClick={handleAdd}
+                onClick={() => setOpenCreateServiceCategory(true)}
                 className="flex self-start items-center gap-1 border-0 bg-[#EAF1FC] text-[#0065DD] mb-1"
               >
                 <FaPlus />

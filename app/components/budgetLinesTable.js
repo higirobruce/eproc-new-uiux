@@ -5,6 +5,7 @@ import {
   Form,
   Input,
   InputNumber,
+  Modal,
   Popconfirm,
   Select,
   Table,
@@ -24,6 +25,7 @@ let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let fendUrl = process.env.NEXT_PUBLIC_FTEND_URL;
 let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
 let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
+import { encode } from "base-64";
 
 const EditableContext = React.createContext(null);
 
@@ -133,9 +135,14 @@ const BudgetLinesTable = ({
   dataSource,
   disable,
   handleUpdateRow,
+  departmentOptions,
+  handleRefresh,
 }) => {
   const [count, setCount] = useState(dataSource?.length + 1);
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const [rowForm] = Form.useForm();
+  const [openCreateBudgetLine, setOpenCreateBudgetLine] = useState(false);
+  let [form] = Form.useForm();
 
   const handleDelete = (key) => {
     const newData = dataSource.filter((item) => item.key !== key && item.key);
@@ -243,7 +250,7 @@ const BudgetLinesTable = ({
       ...item,
       ...row,
     });
-    handleUpdateRow(row, 'budgetLine')
+    handleUpdateRow(row, "budgetLine");
     setDataSource(newData);
   };
 
@@ -256,7 +263,7 @@ const BudgetLinesTable = ({
       ...item,
       ...row,
     });
-    handleUpdateRow(row, 'budgetLine')
+    handleUpdateRow(row, "budgetLine");
     setDataSource(newData);
   };
   const components = {
@@ -265,6 +272,20 @@ const BudgetLinesTable = ({
       cell: EditableCell,
     },
   };
+
+  async function createBudgetLine(value) {
+    fetch(`${url}/budgetLines/`, {
+      method: "POST",
+      headers: {
+        Authorization: "Basic " + `${encode(`${apiUsername}:${apiPassword}`)}`,
+        "Content-Type": "application/json",
+        token: token,
+      },
+      body:JSON.stringify(value)
+    }).then((res) => {
+      handleRefresh();
+    });
+  }
 
   const columns = defaultColumns.map((col) => {
     if (!col.editable) {
@@ -282,14 +303,70 @@ const BudgetLinesTable = ({
     };
   });
 
+  function buildNewBudgetLineModel() {
+    return (
+      <Modal
+        centered
+        open={openCreateBudgetLine}
+        onOk={() => {
+          form.validateFields().then(
+            (value) => {
+              createBudgetLine(value);
+              setOpenCreateBudgetLine(false);
+            },
+            (reason) => {}
+          );
+
+          // setOpenCreateBudgetLine(false);
+        }}
+        title="New Budget Line"
+        okText={"Save"}
+        onCancel={() => setOpenCreateBudgetLine(false)}
+        width={"30%"}
+        bodyStyle={{ maxHeight: "700px", overflow: "hidden" }}
+      >
+        <div className="p-10">
+          <Form form={form} name="name">
+            <Form.Item
+              label="Budget Line name"
+              name="description"
+              rules={[
+                {
+                  required: true,
+                  message: "Can not be empty!",
+                },
+              ]}
+            >
+              <Input size="large" />
+            </Form.Item>
+
+            <Form.Item
+              label="Department"
+              name="department"
+              rules={[
+                {
+                  required: true,
+                  message: "Can not be empty!",
+                },
+              ]}
+            >
+              <Select size="large" options={departmentOptions} />
+            </Form.Item>
+          </Form>
+        </div>
+      </Modal>
+    );
+  }
+
   return (
     <>
+      {buildNewBudgetLineModel()}
       <div className="flex flex-col gap-2 request-empty">
         <div className="flex items-center justify-between w-full">
           <div className="flex justify-between items-center">
             {!disable ? (
               <Button
-                onClick={handleAdd}
+                onClick={() => setOpenCreateBudgetLine(true)}
                 className="flex self-start items-center gap-1 border-0 bg-[#EAF1FC] text-[#0065DD] mb-1"
               >
                 <FaPlus />

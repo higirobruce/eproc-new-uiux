@@ -88,6 +88,7 @@ function page() {
   let token = typeof window !== "undefined" && localStorage.getItem("token");
   let router = useRouter();
   let [list, setList] = useState([]);
+  let [departmentOptions, setDepartmentOptions] = useState([]);
   let [description, setDescription] = useState("");
   let [depId, setDepId] = useState(null);
 
@@ -103,6 +104,15 @@ function page() {
         getAllDepartments(router).then((res) => {
           setList([]);
           setList(res);
+          let options = res?.map((option) => {
+            return {
+              key: option?._id,
+              value: option?._id,
+              label: option?.description,
+            };
+          });
+
+          setDepartmentOptions(options);
         });
         break;
       case 1:
@@ -189,6 +199,36 @@ function page() {
       getAllServiceCategories(router).then((servs) => {
         setList(servs);
       });
+    });
+  }
+
+  async function refreshDepartments() {
+    getAllDepartments(router).then((res) => {
+      setList([]);
+      setList(res);
+      let options = res?.map((option) => {
+        return {
+          key: option?._id,
+          value: option?._id,
+          label: option?.description,
+        };
+      });
+
+      setDepartmentOptions(options);
+    });
+  }
+
+  async function refreshBudgetLines() {
+    getAllBudgetLines(router).then((res) => {
+      setList([]);
+      setList(res);
+    });
+  }
+
+  async function refreshServiceCategories() {
+    getAllServiceCategories(router).then((res) => {
+      setList([]);
+      setList(res);
     });
   }
 
@@ -292,6 +332,7 @@ function page() {
           dataSource={list}
           setDataSource={setList}
           handleUpdateRow={updateRow}
+          handleRefresh={refreshDepartments}
         />
       )}
       {tab == 1 && (
@@ -299,6 +340,8 @@ function page() {
           dataSource={list}
           setDataSource={setList}
           handleUpdateRow={updateRow}
+          departmentOptions={departmentOptions}
+          handleRefresh={refreshBudgetLines}
         />
       )}
 
@@ -307,6 +350,7 @@ function page() {
           dataSource={list}
           setDataSource={setList}
           handleUpdateRow={updateRow}
+          handleRefresh={refreshServiceCategories}
         />
       )}
     </div>
