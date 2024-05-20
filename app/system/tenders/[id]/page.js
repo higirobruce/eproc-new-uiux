@@ -149,6 +149,48 @@ export default function page({ params }) {
       });
   }
 
+  function editSubmission(data, id) {
+    setLoadingRowData(true);
+    fetch(`${url}/submissions/${id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((res) => getResultFromServer(res))
+      .then((res1) => {
+        loadTenders()
+          .then((res2) => getResultFromServer(res2))
+          .then((res3) => {
+            let r = res3.filter((d) => {
+              return d._id === rowData._id;
+            });
+            setRowData(r[0]);
+            setLoadingRowData(false);
+            setEditing(false)
+          })
+          .catch((err) => {
+            console.error(err);
+            setLoadingRowData(false);
+            messageApi.open({
+              type: "error",
+              content: JSON.stringify(err),
+            });
+          });
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoadingRowData(false);
+        messageApi.open({
+          type: "error",
+          content: JSON.stringify(err),
+        });
+      });
+  }
+
   function createPO(
     vendor,
     tender,
@@ -420,6 +462,7 @@ export default function page({ params }) {
           loading={loadingRowData}
           data={rowData}
           handleCreateSubmission={createSubmission}
+          handleEditSubmission={editSubmission}
           handleClose={() => router.push("/system/tenders")}
           handleRefreshData={refresh}
           handleCreatePO={createPO}

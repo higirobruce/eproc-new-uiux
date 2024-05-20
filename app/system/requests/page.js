@@ -142,7 +142,7 @@ export default function UserRequests() {
     //       content: "Something happened! Please try again.",
     //     });
     //   });
-    fetch(`${url}/serviceCategories`, {
+    fetch(`${url}/serviceCategories/?visible=1`, {
       method: "GET",
       headers: {
         Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),

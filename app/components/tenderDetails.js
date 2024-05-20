@@ -120,6 +120,7 @@ const TenderDetails = ({
   user,
   handleSendEvalApproval,
   handleEditSubmission,
+  handleSetEdit
 }) => {
   const [form] = Form.useForm();
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
@@ -719,6 +720,9 @@ const TenderDetails = ({
 
   function editSubmission(submissionData) {
     handleEditSubmission(submissionData, editBid?._id);
+    setEditingBid(false)
+    setTab(3)
+    setSaving(false)
   }
 
   const handleUpload = () => {
@@ -4340,7 +4344,8 @@ const TenderDetails = ({
                                 }`}
                               >
                                 {editingBid
-                                  ? "Save changed"
+                                  ? "Save changes"
+
                                   : "Submit Proposal"}
                               </button>
                               {/* <Form.Item>

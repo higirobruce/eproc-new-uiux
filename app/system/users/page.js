@@ -65,16 +65,16 @@ export default function Users() {
   const { user, login, logout } = useUser();
   // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
   let router = useRouter();
-  const searchParams = useSearchParams()
+  const searchParams = useSearchParams();
   let token = typeof window !== "undefined" && localStorage.getItem("token");
-  
-  const pagination = searchParams.get('page');
-  const search = searchParams.get('search');
-  const statusFilter = searchParams.get('filter');
+
+  const pagination = searchParams.get("page");
+  const search = searchParams.get("search");
+  const statusFilter = searchParams.get("filter");
 
   // Routing Context
-  const {setPage, setFilter, filter} = useInternalContext();
-  
+  const { setPage, setFilter, filter } = useInternalContext();
+
   const [dataLoaded, setDataLoaded] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
@@ -109,8 +109,8 @@ export default function Users() {
 
   useEffect(() => {
     setPage(pagination ? pagination : 1);
-    setFilter(statusFilter ? statusFilter : 'all')
-  }, [pagination, statusFilter])
+    setFilter(statusFilter ? statusFilter : "all");
+  }, [pagination, statusFilter]);
 
   const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -197,7 +197,9 @@ export default function Users() {
 
   useEffect(() => {
     setDataLoaded(false);
-    let requestUrl = `${url}/users/internal/byStatus/${filter ? filter : searchStatus}/`;
+    let requestUrl = `${url}/users/internal/byStatus/${
+      filter ? filter : searchStatus
+    }/`;
     fetch(requestUrl, {
       method: "GET",
       headers: {
@@ -725,8 +727,8 @@ export default function Users() {
                 placeholder="Select status"
                 onChange={(value) => {
                   setPage(1);
-                  setFilter(value); 
-                  setSearchStatus(value)
+                  setFilter(value);
+                  setSearchStatus(value);
                 }}
                 value={filter ? filter : searchStatus}
                 options={[
@@ -978,9 +980,11 @@ export default function Users() {
                       >
                         {dpts?.map((dpt) => {
                           return (
-                            <Select.Option key={dpt._id} value={dpt._id}>
-                              {dpt.description}
-                            </Select.Option>
+                            dpt?.visible && (
+                              <Select.Option key={dpt._id} value={dpt._id}>
+                                {dpt.description}
+                              </Select.Option>
+                            )
                           );
                         })}
                       </Select>
@@ -1302,9 +1306,11 @@ export default function Users() {
                       >
                         {dpts?.map((dpt) => {
                           return (
-                            <Select.Option key={dpt._id} value={dpt._id}>
-                              {dpt.description}
-                            </Select.Option>
+                            dpt?.visible && (
+                              <Select.Option key={dpt._id} value={dpt._id}>
+                                {dpt.description}
+                              </Select.Option>
+                            )
                           );
                         })}
                       </Select>

@@ -1600,6 +1600,7 @@ const RequestDetails = ({
             .filter((i) => i.itemType === "asset")
             .map((i, index) => {
               assetsNeeded = true;
+              i.currency = poCurrency
               i?.assetCodes?.map((a) => {
                 assetItems?.push({
                   ItemCode: a,
@@ -1614,6 +1615,7 @@ const RequestDetails = ({
           items
             .filter((i) => i.itemType === "non-asset" || !i.itemType)
             .map((i, index) => {
+              i.currency = poCurrency
               nonAssetItems?.push({
                 ItemDescription: i.title,
                 Quantity: i.quantity,

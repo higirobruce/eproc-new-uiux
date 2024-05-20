@@ -12,7 +12,7 @@ import {
 import RequestStats from "@/app/components/requestsStatistics";
 import RequestsByDep from "@/app/components/requestsByDep";
 import RequestsByStatus from "@/app/components/requestsByStatus";
-import { Divider, message, Spin } from "antd";
+import { Divider, message, Spin, Select } from "antd";
 import TendersStats from "@/app/components/tendersStatistics";
 import TendersByDep from "@/app/components/tendersByDep";
 import { LoadingOutlined } from "@ant-design/icons";
@@ -48,6 +48,7 @@ import {
 } from "recharts";
 import { isMobile } from "react-device-detect";
 import NotificationComponent from "@/app/hooks/useMobile";
+import { formatAmount } from "@/app/utils/helpers";
 
 export default function page() {
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -55,6 +56,9 @@ export default function page() {
   const [requests, setRequests] = useState([]);
   const [tenders, setTenders] = useState([]);
   const [contracts, setContracts] = useState([]);
+  const [payments, setPayments] = useState([]);
+  const [year, setYear] = useState(new Date().getFullYear());
+  const [internalUsers, setInternalUsers] = useState([]);
   const [purchaseOrders, setPurchaseOrders] = useState([]);
   const [vendors, setVendors] = useState([]);
   const [budgeted, setBudgeted] = useState(0);
@@ -65,7 +69,10 @@ export default function page() {
   const [totalOverview, setTotalOverview] = useState([]);
   const [paymentOverview, setPaymentOverview] = useState("");
   const [dashboardOverview, setDashboardOverview] = useState([]);
-  const [serviceCategories, setServiceCategories] = useState([]);
+  const [spendOverview, setSpendOverview] = useState("");
+  const [expenseOverview, setExpenseOverview] = useState([]);
+  const [serviceCategories, setServiceCategories] = useState("");
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const router = useRouter();
   const [tab, setTab] = useState(0);
 
@@ -76,134 +83,203 @@ export default function page() {
   const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
-    loadServiceCategories()
-      .then((res) => getResultFromServer(res))
-      .then((res) => setServiceCategories(res))
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Something happened! Please try again.",
-        });
-      });
-
-    loadTenders()
-      .then((res) => getResultFromServer(res))
-      .then((res) => {
-        setTenders(res);
-        loadAvgBidsPerTender()
-          .then((res) => getResultFromServer(res))
-          .then((res) => {
-            // alert(JSON.stringify(res))
-            setAvgBids(Math.round(res[0]?.avg * 100) / 100);
+    try {
+      setDataLoaded(true);
+      loadServiceCategories()
+        .then((res) => getResultFromServer(res))
+        .then((res) => setServiceCategories(res))
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
           });
-        loadTendersStats()
-          .then((res) => getResultFromServer(res))
-          .then((res) => {
-            setOpenTenders(Math.round((res?.open / res?.total) * 100) / 100);
-            setClosedTenders(
-              Math.round((res?.closed / res?.total) * 100) / 100
-            );
+        });
+
+      loadTenders()
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          setTenders(res);
+          loadAvgBidsPerTender()
+            .then((res) => getResultFromServer(res))
+            .then((res) => {
+              // alert(JSON.stringify(res))
+              setAvgBids(Math.round(res[0]?.avg * 100) / 100);
+            });
+          loadTendersStats()
+            .then((res) => getResultFromServer(res))
+            .then((res) => {
+              setOpenTenders(Math.round((res?.open / res?.total) * 100) / 100);
+              setClosedTenders(
+                Math.round((res?.closed / res?.total) * 100) / 100
+              );
+            });
+        })
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
           });
-      })
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Something happened! Please try again.",
         });
-      });
 
-    loadRequests()
-      .then((res) => getResultFromServer(res))
-      .then((res) => {
-        setRequests(res);
-        loadRequestsByBudgetStatus()
-          .then((res) => getResultFromServer(res))
-          .then((resBudg) => {
-            let _budgeted = resBudg?.filter((r) => r._id === true);
-            let _unbudgeted = resBudg?.filter((r) => r._id === false);
-            let _total = _budgeted[0]?.count + _unbudgeted[0]?.count;
-            setBudgeted(Math.round((_budgeted[0]?.count / _total) * 100));
-            setUnbudgeted(Math.round((_unbudgeted[0]?.count / _total) * 100));
-            setDataLoaded(true);
+      loadRequests()
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          setRequests(res);
+          loadRequestsByBudgetStatus()
+            .then((res) => getResultFromServer(res))
+            .then((resBudg) => {
+              let _budgeted = resBudg?.filter((r) => r._id === true);
+              let _unbudgeted = resBudg?.filter((r) => r._id === false);
+              let _total = _budgeted[0]?.count + _unbudgeted[0]?.count;
+              setBudgeted(Math.round((_budgeted[0]?.count / _total) * 100));
+              setUnbudgeted(Math.round((_unbudgeted[0]?.count / _total) * 100));
+              setDataLoaded(true);
+            });
+        })
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
           });
-      })
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Something happened! Please try again.",
         });
-      });
 
-    loadContracts()
-      .then((res) => getResultFromServer(res))
-      .then((res) => {
-        setContracts(res);
-      })
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Something happened! Please try again.",
+      loadContracts()
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          setContracts(res);
+        })
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
+          });
         });
-      });
 
-    loadPurchaseOrders()
-      .then((res) => getResultFromServer(res))
-      .then((res) => {
-        setPurchaseOrders(res?.data);
-      })
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Something happened! Please try again.",
+      loadPurchaseOrders()
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          setPurchaseOrders(res?.data);
+        })
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
+          });
         });
-      });
 
-    loadVendors()
-      .then((res) => getResultFromServer(res))
-      .then((res) => {
-        setVendors(res);
-      })
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Something happened! Please try again.",
+      loadVendors()
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          setVendors(res);
+        })
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
+          });
         });
-      });
-    loadRequestOverview()
-      .then((res) => getResultFromServer(res))
-      .then((res) => {
-        setTotalOverview(res);
-      })
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Something happened! Please try again.",
+
+      loadRequestOverview()
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          setTotalOverview(res);
+        })
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
+          });
         });
-      });
-    loadPaymentOverview()
-      .then((res) => getResultFromServer(res))
-      .then((res) => {
-        setPaymentOverview(res);
-      })
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Something happened! Please try again.",
+
+      loadPayment()
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          setPayments(res);
+        })
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
+          });
         });
-      });
-    loadDashboardOverview()
-      .then((res) => getResultFromServer(res))
-      .then((res) => {
-        setDashboardOverview(res);
-        console.log("Dasboard Overview ", res);
-      })
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Something happened! Please try again.",
+
+      loadInternalUsers()
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          setInternalUsers(res);
+        })
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
+          });
         });
+
+      loadPaymentOverview()
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          setPaymentOverview(res);
+        })
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
+          });
+        });
+      loadDashboardOverview()
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          setDashboardOverview(res);
+        })
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
+          });
+        });
+      loadSpendTrackingOverview()
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          setSpendOverview(res);
+        })
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
+          });
+        });
+      loadExpensePlanning()
+        .then((res) => getResultFromServer(res))
+        .then((res) => {
+          setExpenseOverview(res);
+        })
+        .catch((err) => {
+          messageApi.open({
+            type: "error",
+            content: "Something happened! Please try again.",
+          });
+        });
+      setDataLoaded(false);
+    } catch (error) {
+      messageApi.open({
+        type: "error",
+        content: "Something happened! Please try again.",
       });
-  }, []);
+    }
+  }, [year]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [window]);
 
   async function loadTenders() {
     return fetch(`${url}/tenders/`, {
@@ -240,6 +316,28 @@ export default function page() {
 
   async function loadPurchaseOrders() {
     return fetch(`${url}/purchaseOrders/`, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    });
+  }
+
+  async function loadPayment() {
+    return fetch(`${url}/paymentRequests`, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    });
+  }
+
+  async function loadInternalUsers() {
+    return fetch(`${url}/users`, {
       method: "GET",
       headers: {
         Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
@@ -305,7 +403,7 @@ export default function page() {
   }
 
   async function loadRequestOverview() {
-    return fetch(`${url}/requests/totalOverview`, {
+    return fetch(`${url}/requests/totalOverview?year=${year}`, {
       method: "GET",
       headers: {
         Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
@@ -316,7 +414,7 @@ export default function page() {
   }
 
   async function loadPaymentOverview() {
-    return fetch(`${url}/paymentRequests/totalOverview`, {
+    return fetch(`${url}/paymentRequests/totalOverview?year=${year}`, {
       method: "GET",
       headers: {
         Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
@@ -327,7 +425,29 @@ export default function page() {
   }
 
   async function loadDashboardOverview() {
-    return fetch(`${url}/dashboards`, {
+    return fetch(`${url}/dashboards?year=${year}`, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    });
+  }
+
+  async function loadSpendTrackingOverview() {
+    return fetch(`${url}/paymentRequests/spendTracking?year=${year}`, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    });
+  }
+
+  async function loadExpensePlanning() {
+    return fetch(`${url}/paymentRequests/expensePlanning?year=${year}`, {
       method: "GET",
       headers: {
         Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
@@ -381,43 +501,36 @@ export default function page() {
       name: "JAN",
       value: 4000,
       current: 2400,
-      amt: 2400,
     },
     {
       name: "FEB",
       value: 3000,
       current: 1398,
-      amt: 2210,
     },
     {
       name: "MAR",
       value: 2000,
       current: 9800,
-      amt: 2290,
     },
     {
       name: "APR",
       value: 2780,
       current: 3908,
-      amt: 2000,
     },
     {
       name: "MAY",
       value: 1890,
       current: 4800,
-      amt: 2181,
     },
     {
       name: "JUN",
       value: 2390,
       current: 3800,
-      amt: 2500,
     },
     {
       name: "JULY",
       value: 3490,
       current: 4300,
-      amt: 2100,
     },
   ];
 
@@ -426,331 +539,9 @@ export default function page() {
     { name: "Group B", value: 300 },
   ];
 
-  const statusColors = ["#27AFB8", "#53BAA1", "#237396"];
+  const statusColors = ["#7B2CBF", "#E76F51", "#277DA1", "#1677FF", "#E76F51"];
 
-  const overviewData = [
-    // {
-    //   item: "Purchase request",
-    //   labels: [
-    //     {
-    //       color: "#31D5A6",
-    //       name: "Budgeted",
-    //     },
-    //     {
-    //       color: "#878FF6",
-    //       name: "Non-Budgeted",
-    //     },
-    //   ],
-    //   data: [
-    //     {
-    //       name: "JAN",
-    //       budgeted: 4000,
-    //       nonBudgeted: 2400,
-    //       total: 3000,
-    //     },
-    //     {
-    //       name: "FEB",
-    //       budgeted: 3000,
-    //       nonBudgeted: 1398,
-    //       total: 2210,
-    //     },
-    //     {
-    //       name: "MAR",
-    //       budgeted: 2000,
-    //       nonBudgeted: 9800,
-    //       total: 2290,
-    //     },
-    //   ],
-    //   serviceData: [
-    //     {
-    //       name: "JAN",
-    //       Transport: 30,
-    //       Food: 20,
-    //       Electronics: 10,
-    //       Entertainment: null,
-    //       Electricity: null,
-    //       Furnitures: 5
-    //     },
-    //     {
-    //       name: "JAN",
-    //       Transport: 40,
-    //       Food: 20,
-    //       Electronics: 10,
-    //       Entertainment: null,
-    //       Electricity: null,
-    //       Furnitures: 5
-    //     },
-    //     {
-    //       name: "FEB",
-    //       Entertainment: 20,
-    //       Electricity: 50,
-    //       Transport: 10,
-    //       Others: 5
-    //     },
-    //     {
-    //       name: "MAR",
-    //       Entertainment: 30,
-    //       Electricity: 20,
-    //       Transport: 60,
-    //       Entertainment: null,
-    //       Electricity: 10,
-    //       Others: 10
-    //     },
-    //     {
-    //       name: "APR",
-    //       Transport: 30,
-    //       Food: 20,
-    //       Electronics: 10,
-    //       Entertainment: null,
-    //       Electricity: null,
-    //       Furnitures: 5
-    //     },
-    //     {
-    //       name: "MAY",
-    //       Entertainment: 20,
-    //       Electricity: 50,
-    //       Transport: 10,
-    //       Others: 5
-    //     },
-    //     {
-    //       name: "JUN",
-    //       Entertainment: 30,
-    //       Electricity: 20,
-    //       Transport: 60,
-    //       Entertainment: null,
-    //       Electricity: 10,
-    //       Others: 10
-    //     },
-    //     {
-    //       name: "JUL",
-    //       Transport: 30,
-    //       Food: 20,
-    //       Electronics: 10,
-    //       Entertainment: null,
-    //       Electricity: null,
-    //       Furnitures: 5
-    //     },
-    //     {
-    //       name: "AUG",
-    //       Entertainment: 20,
-    //       Electricity: 50,
-    //       Transport: 10,
-    //       Others: 5
-    //     },
-    //     {
-    //       name: "SEP",
-    //       Entertainment: 30,
-    //       Electricity: 20,
-    //       Transport: 60,
-    //       Entertainment: null,
-    //       Electricity: 10,
-    //       Others: 10
-    //     },
-    //     {
-    //       name: "SEP",
-    //       Transport: 30,
-    //       Food: 20,
-    //       Electronics: 10,
-    //       Entertainment: null,
-    //       Electricity: null,
-    //       Furnitures: 5
-    //     },
-    //     {
-    //       name: "OCT",
-    //       Entertainment: 20,
-    //       Electricity: 50,
-    //       Transport: 10,
-    //       Others: 5
-    //     },
-    //     {
-    //       name: "NOV",
-    //       Entertainment: 30,
-    //       Electricity: 20,
-    //       Transport: 60,
-    //       Entertainment: null,
-    //       Electricity: 10,
-    //       Others: 10
-    //     },
-    //     {
-    //       name: "DEC",
-    //       Transport: 30,
-    //       Food: 20,
-    //       Electronics: 10,
-    //       Entertainment: null,
-    //       Electricity: null,
-    //       Furnitures: 5
-    //     }
-    //   ],
-    //   statusData: [
-    //     { name: "Pending approval", value: 10 },
-    //     { name: "Approved", value: 20 },
-    //     { name: "Denied", value: 45 }
-    //   ],
-    //   sourcingData: [
-    //     { name: "Tendering", value: 20 },
-    //     { name: "Direct Contracting", value: 120 },
-    //     { name: "Sourcing from existing vendor", value: 35 }
-    //   ],
-    //   statusColor: ["#2C7BE5", "#D2DDEC", "#31D5A6", "#878FF6"],
-    //   serviceColors: ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', "#2C7BE5", "#D2DDEC", "#31D5A6", "#878FF6"]
-    // },
-    // {
-    //   item: "Payment request",
-    //   labels: [
-    //     {
-    //       color: "#31D5A6",
-    //       name: "Budgeted",
-    //     },
-    //     {
-    //       color: "#878FF6",
-    //       name: "Non-Budgeted",
-    //     },
-    //   ],
-    //   data: [
-    //     {
-    //       name: "JAN",
-    //       budgeted: 4000,
-    //       nonBudgeted: 2400,
-    //       total: 3000,
-    //     },
-    //     {
-    //       name: "FEB",
-    //       budgeted: 3000,
-    //       nonBudgeted: 1398,
-    //       total: 2210,
-    //     },
-    //     {
-    //       name: "MAR",
-    //       budgeted: 2000,
-    //       nonBudgeted: 9800,
-    //       total: 2290,
-    //     },
-    //   ],
-    //   statusData: [
-    //     { name: "Pending approval", value: 10 },
-    //     { name: "Approved", value: 20 },
-    //     { name: "Denied", value: 45 }
-    //   ],
-    //   sourcingData: [
-    //     { name: "Tendering", value: 20 },
-    //     { name: "Direct Contracting", value: 120 },
-    //     { name: "Sourcing from existing vendor", value: 35 }
-    //   ],
-    //   statusColor: ["#2C7BE5", "#D2DDEC", "#31D5A6", "#878FF6"],
-    // },
-    {
-      item: "PO, Contracts & Tenders",
-      labels: [
-        {
-          color: "#31D5A6",
-          name: "PO",
-        },
-        {
-          color: "#53BAA1",
-          name: "Contract",
-        },
-        {
-          color: "#237396",
-          name: "Tender",
-        },
-      ],
-      data: [
-        {
-          name: "JAN",
-          tender: 3,
-          po: 8,
-          contract: 15,
-        },
-        {
-          name: "FEB",
-          tender: 4,
-          po: 5,
-          contract: 9,
-        },
-        {
-          name: "MAR",
-          tender: 10,
-          po: 14,
-          contract: 19,
-        },
-      ],
-      tenderData: [
-        { name: "Opened", value: 20 },
-        { name: "Closed", value: 30 },
-      ],
-      poData: [
-        { name: "Pending approval", value: 10 },
-        { name: "Approved", value: 20 },
-        { name: "Denied", value: 45 },
-      ],
-      contractData: [
-        { name: "Pending approval", value: 10 },
-        { name: "Approved", value: 20 },
-        { name: "Denied", value: 45 },
-      ],
-      statusColor: ["#31D5A6", "#878FF6", "#D2DDEC"],
-    },
-    // {
-    //   item: "Contracts",
-    //   labels: [
-    //     {
-    //       color: "#31D5A6",
-    //       name: "Total Value",
-    //     },
-    //   ],
-    //   data: [
-    //     {
-    //       name: "JAN",
-    //       value: 3
-    //     },
-    //     {
-    //       name: "FEB",
-    //       value: 4
-    //     },
-    //     {
-    //       name: "MAR",
-    //       value: 10
-    //     },
-    //   ],
-    //   statusData: [
-    //     { name: "Draft", value: 400 },
-    //     { name: "In-review", value: 400 },
-    //     { name: "Signed", value: 300 },
-    //     { name: "Terminated", value: 300 },
-    //   ],
-    //   statusColor: ["#31D5A6", "#878FF6", "#31D5A6", "#878FF6"],
-    // },
-    // {
-    //   item: "Purchase Orders",
-    //   labels: [
-    //     {
-    //       color: "#31D5A6",
-    //       name: "Total Value",
-    //     },
-    //   ],
-    //   data: [
-    //     {
-    //       name: "JAN",
-    //       value: 3
-    //     },
-    //     {
-    //       name: "FEB",
-    //       value: 4
-    //     },
-    //     {
-    //       name: "MAR",
-    //       value: 10
-    //     },
-    //   ],
-    //   statusData: [
-    //     { name: "Pending-signature", value: 400 },
-    //     { name: "Signed", value: 300 },
-    //   ],
-    //   statusColor: ["#31D5A6", "#878FF6"],
-    // },
-  ];
-
-  const COLORS = ["#2C7BE5", "#D2DDEC"];
+  const COLORS = ["#14445C", "#F3B700"];
   const COLORS_OVERVIEW = ["#878FF6", "#dfe1fc", "#b3b8ff"];
 
   const CustomYAxisTick = ({ x, y, payload }) => (
@@ -825,12 +616,7 @@ export default function page() {
   }
 
   function transformData(data) {
-    const months = [
-      "JAN",
-      "FEB",
-      "MAR",
-      "APR"
-    ];
+    const months = ["JAN", "FEB", "MAR", "APR"];
 
     const result = months.map((month) => ({
       name: month,
@@ -839,7 +625,7 @@ export default function page() {
       purchaseOrders: 0,
     }));
 
-    if(data) {
+    if (data) {
       for (const [key, value] of Object?.entries(data)) {
         const monthIndex = months.indexOf(key);
         if (monthIndex !== -1) {
@@ -857,7 +643,31 @@ export default function page() {
     return result;
   }
 
+  function generateYearsArray() {
+    const currentYear = new Date().getFullYear();
+    const startYear = 2023;
+    const yearsArray = [];
+
+    for (let year = startYear; year <= currentYear; year++) {
+      yearsArray.push({ value: year, label: `${year}` });
+    }
+
+    return yearsArray;
+  }
+
   const dashboardOverviewData = transformData(dashboardOverview.data);
+
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload?.length) {
+      return (
+        <div className="bg-white px-3 py-1.5 rounded-md shadow-lg">
+          <p>{`${payload[0]?.payload?.payload?._id}: ${payload[0]?.value}`}</p>
+        </div>
+      );
+    }
+  };
+
+  console.log("Window Width ", windowWidth);
 
   return (
     <>
@@ -865,16 +675,74 @@ export default function page() {
       {contextHolder}
 
       {dataLoaded ? (
-        <div className="request mr-6 bg-white h-[calc(100vh-81px)] rounded-lg mb-10 px-5 overflow-y-auto">
-          <div className="mt-5 flex justify-between w-full">
+        <div className="payment-request lg:mr-6 mb-10 pl-5 h-screen overflow-x-auto">
+          {/* <div className="mt-5 flex justify-between w-full">
             <div>
-              {/* <small className="text-[#97ABCA] text-[10px]">Overview</small> */}
               <h5 className="text-[#12263F] text-[22px] mb-2 mx-0 mt-0">
                 Dashboards
               </h5>
             </div>
+          </div> */}
+          <div className="flex justify-end mb-4 mr-1">
+            <Select
+              defaultValue={year}
+              style={{ width: 120 }}
+              size="large"
+              className="border-0"
+              onChange={(value) => setYear(value)}
+              options={generateYearsArray()}
+            />
           </div>
-          <div className="bg-white py-3 rounded my-1">
+          <div className="lg:grid hidden xl:grid-cols-7 md:grid-cols-4 gap-3 my-4">
+            {[
+              {
+                name: "Purchase request",
+                value: requests?.length,
+                color: "#4B59D4",
+              },
+              {
+                name: "Payment request",
+                value: payments?.length,
+                color: "#7EC2C6",
+              },
+              { name: "Tenders", value: tenders?.length, color: "#5A58CB" },
+              { name: "Contract", value: contracts?.length, color: "#679AF3" },
+              {
+                name: "Purchase Orders",
+                value: purchaseOrders?.length,
+                color: "#E4C1A0",
+              },
+              { name: "Vendors", value: vendors?.length, color: "#6A76D7" },
+              {
+                name: "Internal Users",
+                value: internalUsers?.length,
+                color: "#D25C8D",
+              },
+            ].map((item, key) => (
+              <div className="flex gap-x-4 bg-[#FFF] py-2 px-4 rounded-lg">
+                {/* <div className={`border-l-0 border-3 border-solid border-[${item.color}] rounded-xxl`} /> */}
+                <div className="flex flex-grow flex-col gap-y-1">
+                  <div className="w-full flex justify-between">
+                    <h4 className="mt-2 mb-0 text-[#040518]">{item.value}</h4>
+                    <div
+                      className={`flex justify-center items-center bg-[${
+                        item?.color + "22"
+                      }] rounded-lg p-2.5`}
+                    >
+                      <DocumentIcon
+                        color={item.color}
+                        className={`h-4 w-4 text-{${item.color}}`}
+                      />
+                    </div>
+                  </div>
+                  <small key={key} className="text-[#505152] font-medium">
+                    {item.name}
+                  </small>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="bg-white rounded-lg p-3 my-1">
             <div className="flex items-center gap-x-14 px-5 bg-[#F5F5F5]">
               <button
                 className={`bg-transparent py-3 my-3 ${
@@ -909,104 +777,108 @@ export default function page() {
             </div>
           </div>
           {tab == 0 ? (
-            <>
-              <div className="grid grid-cols-7 gap-x-3 mx-2 my-4">
-                {[
-                  { name: "Purchase request", value: "12,400" },
-                  { name: "Payment request", value: "22,560,000" },
-                  { name: "Tenders", value: "120" },
-                  { name: "Contract", value: "46" },
-                  { name: "Purchase Orders", value: "88" },
-                  { name: "Vendors", value: "33" },
-                  { name: "Internal Users", value: "11" },
-                ].map((item, key) => (
-                  <div className="flex flex-col gap-y-4 bg-[#EFF6FFAA] py-3 px-4 rounded">
-                    <small key={key} className="text-[#353535]">
-                      <b>{item.name}</b>
-                    </small>
-                    <h3 className="mt-2 mb-0 text-[#31D5A6]">{item.value}</h3>
-                  </div>
-                ))}
-              </div>
-
+            <div className="payment-request bg-white h-[calc(100vh-310px)] pb-10 rounded-lg p mt-3 pt-6 overflow-y-auto lg:px-5 py-3">
               {/* Purchase Request Graph Mapping */}
-
-              <div className="grid grid-cols-3 gap-x-10 mt-5 px-4 items-start">
-                <div className="col-span-2 py-8">
-                  <span className="text-[17px] font-semibold text-[#12263F]">
-                    Purchase Request
-                  </span>
-                  {/* <div className="w-full py-5 flex justify-center items-center gap-x-8 mt-4">
-                    {el.labels.map((label, i) => (
-                      <div
-                        key={i}
-                        className="flex flex-col space-y-3 items-center"
-                      >
-                        <div className="flex items-center gap-x-2">
-                          <div
-                            className={`w-2 h-2 rounded-full bg-[${label?.color}]`}
-                          />
-                          <span className="text-[15px] text-[#6C757D]">
-                            {label?.name}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div> */}
-                  <div className="pt-8">
-                    <span className="text-[14px] font-semibold text-[#12263F] p-5 m-5">
-                      Budgeted Vs Non-Budgeted
-                    </span>
-                    <ResponsiveContainer width="100%" height={180}>
-                      <LineChart
-                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                        data={totalOverview?.data}
-                      >
-                        <XAxis
-                          dataKey="month"
-                          tickMargin={20}
-                          tick={{ fontSize: 11 }}
-                          tickSize={0}
-                          axisLine={{ strokeDasharray: "5 5" }}
-                        />
-                        <YAxis
-                          axisLine={false}
-                          tickMargin={20}
-                          tickSize={0}
-                          tick={<CustomYAxisTick />}
-                        />
-                        <Tooltip />
-                        <Line
-                          type="monotone"
-                          dataKey={"budgeted"}
-                          stroke="#34AEB3"
-                          dot={false}
-                          strokeWidth={3}
-                        />
-                        <Line
-                          type="monotone"
-                          dataKey={"nonbudgeted"}
-                          stroke="#53D084"
-                          dot={false}
-                          strokeWidth={3}
-                        />
-                        {/* <Line
-                          type="monotone"
-                          dataKey={"value"}
-                          stroke="#878FF6"
-                          dot={false}
-                          strokeWidth={3}
-                        /> */}
-                      </LineChart>
-                    </ResponsiveContainer>
+              {/* <span className="text-[17px] font-semibold text-[#12263F] mt-10 pt-10">
+                Module Lead time
+              </span> */}
+              {/* <div className="grid xl:grid-cols-3 grid-cols-1 items-start gap-x-8 my-5">
+                <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
+                  <small className="text-[#242426] text-[15px] font-medium">Purchase Requests</small>
+                  <div className="flex items-center w-5/6 mt-5">
+                    <div className="bg-white flex-grow py-3 px-5">
+                      <small className="text-[#848CA1]">Avg. Approval time</small>
+                    </div>
+                    <div className="px-8 py-3">
+                      <small className="text-[14.5px] font-semibold">{totalOverview?.leadTimeDays} <small> Days</small></small>
+                    </div>
                   </div>
-                  <div className="pt-8">
+                </div>
+                <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
+                  <small className="text-[#242426] text-[15px] font-medium">Payments Requests</small>
+                  <div className="flex items-center w-5/6 mt-5">
+                    <div className="bg-white flex-grow py-3 px-5">
+                      <small className="text-[#848CA1]">Avg. Approval time</small>
+                    </div>
+                    <div className="px-8 py-3">
+                      <small className="text-[14.5px] font-semibold">{paymentOverview?.leadTimeDays} <small> Days</small></small>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
+                  <small className="text-[#242426] text-[15px] font-medium">PO's, Contracts</small>
+                  <div className="flex items-center w-5/6 mt-5">
+                    <div className="bg-white flex-grow py-3 px-5">
+                      <small className="text-[#848CA1]"><b>PO</b> lead time</small>
+                    </div>
+                    <div className="px-8 py-3">
+                      <small className="text-[14.5px] font-semibold">{dashboardOverview?.posLeadTime} <small> Days</small></small>
+                    </div>
+                  </div>
+                  <div className="flex items-center w-5/6 mt-3">
+                    <div className="bg-white flex-grow py-3 px-5">
+                      <small className="text-[#848CA1]"><b>Contract</b> lead time</small>
+                    </div>
+                    <div className="px-8 py-3">
+                      <small className="text-[14.5px] font-semibold">{dashboardOverview?.contractsLeadTime} <small> Days</small></small>
+                    </div>
+                  </div>
+                </div>
+              </div> */}
+              <div className="grid grid-cols-5 gap-y-10 px-4 items-start">
+                <div className="xl:col-span-4 col-span-2 pb-8 grid grid-cols-2">
+                  <div>
+                    <span className="text-[17px] font-semibold text-[#12263F]">
+                      Purchase Request
+                    </span>
+                    <div className="pt-8 mb-5">
+                      <span className="text-[14px] font-semibold text-[#12263F] p-5 m-5">
+                        Budgeted Vs Non-Budgeted
+                      </span>
+                      <ResponsiveContainer width="100%" height={250}>
+                        <LineChart
+                          margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                          data={totalOverview?.data}
+                        >
+                          <XAxis
+                            dataKey="month"
+                            tickMargin={20}
+                            tick={{ fontSize: 11 }}
+                            tickSize={0}
+                            axisLine={{ strokeDasharray: "5 5" }}
+                          />
+                          <YAxis
+                            axisLine={false}
+                            tickMargin={20}
+                            tickSize={0}
+                            tick={<CustomYAxisTick />}
+                          />
+                          <Tooltip />
+                          <Line
+                            type="monotone"
+                            dataKey={"budgeted"}
+                            stroke="#E76F51"
+                            dot={false}
+                            strokeWidth={4}
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey={"nonbudgeted"}
+                            stroke="#F3B700"
+                            dot={false}
+                            strokeWidth={4}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                  <div className="pt-8 mt-5">
                     <span className="text-[14px] font-semibold text-[#12263F] p-5 m-5">
                       By Service Category
                     </span>
                     <ResponsiveContainer
                       width="100%"
-                      height={180}
+                      height={250}
                       className={"mt-5"}
                     >
                       <BarChart
@@ -1028,111 +900,87 @@ export default function page() {
                         />
                         <Tooltip />
 
-                        {Object.keys(combinedData[0]).map((key, index) => {
-                          if (key !== "month" && key !== "name") {
-                            return (
-                              <Bar
-                                key={key}
-                                dataKey={key}
-                                stackId="a"
-                                fill={statusColors[index % statusColors.length]}
-                                barSize={20}
-                              />
-                            );
+                        {Object?.keys(combinedData && combinedData[0]).map(
+                          (key, index) => {
+                            if (key !== "month" && key !== "name") {
+                              return (
+                                <Bar
+                                  key={key}
+                                  dataKey={key}
+                                  stackId="a"
+                                  fill={
+                                    statusColors[index % statusColors.length]
+                                  }
+                                  barSize={40}
+                                />
+                              );
+                            }
+                            return null;
                           }
-                          return null;
-                        })}
+                        )}
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
-                <div className="col-span-1 flex flex-col px-4 bg-[#F9FAFD]">
-                  <div className="py-10">
-                    <span className="text-[16px] text-[#12263F]">
-                      Approval process
-                    </span>
-                  </div>
-                  <div className="flex xl:flex-row flex-col items-center xl:gap-x-5 mb-5">
-                    <ResponsiveContainer width="97%" height={160}>
-                      <PieChart
-                        margin={{ top: 20, right: 0, left: 20, bottom: 5 }}
-                      >
-                        <Pie
-                          data={totalOverview?.statusData}
-                          cx={50}
-                          cy={50}
-                          startAngle={360}
-                          endAngle={0}
-                          innerRadius={59}
-                          outerRadius={65}
-                          fill="#8884d8"
-                          paddingAngle={2}
-                          dataKey="total"
-                        >
-                          {totalOverview?.statusData?.map((entry, index) => (
-                            <Cell
-                              key={`cell-${index}`}
-                              fill={["#27AFB8", "#53BAA1", "#237396"][index]}
-                            />
-                          ))}
-                        </Pie>
-                      </PieChart>
-                    </ResponsiveContainer>
-                    <div className="flex flex-col gap-y-3 -mt-5">
-                      {totalOverview?.statusData?.map((item, key) => (
-                        <div className="flex items-center gap-x-2">
-                          <div
-                            className={`w-2 h-2 rounded-full bg-[${
-                              ["#27AFB8", "#53BAA1", "#237396"][key]
-                            }]`}
-                          />
-                          <span className="text-[13px] text-[#6C757D]">
-                            {item?._id}
-                          </span>
-                          <span className="text-[13px] text-[#6C757D]">
-                            {item?.total}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="py-10">
-                    <span className="text-[16px] text-[#12263F]">
+              </div>
+              <div className="xl:col-span-1 col-span-2 px-4 pt-5 bg-[#F9FAFD] grid grid-cols-3">
+                <div>
+                  <div className="">
+                    <span className="text-[14px] font-semibold text-[#12263F]">
                       Sourcing methods
                     </span>
                   </div>
-                  <div className="flex xl:flex-row flex-col items-center xl:gap-x-5 mb-5">
-                    <ResponsiveContainer width="97%" height={160}>
+                  <div className="flex flex-col xl:items-center xl:gap-x-5 gap-y-4 mb-5">
+                    <ResponsiveContainer
+                      className={"flex justify-center"}
+                      width="100%"
+                      height={240}
+                    >
                       <PieChart
-                        margin={{ top: 20, right: 0, left: 20, bottom: 5 }}
+                        margin={{ top: 20, right: 0, left: 0, bottom: 5 }}
+                        className="flex justify-center"
                       >
                         <Pie
                           data={totalOverview?.sourcingData}
-                          cx={50}
-                          cy={50}
+                          // cx={70}
+                          cy={90}
                           startAngle={360}
                           endAngle={0}
-                          innerRadius={59}
-                          outerRadius={65}
+                          innerRadius={
+                            windowWidth > 1028
+                              ? 85
+                              : windowWidth > 998
+                              ? 75
+                              : 75
+                          }
+                          outerRadius={
+                            windowWidth > 1028
+                              ? 99
+                              : windowWidth > 998
+                              ? 89
+                              : 89
+                          }
                           fill="#8884d8"
-                          paddingAngle={2}
+                          paddingAngle={5}
+                          cornerRadius={10}
                           dataKey="total"
                         >
                           {totalOverview?.sourcingData?.map((entry, index) => (
                             <Cell
                               key={`cell-${index}`}
-                              fill={["#27AFB8", "#53BAA1", "#237396"][index]}
+                              fill={["#0B7A75", "#FFF1D0", "#BC4749"][index]}
                             />
                           ))}
                         </Pie>
+                        <Tooltip content={<CustomTooltip />} />
                       </PieChart>
                     </ResponsiveContainer>
-                    <div className="flex flex-col gap-y-3 -mt-5">
+                    <div className="xl:flex justify-center flex-wrap hidden gap-3 -mt-5">
                       {totalOverview?.sourcingData?.map((item, key) => (
                         <div className="flex items-center gap-x-2">
                           <div
                             className={`w-1.5 h-1.5 rounded-full bg-[${
-                              ["#237396", "#53BAA1", "#D2DDEC"][key]
+                              ["#0B7A75", "#FFF1D0", "#BC4749"][key]
                             }]`}
                           />
                           <span className="text-[13px] text-[#6C757D]">
@@ -1146,9 +994,91 @@ export default function page() {
                     </div>
                   </div>
                 </div>
+
+                <div>
+                  <div className="">
+                    <span className="text-[14px] font-semibold text-[#12263F]">
+                      Approval process
+                    </span>
+                  </div>
+                  <div className="flex flex-col xl:items-center xl:gap-x-5 gap-y-4 mb-5">
+                    <ResponsiveContainer
+                      className={"flex justify-center"}
+                      width="100%"
+                      height={260}
+                    >
+                      <PieChart
+                        margin={{ top: 20, right: 0, left: 20, bottom: 5 }}
+                      >
+                        <Pie
+                          data={totalOverview?.statusData}
+                          // cx={50}
+                          cy={90}
+                          startAngle={360}
+                          endAngle={0}
+                          innerRadius={
+                            windowWidth > 1028
+                              ? 85
+                              : windowWidth > 998
+                              ? 75
+                              : 75
+                          }
+                          outerRadius={
+                            windowWidth > 1028
+                              ? 99
+                              : windowWidth > 998
+                              ? 89
+                              : 89
+                          }
+                          fill="#8884d8"
+                          paddingAngle={5}
+                          cornerRadius={10}
+                          dataKey="total"
+                        >
+                          {totalOverview?.statusData?.map((entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={["#0B7A75", "#277DA1", "#FFF1D0"][index]}
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip content={<CustomTooltip />} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div className="xl:flex justify-center text-center flex-wrap hidden gap-3 -mt-5">
+                      {totalOverview?.statusData?.map((item, key) => (
+                        <div className="flex justify-center items-center text-center gap-x-2">
+                          <div
+                            className={`w-2 h-2 rounded-full bg-[${
+                              ["#0B7A75", "#277DA1", "#FFF1D0"][key]
+                            }]`}
+                          />
+                          <span className="text-[13px] text-[#6C757D]">
+                            {item?._id}
+                          </span>
+                          <span className="text-[13px] text-[#6C757D]">
+                            {item?.total}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center w-full mb-10 mt-5 border-t border-b-0 border-x-0 border-solid border-[#F1F3FF]">
+                  <div className="bg-white flex-grow py-3 px-5">
+                    <small className="text-[15px] text-[#555b69]">
+                      Avg. Approval time
+                    </small>
+                  </div>
+                  <div className="px-4 py-3">
+                    <small className="text-[14.5px] font-semibold">
+                      {totalOverview?.leadTimeDays} <small> Days</small>
+                    </small>
+                  </div>
+                </div>
               </div>
-              <div className="grid grid-cols-3 gap-x-10 mt-5 px-4 items-start">
-                <div className="col-span-2 py-8">
+              <div className="grid grid-cols-5 gap-y-10 mt-5 px-4 items-start border-t-4 border-solid border-x-0 border-b-0 pt-6 border-[#F5F5F5]">
+                <div className="xl:col-span-4 col-span-3 py-8">
                   <span className="text-[17px] font-semibold text-[#12263F]">
                     Payment Request
                   </span>
@@ -1169,7 +1099,7 @@ export default function page() {
                       </div>
                     ))}
                   </div> */}
-                  <ResponsiveContainer width="100%" height={180}>
+                  <ResponsiveContainer width="100%" height={360}>
                     <LineChart
                       margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                       data={paymentOverview?.data}
@@ -1193,14 +1123,14 @@ export default function page() {
                         dataKey={"budgeted"}
                         stroke="#34AEB3"
                         dot={false}
-                        strokeWidth={3}
+                        strokeWidth={4}
                       />
                       <Line
                         type="monotone"
                         dataKey={"nonbudgeted"}
                         stroke="#53D084"
                         dot={false}
-                        strokeWidth={3}
+                        strokeWidth={4}
                       />
                       <Line
                         type="monotone"
@@ -1220,44 +1150,62 @@ export default function page() {
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="col-span-1 flex flex-col px-4 bg-[#F9FAFD]">
+                <div className="xl:col-span-1 col-span-2 flex flex-col px-4 pt-5 bg-[#F9FAFD]">
                   <div className="my-5">
-                    <span className="text-[15px] text-[#12263F]">
+                    <span className="text-[14px] font-semibold text-[#12263F]">
                       Approval process
                     </span>
                   </div>
-                  <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
-                    <ResponsiveContainer width="97%" height={160}>
+                  <div className="flex flex-col xl:items-center xl:gap-x-5 gap-y-4 mb-5">
+                    <ResponsiveContainer
+                      className={"flex justify-center"}
+                      width="97%"
+                      height={240}
+                    >
                       <PieChart
-                        margin={{ top: 20, right: 0, left: 20, bottom: 5 }}
+                        margin={{ top: 20, right: 0, left: 0, bottom: 5 }}
                       >
                         <Pie
                           data={paymentOverview?.statusData}
-                          cx={50}
-                          cy={50}
+                          // cx={50}
+                          cy={90}
                           startAngle={360}
                           endAngle={0}
-                          innerRadius={59}
-                          outerRadius={65}
+                          innerRadius={
+                            windowWidth > 1028
+                              ? 85
+                              : windowWidth > 998
+                              ? 75
+                              : 75
+                          }
+                          outerRadius={
+                            windowWidth > 1028
+                              ? 99
+                              : windowWidth > 998
+                              ? 89
+                              : 89
+                          }
                           fill="#8884d8"
-                          paddingAngle={2}
+                          paddingAngle={5}
+                          cornerRadius={10}
                           dataKey="total"
                         >
                           {paymentOverview?.statusData?.map((entry, index) => (
                             <Cell
                               key={`cell-${index}`}
-                              fill={["#27AFB8", "#53BAA1", "#237396"][index]}
+                              fill={["#0B7A75", "#FFF1D0", "#277DA1"][index]}
                             />
                           ))}
                         </Pie>
+                        <Tooltip content={<CustomTooltip />} />
                       </PieChart>
                     </ResponsiveContainer>
-                    <div className="flex flex-col gap-y-3 -mt-5">
+                    <div className="xl:flex flex-wrap justify-center hidden gap-3 -mt-5">
                       {paymentOverview?.statusData?.map((item, key) => (
                         <div className="flex items-center gap-x-2">
                           <div
                             className={`w-2 h-2 rounded-full bg-[${
-                              ["#27AFB8", "#53BAA1", "#237396"][key]
+                              ["#0B7A75", "#FFF1D0", "#277DA1"][key]
                             }]`}
                           />
                           <span className="text-[13px] text-[#6C757D]">
@@ -1270,10 +1218,22 @@ export default function page() {
                       ))}
                     </div>
                   </div>
+                  <div className="flex items-center w-full mt-5 mb-10 border-t border-b-0 border-x-0 border-solid border-[#F1F3FF] pt-5">
+                    <div className="bg-white flex-grow py-3 px-5">
+                      <small className="text-[15px] text-[#555b69]">
+                        Avg. Approval time
+                      </small>
+                    </div>
+                    <div className="px-4 py-3">
+                      <small className="text-[14.5px] font-semibold">
+                        {paymentOverview?.leadTimeDays} <small> Days</small>
+                      </small>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-x-10 mt-5 px-4 items-start">
-                <div className="col-span-2 py-8">
+              <div className="grid grid-cols-5 gap-y-10 mt-5 pb-28 px-4 items-start border-t-4 border-solid border-x-0 border-b-0 pt-6 border-[#F5F5F5]">
+                <div className="xl:col-span-4 col-span-3 pb-8">
                   <span className="text-[14px] font-semibold text-[#12263F]">
                     PO, Contracts & Tenders
                   </span>
@@ -1298,7 +1258,14 @@ export default function page() {
                       </div>
                     ))}
                   </div>
-                  <ResponsiveContainer width="100%" height={180}>
+                  <ResponsiveContainer
+                    width="100%"
+                    height={
+                      dashboardOverview?.statusData?.purchaseOrders?.length > 0
+                        ? 880
+                        : 660
+                    }
+                  >
                     <LineChart
                       margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                       data={dashboardOverviewData}
@@ -1322,198 +1289,305 @@ export default function page() {
                         dataKey={"tenders"}
                         stroke="#31D5A6"
                         dot={false}
-                        strokeWidth={3}
+                        strokeWidth={4}
                       />
                       <Line
                         type="monotone"
                         dataKey={"contracts"}
                         stroke="#F5B50F"
                         dot={false}
-                        strokeWidth={3}
+                        strokeWidth={4}
                       />
                       <Line
                         type="monotone"
                         dataKey={"purchaseOrders"}
                         stroke="#878FF6"
                         dot={false}
-                        strokeWidth={3}
+                        strokeWidth={4}
                       />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="col-span-1 flex flex-col px-4 bg-[#F9FAFD] mt-7 pt-5">
-                  <div className="flex flex-col gap-y-10">
-                    {dashboardOverview?.statusData?.tenders?.length > 0 && <div>
-                      <span className="text-[16px] text-[#12263F]">
-                        Tenders
-                      </span>
-                    </div>}
-                    <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
-                      <ResponsiveContainer width="97%" height={140}>
+                <div className="xl:col-span-1 col-span-2 flex flex-col px-4 py-3 bg-[#F9FAFD]">
+                  <div className="flex flex-col">
+                    {dashboardOverview?.statusData?.tenders?.length > 0 && (
+                      <div className="py-3">
+                        <span className="text-[14px] font-semibold text-[#12263F]">
+                          Tenders
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex flex-col xl:items-center xl:gap-x-5 gap-y-4 mb-5">
+                      <ResponsiveContainer
+                        className={"flex justify-center"}
+                        width="100%"
+                        height={220}
+                      >
                         <PieChart
                           margin={{
                             top: 20,
                             right: 0,
-                            left: 20,
+                            left: 0,
                             bottom: 5,
                           }}
                         >
                           <Pie
                             data={dashboardOverview?.statusData?.tenders}
-                            cx={50}
-                            cy={50}
+                            // cx={50}
+                            cy={90}
                             startAngle={360}
                             endAngle={0}
-                            innerRadius={59}
-                            outerRadius={65}
-                            fill="#8884d8"
-                            paddingAngle={2}
+                            innerRadius={
+                              windowWidth > 1028
+                                ? 75
+                                : windowWidth > 998
+                                ? 70
+                                : 65
+                            }
+                            outerRadius={
+                              windowWidth > 1028
+                                ? 89
+                                : windowWidth > 998
+                                ? 84
+                                : 79
+                            }
+                            fill="#31D5A6"
+                            paddingAngle={5}
+                            cornerRadius={10}
                             dataKey="total"
                           >
-                            {dashboardOverview?.statusData?.tenders?.map((entry, index) => (
-                              <Cell
-                                key={`cell-${index}`}
-                                fill={["#27AFB8", "#53BAA1", "#237396"][index]}
-                              />
-                            ))}
+                            {dashboardOverview?.statusData?.tenders?.map(
+                              (entry, index) => (
+                                <Cell
+                                  key={`cell-${index}`}
+                                  fill={
+                                    ["#0B7A75", "#FFF1D0", "#277DA1"][index]
+                                  }
+                                />
+                              )
+                            )}
                           </Pie>
+                          <Tooltip content={<CustomTooltip />} />
                         </PieChart>
                       </ResponsiveContainer>
-                      <div className="flex flex-col gap-y-3 -mt-5">
-                        {dashboardOverview?.statusData?.tenders?.map((item, key) => (
-                          <div className="flex items-center gap-x-2">
-                            <div
-                              className={`w-1.5 h-1.5 rounded-full bg-[${["#27AFB8", "#53BAA1", "#237396"][key]}]`}
-                            />
-                            <span className="text-[13px] text-[#6C757D]">
-                              {item?._id}
-                            </span>
-                            <span className="text-[13px] text-[#6C757D]">
-                              {item?.total}
-                            </span>
-                          </div>
-                        ))}
+                      <div className="xl:flex justify-center flex-wrap hidden gap-x-3 mt-1">
+                        {dashboardOverview?.statusData?.tenders?.map(
+                          (item, key) => (
+                            <div className="xl:flex hidden items-center gap-x-2">
+                              <div
+                                className={`w-1.5 h-1.5 rounded-full bg-[${
+                                  ["#F3B700", "#0065DD", "#7B2CBF"][key]
+                                }]`}
+                              />
+                              <span className="text-[13px] text-[#6C757D]">
+                                {item?._id}
+                              </span>
+                              <span className="text-[13px] text-[#6C757D]">
+                                {item?.total}
+                              </span>
+                            </div>
+                          )
+                        )}
                       </div>
                     </div>
-                    {dashboardOverview?.statusData?.contracts?.length > 0 && <div>
-                      <span className="text-[16px] text-[#12263F]">
-                        Contracts
-                      </span>
-                    </div>}
-                    <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
-                      <ResponsiveContainer width="97%" height={140}>
+                    {dashboardOverview?.statusData?.contracts?.length > 0 && (
+                      <div className="py-3">
+                        <span className="text-[14px] font-semibold text-[#12263F]">
+                          Contracts
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex flex-col xl:items-center xl:gap-x-5 gap-y-4 mb-5">
+                      <ResponsiveContainer width="97%" height={220}>
                         <PieChart
                           margin={{
                             top: 20,
                             right: 0,
-                            left: 20,
+                            left: 0,
                             bottom: 5,
                           }}
                         >
                           <Pie
                             data={dashboardOverview?.statusData?.contracts}
-                            cx={50}
-                            cy={50}
+                            // cx={50}
+                            cy={90}
                             startAngle={360}
                             endAngle={0}
-                            innerRadius={59}
-                            outerRadius={65}
-                            fill="#8884d8"
-                            paddingAngle={2}
+                            innerRadius={
+                              windowWidth > 1028
+                                ? 75
+                                : windowWidth > 998
+                                ? 70
+                                : 65
+                            }
+                            outerRadius={
+                              windowWidth > 1028
+                                ? 89
+                                : windowWidth > 998
+                                ? 84
+                                : 79
+                            }
+                            fill="#F5B50F"
+                            paddingAngle={5}
+                            cornerRadius={10}
                             dataKey="total"
                           >
-                            {dashboardOverview?.statusData?.contracts?.map((entry, index) => (
-                              <Cell
-                                key={`cell-${index}`}
-                                fill={["#27AFB8", "#53BAA1", "#237396"][index]}
-                              />
-                            ))}
+                            {dashboardOverview?.statusData?.contracts?.map(
+                              (entry, index) => (
+                                <Cell
+                                  key={`cell-${index}`}
+                                  fill={
+                                    ["#0B7A75", "#FFF1D0", "#277DA1"][index]
+                                  }
+                                />
+                              )
+                            )}
                           </Pie>
+                          <Tooltip content={<CustomTooltip />} />
                         </PieChart>
                       </ResponsiveContainer>
-                      <div className="flex flex-col gap-y-3 -mt-5">
-                        {dashboardOverview?.statusData?.contracts?.map((item, key) => (
-                          <div className="flex items-center gap-x-2">
-                            <div
-                              className={`w-1.5 h-1.5 rounded-full bg-[${["#27AFB8", "#53BAA1", "#237396"][key]}]`}
-                            />
-                            <span className="text-[13px] text-[#6C757D]">
-                              {item?._id}
-                            </span>
-                            <span className="text-[13px] text-[#6C757D]">
-                              {item?.total}
-                            </span>
-                          </div>
-                        ))}
+                      <div className="xl:flex justify-center hidden flex-wrap gap-x-3">
+                        {dashboardOverview?.statusData?.contracts?.map(
+                          (item, key) => (
+                            <div className="flex items-center gap-x-2">
+                              <div
+                                className={`w-1.5 h-1.5 rounded-full bg-[${
+                                  ["#F3B700", "#0065DD", "#7B2CBF"][key]
+                                }]`}
+                              />
+                              <span className="text-[13px] text-[#6C757D]">
+                                {item?._id}
+                              </span>
+                              <span className="text-[13px] text-[#6C757D]">
+                                {item?.total}
+                              </span>
+                            </div>
+                          )
+                        )}
                       </div>
                     </div>
-                    {dashboardOverview?.statusData?.purchaseOrders.length > 0 && <div>
-                      <span className="text-[16px] text-[#12263F]">
-                        Purchase Orders
-                      </span>
-                    </div>}
-                    <div className="flex xl:flex-row flex-col items-center xl:gap-x-5">
-                      <ResponsiveContainer width="97%" height={140}>
-                        <PieChart
-                          margin={{
-                            top: 20,
-                            right: 0,
-                            left: 20,
-                            bottom: 5,
-                          }}
-                        >
-                          <Pie
-                            data={dashboardOverview?.statusData?.purchaseOrders}
-                            cx={50}
-                            cy={50}
-                            startAngle={360}
-                            endAngle={0}
-                            innerRadius={59}
-                            outerRadius={65}
-                            fill="#8884d8"
-                            paddingAngle={2}
-                            dataKey="total"
+                    {dashboardOverview?.statusData?.purchaseOrders.length >
+                      0 && (
+                      <div className="py-3">
+                        <span className="text-[14px] font-semibold text-[#12263F]">
+                          Purchase Orders
+                        </span>
+                      </div>
+                    )}
+                    {dashboardOverview?.statusData?.purchaseOrders.length >
+                      0 && (
+                      <div className="flex flex-col xl:items-center xl:gap-x-5 gap-x-4 mb-5">
+                        <ResponsiveContainer width="97%" height={220}>
+                          <PieChart
+                            margin={{
+                              top: 20,
+                              right: 0,
+                              left: 0,
+                              bottom: 5,
+                            }}
                           >
-                            {dashboardOverview?.statusData?.purchaseOrders?.map((entry, index) => (
-                              <Cell
-                                key={`cell-${index}`}
-                                fill={["#27AFB8", "#53BAA1", "#237396"][index]}
-                              />
-                            ))}
-                          </Pie>
-                        </PieChart>
-                      </ResponsiveContainer>
-                      <div className="flex flex-col gap-y-3 -mt-5">
-                        {dashboardOverview?.statusData?.purchaseOrders?.map((item, key) => (
-                          <div className="flex items-center gap-x-2">
-                            <div
-                              className={`w-1.5 h-1.5 rounded-full bg-[${["#27AFB8", "#53BAA1", "#237396"][key]}]`}
-                            />
-                            <span className="text-[13px] text-[#6C757D]">
-                              {item?._id}
-                            </span>
-                            <span className="text-[13px] text-[#6C757D]">
-                              {item?.total}
-                            </span>
-                          </div>
-                        ))}
+                            <Pie
+                              data={
+                                dashboardOverview?.statusData?.purchaseOrders
+                              }
+                              // cx={50}
+                              cy={90}
+                              startAngle={360}
+                              endAngle={0}
+                              innerRadius={
+                                windowWidth > 1028
+                                  ? 75
+                                  : windowWidth > 998
+                                  ? 70
+                                  : 75
+                              }
+                              outerRadius={
+                                windowWidth > 1028
+                                  ? 89
+                                  : windowWidth > 998
+                                  ? 84
+                                  : 89
+                              }
+                              fill="#878FF6"
+                              paddingAngle={5}
+                              cornerRadius={10}
+                              dataKey="total"
+                            >
+                              {dashboardOverview?.statusData?.purchaseOrders?.map(
+                                (entry, index) => (
+                                  <Cell
+                                    key={`cell-${index}`}
+                                    fill={
+                                      ["#0B7A75", "#FFF1D0", "#277DA1"][index]
+                                    }
+                                  />
+                                )
+                              )}
+                            </Pie>
+                            <Tooltip content={<CustomTooltip />} />
+                          </PieChart>
+                        </ResponsiveContainer>
+                        <div className="xl:flex justify-center hidden flex-wrap gap-y-3">
+                          {dashboardOverview?.statusData?.purchaseOrders?.map(
+                            (item, key) => (
+                              <div className="flex items-center gap-x-2">
+                                <div
+                                  className={`w-1.5 h-1.5 rounded-full bg-[${
+                                    ["#F3B700", "#0065DD", "#7B2CBF"][key]
+                                  }]`}
+                                />
+                                <span className="text-[13px] text-[#6C757D]">
+                                  {item?._id}
+                                </span>
+                                <span className="text-[13px] text-[#6C757D]">
+                                  {item?.total}
+                                </span>
+                              </div>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex items-center w-full mt-5">
+                      <div className="bg-white flex-grow py-3 px-5">
+                        <small className="text-[15px] text-[#555b69]">
+                          <b>PO</b> lead time
+                        </small>
+                      </div>
+                      <div className="px-8 py-3">
+                        <small className="text-[14.5px] font-semibold">
+                          {dashboardOverview?.posLeadTime} <small> Days</small>
+                        </small>
+                      </div>
+                    </div>
+                    <div className="flex items-center w-full mt-3">
+                      <div className="bg-white flex-grow py-3 px-5">
+                        <small className="text-[15px] text-[#555b69]">
+                          <b>Contract</b> lead time
+                        </small>
+                      </div>
+                      <div className="px-8 py-3">
+                        <small className="text-[14.5px] font-semibold">
+                          {dashboardOverview?.contractsLeadTime}{" "}
+                          <small> Days</small>
+                        </small>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </>
+            </div>
           ) : tab == 1 ? (
-            <>
-              <div className="grid grid-cols-7 gap-x-8 bg-[#F9FAFD] p-4">
-                <div className="col-span-5">
+            <div className="payment-request bg-white h-[calc(100vh-310px)] pb-10 rounded-lg mt-3 overflow-y-auto px-5 py-3">
+              <div className="grid grid-cols-5 gap-x-8 bg-[#F9FAFD] p-4">
+                <div className="col-span-4">
                   <span className="text-[16px] text-[#12263F]">
                     Amount Paid vs Requests over time
                   </span>
                   <div className="bg-white w-full py-3 grid grid-cols-2 justify-center mt-4">
                     <div className="flex flex-col space-y-2 items-center">
                       <div className="flex items-center gap-x-2">
-                        <div className="w-2 h-2 rounded-full bg-[#2C7BE5]" />
+                        <div className="w-2 h-2 rounded-full bg-[#D2DDEC]" />
                         <span className="text-[15px] text-[#6C757D]">
                           Amount Paid
                         </span>
@@ -1521,20 +1595,20 @@ export default function page() {
                     </div>
                     <div className="flex flex-col space-y-2 items-center">
                       <div className="flex items-center gap-x-2">
-                        <div className="w-2 h-2 rounded-full bg-[#D2DDEC]" />
+                        <div className="w-2 h-2 rounded-full bg-[#2C7BE5]" />
                         <span className="text-[15px] text-[#6C757D]">
                           Payment Request
                         </span>
                       </div>
                     </div>
                   </div>
-                  <ResponsiveContainer width="100%" height={260}>
+                  <ResponsiveContainer width="100%" height={360}>
                     <BarChart
-                      data={purchaseData}
+                      data={spendOverview?.data}
                       margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                     >
                       <XAxis
-                        dataKey="name"
+                        dataKey="month"
                         tickMargin={20}
                         tick={{ fontSize: 11 }}
                         tickSize={0}
@@ -1559,29 +1633,29 @@ export default function page() {
                       <Tooltip />
                       <Bar
                         yAxisId="left"
-                        dataKey="value"
-                        fill="#2C7BE5"
+                        dataKey="requests"
+                        fill="#277DA1"
                         barSize={20}
                         radius={0}
                       />
                       <Bar
                         yAxisId="right"
-                        dataKey="current"
-                        fill="#D2DDEC"
+                        dataKey="total_paid"
+                        fill="#4C956C"
                         barSize={20}
                         radius={0}
                       />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="flex flex-col space-y-3 col-span-2">
+                <div className="flex flex-col space-y-3 col-span-1">
                   <div className="bg-white flex justify-between items-center py-1 px-4 ring-1 ring-[#EDF2F9] rounded-lg">
                     <div>
                       <h6 className="text-[#95AAC9] font-light text-[12px] mt-4 mb-6">
                         Total Amount
                       </h6>
                       <h2 className="text-[#6C757D] text-[20px] font-semibold mt-0">
-                        $1,200,000
+                        ${formatAmount(spendOverview?.totals[0]?.total_amount)}
                       </h2>
                     </div>
                     <PiCurrencyCircleDollarFill
@@ -1595,7 +1669,7 @@ export default function page() {
                         Total Requests
                       </h6>
                       <h2 className="text-[#6C757D] text-[20px] font-semibold mt-4">
-                        1,870
+                        {spendOverview?.totals[0]?.total_requests}
                       </h2>
                     </div>
                     <MdOutlinePendingActions
@@ -1609,15 +1683,61 @@ export default function page() {
                         Average
                       </h6>
                       <h2 className="text-[#6C757D] text-[20px] font-semibold mt-4">
-                        $640 / requests
+                        $
+                        {formatAmount(
+                          spendOverview?.totals[0]?.average_request
+                        )}{" "}
+                        / requests
                       </h2>
                     </div>
                     <MdOutlinePayments size={24} className="text-[#95AAC9]" />
                   </div>
                 </div>
               </div>
-              <div className="grid grid-cols-3 space-x-4 mt-5">
-                <div className="col-span-1 bg-[#F9FAFD] flex flex-col justify-between">
+              <div className="grid grid-cols-7 space-x-4 pb-20 mt-5">
+                <div className="w-full col-span-5 bg-[#F9FAFD]">
+                  <div className="m-5">
+                    <span className="text-[16px] text-[#12263F]">
+                      Department Expenditures
+                    </span>
+                  </div>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart
+                      data={dashboardOverview?.departmentExpanditure}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                    >
+                      <XAxis
+                        dataKey="name"
+                        tickMargin={20}
+                        tick={{ fontSize: 11 }}
+                        tickSize={0}
+                        axisLine={{ strokeDasharray: "5 5" }}
+                      />
+                      <YAxis
+                        axisLine={false}
+                        tickMargin={20}
+                        tickSize={0}
+                        tick={<CustomYAxisTick />}
+                      />
+                      <Tooltip />
+                      <Bar
+                        dataKey="budgeted"
+                        stackId="a"
+                        fill="#277DA1"
+                        barSize={20}
+                        radius={0}
+                      />
+                      <Bar
+                        dataKey="nonBudgeted"
+                        stackId="a"
+                        fill="#FFF1D0"
+                        barSize={20}
+                        radius={0}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="col-span-2 bg-[#F9FAFD] flex flex-col justify-between">
                   <div className="m-5">
                     <span className="text-[16px] text-[#12263F]">
                       Budget Comparison
@@ -1629,8 +1749,8 @@ export default function page() {
                         margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                       >
                         <Pie
-                          data={budgetData}
-                          cx={130}
+                          data={spendOverview?.budgetData}
+                          cx={90}
                           cy={120}
                           startAngle={360}
                           endAngle={0}
@@ -1640,13 +1760,14 @@ export default function page() {
                           paddingAngle={2}
                           dataKey="value"
                         >
-                          {data.map((entry, index) => (
+                          {spendOverview?.budgetData?.map((entry, index) => (
                             <Cell
                               key={`cell-${index}`}
                               fill={COLORS[index % COLORS.length]}
                             />
                           ))}
                         </Pie>
+                        <Tooltip />
                       </PieChart>
                     </ResponsiveContainer>
                     <div className="flex flex-col bg-white px-6 py-3.5 space-y-3 mr-12 -mt-10">
@@ -1654,75 +1775,45 @@ export default function page() {
                         Budgeted
                       </span>
                       <span className="text-[23px] text-[#12263F]">
-                        <b>72%</b>
+                        <b>
+                          {formatAmount(
+                            (
+                              (spendOverview?.totals[0]?.total_amount /
+                                spendOverview?.budgetData[0]?.value) *
+                              100
+                            ).toFixed(2)
+                          )}
+                          %
+                        </b>
                       </span>
                       <span className="text-[13px] text-[#12263F]">
-                        <b>$864k</b>/3360k
+                        <b>
+                          ${formatAmount(spendOverview?.budgetData[0]?.value)}
+                        </b>
+                        /{formatAmount(spendOverview?.budgetData[1]?.value)}
                       </span>
                     </div>
                   </div>
                   <div className="w-full flex space-x-5 justify-center mb-4">
                     <div className="flex items-center space-x-3">
-                      <div className="w-4 h-4 bg-[#2C7BE5]" />
+                      <div className="w-4 h-4 bg-[#14445C]" />
                       <small className="text-[#A2B4D0] font-light">
                         Budgeted
                       </small>
                     </div>
                     <div className="flex items-center space-x-3">
-                      <div className="w-4 h-4 bg-[#D2DDEC]" />
+                      <div className="w-4 h-4 bg-[#F3B700]" />
                       <small className="text-[#A2B4D0] font-light">
                         Un-Budgeted
                       </small>
                     </div>
                   </div>
                 </div>
-                <div className="w-full col-span-2 bg-[#F9FAFD]">
-                  <div className="m-5">
-                    <span className="text-[16px] text-[#12263F]">
-                      Department Expenditures
-                    </span>
-                  </div>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart
-                      data={departmentExpanditure}
-                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                    >
-                      <XAxis
-                        dataKey="name"
-                        tickMargin={20}
-                        tick={{ fontSize: 11 }}
-                        tickSize={0}
-                        axisLine={{ strokeDasharray: "5 5" }}
-                      />
-                      <YAxis
-                        axisLine={false}
-                        tickMargin={20}
-                        tickSize={0}
-                        tick={<CustomYAxisTick />}
-                      />
-                      <Tooltip />
-                      <Bar
-                        dataKey="value"
-                        stackId="a"
-                        fill="#6786F5"
-                        barSize={20}
-                        radius={0}
-                      />
-                      <Bar
-                        dataKey="current"
-                        stackId="a"
-                        fill="#D2DDEC"
-                        barSize={20}
-                        radius={0}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
               </div>
-            </>
+            </div>
           ) : (
-            <>
-              <div className="grid grid-cols-5 gap-x-8 bg-[#F9FAFD] py-4 my-4">
+            <div className="payment-request bg-white h-[calc(100vh-310px)] rounded-lg mt-3 overflow-y-auto px-5 py-3">
+              <div className="grid grid-cols-5 gap-x-8 bg-[#F9FAFD] py-4 px-3 my-4">
                 <div className="col-span-4">
                   <span className="text-[16px] text-[#12263F]">
                     Expense Planning
@@ -1730,7 +1821,7 @@ export default function page() {
                   <div className="bg-white w-full py-5 grid grid-cols-2 justify-center mt-4">
                     <div className="flex flex-col space-y-3 items-center">
                       <div className="flex items-center gap-x-2">
-                        <div className="w-2 h-2 rounded-full bg-[#31D5A6]" />
+                        <div className="w-2 h-2 rounded-full bg-[#E76F51]" />
                         <span className="text-[15px] text-[#6C757D]">
                           Internal Requests
                         </span>
@@ -1738,7 +1829,7 @@ export default function page() {
                     </div>
                     <div className="flex flex-col space-y-3 items-center">
                       <div className="flex items-center gap-x-2">
-                        <div className="w-2 h-2 rounded-full bg-[#878FF6]" />
+                        <div className="w-2 h-2 rounded-full bg-[#277DA1]" />
                         <span className="text-[15px] text-[#6C757D]">
                           External Requests
                         </span>
@@ -1748,10 +1839,10 @@ export default function page() {
                   <ResponsiveContainer width="100%" height={280}>
                     <LineChart
                       margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                      data={data}
+                      data={expenseOverview?.data}
                     >
                       <XAxis
-                        dataKey="name"
+                        dataKey="month"
                         tickMargin={20}
                         tick={{ fontSize: 11 }}
                         tickSize={0}
@@ -1766,15 +1857,15 @@ export default function page() {
                       <Tooltip />
                       <Line
                         type="monotone"
-                        dataKey="value"
-                        stroke="#31D5A6"
+                        dataKey="internal_requests"
+                        stroke="#E76F51"
                         dot={false}
                         strokeWidth={3}
                       />
                       <Line
                         type="monotone"
-                        dataKey="current"
-                        stroke="#878FF6"
+                        dataKey="external_requests"
+                        stroke="#277DA1"
                         dot={false}
                         strokeWidth={3}
                       />
@@ -1788,7 +1879,10 @@ export default function page() {
                         Total Requests Amount
                       </h6>
                       <h2 className="text-[#6C757D] text-[20px] font-semibold mt-0">
-                        $1,200,000
+                        $
+                        {formatAmount(
+                          expenseOverview?.totals[0]?.total_requests_amount
+                        )}
                       </h2>
                     </div>
                     <PiCurrencyCircleDollarFill
@@ -1805,7 +1899,10 @@ export default function page() {
                         {/* <span className="text-[#95AAC9] font-light text-[12px] mt-0 mb-0"> (this week)</span> */}
                       </div>
                       <h2 className="text-[#6C757D] text-[20px] font-semibold mt-4">
-                        $85,000
+                        $
+                        {formatAmount(
+                          expenseOverview?.totals[0]?.total_pending_payments
+                        )}
                       </h2>
                     </div>
                     <MdOutlinePendingActions
@@ -1821,33 +1918,33 @@ export default function page() {
                         </h6>
                         <span className="text-[#95AAC9] font-light text-[12px] mt-0 mb-0">
                           {" "}
-                          (this week)
+                          {/* (this week) */}
                         </span>
                       </div>
                       <h2 className="text-[#6C757D] text-[20px] font-semibold mt-4">
-                        10
+                        {expenseOverview?.totals[0]?.count_pending_payments}
                       </h2>
                     </div>
                     <MdOutlinePayments size={24} className="text-[#95AAC9]" />
                   </div>
                 </div>
               </div>
-              <div className="w-full col-span-2 pt-3 bg-[#F9FAFD]">
+              <div className="w-full col-span-2 pt-5 bg-[#F9FAFD] pb-16 px-3 my-4">
                 <span className="text-[16px] text-[#12263F]">
                   Department Expenditures
                 </span>
                 <div className="bg-white w-full py-5 grid grid-cols-2 justify-center mt-4">
                   <div className="flex flex-col space-y-3 items-center mx-5">
                     <div className="flex items-center gap-x-2">
-                      <div className="w-2 h-2 rounded-full bg-[#6786F5]" />
-                      <span className="text-[15px] text-[#6C757D]">
+                      <div className="w-2 h-2 rounded-full bg-[#797774]" />
+                      <span className="text-[15px] text-[#cccecf]">
                         Internal Requests
                       </span>
                     </div>
                   </div>
                   <div className="flex flex-col space-y-3 items-center">
                     <div className="flex items-center gap-x-2">
-                      <div className="w-2 h-2 rounded-full bg-[#D2DDEC]" />
+                      <div className="w-2 h-2 rounded-full bg-[#277DA1]" />
                       <span className="text-[15px] text-[#6C757D]">
                         External Requests
                       </span>
@@ -1856,7 +1953,7 @@ export default function page() {
                 </div>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart
-                    data={departmentExpanditure}
+                    data={expenseOverview?.dapartmentalExpenses}
                     margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                   >
                     <XAxis
@@ -1874,23 +1971,23 @@ export default function page() {
                     />
                     <Tooltip />
                     <Bar
-                      dataKey="value"
+                      dataKey="external_requests"
                       stackId="a"
-                      fill="#6786F5"
+                      fill="#277DA1"
                       barSize={20}
                       radius={0}
                     />
                     <Bar
-                      dataKey="current"
+                      dataKey="internal_requests"
                       stackId="a"
-                      fill="#D2DDEC"
+                      fill="#cccecf"
                       barSize={20}
                       radius={0}
                     />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-            </>
+            </div>
           )}
 
           {/* <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4 mr-6 my-5">
