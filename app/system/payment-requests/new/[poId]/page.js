@@ -161,7 +161,7 @@ export default function NewPaymentRequest({ params }) {
     return {
       totalVal: t,
       totalTax: tax,
-      grossTotal: t + tax,
+      grossTotal: _.round(t + tax),
     };
   }
 
@@ -427,7 +427,7 @@ export default function NewPaymentRequest({ params }) {
                                       (poVal == -1 &&
                                         value > getPoTotalVal()?.grossTotal)
                                     ) {
-                                      reject(
+                                       reject(
                                         "Requested amount should not exceed the PO Value!"
                                       );
                                     } else {

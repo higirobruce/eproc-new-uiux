@@ -3157,6 +3157,11 @@ const RequestDetails = ({
                         onChange={(value, option) => {
                           let r = { ...data };
                           r.currency = value;
+                          let items = r.items.map((i) => {
+                            i.currency = value;
+                            return i;
+                          });
+                          r.items = items;
                           handleUpdateRequest(r);
                         }}
                         // filterSort={(optionA, optionB) =>
