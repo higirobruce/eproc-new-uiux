@@ -609,7 +609,7 @@ const RequestDetails = ({
 
     // console.log('Seeeeet Files', _p)
 
-    fetch(`${url}/serviceCategories`, {
+    fetch(`${url}/serviceCategories/?visible=1`, {
       method: "GET",
       headers: {
         Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
@@ -1600,7 +1600,7 @@ const RequestDetails = ({
             .filter((i) => i.itemType === "asset")
             .map((i, index) => {
               assetsNeeded = true;
-              i.currency = poCurrency
+              i.currency = poCurrency;
               i?.assetCodes?.map((a) => {
                 assetItems?.push({
                   ItemCode: a,
@@ -1615,7 +1615,7 @@ const RequestDetails = ({
           items
             .filter((i) => i.itemType === "non-asset" || !i.itemType)
             .map((i, index) => {
-              i.currency = poCurrency
+              i.currency = poCurrency;
               nonAssetItems?.push({
                 ItemDescription: i.title,
                 Quantity: i.quantity,
@@ -3263,6 +3263,7 @@ const RequestDetails = ({
                         value={data?.budgetLine?._id}
                         disabled={disable}
                         onChange={(value, option) => {
+                          alert(value)
                           let r = { ...data };
                           r.budgetLine = value;
                           handleUpdateRequest(r);
@@ -3279,18 +3280,22 @@ const RequestDetails = ({
                             .toLowerCase()
                             .includes(inputValue.toLowerCase());
                         }}
-                        options={budgetLines.map((s) => {
-                          return {
-                            label: s.description.toUpperCase(),
-                            options: s.budgetlines.map((sub) => {
-                              return {
-                                label: sub.description,
-                                value: sub._id,
-                                title: sub.description,
-                              };
-                            }),
-                          };
-                        })}
+                        options={budgetLines
+                          .filter((s) => s.visible == true)
+                          .map((s) => {
+                            return {
+                              label: s.description.toUpperCase(),
+                              options: s.budgetlines
+                                .filter((s) => s.visible == true)
+                                .map((sub) => {
+                                  return {
+                                    label: sub.description,
+                                    value: sub._id,
+                                    title: sub.description,
+                                  };
+                                }),
+                            };
+                          })}
                       ></Select>
                     </div>
                   </div>

@@ -47,7 +47,7 @@ import { MdCreateNewFolder } from "react-icons/md";
 import { useUser } from "@/app/context/UserContext";
 import { isMobile } from "react-device-detect";
 import NotificationComponent from "@/app/hooks/useMobile";
-import Link from 'next/link';
+import Link from "next/link";
 import moment from "moment";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
@@ -78,14 +78,35 @@ async function getUserDetails(id, router) {
 }
 
 const activityUser = {
-  'users': {path: '/system/users', icon: <UserOutlined size={24} className="text-[#01AF65]" />},
-  'vendors': {path: '/system/vendors', icon: <UserOutlined size={24} className="text-[#01AF65]" />},
-  'requests': {path: '/system/requests', icon: <SolutionOutlined size={24} className="text-[#01AF65]" />},
-  'tenders': {path: '/system/tenders', icon: <MessageOutlined size={24} className="text-[#01AF65]" />},
-  'contracts': {path: '/system/contracts', icon: <FileDoneOutlined size={24} className="text-[#01AF65]" />},
-  'purchase-orders': {path: '/system/purchase-orders', icon: <OrderedListOutlined size={24} className="text-[#01AF65]" />},
-  'payment-requests': {path: '/system/payment-requests', icon: <DollarOutlined size={24} className="text-[#01AF65]" />},
-}
+  users: {
+    path: "/system/users",
+    icon: <UserOutlined size={24} className="text-[#01AF65]" />,
+  },
+  vendors: {
+    path: "/system/vendors",
+    icon: <UserOutlined size={24} className="text-[#01AF65]" />,
+  },
+  requests: {
+    path: "/system/requests",
+    icon: <SolutionOutlined size={24} className="text-[#01AF65]" />,
+  },
+  tenders: {
+    path: "/system/tenders",
+    icon: <MessageOutlined size={24} className="text-[#01AF65]" />,
+  },
+  contracts: {
+    path: "/system/contracts",
+    icon: <FileDoneOutlined size={24} className="text-[#01AF65]" />,
+  },
+  "purchase-orders": {
+    path: "/system/purchase-orders",
+    icon: <OrderedListOutlined size={24} className="text-[#01AF65]" />,
+  },
+  "payment-requests": {
+    path: "/system/payment-requests",
+    icon: <DollarOutlined size={24} className="text-[#01AF65]" />,
+  },
+};
 
 export default function page({ params }) {
   const { user, login, logout } = useUser();
@@ -120,7 +141,7 @@ export default function page({ params }) {
       setRow(res);
     });
 
-    userActivity(params?.id)
+    userActivity(params?.id);
 
     fetch(`${url}/dpts`, {
       method: "GET",
@@ -197,17 +218,16 @@ export default function page({ params }) {
         "Content-Type": "application/json",
       },
     })
-    .then((res) => res.json())
-    .then((res) => {
-      setUserActivityData(res);
-    })
-    .catch((err) => {
-      messageApi.open({
-        type: "error",
-        content: "Something happened! Please try again.",
+      .then((res) => res.json())
+      .then((res) => {
+        setUserActivityData(res);
+      })
+      .catch((err) => {
+        messageApi.open({
+          type: "error",
+          content: "Something happened! Please try again.",
+        });
       });
-    });
-
   }
 
   function setCanView(canView, module) {
@@ -859,13 +879,17 @@ export default function page({ params }) {
                           setRow(r);
                         }}
                       >
-                        {dpts?.map((dpt) => {
-                          return (
-                            dpt?.visible &&<Select.Option key={dpt._id} value={dpt._id}>
-                              {dpt.description}
-                            </Select.Option>
-                          );
-                        })}
+                        {dpts
+                          ?.filter((s) => s.visible == true)
+                          .map((dpt) => {
+                            return (
+                              dpt?.visible && (
+                                <Select.Option key={dpt._id} value={dpt._id}>
+                                  {dpt.description}
+                                </Select.Option>
+                              )
+                            );
+                          })}
                       </Select>
                     </div>
                   </div>
@@ -1073,30 +1097,44 @@ export default function page({ params }) {
                 <Timeline
                   className="mt-8"
                   // mode="alternate"
-                  items={
-                    userActivityData?.map((item, k) => (
-                      {
-                        children: (
-                          <div className="flex flex-col mb-1">
-                            <div className="flex gap-x-3 items-center">
-                              <h6 className="m-0 py-0.5 px-0 text-[14px] text-[#344767]">{row?.firstName + ' ' + row?.lastName}</h6>
-                              <span className="text-[13px] text-[#80878b]"> {item?.action}</span>
-                              {item?.doneBy && <Link className="text-blue-600" href={activityUser[item?.module]?.path + `/${item?.referenceId}`}>{item?.referenceId}</Link>}
-                            </div>
-                            <Tooltip title={moment(item?.doneAt).format('MMMM Do YYYY, h:mm:ss a')}>
-                              <small className="text-[#80878b]">
-                                {moment(item?.doneAt).endOf().fromNow()}
-                              </small>
-                            </Tooltip>
-                          </div>
-                        ),
-                        color: "blue",
-                        dot: activityUser[item?.module]?.icon
-                      }
-                    ))
-                    }
+                  items={userActivityData?.map((item, k) => ({
+                    children: (
+                      <div className="flex flex-col mb-1">
+                        <div className="flex gap-x-3 items-center">
+                          <h6 className="m-0 py-0.5 px-0 text-[14px] text-[#344767]">
+                            {row?.firstName + " " + row?.lastName}
+                          </h6>
+                          <span className="text-[13px] text-[#80878b]">
+                            {" "}
+                            {item?.action}
+                          </span>
+                          {item?.doneBy && (
+                            <Link
+                              className="text-blue-600"
+                              href={
+                                activityUser[item?.module]?.path +
+                                `/${item?.referenceId}`
+                              }
+                            >
+                              {item?.referenceId}
+                            </Link>
+                          )}
+                        </div>
+                        <Tooltip
+                          title={moment(item?.doneAt).format(
+                            "MMMM Do YYYY, h:mm:ss a"
+                          )}
+                        >
+                          <small className="text-[#80878b]">
+                            {moment(item?.doneAt).endOf().fromNow()}
+                          </small>
+                        </Tooltip>
+                      </div>
+                    ),
+                    color: "blue",
+                    dot: activityUser[item?.module]?.icon,
+                  }))}
                 />
-                
               </div>
             ) : (
               tab == 4 && (

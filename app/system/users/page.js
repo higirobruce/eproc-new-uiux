@@ -967,6 +967,7 @@ export default function Users() {
                       <Select
                         // mode="multiple"
                         // allowClear
+                        showSearch={true}
                         style={{ width: "100%" }}
                         defaultValue={row?.department?._id}
                         placeholder="Please select"
@@ -978,15 +979,17 @@ export default function Users() {
                           setRow(r);
                         }}
                       >
-                        {dpts?.map((dpt) => {
-                          return (
-                            dpt?.visible && (
-                              <Select.Option key={dpt._id} value={dpt._id}>
-                                {dpt.description}
-                              </Select.Option>
-                            )
-                          );
-                        })}
+                        {dpts
+                          ?.filter((s) => s.visible == true)
+                          .map((dpt) => {
+                            return (
+                              dpt?.visible && (
+                                <Select.Option key={dpt._id} value={dpt._id}>
+                                  {dpt.description}
+                                </Select.Option>
+                              )
+                            );
+                          })}
                       </Select>
                     )}
                   </div>
@@ -1301,18 +1304,21 @@ export default function Users() {
                         // mode="multiple"
                         // allowClear
                         // style={{width:'100%'}}
+                        
                         size="large"
                         placeholder="Please select"
                       >
-                        {dpts?.map((dpt) => {
-                          return (
-                            dpt?.visible && (
-                              <Select.Option key={dpt._id} value={dpt._id}>
-                                {dpt.description}
-                              </Select.Option>
-                            )
-                          );
-                        })}
+                        {dpts
+                          ?.filter((s) => s.visible == true)
+                          .map((dpt) => {
+                            return (
+                              dpt?.visible && (
+                                <Select.Option key={dpt._id} value={dpt._id}>
+                                  {dpt.description}
+                                </Select.Option>
+                              )
+                            );
+                          })}
                       </Select>
                     </Form.Item>
                   </div>
