@@ -373,7 +373,7 @@ const ServiceCategoriesTable = ({
         bodyStyle={{ maxHeight: "700px", overflow: "hidden" }}
       >
         <div className="p-10">
-          This will override the old data. Do you want to continue?
+          This will override the old information. Do you want to continue?
         </div>
       </Modal>
     );
