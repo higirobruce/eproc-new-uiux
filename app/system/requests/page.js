@@ -1426,10 +1426,10 @@ export default function UserRequests() {
                                 .toLowerCase()
                                 .includes(inputValue.toLowerCase());
                             }}
-                            options={budgetLines.map((s) => {
+                            options={budgetLines.filter((s) => s.visible == true).map((s) => {
                               return {
                                 label: s.description.toUpperCase(),
-                                options: s.budgetlines.map((sub) => {
+                                options: s.budgetlines.filter((s) => s.visible == true).map((sub) => {
                                   return {
                                     label: sub.description,
                                     value: sub._id,

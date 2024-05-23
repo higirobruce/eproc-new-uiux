@@ -507,18 +507,22 @@ export default function NewPaymentRequest() {
                                     .toLowerCase()
                                     .includes(inputValue.toLowerCase());
                                 }}
-                                options={budgetLines?.map((s) => {
-                                  return {
-                                    label: s.description.toUpperCase(),
-                                    options: s.budgetlines?.map((sub) => {
-                                      return {
-                                        label: sub.description,
-                                        value: sub._id,
-                                        title: sub.description,
-                                      };
-                                    }),
-                                  };
-                                })}
+                                options={budgetLines
+                                  ?.filter((s) => s.visible == true)
+                                  .map((s) => {
+                                    return {
+                                      label: s.description.toUpperCase(),
+                                      options: s.budgetlines
+                                        ?.filter((s) => s.visible == true)
+                                        .map((sub) => {
+                                          return {
+                                            label: sub.description,
+                                            value: sub._id,
+                                            title: sub.description,
+                                          };
+                                        }),
+                                    };
+                                  })}
                               ></Select>
                             </Form.Item>
                           </div>
