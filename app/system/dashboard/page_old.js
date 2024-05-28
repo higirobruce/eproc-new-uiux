@@ -49,7 +49,6 @@ import {
 import { isMobile } from "react-device-detect";
 import NotificationComponent from "@/app/hooks/useMobile";
 import { formatAmount } from "@/app/utils/helpers";
-import Chart from "react-apexcharts";
 
 export default function page() {
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -697,7 +696,6 @@ export default function page() {
               </h5>
             </div>
           </div> */}
-          {/* Select Year */}
           <div className="flex justify-end mb-4 mr-1">
             <Select
               defaultValue={year}
@@ -708,7 +706,6 @@ export default function page() {
               options={generateYearsArray()}
             />
           </div>
-          {/* Cards */}
           <div className="lg:grid hidden xl:grid-cols-7 md:grid-cols-4 gap-3 my-4">
             {[
               {
@@ -758,8 +755,6 @@ export default function page() {
               </div>
             ))}
           </div>
-
-          {/* Tabs */}
           <div className="bg-white rounded-lg p-3 my-1">
             <div className="flex items-center gap-x-14 px-5 bg-[#F5F5F5]">
               <button
@@ -849,142 +844,258 @@ export default function page() {
                     Purchase Request
                   </span>
 
-                  <div className="grid grid-cols-2 gap-5">
+                  <div className="grid grid-cols-3">
                     {/* Budgeted vs Non-Budgeted */}
-                    <div className="pt-5 col-span-2 grid grid-cols-2">
-                      {/* <span className="text-[14px] font-semibold text-[#12263F] p-5 m-5">
+                    <div className="pt-5 col-span-2">
+                      <span className="text-[14px] font-semibold text-[#12263F] p-5 m-5">
                         Budgeted Vs Non-Budgeted
-                      </span> */}
+                      </span>
+                      <ResponsiveContainer width="100%" height={200}>
+                        <LineChart
+                          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                          data={totalOverview?.data}
+                        >
+                          <XAxis
+                            dataKey="month"
+                            tickMargin={20}
+                            tick={{ fontSize: 11 }}
+                            tickSize={0}
+                            axisLine={{ strokeDasharray: "5 5" }}
+                          />
+                          <YAxis
+                            axisLine={false}
+                            tickMargin={20}
+                            tickSize={0}
+                            tick={<CustomYAxisTick />}
+                          />
+                          <Tooltip />
+                          <Line
+                            type="monotone"
+                            dataKey={"budgeted"}
+                            stroke="#E76F51"
+                            dot={false}
+                            strokeWidth={4}
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey={"nonbudgeted"}
+                            stroke="#F3B700"
+                            dot={false}
+                            strokeWidth={4}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
 
-                      {console.log(totalOverview)}
-
-                      <div>
-                        <Chart
-                          options={{
-                            stroke: {
-                              curve: "smooth",
-                              // width: 2,
-                            },
-                            chart: {
-                              id: "basic-line",
-                            },
-                            xaxis: {
-                              categories: totalOverview?.data?.map((d) => {
-                                return d?.month;
-                              }),
-                            },
-                          }}
-                          series={[
-                            {
-                              name: "budgeted",
-                              data: totalOverview?.data?.map((d) => {
-                                return d?.budgeted;
-                              }),
-                            },
-                            {
-                              name: "non-budgeted",
-                              data: totalOverview?.data?.map((d) => {
-                                return d?.nonbudgeted;
-                              }),
-                            },
-                          ]}
-                          type="line"
-                          height="300"
-                          // width="500"
-                        />
+                    {/* Sourcing Methods */}
+                    <div className="bg-[#F9FAFD] px-4 pt-5">
+                      <div className="pb-3">
+                        <span className="text-[14px] font-semibold text-[#12263F]">
+                          Sourcing methods
+                        </span>
                       </div>
+                      <div className="flex flex-row xl:items-center xl:gap-x-5 gap-y-4">
+                        <ResponsiveContainer
+                          className={"flex justify-center"}
+                          width={300}
+                          height={240}
+                        >
+                          <PieChart
+                            margin={{ top: 5, right: 0, left: 0, bottom: 5 }}
+                            className="flex justify-center"
+                            // width={730} height={250}
+                          >
+                            <Pie
+                              data={totalOverview?.sourcingData}
+                              // cx={70}
+                              cy="50%"
+                              startAngle={360}
+                              endAngle={0}
+                              innerRadius={
+                                windowWidth > 1028
+                                  ? 85
+                                  : windowWidth > 998
+                                  ? 75
+                                  : 75
+                              }
+                              outerRadius={
+                                windowWidth > 1028
+                                  ? 99
+                                  : windowWidth > 998
+                                  ? 89
+                                  : 89
+                              }
+                              fill="#8884d8"
+                              paddingAngle={5}
+                              cornerRadius={10}
+                              dataKey="total"
+                            >
+                              {totalOverview?.sourcingData?.map(
+                                (entry, index) => (
+                                  <Cell
+                                    key={`cell-${index}`}
+                                    fill={
+                                      ["#0B7A75", "#FFF1D0", "#BC4749"][index]
+                                    }
+                                  />
+                                )
+                              )}
+                            </Pie>
+                            <Tooltip content={<CustomTooltip />} />
+                          </PieChart>
+                        </ResponsiveContainer>
 
-                      <div>
-                        <Chart
-                          options={{
-                            // stroke: {
-                            //   curve: "smooth",
-                            //   // width: 2,
-                            // },
-                            chart: {
-                              id: "bar-serviceCagtegory",
-                              stacked: true,
-                            },
-                            xaxis: {
-                              categories: ["JAN", "FEB", "MAR", "APR", "MAY"],
-                            },
-                          }}
-                          series={[
-                            {
-                              name: "Category1",
-                              data: [1, 2, 3, 4, 5],
-                            },
-                            {
-                              name: "Category2",
-                              data: [0, 9, 2, 7, 1],
-                            },
-
-                            {
-                              name: "Category3",
-                              data: [3, 6, 2, 1, 1],
-                            },
-                            {
-                              name: "Category4",
-                              data: [9, 1, 8, 3, 7],
-                            },
-                            {
-                              name: "Category5",
-                              data: [5, 1, 9, 3, 1],
-                            },
-                            {
-                              name: "Category6",
-                              data: [7, 1, 2, 9, 3],
-                            },
-                          ]}
-                          type="bar"
-                          height="300"
-                          // width="500"
-                        />
+                        <div className="xl:flex justify- flex-wrap hidden gap-3 -mt-5">
+                          {totalOverview?.sourcingData?.map((item, key) => (
+                            <div className="flex items-center gap-x-2">
+                              <div
+                                className={`w-1.5 h-1.5 rounded-full bg-[${
+                                  ["#0B7A75", "#FFF1D0", "#BC4749"][key]
+                                }]`}
+                              />
+                              <span className="text-[13px] text-[#6C757D]">
+                                {item?._id}
+                              </span>
+                              <span className="text-[13px] text-[#6C757D]">
+                                {item?.total}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Sourcing Methods */}
-                  <div className="pt-10 grid grid-cols-2">
-                    {/* <span className="text-[14px] font-semibold text-[#12263F]">
-                          Sourcing methods
-                        </span> */}
-                    <Chart
-                      options={{
-                        chart: {
-                          id: "pie-sourcing",
-                        },
+                  <div className="grid grid-cols-3">
+                    {/* By Serice Category */}
 
-                        labels: totalOverview?.sourcingData?.map((s) => {
-                          return s?._id;
-                        }),
-                      }}
-                      series={totalOverview?.sourcingData?.map((s) => {
-                        return s?.total;
-                      })}
-                      type="pie"
-                      width="320"
-                    />
+                    <div className=" col-span-2">
+                      <span className="text-[14px] font-semibold text-[#12263F] p-5 m-5">
+                        By Service Category
+                      </span>
+                      <ResponsiveContainer
+                        width="100%"
+                        height={200}
+                        className={""}
+                      >
+                        <BarChart
+                          data={combinedData}
+                          margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                        >
+                          <XAxis
+                            dataKey="name"
+                            tickMargin={20}
+                            tick={{ fontSize: 11 }}
+                            tickSize={0}
+                            axisLine={{ strokeDasharray: "5 5" }}
+                          />
+                          <YAxis
+                            axisLine={false}
+                            tickMargin={30}
+                            tickSize={0}
+                            tick={<CustomYAxisTick />}
+                          />
+                          <Tooltip />
 
-                    <Chart
-                      options={{
-                        chart: {
-                          id: "pie-approval",
-                        },
+                          {Object?.keys(combinedData && combinedData[0]).map(
+                            (key, index) => {
+                              if (key !== "month" && key !== "name") {
+                                return (
+                                  <Bar
+                                    key={key}
+                                    dataKey={key}
+                                    stackId="a"
+                                    fill={
+                                      statusColors[index % statusColors.length]
+                                    }
+                                    barSize={40}
+                                  />
+                                );
+                              }
+                              return null;
+                            }
+                          )}
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
 
-                        labels: totalOverview?.statusData?.map((s) => {
-                          return s?._id;
-                        }),
-                      }}
-                      series={totalOverview?.statusData?.map((s) => {
-                        return s?.total;
-                      })}
-                      type="pie"
-                      width="320"
-                    />
+                    {/* Approval processes */}
+                    <div className="bg-[#f9fafd] px-4">
+                      <div className="">
+                        <span className="text-[14px] font-semibold text-[#12263F]">
+                          Approval process
+                        </span>
+                      </div>
+                      <div className="flex flex-row xl:items-center xl:gap-x-5 gap-y-4">
+                        <ResponsiveContainer
+                          className={"flex justify-center"}
+                          width={250}
+                          height={240}
+                        >
+                          <PieChart
+                            margin={{ top: 10, right: 0, left: 20, bottom: 5 }}
+                            className="flex justify-center"
+                          >
+                            <Pie
+                              data={totalOverview?.statusData}
+                              // cx={50}
+                              cy="50%"
+                              startAngle={360}
+                              endAngle={0}
+                              innerRadius={
+                                windowWidth > 1028
+                                  ? 85
+                                  : windowWidth > 998
+                                  ? 75
+                                  : 75
+                              }
+                              outerRadius={
+                                windowWidth > 1028
+                                  ? 99
+                                  : windowWidth > 998
+                                  ? 89
+                                  : 89
+                              }
+                              fill="#8884d8"
+                              paddingAngle={5}
+                              cornerRadius={10}
+                              dataKey="total"
+                            >
+                              {totalOverview?.statusData?.map(
+                                (entry, index) => (
+                                  <Cell
+                                    key={`cell-${index}`}
+                                    fill={
+                                      ["#0B7A75", "#277DA1", "#FFF1D0"][index]
+                                    }
+                                  />
+                                )
+                              )}
+                            </Pie>
+                            <Tooltip content={<CustomTooltip />} />
+                          </PieChart>
+                        </ResponsiveContainer>
+                        <div className="xl:flex justify-start text-center flex-wrap hidden gap-3 -mt-5">
+                          {totalOverview?.statusData?.map((item, key) => (
+                            <div className="flex justify-center items-center text-center gap-x-2">
+                              <div
+                                className={`w-2 h-2 rounded-full bg-[${
+                                  ["#0B7A75", "#277DA1", "#FFF1D0"][key]
+                                }]`}
+                              />
+                              <span className="text-[13px] text-[#6C757D]">
+                                {item?._id}
+                              </span>
+                              <span className="text-[13px] text-[#6C757D]">
+                                {item?.total}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-
                 {/* <div className="xl:col-span-1 col-span-2 flex flex-col px-4 pt-5 bg-[#F9FAFD]">
                   <div className="flex items-center w-full mb-10 mt-5 border-t border-b-0 border-x-0 border-solid border-[#F1F3FF]">
                     <div className="bg-white flex-grow py-3 px-5">
@@ -1022,6 +1133,56 @@ export default function page() {
                       </div>
                     ))}
                   </div> */}
+                  <ResponsiveContainer width="100%" height={360}>
+                    <LineChart
+                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                      data={paymentOverview?.data}
+                    >
+                      <XAxis
+                        dataKey="month"
+                        tickMargin={20}
+                        tick={{ fontSize: 11 }}
+                        tickSize={0}
+                        axisLine={{ strokeDasharray: "5 5" }}
+                      />
+                      <YAxis
+                        axisLine={false}
+                        tickMargin={20}
+                        tickSize={0}
+                        tick={<CustomYAxisTick />}
+                      />
+                      <Tooltip />
+                      <Line
+                        type="monotone"
+                        dataKey={"budgeted"}
+                        stroke="#34AEB3"
+                        dot={false}
+                        strokeWidth={4}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey={"nonbudgeted"}
+                        stroke="#53D084"
+                        dot={false}
+                        strokeWidth={4}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey={"total"}
+                        stroke="#FF5555"
+                        dot={false}
+                        strokeWidth={1}
+                        strokeDasharray="5 5"
+                      />
+                      {/* <Line
+                        type="monotone"
+                        dataKey={"value"}
+                        stroke="#878FF6"
+                        dot={false}
+                        strokeWidth={3}
+                      /> */}
+                    </LineChart>
+                  </ResponsiveContainer>
                 </div>
                 <div className="xl:col-span-1 flex flex-col px-4 pt-5 bg-[#F9FAFD]">
                   <div className="py-5">
@@ -1029,7 +1190,68 @@ export default function page() {
                       Approval process
                     </span>
                   </div>
-                  <div className="flex flex-row xl:items-center xl:gap-x-5 gap-y-4 mb-5"></div>
+                  <div className="flex flex-row xl:items-center xl:gap-x-5 gap-y-4 mb-5">
+                    <ResponsiveContainer
+                      className={"flex justify-center"}
+                      width="100%"
+                      height={240}
+                    >
+                      <PieChart
+                        margin={{ top: 20, right: 0, left: 0, bottom: 5 }}
+                      >
+                        <Pie
+                          data={paymentOverview?.statusData}
+                          // cx={50}
+                          cy={90}
+                          startAngle={360}
+                          endAngle={0}
+                          innerRadius={
+                            windowWidth > 1028
+                              ? 85
+                              : windowWidth > 998
+                              ? 75
+                              : 75
+                          }
+                          outerRadius={
+                            windowWidth > 1028
+                              ? 99
+                              : windowWidth > 998
+                              ? 89
+                              : 89
+                          }
+                          fill="#8884d8"
+                          paddingAngle={5}
+                          cornerRadius={10}
+                          dataKey="total"
+                        >
+                          {paymentOverview?.statusData?.map((entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={["#0B7A75", "#FFF1D0", "#277DA1"][index]}
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip content={<CustomTooltip />} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div className="xl:flex flex-wrap justify-start hidden gap-3 -mt-5">
+                      {paymentOverview?.statusData?.map((item, key) => (
+                        <div className="flex items-center gap-x-2">
+                          <div
+                            className={`w-2 h-2 rounded-full bg-[${
+                              ["#0B7A75", "#FFF1D0", "#277DA1"][key]
+                            }]`}
+                          />
+                          <span className="text-[13px] text-[#6C757D]">
+                            {item?._id}
+                          </span>
+                          <span className="text-[13px] text-[#6C757D]">
+                            {item?.total}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                   <div className="flex items-center w-full mt-5 mb-10 border-t border-b-0 border-x-0 border-solid border-[#F1F3FF] pt-5">
                     <div className="bg-white flex-grow py-3 px-5">
                       <small className="text-[15px] text-[#555b69]">
