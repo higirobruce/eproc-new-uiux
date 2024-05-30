@@ -39,6 +39,8 @@ export default function page() {
   let token = localStorage.getItem("token");
   const router = useRouter();
   const [tab, setTab] = useState(0);
+  const [categorySeries, setCategorySeries] = useState([]);
+  const [serviceCategoriesCats, setServiceCategoriesCats] = useState([]);
 
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
@@ -151,6 +153,23 @@ export default function page() {
         .then((res) => getResultFromServer(res))
         .then((res) => {
           setTotalOverview(res);
+          let data = res?.serviceCatData;
+
+          const categories = Array.from(
+            new Set(
+              data
+                .flatMap(Object.keys)
+                .filter((key) => key !== "name" && key !== "month")
+            )
+          );
+
+          const _categorySeries = categories.map((category) => ({
+            name: category,
+            data: data.map((item) => item[category] || 0), // Use 0 if the category is not present in the item
+          }));
+
+          setServiceCategoriesCats(categories);
+          setCategorySeries(_categorySeries);
         })
         .catch((err) => {
           messageApi.open({
@@ -803,36 +822,16 @@ export default function page() {
                               stacked: true,
                             },
                             xaxis: {
-                              categories: ["JAN", "FEB", "MAR", "APR", "MAY"],
+                              categories: totalOverview?.serviceCatData?.map(
+                                (s) => s?.name
+                              ),
+                              
                             },
+                            legend:{
+                              show:false
+                            }
                           }}
-                          series={[
-                            {
-                              name: "Category1",
-                              data: [1, 2, 3, 4, 5],
-                            },
-                            {
-                              name: "Category2",
-                              data: [0, 9, 2, 7, 1],
-                            },
-
-                            {
-                              name: "Category3",
-                              data: [3, 6, 2, 1, 1],
-                            },
-                            {
-                              name: "Category4",
-                              data: [9, 1, 8, 3, 7],
-                            },
-                            {
-                              name: "Category5",
-                              data: [5, 1, 9, 3, 1],
-                            },
-                            {
-                              name: "Category6",
-                              data: [7, 1, 2, 9, 3],
-                            },
-                          ]}
+                          series={categorySeries}
                           type="bar"
                           height="300"
                           // width="500"
