@@ -851,16 +851,19 @@ export default function page() {
 
                   <div className="grid grid-cols-2 gap-5">
                     {/* Budgeted vs Non-Budgeted */}
-                    <div className="pt-5 col-span-2 grid grid-cols-2">
+                    <div className="pt-5 col-span-2 grid grid-cols-2 gap-5">
                       {/* <span className="text-[14px] font-semibold text-[#12263F] p-5 m-5">
                         Budgeted Vs Non-Budgeted
                       </span> */}
 
-                      {console.log(totalOverview)}
+                      {console.log(dashboardOverview)}
 
-                      <div>
+                      <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
                         <Chart
                           options={{
+                            title: {
+                              text: "Budgeted vs Non-Budgeted",
+                            },
                             stroke: {
                               curve: "smooth",
                               // width: 2,
@@ -894,13 +897,16 @@ export default function page() {
                         />
                       </div>
 
-                      <div>
+                      <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
                         <Chart
                           options={{
                             // stroke: {
                             //   curve: "smooth",
                             //   // width: 2,
                             // },
+                            title: {
+                              text: "PRs by Service categories",
+                            },
                             chart: {
                               id: "bar-serviceCagtegory",
                               stacked: true,
@@ -945,43 +951,58 @@ export default function page() {
                   </div>
 
                   {/* Sourcing Methods */}
-                  <div className="pt-10 grid grid-cols-2">
+                  <div className="pt-5 mt-5 grid grid-cols-3 bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
                     {/* <span className="text-[14px] font-semibold text-[#12263F]">
                           Sourcing methods
                         </span> */}
-                    <Chart
-                      options={{
-                        chart: {
-                          id: "pie-sourcing",
-                        },
+                    <div>
+                      <Chart
+                        options={{
+                          chart: {
+                            id: "pie-sourcing",
+                          },
 
-                        labels: totalOverview?.sourcingData?.map((s) => {
-                          return s?._id;
-                        }),
-                      }}
-                      series={totalOverview?.sourcingData?.map((s) => {
-                        return s?.total;
-                      })}
-                      type="pie"
-                      width="320"
-                    />
+                          labels: totalOverview?.sourcingData?.map((s) => {
+                            return s?._id;
+                          }),
+                        }}
+                        series={totalOverview?.sourcingData?.map((s) => {
+                          return s?.total;
+                        })}
+                        type="pie"
+                        width="320"
+                      />
+                    </div>
 
-                    <Chart
-                      options={{
-                        chart: {
-                          id: "pie-approval",
-                        },
+                    <div>
+                      <Chart
+                        options={{
+                          chart: {
+                            id: "pie-approval",
+                          },
 
-                        labels: totalOverview?.statusData?.map((s) => {
-                          return s?._id;
-                        }),
-                      }}
-                      series={totalOverview?.statusData?.map((s) => {
-                        return s?.total;
-                      })}
-                      type="pie"
-                      width="320"
-                    />
+                          labels: totalOverview?.statusData?.map((s) => {
+                            return s?._id;
+                          }),
+                        }}
+                        series={totalOverview?.statusData?.map((s) => {
+                          return s?.total;
+                        })}
+                        type="pie"
+                        width="320"
+                      />
+                    </div>
+                    <div className="flex items-center mt-3">
+                      <div className="bg-white flex flex-row space-x-3 py-3 px-5">
+                        <small className="text-[#848CA1]">
+                          <b>Contract</b> lead time
+                        </small>
+                        <small className="text-[14.5px] font-semibold">
+                          {dashboardOverview?.contractsLeadTime}{" "}
+                          <small> Days</small>
+                        </small>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -1000,208 +1021,242 @@ export default function page() {
                   </div>
                 </div> */}
               </div>
-              <div className="grid grid-cols-3 gap-y-10 mt-5 px-4 items-start border-t-4 border-solid border-x-0 border-b-0 pt-6 border-[#F5F5F5]">
-                <div className="xl:col-span-2 col-span-2 py-8">
+              <div className="gap-y-5 mt-5 px-4 items-start border-t-4 border-solid border-x-0 border-b-0 pt-6 border-[#F5F5F5]">
+                <div className="xl:col-span-2 col-span-2 py-5">
                   <span className="text-[17px] font-semibold text-[#12263F]">
                     Payment Request
                   </span>
-                  {/* <div className="w-full py-5 flex justify-center items-center gap-x-8 mt-4">
-                    {el.labels.map((label, i) => (
-                      <div
-                        key={i}
-                        className="flex flex-col space-y-3 items-center"
-                      >
-                        <div className="flex items-center gap-x-2">
-                          <div
-                            className={`w-2 h-2 rounded-full bg-[${label?.color}]`}
-                          />
-                          <span className="text-[15px] text-[#6C757D]">
-                            {label?.name}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div> */}
                 </div>
-                <div className="xl:col-span-1 flex flex-col px-4 pt-5 bg-[#F9FAFD]">
+                <div className="grid grid-cols-2 gap-5">
+                  <div className="xl:col-span-1 rounded flex flex-col px-4 pt-5 bg-[#F9FAFD]">
+                    <Chart
+                      options={{
+                        title: {
+                          text: "Budgeted vs Non-Budgeted",
+                        },
+                        stroke: {
+                          curve: "smooth",
+                          // width: 2,
+                        },
+                        chart: {
+                          id: "basic-line",
+                        },
+                        xaxis: {
+                          categories: paymentOverview?.data?.map((d) => {
+                            return d?.month;
+                          }),
+                        },
+                      }}
+                      series={[
+                        {
+                          name: "budgeted",
+                          data: paymentOverview?.data?.map((d) => {
+                            return d?.budgeted;
+                          }),
+                        },
+                        {
+                          name: "non-budgeted",
+                          data: paymentOverview?.data?.map((d) => {
+                            return d?.nonbudgeted;
+                          }),
+                        },
+                      ]}
+                      type="line"
+                      height="300"
+                      // width="500"
+                    />
+                  </div>
+
+                  <div className="xl:col-span-1 rounded flex flex-col px-4 pt-5 bg-[#F9FAFD]">
+                    <Chart
+                      options={{
+                        chart: {
+                          id: "pie-approval",
+                        },
+
+                        labels: paymentOverview?.statusData?.map((s) => {
+                          return s?._id;
+                        }),
+                      }}
+                      series={paymentOverview?.statusData?.map((s) => {
+                        return s?.total;
+                      })}
+                      type="pie"
+                      width="360"
+                    />
+                    <div className="flex items-center mt-5 mb-10 border-t border-b-0 border-x-0 border-solid border-[#F1F3FF] pt-5">
+                      <div className="bg-white flex flex-row space-x-3 py-3 px-5">
+                        <small className="text-[15px] text-[#555b69]">
+                          Avg. Approval time
+                        </small>
+                        <small className="text-[14.5px] font-semibold">
+                          {paymentOverview?.leadTimeDays} <small> Days</small>
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* <div className="xl:col-span-1 flex flex-col px-4 pt-5 bg-[#F9FAFD]">
                   <div className="py-5">
                     <span className="text-[14px] font-semibold text-[#12263F]">
                       Approval process
                     </span>
                   </div>
                   <div className="flex flex-row xl:items-center xl:gap-x-5 gap-y-4 mb-5"></div>
-                  <div className="flex items-center w-full mt-5 mb-10 border-t border-b-0 border-x-0 border-solid border-[#F1F3FF] pt-5">
-                    <div className="bg-white flex-grow py-3 px-5">
-                      <small className="text-[15px] text-[#555b69]">
-                        Avg. Approval time
-                      </small>
-                    </div>
-                    <div className="px-4 py-3">
-                      <small className="text-[14.5px] font-semibold">
-                        {paymentOverview?.leadTimeDays} <small> Days</small>
-                      </small>
-                    </div>
-                  </div>
-                </div>
+                  
+                </div> */}
               </div>
-              <div className="grid grid-cols-5 gap-y-10 mt-5 pb-28 px-4 items-start border-t-4 border-solid border-x-0 border-b-0 pt-6 border-[#F5F5F5]">
-                <div className="xl:col-span-4 col-span-3 pb-8">
+
+              <div className="grid gap-y-10 mt-5 pb-28 px-4 items-start border-t-4 border-solid border-x-0 border-b-0 pt-6 border-[#F5F5F5]">
+                <div className="xl:col-span-4 pb-8">
                   <span className="text-[14px] font-semibold text-[#12263F]">
                     PO, Contracts & Tenders
                   </span>
-                  <div className="w-full py-5 flex justify-center items-center gap-x-8 mt-4">
-                    {[
-                      { name: "Tenders", color: "#31D5A6" },
-                      { name: "Contracts", color: "#F5B50F" },
-                      { name: "Purchase Orders", color: "#878FF6" },
-                    ].map((label, i) => (
-                      <div
-                        key={i}
-                        className="flex flex-col space-y-3 items-center"
-                      >
-                        <div className="flex items-center gap-x-2">
-                          <div
-                            className={`w-2 h-2 rounded-full bg-[${label?.color}]`}
-                          />
-                          <span className="text-[15px] text-[#6C757D]">
-                            {label?.name}
-                          </span>
+
+                  <div className="grid md:grid-cols-2 pt-5 gap-5">
+                    <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
+                      <Chart
+                        options={{
+                          stroke: {
+                            curve: "smooth",
+                            // width: 2,
+                          },
+                          chart: {
+                            id: "basic-line",
+                          },
+                          xaxis: {
+                            categories: dashboardOverviewData?.map((d) => {
+                              return d?.name;
+                            }),
+                          },
+                        }}
+                        series={[
+                          {
+                            name: "contracts",
+                            data: dashboardOverviewData?.map((d) => {
+                              return d?.contracts;
+                            }),
+                          },
+                          {
+                            name: "tenders",
+                            data: dashboardOverviewData?.map((d) => {
+                              return d?.tenders;
+                            }),
+                          },
+                          {
+                            name: "purchaseOrders",
+                            data: dashboardOverviewData?.map((d) => {
+                              return d?.purchaseOrders;
+                            }),
+                          },
+                        ]}
+                        type="line"
+                        height="300"
+                        // width="500"
+                      />
+                    </div>
+                    {dashboardOverview?.statusData && (
+                      <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
+                        <div className="flex flex-col xl:items-center xl:gap-x-5 gap-y-4 mb-5">
+                          <div>
+                            <Chart
+                              options={{
+                                title: {
+                                  text: "Tenders - Approval stages",
+                                },
+                                chart: {
+                                  id: "pie-approval",
+                                },
+
+                                labels:
+                                  dashboardOverview?.statusData?.tenders?.map(
+                                    (s) => {
+                                      return s?._id;
+                                    }
+                                  ),
+                              }}
+                              series={dashboardOverview?.statusData?.tenders?.map(
+                                (s) => {
+                                  return s?.total;
+                                }
+                              )}
+                              type="pie"
+                              width="400"
+                            />
+                          </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                  <ResponsiveContainer
-                    width="100%"
-                    height={
-                      dashboardOverview?.statusData?.purchaseOrders?.length > 0
-                        ? 880
-                        : 660
-                    }
-                  >
-                    <LineChart
-                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                      data={dashboardOverviewData}
-                    >
-                      <XAxis
-                        dataKey="name"
-                        tickMargin={20}
-                        tick={{ fontSize: 11 }}
-                        tickSize={0}
-                        axisLine={{ strokeDasharray: "5 5" }}
-                      />
-                      <YAxis
-                        axisLine={false}
-                        tickMargin={20}
-                        tickSize={0}
-                        tick={<CustomYAxisTick />}
-                      />
-                      <Tooltip />
-                      <Line
-                        type="monotone"
-                        dataKey={"tenders"}
-                        stroke="#31D5A6"
-                        dot={false}
-                        strokeWidth={4}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey={"contracts"}
-                        stroke="#F5B50F"
-                        dot={false}
-                        strokeWidth={4}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey={"purchaseOrders"}
-                        stroke="#878FF6"
-                        dot={false}
-                        strokeWidth={4}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="xl:col-span-1 col-span-2 flex flex-col px-4 py-3 bg-[#F9FAFD]">
-                  <div className="flex flex-col">
-                    {dashboardOverview?.statusData?.tenders?.length > 0 && (
-                      <div className="py-3">
-                        <span className="text-[14px] font-semibold text-[#12263F]">
-                          Tenders
-                        </span>
+                    )}
+                    {dashboardOverview?.statusData && (
+                      <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
+                        <div className="flex flex-col xl:items-center xl:gap-x-5 gap-y-4 mb-5">
+                          <div>
+                            <Chart
+                              options={{
+                                title: {
+                                  text: "Contracts - Approval stages",
+                                },
+                                chart: {
+                                  id: "pie-approval",
+                                },
+
+                                labels:
+                                  dashboardOverview?.statusData?.contracts?.map(
+                                    (s) => {
+                                      return s?._id;
+                                    }
+                                  ),
+                              }}
+                              series={dashboardOverview?.statusData?.contracts?.map(
+                                (s) => {
+                                  return s?.total;
+                                }
+                              )}
+                              type="pie"
+                              width="400"
+                            />
+                          </div>
+                        </div>
                       </div>
                     )}
-                    <div className="flex flex-col xl:items-center xl:gap-x-5 gap-y-4 mb-5">
-                      <ResponsiveContainer
-                        className={"flex justify-center"}
-                        width="100%"
-                        height={220}
-                      >
-                        <PieChart
-                          margin={{
-                            top: 20,
-                            right: 0,
-                            left: 0,
-                            bottom: 5,
-                          }}
-                        >
-                          <Pie
-                            data={dashboardOverview?.statusData?.tenders}
-                            // cx={50}
-                            cy={90}
-                            startAngle={360}
-                            endAngle={0}
-                            innerRadius={
-                              windowWidth > 1028
-                                ? 75
-                                : windowWidth > 998
-                                ? 70
-                                : 65
-                            }
-                            outerRadius={
-                              windowWidth > 1028
-                                ? 89
-                                : windowWidth > 998
-                                ? 84
-                                : 79
-                            }
-                            fill="#31D5A6"
-                            paddingAngle={5}
-                            cornerRadius={10}
-                            dataKey="total"
-                          >
-                            {dashboardOverview?.statusData?.tenders?.map(
-                              (entry, index) => (
-                                <Cell
-                                  key={`cell-${index}`}
-                                  fill={
-                                    ["#0B7A75", "#FFF1D0", "#277DA1"][index]
-                                  }
-                                />
-                              )
-                            )}
-                          </Pie>
-                          <Tooltip content={<CustomTooltip />} />
-                        </PieChart>
-                      </ResponsiveContainer>
-                      <div className="xl:flex justify-center flex-wrap hidden gap-x-3 mt-1">
-                        {dashboardOverview?.statusData?.tenders?.map(
-                          (item, key) => (
-                            <div className="xl:flex hidden items-center gap-x-2">
-                              <div
-                                className={`w-1.5 h-1.5 rounded-full bg-[${
-                                  ["#F3B700", "#0065DD", "#7B2CBF"][key]
-                                }]`}
-                              />
-                              <span className="text-[13px] text-[#6C757D]">
-                                {item?._id}
-                              </span>
-                              <span className="text-[13px] text-[#6C757D]">
-                                {item?.total}
-                              </span>
-                            </div>
-                          )
-                        )}
+
+                    {dashboardOverview?.statusData && (
+                      <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
+                        <div className="flex flex-col xl:items-center xl:gap-x-5 gap-y-4 mb-5">
+                          <div>
+                            <Chart
+                              options={{
+                                title: {
+                                  text: "Purchase orders - Approval stages",
+                                },
+                                chart: {
+                                  id: "pie-approval",
+                                },
+
+                                labels:
+                                  dashboardOverview?.statusData?.purchaseOrders?.map(
+                                    (s) => {
+                                      return s?._id || "pending";
+                                    }
+                                  ),
+                              }}
+                              series={dashboardOverview?.statusData?.purchaseOrders?.map(
+                                (s) => {
+                                  return s?.total;
+                                }
+                              )}
+                              type="pie"
+                              width="400"
+                            />
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    )}
+                  </div>
+                </div>
+                {/* <div className="xl:col-span-1 flex flex-col px-4 py-3 bg-[#F9FAFD]">
+                  <div className="flex flex-col">
                     {dashboardOverview?.statusData?.contracts?.length > 0 && (
                       <div className="py-3">
                         <span className="text-[14px] font-semibold text-[#12263F]">
@@ -1278,7 +1333,7 @@ export default function page() {
                         )}
                       </div>
                     </div>
-                    {dashboardOverview?.statusData?.purchaseOrders.length >
+                    {dashboardOverview?.statusData?.purchaseOrders?.length >
                       0 && (
                       <div className="py-3">
                         <span className="text-[14px] font-semibold text-[#12263F]">
@@ -1286,7 +1341,7 @@ export default function page() {
                         </span>
                       </div>
                     )}
-                    {dashboardOverview?.statusData?.purchaseOrders.length >
+                    {dashboardOverview?.statusData?.purchaseOrders?.length >
                       0 && (
                       <div className="flex flex-col xl:items-center xl:gap-x-5 gap-x-4 mb-5">
                         <ResponsiveContainer width="97%" height={220}>
@@ -1386,7 +1441,7 @@ export default function page() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           ) : tab == 1 ? (
@@ -1575,7 +1630,7 @@ export default function page() {
                           {spendOverview?.budgetData?.map((entry, index) => (
                             <Cell
                               key={`cell-${index}`}
-                              fill={COLORS[index % COLORS.length]}
+                              fill={COLORS[index % COLORS?.length]}
                             />
                           ))}
                         </Pie>
