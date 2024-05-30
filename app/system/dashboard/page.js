@@ -841,10 +841,14 @@ export default function page() {
                   </div>
 
                   {/* Sourcing Methods */}
-                  <div className="pt-5 mt-5 grid grid-cols-3 bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
-                    <div>
+                  <div className="pt-3 grid grid-cols-3 gap-5 ">
+                    <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
                       <Chart
                         options={{
+                          title:{
+                            text:"Sourcing methods"
+                          },
+
                           chart: {
                             id: "pie-sourcing",
                           },
@@ -857,13 +861,16 @@ export default function page() {
                           return s?.total;
                         })}
                         type="pie"
-                        width="320"
+                        height="180"
                       />
                     </div>
 
-                    <div>
+                    <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
                       <Chart
                         options={{
+                          title:{
+                            text:"Approval stages"
+                          },
                           chart: {
                             id: "pie-approval",
                           },
@@ -876,10 +883,10 @@ export default function page() {
                           return s?.total;
                         })}
                         type="pie"
-                        width="320"
+                        height="180"
                       />
                     </div>
-                    <div className="flex items-center mt-3">
+                    <div className="flex items-center mt-3 ">
                       <div className="bg-white flex flex-row space-x-3 py-3 px-5">
                         <small className="text-[#848CA1]">
                           <b>Contract</b> lead time
