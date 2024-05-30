@@ -1,34 +1,14 @@
 "use client";
-import CountCard from "@/app/components/countCard";
 import React, { useEffect, useState } from "react";
-import {
-  DocumentCheckIcon,
-  DocumentDuplicateIcon,
-  DocumentIcon,
-  DocumentTextIcon,
-  UserGroupIcon,
-  UsersIcon,
-} from "@heroicons/react/24/outline";
-import RequestStats from "@/app/components/requestsStatistics";
-import RequestsByDep from "@/app/components/requestsByDep";
-import RequestsByStatus from "@/app/components/requestsByStatus";
-import { Divider, message, Spin, Select } from "antd";
-import TendersStats from "@/app/components/tendersStatistics";
-import TendersByDep from "@/app/components/tendersByDep";
+import { DocumentIcon } from "@heroicons/react/24/outline";
+
+import { message, Spin, Select } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { encode } from "base-64";
 import { useRouter } from "next/navigation";
-import { color, motion } from "framer-motion";
-import {
-  MdFileCopy,
-  MdAttachFile,
-  MdOutlineAllInbox,
-  MdOutlinePendingActions,
-  MdOutlinePayments,
-} from "react-icons/md";
-import { FiUsers } from "react-icons/fi";
+import { MdOutlinePendingActions, MdOutlinePayments } from "react-icons/md";
 import { PiCurrencyCircleDollarFill } from "react-icons/pi";
-import { FaCaretUp } from "react-icons/fa";
+
 import {
   Pie,
   Label,
@@ -53,7 +33,7 @@ import Chart from "react-apexcharts";
 
 export default function page() {
   const [dataLoaded, setDataLoaded] = useState(false);
-  let token = typeof window !== "undefined" && localStorage.getItem("token");
+
   const [requests, setRequests] = useState([]);
   const [tenders, setTenders] = useState([]);
   const [contracts, setContracts] = useState([]);
@@ -73,7 +53,7 @@ export default function page() {
   const [spendOverview, setSpendOverview] = useState("");
   const [expenseOverview, setExpenseOverview] = useState([]);
   const [serviceCategories, setServiceCategories] = useState("");
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  let token = localStorage.getItem("token");
   const router = useRouter();
   const [tab, setTab] = useState(0);
 
@@ -268,19 +248,6 @@ export default function page() {
       });
     }
   }, [year]);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    // Cleanup event listener on component unmount
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [window]);
 
   async function loadTenders() {
     return fetch(`${url}/tenders/`, {
@@ -681,8 +648,6 @@ export default function page() {
     }
   };
 
-  console.log("Window Width ", windowWidth);
-
   return (
     <>
       {isMobile && <NotificationComponent />}
@@ -690,13 +655,6 @@ export default function page() {
 
       {dataLoaded ? (
         <div className="payment-request lg:mr-6 mb-10 pl-5 h-screen overflow-x-auto">
-          {/* <div className="mt-5 flex justify-between w-full">
-            <div>
-              <h5 className="text-[#12263F] text-[22px] mb-2 mx-0 mt-0">
-                Dashboards
-              </h5>
-            </div>
-          </div> */}
           {/* Select Year */}
           <div className="flex justify-end mb-4 mr-1">
             <Select
@@ -736,7 +694,6 @@ export default function page() {
               },
             ].map((item, key) => (
               <div className="flex gap-x-4 bg-[#FFF] py-2 px-4 rounded-lg">
-                {/* <div className={`border-l-0 border-3 border-solid border-[${item.color}] rounded-xxl`} /> */}
                 <div className="flex flex-grow flex-col gap-y-1">
                   <div className="w-full flex justify-between">
                     <h4 className="mt-2 mb-0 text-[#040518]">{item.value}</h4>
@@ -796,53 +753,6 @@ export default function page() {
           </div>
           {tab == 0 ? (
             <div className="payment-request bg-white h-[calc(100vh-310px)] pb-10 rounded-lg p mt-3 pt-6 overflow-y-auto lg:px-5 py-3">
-              {/* Purchase Request Graph Mapping */}
-              {/* <span className="text-[17px] font-semibold text-[#12263F] mt-10 pt-10">
-                Module Lead time
-              </span> */}
-              {/* <div className="grid xl:grid-cols-3 grid-cols-1 items-start gap-x-8 my-5">
-                <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
-                  <small className="text-[#242426] text-[15px] font-medium">Purchase Requests</small>
-                  <div className="flex items-center w-5/6 mt-5">
-                    <div className="bg-white flex-grow py-3 px-5">
-                      <small className="text-[#848CA1]">Avg. Approval time</small>
-                    </div>
-                    <div className="px-8 py-3">
-                      <small className="text-[14.5px] font-semibold">{totalOverview?.leadTimeDays} <small> Days</small></small>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
-                  <small className="text-[#242426] text-[15px] font-medium">Payments Requests</small>
-                  <div className="flex items-center w-5/6 mt-5">
-                    <div className="bg-white flex-grow py-3 px-5">
-                      <small className="text-[#848CA1]">Avg. Approval time</small>
-                    </div>
-                    <div className="px-8 py-3">
-                      <small className="text-[14.5px] font-semibold">{paymentOverview?.leadTimeDays} <small> Days</small></small>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
-                  <small className="text-[#242426] text-[15px] font-medium">PO's, Contracts</small>
-                  <div className="flex items-center w-5/6 mt-5">
-                    <div className="bg-white flex-grow py-3 px-5">
-                      <small className="text-[#848CA1]"><b>PO</b> lead time</small>
-                    </div>
-                    <div className="px-8 py-3">
-                      <small className="text-[14.5px] font-semibold">{dashboardOverview?.posLeadTime} <small> Days</small></small>
-                    </div>
-                  </div>
-                  <div className="flex items-center w-5/6 mt-3">
-                    <div className="bg-white flex-grow py-3 px-5">
-                      <small className="text-[#848CA1]"><b>Contract</b> lead time</small>
-                    </div>
-                    <div className="px-8 py-3">
-                      <small className="text-[14.5px] font-semibold">{dashboardOverview?.contractsLeadTime} <small> Days</small></small>
-                    </div>
-                  </div>
-                </div>
-              </div> */}
               <div className="gap-y-5 px-4 items-start">
                 <div className="xl:col-span-4 col-span-3 ">
                   <span className="text-[17px] font-semibold text-[#12263F]">
@@ -852,12 +762,6 @@ export default function page() {
                   <div className="grid grid-cols-2 gap-5">
                     {/* Budgeted vs Non-Budgeted */}
                     <div className="pt-5 col-span-2 grid grid-cols-2 gap-5">
-                      {/* <span className="text-[14px] font-semibold text-[#12263F] p-5 m-5">
-                        Budgeted Vs Non-Budgeted
-                      </span> */}
-
-                      {console.log(dashboardOverview)}
-
                       <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
                         <Chart
                           options={{
@@ -952,9 +856,6 @@ export default function page() {
 
                   {/* Sourcing Methods */}
                   <div className="pt-5 mt-5 grid grid-cols-3 bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
-                    {/* <span className="text-[14px] font-semibold text-[#12263F]">
-                          Sourcing methods
-                        </span> */}
                     <div>
                       <Chart
                         options={{
@@ -1005,21 +906,6 @@ export default function page() {
                     </div>
                   </div>
                 </div>
-
-                {/* <div className="xl:col-span-1 col-span-2 flex flex-col px-4 pt-5 bg-[#F9FAFD]">
-                  <div className="flex items-center w-full mb-10 mt-5 border-t border-b-0 border-x-0 border-solid border-[#F1F3FF]">
-                    <div className="bg-white flex-grow py-3 px-5">
-                      <small className="text-[15px] text-[#555b69]">
-                        Avg. Approval time
-                      </small>
-                    </div>
-                    <div className="px-4 py-3">
-                      <small className="text-[14.5px] font-semibold">
-                        {totalOverview?.leadTimeDays} <small> Days</small>
-                      </small>
-                    </div>
-                  </div>
-                </div> */}
               </div>
               <div className="gap-y-5 mt-5 px-4 items-start border-t-4 border-solid border-x-0 border-b-0 pt-6 border-[#F5F5F5]">
                 <div className="xl:col-span-2 col-span-2 py-5">
@@ -1096,16 +982,6 @@ export default function page() {
                     </div>
                   </div>
                 </div>
-
-                {/* <div className="xl:col-span-1 flex flex-col px-4 pt-5 bg-[#F9FAFD]">
-                  <div className="py-5">
-                    <span className="text-[14px] font-semibold text-[#12263F]">
-                      Approval process
-                    </span>
-                  </div>
-                  <div className="flex flex-row xl:items-center xl:gap-x-5 gap-y-4 mb-5"></div>
-                  
-                </div> */}
               </div>
 
               <div className="grid gap-y-10 mt-5 pb-28 px-4 items-start border-t-4 border-solid border-x-0 border-b-0 pt-6 border-[#F5F5F5]">
@@ -1255,265 +1131,68 @@ export default function page() {
                     )}
                   </div>
                 </div>
-                {/* <div className="xl:col-span-1 flex flex-col px-4 py-3 bg-[#F9FAFD]">
-                  <div className="flex flex-col">
-                    {dashboardOverview?.statusData?.contracts?.length > 0 && (
-                      <div className="py-3">
-                        <span className="text-[14px] font-semibold text-[#12263F]">
-                          Contracts
-                        </span>
-                      </div>
-                    )}
-                    <div className="flex flex-col xl:items-center xl:gap-x-5 gap-y-4 mb-5">
-                      <ResponsiveContainer width="97%" height={220}>
-                        <PieChart
-                          margin={{
-                            top: 20,
-                            right: 0,
-                            left: 0,
-                            bottom: 5,
-                          }}
-                        >
-                          <Pie
-                            data={dashboardOverview?.statusData?.contracts}
-                            // cx={50}
-                            cy={90}
-                            startAngle={360}
-                            endAngle={0}
-                            innerRadius={
-                              windowWidth > 1028
-                                ? 75
-                                : windowWidth > 998
-                                ? 70
-                                : 65
-                            }
-                            outerRadius={
-                              windowWidth > 1028
-                                ? 89
-                                : windowWidth > 998
-                                ? 84
-                                : 79
-                            }
-                            fill="#F5B50F"
-                            paddingAngle={5}
-                            cornerRadius={10}
-                            dataKey="total"
-                          >
-                            {dashboardOverview?.statusData?.contracts?.map(
-                              (entry, index) => (
-                                <Cell
-                                  key={`cell-${index}`}
-                                  fill={
-                                    ["#0B7A75", "#FFF1D0", "#277DA1"][index]
-                                  }
-                                />
-                              )
-                            )}
-                          </Pie>
-                          <Tooltip content={<CustomTooltip />} />
-                        </PieChart>
-                      </ResponsiveContainer>
-                      <div className="xl:flex justify-center hidden flex-wrap gap-x-3">
-                        {dashboardOverview?.statusData?.contracts?.map(
-                          (item, key) => (
-                            <div className="flex items-center gap-x-2">
-                              <div
-                                className={`w-1.5 h-1.5 rounded-full bg-[${
-                                  ["#F3B700", "#0065DD", "#7B2CBF"][key]
-                                }]`}
-                              />
-                              <span className="text-[13px] text-[#6C757D]">
-                                {item?._id}
-                              </span>
-                              <span className="text-[13px] text-[#6C757D]">
-                                {item?.total}
-                              </span>
-                            </div>
-                          )
-                        )}
-                      </div>
-                    </div>
-                    {dashboardOverview?.statusData?.purchaseOrders?.length >
-                      0 && (
-                      <div className="py-3">
-                        <span className="text-[14px] font-semibold text-[#12263F]">
-                          Purchase Orders
-                        </span>
-                      </div>
-                    )}
-                    {dashboardOverview?.statusData?.purchaseOrders?.length >
-                      0 && (
-                      <div className="flex flex-col xl:items-center xl:gap-x-5 gap-x-4 mb-5">
-                        <ResponsiveContainer width="97%" height={220}>
-                          <PieChart
-                            margin={{
-                              top: 20,
-                              right: 0,
-                              left: 0,
-                              bottom: 5,
-                            }}
-                          >
-                            <Pie
-                              data={
-                                dashboardOverview?.statusData?.purchaseOrders
-                              }
-                              // cx={50}
-                              cy={90}
-                              startAngle={360}
-                              endAngle={0}
-                              innerRadius={
-                                windowWidth > 1028
-                                  ? 75
-                                  : windowWidth > 998
-                                  ? 70
-                                  : 75
-                              }
-                              outerRadius={
-                                windowWidth > 1028
-                                  ? 89
-                                  : windowWidth > 998
-                                  ? 84
-                                  : 89
-                              }
-                              fill="#878FF6"
-                              paddingAngle={5}
-                              cornerRadius={10}
-                              dataKey="total"
-                            >
-                              {dashboardOverview?.statusData?.purchaseOrders?.map(
-                                (entry, index) => (
-                                  <Cell
-                                    key={`cell-${index}`}
-                                    fill={
-                                      ["#0B7A75", "#FFF1D0", "#277DA1"][index]
-                                    }
-                                  />
-                                )
-                              )}
-                            </Pie>
-                            <Tooltip content={<CustomTooltip />} />
-                          </PieChart>
-                        </ResponsiveContainer>
-                        <div className="xl:flex justify-center hidden flex-wrap gap-y-3">
-                          {dashboardOverview?.statusData?.purchaseOrders?.map(
-                            (item, key) => (
-                              <div className="flex items-center gap-x-2">
-                                <div
-                                  className={`w-1.5 h-1.5 rounded-full bg-[${
-                                    ["#F3B700", "#0065DD", "#7B2CBF"][key]
-                                  }]`}
-                                />
-                                <span className="text-[13px] text-[#6C757D]">
-                                  {item?._id}
-                                </span>
-                                <span className="text-[13px] text-[#6C757D]">
-                                  {item?.total}
-                                </span>
-                              </div>
-                            )
-                          )}
-                        </div>
-                      </div>
-                    )}
-                    <div className="flex items-center w-full mt-5">
-                      <div className="bg-white flex-grow py-3 px-5">
-                        <small className="text-[15px] text-[#555b69]">
-                          <b>PO</b> lead time
-                        </small>
-                      </div>
-                      <div className="px-8 py-3">
-                        <small className="text-[14.5px] font-semibold">
-                          {dashboardOverview?.posLeadTime} <small> Days</small>
-                        </small>
-                      </div>
-                    </div>
-                    <div className="flex items-center w-full mt-3">
-                      <div className="bg-white flex-grow py-3 px-5">
-                        <small className="text-[15px] text-[#555b69]">
-                          <b>Contract</b> lead time
-                        </small>
-                      </div>
-                      <div className="px-8 py-3">
-                        <small className="text-[14.5px] font-semibold">
-                          {dashboardOverview?.contractsLeadTime}{" "}
-                          <small> Days</small>
-                        </small>
-                      </div>
-                    </div>
-                  </div>
-                </div> */}
               </div>
             </div>
           ) : tab == 1 ? (
             <div className="payment-request bg-white h-[calc(100vh-310px)] pb-10 rounded-lg mt-3 overflow-y-auto px-5 py-3">
               <div className="grid grid-cols-5 gap-x-8 bg-[#F9FAFD] p-4">
                 <div className="col-span-4">
-                  <span className="text-[16px] text-[#12263F]">
-                    Amount Paid vs Requests over time
-                  </span>
-                  <div className="bg-white w-full py-3 grid grid-cols-2 justify-center mt-4">
-                    <div className="flex flex-col space-y-2 items-center">
-                      <div className="flex items-center gap-x-2">
-                        <div className="w-2 h-2 rounded-full bg-[#D2DDEC]" />
-                        <span className="text-[15px] text-[#6C757D]">
-                          Amount Paid
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex flex-col space-y-2 items-center">
-                      <div className="flex items-center gap-x-2">
-                        <div className="w-2 h-2 rounded-full bg-[#2C7BE5]" />
-                        <span className="text-[15px] text-[#6C757D]">
-                          Payment Request
-                        </span>
-                      </div>
-                    </div>
+                  <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
+                    <Chart
+                      options={{
+                        title: {
+                          text: "Amount Paid vs Requests over time",
+                        },
+                        chart: {
+                          id: "bar-paid-nrequest",
+                          type: "line",
+                          // stacked: true,
+                        },
+                        stroke: {
+                          width: [4, 4, 4],
+                          curve: "monotoneCubic",
+                        },
+                        dataLabels: {
+                          enabled: true,
+                        },
+                        labels: spendOverview?.data?.map((s) => {
+                          return s?.month;
+                        }),
+                        yaxis: [
+                          {
+                            title: {
+                              text: "Total Paid",
+                            },
+                          },
+                          {
+                            opposite: true,
+                            title: {
+                              text: "Number of requests",
+                            },
+                          },
+                        ],
+                      }}
+                      // type="bar"
+                      height="300"
+                      series={[
+                        {
+                          name: "paid",
+                          type: "bar",
+                          data: spendOverview?.data?.map((s) => {
+                            return s?.total_paid;
+                          }),
+                        },
+                        {
+                          name: "# of requests",
+                          type: "line",
+                          data: spendOverview?.data?.map((s) => {
+                            return s?.requests;
+                          }),
+                        },
+                      ]}
+                      // width="500"
+                    />
                   </div>
-                  <ResponsiveContainer width="100%" height={360}>
-                    <BarChart
-                      data={spendOverview?.data}
-                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                    >
-                      <XAxis
-                        dataKey="month"
-                        tickMargin={20}
-                        tick={{ fontSize: 11 }}
-                        tickSize={0}
-                        axisLine={{ strokeDasharray: "5 5" }}
-                      />
-                      <YAxis
-                        yAxisId="left"
-                        orientation="left"
-                        axisLine={false}
-                        tickMargin={20}
-                        tickSize={0}
-                        tick={<CustomYAxisTick />}
-                      />
-                      <YAxis
-                        yAxisId="right"
-                        orientation="right"
-                        axisLine={false}
-                        tickMargin={20}
-                        tickSize={0}
-                        tick={{ fontSize: 11 }}
-                      />
-                      <Tooltip />
-                      <Bar
-                        yAxisId="left"
-                        dataKey="requests"
-                        fill="#277DA1"
-                        barSize={20}
-                        radius={0}
-                      />
-                      <Bar
-                        yAxisId="right"
-                        dataKey="total_paid"
-                        fill="#4C956C"
-                        barSize={20}
-                        radius={0}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
                 </div>
                 <div className="flex flex-col space-y-3 col-span-1">
                   <div className="bg-white flex justify-between items-center py-1 px-4 ring-1 ring-[#EDF2F9] rounded-lg">
@@ -1561,118 +1240,75 @@ export default function page() {
                   </div>
                 </div>
               </div>
-              <div className="grid grid-cols-7 space-x-4 pb-20 mt-5">
-                <div className="w-full col-span-5 bg-[#F9FAFD]">
-                  <div className="m-5">
-                    <span className="text-[16px] text-[#12263F]">
-                      Department Expenditures
-                    </span>
-                  </div>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart
-                      data={dashboardOverview?.departmentExpanditure}
-                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                    >
-                      <XAxis
-                        dataKey="name"
-                        tickMargin={20}
-                        tick={{ fontSize: 11 }}
-                        tickSize={0}
-                        axisLine={{ strokeDasharray: "5 5" }}
-                      />
-                      <YAxis
-                        axisLine={false}
-                        tickMargin={20}
-                        tickSize={0}
-                        tick={<CustomYAxisTick />}
-                      />
-                      <Tooltip />
-                      <Bar
-                        dataKey="budgeted"
-                        stackId="a"
-                        fill="#277DA1"
-                        barSize={20}
-                        radius={0}
-                      />
-                      <Bar
-                        dataKey="nonBudgeted"
-                        stackId="a"
-                        fill="#FFF1D0"
-                        barSize={20}
-                        radius={0}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
+              <div className="grid grid-cols-3 space-x-4 pb-20 mt-5 gap-10">
+                <div className="w-full col-span-2 bg-[#F9FAFD] px-5 py-3 ">
+                  <Chart
+                    options={{
+                      title: {
+                        text: "Department Expenditures",
+                      },
+                      // stroke: {
+                      //   curve: "smooth",
+                      //   // width: 2,
+                      // },
+                      chart: {
+                        id: "basic-line",
+                        // type:'bar'
+                        stacked: true,
+                      },
+                      xaxis: {
+                        categories:
+                          dashboardOverview?.departmentExpanditure?.map((d) => {
+                            return d?.name;
+                          }),
+                      },
+                    }}
+                    series={[
+                      {
+                        name: "budgeted",
+                        data: dashboardOverview?.departmentExpanditure?.map(
+                          (d) => {
+                            return d?.budgeted;
+                          }
+                        ),
+                      },
+                      {
+                        name: "non-budgeted",
+                        data: dashboardOverview?.departmentExpanditure?.map(
+                          (d) => {
+                            return d?.nonBudgeted;
+                          }
+                        ),
+                      },
+                    ]}
+                    type="bar"
+                    height="300"
+                    // width="500"
+                  />
                 </div>
-                <div className="col-span-2 bg-[#F9FAFD] flex flex-col justify-between">
-                  <div className="m-5">
-                    <span className="text-[16px] text-[#12263F]">
-                      Budget Comparison
-                    </span>
-                  </div>
+                <div className="bg-[#F9FAFD] flex flex-col justify-between px-5 py-3 ">
                   <div className="flex items-center justify-between">
-                    <ResponsiveContainer width="100%" height={320}>
-                      <PieChart
-                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                      >
-                        <Pie
-                          data={spendOverview?.budgetData}
-                          cx={90}
-                          cy={120}
-                          startAngle={360}
-                          endAngle={0}
-                          innerRadius={80}
-                          outerRadius={95}
-                          fill="#8884d8"
-                          paddingAngle={2}
-                          dataKey="value"
-                        >
-                          {spendOverview?.budgetData?.map((entry, index) => (
-                            <Cell
-                              key={`cell-${index}`}
-                              fill={COLORS[index % COLORS?.length]}
-                            />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
-                    <div className="flex flex-col bg-white px-6 py-3.5 space-y-3 mr-12 -mt-10">
-                      <span className="text-[13px] text-[#A1A7AD]">
-                        Budgeted
-                      </span>
-                      <span className="text-[23px] text-[#12263F]">
-                        <b>
-                          {formatAmount(
-                            (
-                              (spendOverview?.totals[0]?.total_amount /
-                                spendOverview?.budgetData[0]?.value) *
-                              100
-                            ).toFixed(2)
-                          )}
-                          %
-                        </b>
-                      </span>
-                      <span className="text-[13px] text-[#12263F]">
-                        <b>
-                          ${formatAmount(spendOverview?.budgetData[0]?.value)}
-                        </b>
-                        /{formatAmount(spendOverview?.budgetData[1]?.value)}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="w-full flex space-x-5 justify-center mb-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-4 h-4 bg-[#14445C]" />
-                      <small className="text-[#A2B4D0] font-light">
-                        Budgeted
-                      </small>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-4 h-4 bg-[#F3B700]" />
-                      <small className="text-[#A2B4D0] font-light">
-                        Un-Budgeted
-                      </small>
+                    <div>
+                      <Chart
+                        options={{
+                          title: {
+                            text: "Budget comparison",
+                          },
+
+                          chart: {
+                            id: "pie-budget-comparison",
+                          },
+
+                          labels: spendOverview?.budgetData?.map((s) => {
+                            return s?.name;
+                          }),
+                        }}
+                        series={spendOverview?.budgetData?.map((s) => {
+                          return s?.value;
+                        })}
+                        type="pie"
+                        width="400"
+                      />
                     </div>
                   </div>
                 </div>
@@ -1682,28 +1318,7 @@ export default function page() {
             <div className="payment-request bg-white h-[calc(100vh-310px)] rounded-lg mt-3 overflow-y-auto px-5 py-3">
               <div className="grid grid-cols-5 gap-x-8 bg-[#F9FAFD] py-4 px-3 my-4">
                 <div className="col-span-4">
-                  <span className="text-[16px] text-[#12263F]">
-                    Expense Planning
-                  </span>
-                  <div className="bg-white w-full py-5 grid grid-cols-2 justify-center mt-4">
-                    <div className="flex flex-col space-y-3 items-center">
-                      <div className="flex items-center gap-x-2">
-                        <div className="w-2 h-2 rounded-full bg-[#E76F51]" />
-                        <span className="text-[15px] text-[#6C757D]">
-                          Internal Requests
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex flex-col space-y-3 items-center">
-                      <div className="flex items-center gap-x-2">
-                        <div className="w-2 h-2 rounded-full bg-[#277DA1]" />
-                        <span className="text-[15px] text-[#6C757D]">
-                          External Requests
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <ResponsiveContainer width="100%" height={280}>
+                  {/* <ResponsiveContainer width="100%" height={280}>
                     <LineChart
                       margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                       data={expenseOverview?.data}
@@ -1737,7 +1352,45 @@ export default function page() {
                         strokeWidth={3}
                       />
                     </LineChart>
-                  </ResponsiveContainer>
+                  </ResponsiveContainer> */}
+                  <Chart
+                    options={{
+                      title: {
+                        text: "Expense Planning",
+                      },
+                      // stroke: {
+                      //   curve: "smooth",
+                      //   // width: 2,
+                      // },
+                      chart: {
+                        id: "basic-line",
+                        // type:'bar'
+                        // stacked: true,
+                      },
+                      xaxis: {
+                        categories: expenseOverview?.data?.map((d) => {
+                          return d?.month;
+                        }),
+                      },
+                    }}
+                    series={[
+                      {
+                        name: "internal requests",
+                        data: expenseOverview?.data?.map((d) => {
+                          return d?.internal_requests;
+                        }),
+                      },
+                      {
+                        name: "external requests",
+                        data: expenseOverview?.data?.map((d) => {
+                          return d?.external_requests;
+                        }),
+                      },
+                    ]}
+                    type="bar"
+                    height="300"
+                    // width="500"
+                  />
                 </div>
                 <div className="flex flex-col space-y-3 col-span-1">
                   <div className="bg-white flex justify-between items-center py-1 px-4 ring-1 ring-[#EDF2F9] rounded-lg">
@@ -1797,62 +1450,46 @@ export default function page() {
                 </div>
               </div>
               <div className="w-full col-span-2 pt-5 bg-[#F9FAFD] pb-16 px-3 my-4">
-                <span className="text-[16px] text-[#12263F]">
-                  Department Expenditures
-                </span>
-                <div className="bg-white w-full py-5 grid grid-cols-2 justify-center mt-4">
-                  <div className="flex flex-col space-y-3 items-center mx-5">
-                    <div className="flex items-center gap-x-2">
-                      <div className="w-2 h-2 rounded-full bg-[#797774]" />
-                      <span className="text-[15px] text-[#cccecf]">
-                        Internal Requests
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col space-y-3 items-center">
-                    <div className="flex items-center gap-x-2">
-                      <div className="w-2 h-2 rounded-full bg-[#277DA1]" />
-                      <span className="text-[15px] text-[#6C757D]">
-                        External Requests
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart
-                    data={expenseOverview?.dapartmentalExpenses}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                  >
-                    <XAxis
-                      dataKey="name"
-                      tickMargin={20}
-                      tick={{ fontSize: 11 }}
-                      tickSize={0}
-                      axisLine={{ strokeDasharray: "5 5" }}
-                    />
-                    <YAxis
-                      axisLine={false}
-                      tickMargin={20}
-                      tickSize={0}
-                      tick={<CustomYAxisTick />}
-                    />
-                    <Tooltip />
-                    <Bar
-                      dataKey="external_requests"
-                      stackId="a"
-                      fill="#277DA1"
-                      barSize={20}
-                      radius={0}
-                    />
-                    <Bar
-                      dataKey="internal_requests"
-                      stackId="a"
-                      fill="#cccecf"
-                      barSize={20}
-                      radius={0}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
+                <Chart
+                  options={{
+                    title: {
+                      text: "Department Expenditures",
+                    },
+                    // stroke: {
+                    //   curve: "smooth",
+                    //   // width: 2,
+                    // },
+                    chart: {
+                      id: "basic-line",
+                      // type:'bar'
+                      // stacked: true,
+                    },
+                    xaxis: {
+                      categories: expenseOverview?.dapartmentalExpenses?.map(
+                        (d) => {
+                          return d?.name;
+                        }
+                      ),
+                    },
+                  }}
+                  series={[
+                    {
+                      name: "internal requests",
+                      data: expenseOverview?.dapartmentalExpenses?.map((d) => {
+                        return d?.internal_requests;
+                      }),
+                    },
+                    {
+                      name: "external requests",
+                      data: expenseOverview?.dapartmentalExpenses?.map((d) => {
+                        return d?.external_requests;
+                      }),
+                    },
+                  ]}
+                  type="bar"
+                  height="300"
+                  // width="500"
+                />
               </div>
             </div>
           )}
