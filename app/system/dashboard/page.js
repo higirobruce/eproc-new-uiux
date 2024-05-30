@@ -11,8 +11,8 @@ import { PiCurrencyCircleDollarFill } from "react-icons/pi";
 import { isMobile } from "react-device-detect";
 import NotificationComponent from "@/app/hooks/useMobile";
 import { formatAmount } from "@/app/utils/helpers";
-import dynamic from 'next/dynamic';
-const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
+import dynamic from "next/dynamic";
+const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 export default function page() {
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -45,6 +45,10 @@ export default function page() {
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
 
   const [messageApi, contextHolder] = message.useMessage();
+
+  const numberWithCommas = (value) => {
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
 
   useEffect(() => {
     try {
@@ -1137,6 +1141,7 @@ export default function page() {
                         },
                         dataLabels: {
                           enabled: true,
+                          formatter: numberWithCommas,
                         },
                         labels: spendOverview?.data?.map((s) => {
                           return s?.month;
@@ -1146,11 +1151,17 @@ export default function page() {
                             title: {
                               text: "Total Paid",
                             },
+                            labels: {
+                              formatter: numberWithCommas,
+                            },
                           },
                           {
                             opposite: true,
                             title: {
                               text: "Number of requests",
+                            },
+                            labels: {
+                              formatter: numberWithCommas,
                             },
                           },
                         ],
@@ -1244,6 +1255,14 @@ export default function page() {
                           dashboardOverview?.departmentExpanditure?.map((d) => {
                             return d?.name;
                           }),
+                      },
+                      yaxis: {
+                        labels: {
+                          formatter: numberWithCommas,
+                        },
+                      },
+                      dataLabels: {
+                        formatter: numberWithCommas,
                       },
                     }}
                     series={[
@@ -1355,6 +1374,14 @@ export default function page() {
                           return d?.month;
                         }),
                       },
+                      yaxis: {
+                        labels: {
+                          formatter: numberWithCommas,
+                        },
+                      },
+                      dataLabels: {
+                        formatter: numberWithCommas,
+                      },
                     }}
                     series={[
                       {
@@ -1434,43 +1461,53 @@ export default function page() {
               </div>
               <div className="w-full col-span-2 pt-5 bg-[#F9FAFD] pb-16 px-3 my-4">
                 <Chart
-                    options={{
-                      title: {
-                        text: "Department Expenditures",
-                      },
-                      // stroke: {
-                      //   curve: "smooth",
-                      //   // width: 2,
-                      // },
-                      chart: {
-                        id: "basic-line",
-                        // type:'bar'
-                        // stacked: true,
-                      },
-                      xaxis: {
-                        categories: expenseOverview?.dapartmentalExpenses?.map((d) => {
+                  options={{
+                    title: {
+                      text: "Department Expenditures",
+                    },
+                    // stroke: {
+                    //   curve: "smooth",
+                    //   // width: 2,
+                    // },
+                    chart: {
+                      id: "basic-line",
+                      // type:'bar'
+                      // stacked: true,
+                    },
+                    xaxis: {
+                      categories: expenseOverview?.dapartmentalExpenses?.map(
+                        (d) => {
                           return d?.name;
-                        }),
+                        }
+                      ),
+                    },
+                    yaxis: {
+                      labels: {
+                        formatter: numberWithCommas,
                       },
-                    }}
-                    series={[
-                      {
-                        name: "internal requests",
-                        data: expenseOverview?.dapartmentalExpenses?.map((d) => {
-                          return d?.internal_requests;
-                        }),
-                      },
-                      {
-                        name: "external requests",
-                        data: expenseOverview?.dapartmentalExpenses?.map((d) => {
-                          return d?.external_requests;
-                        }),
-                      },
-                    ]}
-                    type="bar"
-                    height="300"
-                    // width="500"
-                  />
+                    },
+                    dataLabels: {
+                      formatter: numberWithCommas,
+                    },
+                  }}
+                  series={[
+                    {
+                      name: "internal requests",
+                      data: expenseOverview?.dapartmentalExpenses?.map((d) => {
+                        return d?.internal_requests;
+                      }),
+                    },
+                    {
+                      name: "external requests",
+                      data: expenseOverview?.dapartmentalExpenses?.map((d) => {
+                        return d?.external_requests;
+                      }),
+                    },
+                  ]}
+                  type="bar"
+                  height="300"
+                  // width="500"
+                />
               </div>
             </div>
           )}
