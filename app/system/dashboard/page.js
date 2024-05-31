@@ -1032,7 +1032,7 @@ export default function page() {
                             <Chart
                               options={{
                                 title: {
-                                  text: "Tenders - Approval stages",
+                                  text: "Tenders",
                                 },
                                 chart: {
                                   id: "pie-approval",
