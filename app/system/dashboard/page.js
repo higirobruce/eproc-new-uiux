@@ -660,7 +660,7 @@ export default function page() {
       {contextHolder}
 
       {dataLoaded ? (
-        <div className="payment-request lg:mr-6 mb-10 pl-5 h-screen overflow-x-auto">
+        <div className="payment-request lg:m-6  mb-10 p-5 h-screen overflow-x-auto">
           {/* Cards */}
           <div className="lg:grid hidden xl:grid-cols-8 md:grid-cols-4 gap-3 my-4">
             {[
@@ -758,7 +758,7 @@ export default function page() {
             </div>
           </div>
           {tab == 0 ? (
-            <div className="payment-request bg-white h-[calc(100vh-310px)] pb-10 rounded-lg p mt-3 pt-6 overflow-y-auto lg:px-5 py-3">
+            <div className="payment-request bg-white h-[calc(100vh-310px)] rounded-lg mt-3 pt-6 overflow-y-auto lg:px-5 py-3">
               <div className="gap-y-5 px-4 items-start">
                 <div className="xl:col-span-4 col-span-3 ">
                   <span className="text-[17px] font-semibold text-[#12263F]">
@@ -1026,8 +1026,7 @@ export default function page() {
                     </div>
                     {dashboardOverview?.statusData && (
                       <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
-                        <div className="flex flex-col xl:items-center xl:gap-x-5 gap-y-4 mb-5">
-                          <div>
+                        <div>
                             <Chart
                               options={{
                                 title: {
@@ -1053,7 +1052,6 @@ export default function page() {
                               width="400"
                             />
                           </div>
-                        </div>
                       </div>
                     )}
                     {dashboardOverview?.statusData && (
@@ -1127,9 +1125,9 @@ export default function page() {
             </div>
           ) : tab == 1 ? (
             <div className="payment-request bg-white h-[calc(100vh-310px)] pb-10 rounded-lg mt-3 overflow-y-auto px-5 py-3">
-              <div className="grid grid-cols-5 gap-x-8 bg-[#F9FAFD] p-4">
-                <div className="col-span-4">
-                  <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
+              <div className="grid xl:grid-cols-5 gap-x-8 bg-[#F9FAFD] p-4">
+                <div className="xl:col-span-4">
+                  <div className="bg-[#F9FAFD] xl:p-5 p-1 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
                     <Chart
                       options={{
                         title: {
@@ -1193,7 +1191,7 @@ export default function page() {
                     />
                   </div>
                 </div>
-                <div className="flex flex-col space-y-3 col-span-1">
+                <div className="flex flex-col space-y-3 sm:w-full">
                   <div className="bg-white flex justify-between items-center py-1 px-4 ring-1 ring-[#EDF2F9] rounded-lg">
                     <div>
                       <h6 className="text-[#95AAC9] font-light text-[12px] mt-4 mb-6">
@@ -1239,8 +1237,9 @@ export default function page() {
                   </div>
                 </div>
               </div>
-              <div className="grid grid-cols-3 space-x-4 pb-20 mt-5 gap-10">
-                <div className="w-full col-span-2 bg-[#F9FAFD] px-5 py-3 ">
+
+              <div className="grid xl:grid-cols-3 mt-5 xl:gap-10">
+                <div className=" xl:col-span-2 bg-[#F9FAFD] py-3 ">
                   <Chart
                     options={{
                       title: {
@@ -1293,38 +1292,36 @@ export default function page() {
                     // width="500"
                   />
                 </div>
-                <div className="bg-[#F9FAFD] flex flex-col justify-between px-5 py-3 ">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Chart
-                        options={{
-                          title: {
-                            text: "Budget comparison",
-                          },
+                <div className="bg-[#F9FAFD] px-5 py-3 ">
+                  <div>
+                    <Chart
+                      options={{
+                        title: {
+                          text: "Budget comparison",
+                        },
 
-                          chart: {
-                            id: "pie-budget-comparison",
-                          },
+                        chart: {
+                          id: "pie-budget-comparison",
+                        },
 
-                          labels: spendOverview?.budgetData?.map((s) => {
-                            return s?.name;
-                          }),
-                        }}
-                        series={spendOverview?.budgetData?.map((s) => {
-                          return s?.value;
-                        })}
-                        type="pie"
-                        width="400"
-                      />
-                    </div>
+                        labels: spendOverview?.budgetData?.map((s) => {
+                          return s?.name;
+                        }),
+                      }}
+                      series={spendOverview?.budgetData?.map((s) => {
+                        return s?.value;
+                      })}
+                      type="pie"
+                      width="400"
+                    />
                   </div>
                 </div>
               </div>
             </div>
           ) : (
             <div className="payment-request bg-white h-[calc(100vh-310px)] rounded-lg mt-3 overflow-y-auto px-5 py-3">
-              <div className="grid grid-cols-5 gap-x-8 bg-[#F9FAFD] py-4 px-3 my-4">
-                <div className="col-span-4">
+              <div className="grid xl:grid-cols-5 gap-x-8 bg-[#F9FAFD] py-4 px-3 my-4">
+                <div className="xl:col-span-4">
                   {/* <ResponsiveContainer width="100%" height={280}>
                     <LineChart
                       margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
@@ -1407,7 +1404,7 @@ export default function page() {
                     // width="500"
                   />
                 </div>
-                <div className="flex flex-col space-y-3 col-span-1">
+                <div className="flex flex-col space-y-3 col-span-1 sm:w-full">
                   <div className="bg-white flex justify-between items-center py-1 px-4 ring-1 ring-[#EDF2F9] rounded-lg">
                     <div>
                       <h6 className="text-[#95AAC9] font-light text-[12px] mt-4 mb-6">
@@ -1464,7 +1461,7 @@ export default function page() {
                   </div>
                 </div>
               </div>
-              <div className="w-full col-span-2 pt-5 bg-[#F9FAFD] pb-16 px-3 my-4">
+              <div className=" xl:col-span-2 pt-5 bg-[#F9FAFD] pb-16 px-3">
                 <Chart
                   options={{
                     title: {
