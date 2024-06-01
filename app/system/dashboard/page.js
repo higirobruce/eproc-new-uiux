@@ -661,19 +661,8 @@ export default function page() {
 
       {dataLoaded ? (
         <div className="payment-request lg:mr-6 mb-10 pl-5 h-screen overflow-x-auto">
-          {/* Select Year */}
-          <div className="flex justify-end mb-4 mr-1">
-            <Select
-              defaultValue={year}
-              style={{ width: 120 }}
-              size="large"
-              className="border-0"
-              onChange={(value) => setYear(value)}
-              options={generateYearsArray()}
-            />
-          </div>
           {/* Cards */}
-          <div className="lg:grid hidden xl:grid-cols-7 md:grid-cols-4 gap-3 my-4">
+          <div className="lg:grid hidden xl:grid-cols-8 md:grid-cols-4 gap-3 my-4">
             {[
               {
                 name: "Purchase request",
@@ -720,13 +709,24 @@ export default function page() {
                 </div>
               </div>
             ))}
+            {/* Select Year */}
+            <div className="flex justify-end mb-4 mr-1">
+              <Select
+                defaultValue={year}
+                style={{ width: 120 }}
+                size="large"
+                className="border-0"
+                onChange={(value) => setYear(value)}
+                options={generateYearsArray()}
+              />
+            </div>
           </div>
 
           {/* Tabs */}
-          <div className="bg-white rounded-lg p-3 my-1">
-            <div className="flex items-center gap-x-14 px-5 bg-[#F5F5F5]">
+          <div className="bg-white rounded-lg my-1 ">
+            <div className="flex items-center gap-x-14 px-5 py-1 bg-[#F5F5F5] rounded">
               <button
-                className={`bg-transparent py-3 my-3 ${
+                className={`bg-transparent py-1 my-1 ${
                   tab == 0
                     ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238] px-4`
                     : `border-none text-[#8392AB]`
@@ -736,7 +736,7 @@ export default function page() {
                 Overview
               </button>
               <button
-                className={`bg-transparent py-3 my-3 ${
+                className={`bg-transparent py-1 my-1 ${
                   tab == 1
                     ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238] px-4`
                     : `border-none text-[#8392AB]`
@@ -746,7 +746,7 @@ export default function page() {
                 Spend Tracking
               </button>
               <button
-                className={`bg-transparent py-3 my-3 ${
+                className={`bg-transparent py-1 my-1 ${
                   tab == 2
                     ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238] px-4`
                     : `border-none text-[#8392AB]`
@@ -765,9 +765,9 @@ export default function page() {
                     Purchase Request
                   </span>
 
-                  <div className="grid grid-cols-2 gap-5">
+                  <div className="grid xl:grid-cols-2 gap-5">
                     {/* Budgeted vs Non-Budgeted */}
-                    <div className="pt-5 col-span-2 grid grid-cols-2 gap-5">
+                    <div className="pt-5 col-span-2 grid xl:grid-cols-2 gap-5">
                       <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
                         <Chart
                           options={{
@@ -825,11 +825,10 @@ export default function page() {
                               categories: totalOverview?.serviceCatData?.map(
                                 (s) => s?.name
                               ),
-                              
                             },
-                            legend:{
-                              show:false
-                            }
+                            legend: {
+                              show: false,
+                            },
                           }}
                           series={categorySeries}
                           type="bar"
@@ -841,12 +840,12 @@ export default function page() {
                   </div>
 
                   {/* Sourcing Methods */}
-                  <div className="pt-3 grid grid-cols-3 gap-5 ">
+                  <div className="pt-3 grid xl:grid-cols-3 gap-5 ">
                     <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
                       <Chart
                         options={{
-                          title:{
-                            text:"Sourcing methods"
+                          title: {
+                            text: "Sourcing methods",
                           },
 
                           chart: {
@@ -868,8 +867,8 @@ export default function page() {
                     <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
                       <Chart
                         options={{
-                          title:{
-                            text:"Approval stages"
+                          title: {
+                            text: "Approval stages",
                           },
                           chart: {
                             id: "pie-approval",
@@ -906,7 +905,7 @@ export default function page() {
                     Payment Request
                   </span>
                 </div>
-                <div className="grid grid-cols-2 gap-5">
+                <div className="grid xl:grid-cols-2 gap-5">
                   <div className="xl:col-span-1 rounded flex flex-col px-4 pt-5 bg-[#F9FAFD]">
                     <Chart
                       options={{
@@ -983,7 +982,7 @@ export default function page() {
                     PO, Contracts & Tenders
                   </span>
 
-                  <div className="grid md:grid-cols-2 pt-5 gap-5">
+                  <div className="grid xl:grid-cols-2 pt-5 gap-5">
                     <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
                       <Chart
                         options={{
