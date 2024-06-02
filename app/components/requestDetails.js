@@ -89,6 +89,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import UploadOtherFiles from "./uploadOtherFiles";
 import { Dialog, Transition } from "@headlessui/react";
+import { activityUser } from "../utils/helpers";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -3263,7 +3264,7 @@ const RequestDetails = ({
                         value={data?.budgetLine?._id}
                         disabled={disable}
                         onChange={(value, option) => {
-                          alert(value)
+                          alert(value);
                           let r = { ...data };
                           r.budgetLine = value;
                           handleUpdateRequest(r);
@@ -4035,7 +4036,58 @@ const RequestDetails = ({
                               )}
                           </div>
                         ) : (
-                          <div />
+                          <div className="bg-white rounded-lg pb-4 px-5">
+                            {contextHolder}
+                            <Timeline
+                              className="mt-8"
+                              // mode="alternate"
+                              items={[
+                                {
+                                  action: "Edited purchase request",
+                                  module: "users",
+                                  doneBy: "Eric Nziza4",
+                                  referenceId: "647ceaae9a47b3f2c78aa7cb",
+                                  doneAt: "2024-05-13T21:34:16.395Z",
+                                },
+                              ]?.map((item, k) => ({
+                                children: (
+                                  <div className="flex flex-col mb-1">
+                                    <div className="flex gap-x-3 items-center">
+                                      <h6 className="m-0 py-0.5 px-0 text-[14px] text-[#344767]">
+                                        {item?.doneBy}
+                                      </h6>
+                                      <span className="text-[13px] text-[#80878b]">
+                                        {" "}
+                                        {item?.action}
+                                      </span>
+                                      {item?.doneBy && (
+                                        <Link
+                                          className="text-blue-600"
+                                          href={
+                                            activityUser[item?.module]?.path +
+                                            `/${item?.referenceId}`
+                                          }
+                                        >
+                                          {item?.referenceId.slice(0, 12)}
+                                        </Link>
+                                      )}
+                                    </div>
+                                    <Tooltip
+                                      title={moment(item?.doneAt).format(
+                                        "MMMM Do YYYY, h:mm:ss a"
+                                      )}
+                                    >
+                                      <small className="text-[#80878b]">
+                                        {moment(item?.doneAt).endOf().fromNow()}
+                                      </small>
+                                    </Tooltip>
+                                  </div>
+                                ),
+                                color: "blue",
+                                dot: activityUser[item?.module]?.icon,
+                              }))}
+                            />
+                          </div>
                         )}
                       </div>
                     </Dialog.Panel>
