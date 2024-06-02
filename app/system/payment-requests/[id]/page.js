@@ -305,6 +305,7 @@ export default function PaymentRequest({ params }) {
   let [phoneName, setPhoneName] = useState("");
   let [phoneNumber, setPhoneNumber] = useState("");
   const [tab, setTab] = useState(0);
+  const [paymentActivityData, setPaymentActivityData] = useState([])
   const { page, filter } = usePaymentContext();
 
   useEffect(() => {
@@ -350,6 +351,8 @@ export default function PaymentRequest({ params }) {
       setBudgeted(res?.budgeted);
       setCurrency(_paymentRequest?.currency);
     });
+
+    paymentActivity(params.id)
 
     const getBase64 = (file) =>
       new Promise((resolve, reject) => {
@@ -400,6 +403,28 @@ export default function PaymentRequest({ params }) {
         });
       });
   }, [params]);
+
+  function paymentActivity(id) {
+    fetch(`${url}/paymentRequests/logs/${id}`, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((res) => res.json())
+    .then((res) => {
+      setPaymentActivityData(res)
+    })
+    .catch((err) => {
+      messageApi.open({
+        type: "error",
+        content: "Something happened! Please try again.",
+      });
+    });
+  
+  }
 
   useEffect(() => {
     po &&
@@ -999,36 +1024,31 @@ export default function PaymentRequest({ params }) {
                           <Timeline
                             className="mt-8"
                             // mode="alternate"
-                            items={[
-                              {
-                                action: "Edited purchase request",
-                                module: "users",
-                                doneBy: "Eric Nziza4",
-                                referenceId: "647ceaae9a47b3f2c78aa7cb",
-                                doneAt: "2024-05-13T21:34:16.395Z",
-                              },
-                            ]?.map((item, k) => ({
+                            items={paymentActivityData.length > 0 ? paymentActivityData.map((item, k) => ({
                               children: (
                                 <div className="flex flex-col mb-1">
                                   <div className="flex gap-x-3 items-center">
-                                    <h6 className="m-0 py-0.5 px-0 text-[14px] text-[#344767]">
-                                      {item?.doneBy}
-                                    </h6>
+                                    <Link
+                                      className="text-blue-600"
+                                      href={`/system/payment-requests` +
+                                        `/${item?.meta?.referenceId}`
+                                      }
+                                    >
+                                      Document
+                                    </Link>
                                     <span className="text-[13px] text-[#80878b]">
                                       {" "}
-                                      {item?.action}
+                                      {item?.meta?.moduleMessage}
                                     </span>
-                                    {item?.doneBy && (
-                                      <Link
-                                        className="text-blue-600"
-                                        href={
-                                          activityUser[item?.module]?.path +
-                                          `/${item?.referenceId}`
-                                        }
-                                      >
-                                        {item?.referenceId.slice(0, 12)}
-                                      </Link>
-                                    )}
+                                    <Link
+                                      className="text-blue-600"
+                                      href={
+                                        activityUser[item?.meta?.module]?.path +
+                                        `/${item?.meta?.doneBy}`
+                                      }
+                                    >
+                                      {item?.hostname}
+                                    </Link>
                                   </div>
                                   <Tooltip
                                     title={moment(item?.doneAt).format(
@@ -1043,7 +1063,11 @@ export default function PaymentRequest({ params }) {
                               ),
                               color: "blue",
                               dot: activityUser[item?.module]?.icon,
-                            }))}
+                            })) : (
+                              <p className="my-10 text-center text-black">
+                                No Data
+                              </p>
+                            )}
                           />
                         </div>
                       )}
