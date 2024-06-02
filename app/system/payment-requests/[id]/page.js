@@ -1025,56 +1025,54 @@ export default function PaymentRequest({ params }) {
                             // mode="alternate"
                             items={
                               paymentActivityData.length > 0 ? (
-                                paymentActivityData.map((item, k) => ({
-                                  children: (
-                                    <div className="flex flex-col mb-1">
-                                      {item?.meta?.moduleMessage && (
-                                        <>
-                                          <div className="flex gap-x-3 items-center">
-                                            <Link
-                                              className="text-blue-600"
-                                              href={
-                                                `/system/payment-requests` +
-                                                `/${item?.meta?.referenceId}`
-                                              }
-                                            >
-                                              Document
-                                            </Link>
-                                            <span className="text-[13px] text-[#80878b]">
-                                              {" "}
-                                              {item?.meta?.moduleMessage}
-                                            </span>
-                                            <Link
-                                              className="text-blue-600"
-                                              href={
-                                                activityUser[item?.meta?.module]
-                                                  ?.path +
-                                                `/${item?.meta?.doneBy?._id}`
-                                              }
-                                            >
-                                              {item?.meta?.doneBy?.lastName +
-                                                " " +
-                                                item?.meta?.doneBy?.firstName}
-                                            </Link>
-                                          </div>
-                                          <Tooltip
-                                            title={moment(item?.doneAt).format(
-                                              "MMMM Do YYYY, h:mm:ss a"
-                                            )}
+                                paymentActivityData
+                                  .filter((item) => item?.meta?.moduleMessage)
+                                  .map((item, k) => ({
+                                    children: (
+                                      <div className="flex flex-col mb-1">
+                                        <div className="flex gap-x-3 items-center">
+                                          <Link
+                                            className="text-blue-600"
+                                            href={
+                                              `/system/payment-requests` +
+                                              `/${item?.meta?.referenceId}`
+                                            }
                                           >
-                                            <small className="text-[#80878b]">
-                                              {moment(item?.doneAt)
-                                                .endOf()
-                                                .fromNow()}
-                                            </small>
-                                          </Tooltip>
-                                        </>
-                                      )}
-                                    </div>
-                                  ),
-                                  color: "blue",
-                                  dot: activityUser[item?.module]?.icon,
-                                }))
+                                            Document
+                                          </Link>
+                                          <span className="text-[13px] text-[#80878b]">
+                                            {" "}
+                                            {item?.meta?.moduleMessage}
+                                          </span>
+                                          <Link
+                                            className="text-blue-600"
+                                            href={
+                                              activityUser[item?.meta?.module]
+                                                ?.path +
+                                              `/${item?.meta?.doneBy?._id}`
+                                            }
+                                          >
+                                            {item?.meta?.doneBy?.lastName +
+                                              " " +
+                                              item?.meta?.doneBy?.firstName}
+                                          </Link>
+                                        </div>
+                                        <Tooltip
+                                          title={moment(item?.doneAt).format(
+                                            "MMMM Do YYYY, h:mm:ss a"
+                                          )}
+                                        >
+                                          <small className="text-[#80878b]">
+                                            {moment(item?.doneAt)
+                                              .endOf()
+                                              .fromNow()}
+                                          </small>
+                                        </Tooltip>
+                                      </div>
+                                    ),
+                                    color: "blue",
+                                    dot: activityUser[item?.module]?.icon,
+                                  }))
                               ) : (
                                 <p className="my-10 text-center text-black">
                                   No Data
