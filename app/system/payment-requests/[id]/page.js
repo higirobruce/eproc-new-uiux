@@ -1044,10 +1044,10 @@ export default function PaymentRequest({ params }) {
                                       className="text-blue-600"
                                       href={
                                         activityUser[item?.meta?.module]?.path +
-                                        `/${item?.meta?.doneBy}`
+                                        `/${item?.meta?.doneBy?._id}`
                                       }
                                     >
-                                      {item?.hostname}
+                                      {item?.meta?.doneBy?.lastName + ' '+item?.meta?.doneBy?.firstName}
                                     </Link>
                                   </div>
                                   <Tooltip

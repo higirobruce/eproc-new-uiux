@@ -443,6 +443,7 @@ const RequestDetails = ({
   const [creatingPO, setCreatingPO] = useState(false);
   const [comment, setComment] = useState("");
   const [rate, setRate] = useState(0);
+  const [prActivityData, setprActivityData] = useState([]);
 
   const [assetOptions, setAssetOptions] = useState([]);
 
@@ -756,6 +757,7 @@ const RequestDetails = ({
     checkDirectPOExists(data);
     setReqAttachId(v4());
     getFixedAssets();
+    getPrActivity(data?._id);
     if (data) {
       checkContractExists();
       checkTenderExists(data);
@@ -789,6 +791,26 @@ const RequestDetails = ({
     if (po?.deliveryProgress >= 100) setCurrentStep(3);
   }, [tender, po]);
 
+  function getPrActivity(id) {
+    fetch(`${url}/paymentRequests/logs/${id}`, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setprActivityData(res);
+      })
+      .catch((err) => {
+        messageApi.open({
+          type: "error",
+          content: "Something happened! Please try again.",
+        });
+      });
+  }
   function getRequestStatus(code) {
     // if (code === 0) return "verified";
     if (code === 0) return "pending";
@@ -4041,51 +4063,67 @@ const RequestDetails = ({
                             <Timeline
                               className="mt-8"
                               // mode="alternate"
-                              items={[
-                                {
-                                  action: "Edited purchase request",
-                                  module: "users",
-                                  doneBy: "Eric Nziza4",
-                                  referenceId: "647ceaae9a47b3f2c78aa7cb",
-                                  doneAt: "2024-05-13T21:34:16.395Z",
-                                },
-                              ]?.map((item, k) => ({
-                                children: (
-                                  <div className="flex flex-col mb-1">
-                                    <div className="flex gap-x-3 items-center">
-                                      <h6 className="m-0 py-0.5 px-0 text-[14px] text-[#344767]">
-                                        {item?.doneBy}
-                                      </h6>
-                                      <span className="text-[13px] text-[#80878b]">
-                                        {" "}
-                                        {item?.action}
-                                      </span>
-                                      {item?.doneBy && (
-                                        <Link
-                                          className="text-blue-600"
-                                          href={
-                                            activityUser[item?.module]?.path +
-                                            `/${item?.referenceId}`
-                                          }
-                                        >
-                                          {item?.referenceId.slice(0, 12)}
-                                        </Link>
-                                      )}
-                                    </div>
-                                    <Tooltip
-                                      title={moment(item?.doneAt).format(
-                                        "MMMM Do YYYY, h:mm:ss a"
-                                      )}
-                                    >
-                                      <small className="text-[#80878b]">
-                                        {moment(item?.doneAt).endOf().fromNow()}
-                                      </small>
-                                    </Tooltip>
-                                  </div>
-                                ),
-                                color: "blue",
-                                dot: activityUser[item?.module]?.icon,
-                              }))}
+                              items={
+                                prActivityData.length > 0 ? (
+                                  prActivityData.map((item, k) => ({
+                                    children: (
+                                      <div className="flex flex-col mb-1">
+                                        {item?.meta?.moduleMessage && (
+                                          <>
+                                            <div className="flex gap-x-3 items-center">
+                                              <Link
+                                                className="text-blue-600"
+                                                href={
+                                                  `/system/requests` +
+                                                  `/${item?.meta?.referenceId}`
+                                                }
+                                              >
+                                                Document
+                                              </Link>
+                                              <span className="text-[13px] text-[#80878b]">
+                                                {" "}
+                                                {item?.meta?.moduleMessage}
+                                              </span>
+                                              <Link
+                                                className="text-blue-600"
+                                                href={
+                                                  activityUser[
+                                                    item?.meta?.module
+                                                  ]?.path +
+                                                  `/${item?.meta?.doneBy?._id}`
+                                                }
+                                              >
+                                                {item?.meta?.doneBy?.lastName +
+                                                  " " +
+                                                  item?.meta?.doneBy?.firstName}
+                                              </Link>
+                                            </div>
+                                            <Tooltip
+                                              title={moment(
+                                                item?.doneAt
+                                              ).format(
+                                                "MMMM Do YYYY, h:mm:ss a"
+                                              )}
+                                            >
+                                              <small className="text-[#80878b]">
+                                                {moment(item?.doneAt)
+                                                  .endOf()
+                                                  .fromNow()}
+                                              </small>
+                                            </Tooltip>
+                                          </>
+                                        )}
+                                      </div>
+                                    ),
+                                    color: "blue",
+                                    dot: activityUser[item?.module]?.icon,
+                                  }))
+                                ) : (
+                                  <p className="my-10 text-center text-black">
+                                    No Data
+                                  </p>
+                                )
+                              }
                             />
                           </div>
                         )}
