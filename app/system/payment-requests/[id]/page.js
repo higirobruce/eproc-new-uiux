@@ -49,7 +49,7 @@ import {
   LockClosedIcon,
   UserGroupIcon,
   LightBulbIcon,
-  XMarkIcon
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import UploadPaymentReq from "@/app/components/uploadPaymentReq";
 import UpdatePaymentReqDoc from "@/app/components/updatePaymentReqDoc";
@@ -64,6 +64,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { usePaymentContext } from "@/app/context/PaymentContext";
 import { isMobile } from "react-device-detect";
 import NotificationComponent from "@/app/hooks/useMobile";
+import { activityUser } from "@/app/utils/helpers";
 
 let url = process.env.NEXT_PUBLIC_BKEND_URL;
 let fend_url = process.env.NEXT_PUBLIC_FTEND_URL;
@@ -303,8 +304,8 @@ export default function PaymentRequest({ params }) {
   let [accountNumber, setAccountNumber] = useState("");
   let [phoneName, setPhoneName] = useState("");
   let [phoneNumber, setPhoneNumber] = useState("");
-  const [tab, setTab] = useState(0)
-  const {page, filter} = usePaymentContext()
+  const [tab, setTab] = useState(0);
+  const { page, filter } = usePaymentContext();
 
   useEffect(() => {
     getPaymentRequestDetails(params.id, router).then((res) => {
@@ -893,7 +894,11 @@ export default function PaymentRequest({ params }) {
     >
       {isMobile && <NotificationComponent />}
       <Transition.Root show={show || false} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={() => setShow(false)}>
+        <Dialog
+          as="div"
+          className="relative z-10"
+          onClose={() => setShow(false)}
+        >
           <Transition.Child
             as={Fragment}
             enter="ease-in-out duration-500"
@@ -958,23 +963,90 @@ export default function PaymentRequest({ params }) {
                           >
                             Related Docs
                           </button>
+                          <button
+                            className={`bg-transparent py-3 my-3 ${
+                              tab == 1
+                                ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 border-solid text-[#263238] px-4`
+                                : `border-none text-[#8392AB]`
+                            } text-[14px] cursor-pointer`}
+                            onClick={() => setTab(1)}
+                          >
+                            Audit Tracking
+                          </button>
                         </div>
                       </div>
-                      {paymentRequest?.purchaseOrder && (
-                          <>
-                            <h4 className="mb-2 mt-4 font-semibold ml-6">
-                              PO Reference
-                            </h4>
-                            <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
-                              <Link
-                                href={`/system/purchase-orders/${paymentRequest?.purchaseOrder?._id}/?page=${page}&filter=${filter}`}
-                                className="font-bold text-[16px] no-underline text-blue-600"
-                              >
-                                {paymentRequest?.purchaseOrder?.number}
-                              </Link>
-                            </div>
-                          </>
-                        )}
+                      {tab == 0 ? (
+                        <>
+                          {paymentRequest?.purchaseOrder && (
+                            <>
+                              <h4 className="mb-2 mt-4 font-semibold ml-6">
+                                PO Reference
+                              </h4>
+                              <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                                <Link
+                                  href={`/system/purchase-orders/${paymentRequest?.purchaseOrder?._id}/?page=${page}&filter=${filter}`}
+                                  className="font-bold text-[16px] no-underline text-blue-600"
+                                >
+                                  {paymentRequest?.purchaseOrder?.number}
+                                </Link>
+                              </div>
+                            </>
+                          )}
+                        </>
+                      ) : (
+                        <div className="bg-white rounded-lg pb-4 px-5">
+                          {contextHolder}
+                          <Timeline
+                            className="mt-8"
+                            // mode="alternate"
+                            items={[
+                              {
+                                action: "Edited purchase request",
+                                module: "users",
+                                doneBy: "Eric Nziza4",
+                                referenceId: "647ceaae9a47b3f2c78aa7cb",
+                                doneAt: "2024-05-13T21:34:16.395Z",
+                              },
+                            ]?.map((item, k) => ({
+                              children: (
+                                <div className="flex flex-col mb-1">
+                                  <div className="flex gap-x-3 items-center">
+                                    <h6 className="m-0 py-0.5 px-0 text-[14px] text-[#344767]">
+                                      {item?.doneBy}
+                                    </h6>
+                                    <span className="text-[13px] text-[#80878b]">
+                                      {" "}
+                                      {item?.action}
+                                    </span>
+                                    {item?.doneBy && (
+                                      <Link
+                                        className="text-blue-600"
+                                        href={
+                                          activityUser[item?.module]?.path +
+                                          `/${item?.referenceId}`
+                                        }
+                                      >
+                                        {item?.referenceId.slice(0, 12)}
+                                      </Link>
+                                    )}
+                                  </div>
+                                  <Tooltip
+                                    title={moment(item?.doneAt).format(
+                                      "MMMM Do YYYY, h:mm:ss a"
+                                    )}
+                                  >
+                                    <small className="text-[#80878b]">
+                                      {moment(item?.doneAt).endOf().fromNow()}
+                                    </small>
+                                  </Tooltip>
+                                </div>
+                              ),
+                              color: "blue",
+                              dot: activityUser[item?.module]?.icon,
+                            }))}
+                          />
+                        </div>
+                      )}
                       <div />
                     </div>
                   </Dialog.Panel>
@@ -993,9 +1065,14 @@ export default function PaymentRequest({ params }) {
         >
           Return to List
         </Button>
-        {user?.userType !== "VENDOR" && <button onClick={() => setShow(true)} className="cursor-pointer bg-transparent px-1.5 py-1 rounded-full border-solid border-2 border-[#FFF]">
-          <TiInfoLarge className="text-[#FFF]" />
-        </button>}
+        {user?.userType !== "VENDOR" && (
+          <button
+            onClick={() => setShow(true)}
+            className="cursor-pointer bg-transparent px-1.5 py-1 rounded-full border-solid border-2 border-[#FFF]"
+          >
+            <TiInfoLarge className="text-[#FFF]" />
+          </button>
+        )}
       </div>
       <div className="request-details gap-4 mb-6 items-start h-[calc(100vh-200px)] overflow-y-auto">
         <div className="grid md:grid-cols-5 gap-1 items-start">
@@ -1063,9 +1140,14 @@ export default function PaymentRequest({ params }) {
                       {paymentRequest?.status}
                     </Tag>
                   </div>
-                  {paymentRequest?.status == 'declined' && <Tooltip title={paymentRequest?.reasonForRejection} className="cursor-pointer bg-transparent p-0.5 rounded-full mt-0.5">
-                    <TiInfoLarge className="text-[#344767] w-6 h-6" />
-                  </Tooltip>}
+                  {paymentRequest?.status == "declined" && (
+                    <Tooltip
+                      title={paymentRequest?.reasonForRejection}
+                      className="cursor-pointer bg-transparent p-0.5 rounded-full mt-0.5"
+                    >
+                      <TiInfoLarge className="text-[#344767] w-6 h-6" />
+                    </Tooltip>
+                  )}
                   {/* <div className="space-x-3 ">
                     {!paymentRequest?.status?.includes("approved") &&
                       paymentRequest?.status !== "declined" &&
@@ -1491,18 +1573,22 @@ export default function PaymentRequest({ params }) {
                                   .toLowerCase()
                                   .includes(inputValue.toLowerCase());
                               }}
-                              options={budgetLines.filter((s) => s.visible == true).map((s) => {
-                                return {
-                                  label: s.description.toUpperCase(),
-                                  options: s.budgetlines.filter((s) => s.visible == true).map((sub) => {
-                                    return {
-                                      label: sub.description,
-                                      value: sub._id,
-                                      title: sub.description,
-                                    };
-                                  }),
-                                };
-                              })}
+                              options={budgetLines
+                                .filter((s) => s.visible == true)
+                                .map((s) => {
+                                  return {
+                                    label: s.description.toUpperCase(),
+                                    options: s.budgetlines
+                                      .filter((s) => s.visible == true)
+                                      .map((sub) => {
+                                        return {
+                                          label: sub.description,
+                                          value: sub._id,
+                                          title: sub.description,
+                                        };
+                                      }),
+                                  };
+                                })}
                               disabled={!conditions}
                             ></Select>
                           </Form.Item>

@@ -32,6 +32,7 @@ import {
   Popconfirm,
   Switch,
   Tooltip,
+  Timeline,
 } from "antd";
 import {
   CloseCircleOutlined,
@@ -72,6 +73,7 @@ import { LuHash, LuUser } from "react-icons/lu";
 import { Dialog, Transition } from "@headlessui/react";
 import { TiInfoLarge } from "react-icons/ti";
 import UploadOtherFiles from "./uploadOtherFiles";
+import { activityUser } from "../utils/helpers";
 
 const PrintPDF = dynamic(() => import("@/app/components/printPDF"), {
   srr: false,
@@ -4110,54 +4112,113 @@ const TenderDetails = ({
                           >
                             Related Docs
                           </button>
+                          <button
+                              className={`bg-transparent py-3 my-3 ${
+                                referenceTab == 1
+                                  ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 border-solid text-[#263238] px-4`
+                                  : `border-none text-[#8392AB]`
+                              } text-[14px] cursor-pointer`}
+                              onClick={() => setReferenceTab(1)}
+                            >
+                              Audit Tracking
+                            </button>
                         </div>
                       </div>
-                      {contract && (
+                      {referenceTab == 0 ? (
                         <>
-                          <h4 className="mb-2 mt-4 font-semibold ml-6">
-                            Contract Reference
-                          </h4>
-                          <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
-                            <Link
-                              href={`/system/contracts/${contract?._id}`}
-                              className="font-bold text-[16px] no-underline text-blue-600"
-                            >
-                              {contract?.number}
-                            </Link>
-                          </div>
+                          {contract && (
+                            <>
+                              <h4 className="mb-2 mt-4 font-semibold ml-6">
+                                Contract Reference
+                              </h4>
+                              <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                                <Link
+                                  href={`/system/contracts/${contract?._id}`}
+                                  className="font-bold text-[16px] no-underline text-blue-600"
+                                >
+                                  {contract?.number}
+                                </Link>
+                              </div>
+                            </>
+                          )}
+                          {po && (
+                            <>
+                              <h4 className="mb-2 mt-4 font-semibold ml-6">
+                                PO Reference
+                              </h4>
+                              <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                                <Link
+                                  href={`/system/purchase-orders/${po?._id}`}
+                                  className="font-bold text-[16px] no-underline text-blue-600"
+                                >
+                                  {po?.number}
+                                </Link>
+                              </div>
+                            </>
+                          )}
+                          {data?.purchaseRequest && (
+                            <>
+                              <h4 className="mb-2 mt-4 font-semibold ml-6">
+                                Requests Reference
+                              </h4>
+                              <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                                <Link
+                                  href={`/system/requests/${
+                                    data?.purchaseRequest?._id
+                                  }/?page=${1}&filter=${"all"}`}
+                                  className="font-bold text-[16px] no-underline text-blue-600"
+                                >
+                                  {data?.purchaseRequest?.number}
+                                </Link>
+                              </div>
+                            </>
+                          )}
                         </>
-                      )}
-                      {po && (
-                        <>
-                          <h4 className="mb-2 mt-4 font-semibold ml-6">
-                            PO Reference
-                          </h4>
-                          <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
-                            <Link
-                              href={`/system/purchase-orders/${po?._id}`}
-                              className="font-bold text-[16px] no-underline text-blue-600"
-                            >
-                              {po?.number}
-                            </Link>
+                      ) : (
+                        <div className="bg-white rounded-lg pb-4 px-5">
+                            {contextHolder}
+                            <Timeline
+                              className="mt-8"
+                              // mode="alternate"
+                              items={[{action: 'Edited Tender request', module: 'users', doneBy: 'Eric Nziza4', referenceId: '647ceaae9a47b3f2c78aa7cb', doneAt: '2024-05-13T21:34:16.395Z'}]?.map((item, k) => ({
+                                children: (
+                                  <div className="flex flex-col mb-1">
+                                    <div className="flex gap-x-3 items-center">
+                                      <h6 className="m-0 py-0.5 px-0 text-[14px] text-[#344767]">
+                                        {item?.doneBy}
+                                      </h6>
+                                      <span className="text-[13px] text-[#80878b]">
+                                        {" "}
+                                        {item?.action}
+                                      </span>
+                                      {item?.doneBy && (
+                                        <Link
+                                          className="text-blue-600"
+                                          href={
+                                            activityUser[item?.module]?.path +
+                                            `/${item?.referenceId}`
+                                          }
+                                        >
+                                          {item?.referenceId.slice(0, 12)}
+                                        </Link>
+                                      )}
+                                    </div>
+                                    <Tooltip
+                                      title={moment(item?.doneAt).format(
+                                        "MMMM Do YYYY, h:mm:ss a"
+                                      )}
+                                    >
+                                      <small className="text-[#80878b]">
+                                        {moment(item?.doneAt).endOf().fromNow()}
+                                      </small>
+                                    </Tooltip>
+                                  </div>
+                                ),
+                                color: "blue",
+                                dot: activityUser[item?.module]?.icon,
+                              }))}
+                            />
                           </div>
-                        </>
-                      )}
-                      {data?.purchaseRequest && (
-                        <>
-                          <h4 className="mb-2 mt-4 font-semibold ml-6">
-                            Requests Reference
-                          </h4>
-                          <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
-                            <Link
-                              href={`/system/requests/${
-                                data?.purchaseRequest?._id
-                              }/?page=${1}&filter=${"all"}`}
-                              className="font-bold text-[16px] no-underline text-blue-600"
-                            >
-                              {data?.purchaseRequest?.number}
-                            </Link>
-                          </div>
-                        </>
                       )}
                       <div />
                     </div>
