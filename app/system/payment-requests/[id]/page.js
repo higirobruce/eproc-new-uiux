@@ -305,7 +305,7 @@ export default function PaymentRequest({ params }) {
   let [phoneName, setPhoneName] = useState("");
   let [phoneNumber, setPhoneNumber] = useState("");
   const [tab, setTab] = useState(0);
-  const [paymentActivityData, setPaymentActivityData] = useState([])
+  const [paymentActivityData, setPaymentActivityData] = useState([]);
   const { page, filter } = usePaymentContext();
 
   useEffect(() => {
@@ -352,7 +352,7 @@ export default function PaymentRequest({ params }) {
       setCurrency(_paymentRequest?.currency);
     });
 
-    paymentActivity(params.id)
+    paymentActivity(params.id);
 
     const getBase64 = (file) =>
       new Promise((resolve, reject) => {
@@ -413,17 +413,16 @@ export default function PaymentRequest({ params }) {
         "Content-Type": "application/json",
       },
     })
-    .then((res) => res.json())
-    .then((res) => {
-      setPaymentActivityData(res)
-    })
-    .catch((err) => {
-      messageApi.open({
-        type: "error",
-        content: "Something happened! Please try again.",
+      .then((res) => res.json())
+      .then((res) => {
+        setPaymentActivityData(res);
+      })
+      .catch((err) => {
+        messageApi.open({
+          type: "error",
+          content: "Something happened! Please try again.",
+        });
       });
-    });
-  
   }
 
   useEffect(() => {
@@ -1024,50 +1023,64 @@ export default function PaymentRequest({ params }) {
                           <Timeline
                             className="mt-8"
                             // mode="alternate"
-                            items={paymentActivityData.length > 0 ? paymentActivityData.map((item, k) => ({
-                              children: (
-                                <div className="flex flex-col mb-1">
-                                  <div className="flex gap-x-3 items-center">
-                                    <Link
-                                      className="text-blue-600"
-                                      href={`/system/payment-requests` +
-                                        `/${item?.meta?.referenceId}`
-                                      }
-                                    >
-                                      Document
-                                    </Link>
-                                    <span className="text-[13px] text-[#80878b]">
-                                      {" "}
-                                      {item?.meta?.moduleMessage}
-                                    </span>
-                                    <Link
-                                      className="text-blue-600"
-                                      href={
-                                        activityUser[item?.meta?.module]?.path +
-                                        `/${item?.meta?.doneBy?._id}`
-                                      }
-                                    >
-                                      {item?.meta?.doneBy?.lastName + ' '+item?.meta?.doneBy?.firstName}
-                                    </Link>
-                                  </div>
-                                  <Tooltip
-                                    title={moment(item?.doneAt).format(
-                                      "MMMM Do YYYY, h:mm:ss a"
-                                    )}
-                                  >
-                                    <small className="text-[#80878b]">
-                                      {moment(item?.doneAt).endOf().fromNow()}
-                                    </small>
-                                  </Tooltip>
-                                </div>
-                              ),
-                              color: "blue",
-                              dot: activityUser[item?.module]?.icon,
-                            })) : (
-                              <p className="my-10 text-center text-black">
-                                No Data
-                              </p>
-                            )}
+                            items={
+                              paymentActivityData.length > 0 ? (
+                                paymentActivityData.map((item, k) => ({
+                                  children: (
+                                    <div className="flex flex-col mb-1">
+                                      {item?.meta?.moduleMessage && (
+                                        <>
+                                          <div className="flex gap-x-3 items-center">
+                                            <Link
+                                              className="text-blue-600"
+                                              href={
+                                                `/system/payment-requests` +
+                                                `/${item?.meta?.referenceId}`
+                                              }
+                                            >
+                                              Document
+                                            </Link>
+                                            <span className="text-[13px] text-[#80878b]">
+                                              {" "}
+                                              {item?.meta?.moduleMessage}
+                                            </span>
+                                            <Link
+                                              className="text-blue-600"
+                                              href={
+                                                activityUser[item?.meta?.module]
+                                                  ?.path +
+                                                `/${item?.meta?.doneBy?._id}`
+                                              }
+                                            >
+                                              {item?.meta?.doneBy?.lastName +
+                                                " " +
+                                                item?.meta?.doneBy?.firstName}
+                                            </Link>
+                                          </div>
+                                          <Tooltip
+                                            title={moment(item?.doneAt).format(
+                                              "MMMM Do YYYY, h:mm:ss a"
+                                            )}
+                                          >
+                                            <small className="text-[#80878b]">
+                                              {moment(item?.doneAt)
+                                                .endOf()
+                                                .fromNow()}
+                                            </small>
+                                          </Tooltip>
+                                        </>
+                                      )}
+                                    </div>
+                                  ),
+                                  color: "blue",
+                                  dot: activityUser[item?.module]?.icon,
+                                }))
+                              ) : (
+                                <p className="my-10 text-center text-black">
+                                  No Data
+                                </p>
+                              )
+                            }
                           />
                         </div>
                       )}
