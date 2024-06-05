@@ -792,7 +792,7 @@ const RequestDetails = ({
   }, [tender, po]);
 
   function getPrActivity(id) {
-    fetch(`${url}/paymentRequests/logs/${id}`, {
+    fetch(`${url}/requests/logs/${id}`, {
       method: "GET",
       headers: {
         Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
@@ -4060,6 +4060,7 @@ const RequestDetails = ({
                         ) : (
                           <div className="bg-white rounded-lg pb-4 px-5">
                             {contextHolder}
+                            {}
                             <Timeline
                               className="mt-8"
                               // mode="alternate"
