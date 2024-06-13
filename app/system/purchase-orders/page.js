@@ -1629,7 +1629,7 @@ export default function PurchaseOrders() {
                                       {s?.names}
                                     </small> */}
                                     <div className="bg-[#F1F3FF] py-1 px-3 rounded-xl text-[11px] font-medium text-[#353531]">
-                                      {s?.title}
+                                      {s?.names || s?.title}
                                     </div>
                                   </div>
                                 );
