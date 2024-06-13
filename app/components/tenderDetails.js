@@ -3724,7 +3724,7 @@ const TenderDetails = ({
                 </div>
               )}
             </div>
-            <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1">
+            <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1">
               <div className="flex flex-col items-start">
                 <div className="text-[14px] font-medium m-3 text-[#344767]">
                   Tender Number
@@ -3743,14 +3743,14 @@ const TenderDetails = ({
                 </div>
               </div>
 
-              <div className="flex flex-col items-start">
+              {/* <div className="flex flex-col items-start">
                 <div className="text-[14px] font-medium m-3 text-[#344767]">
                   Due date
                 </div>
                 <div className="text-[13px] mt-2 font-medium ml-3 text-[#87A1AA]">
                   {moment(data?.dueDate).format("YYYY-MMM-DD")}
                 </div>
-              </div>
+              </div> */}
 
               <div className="flex flex-col space-y-3">
                 <div className="text-[14px] font-medium mt-3 text-[#344767]">
