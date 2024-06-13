@@ -463,6 +463,12 @@ const RequestDetails = ({
   const [tab, setTab] = useState(0);
   const contentHeight = useRef();
   const scrollRef = useRef();
+  const [contractTitle, setContractTitle] = useState("Contract title");
+  const [contractSender, setContractSender] = useState("Irembo Ltd");
+  const [contractReceiver, setContractReceiver] = useState("");
+  const [contractSenderParty, setContractSenderParty] = useState("Sender");
+  const [contractReceiverParty, setContractReceiverParty] =
+    useState("Receiver");
 
   const showPopconfirm = () => {
     setOpen(true);
@@ -569,6 +575,10 @@ const RequestDetails = ({
 
   let [servCategories, setServCategories] = useState([]);
   let [budgetLines, setBudgetLines] = useState([]);
+
+  useEffect(() => {
+    setContractReceiver(vendor?.companyName);
+  }, [vendor]);
 
   useEffect(() => {
     refresh();
@@ -2312,7 +2322,11 @@ const RequestDetails = ({
                   contractStartDate,
                   contractEndDate,
                   signatories,
-                  refDoc === "Direct Contracting" ? reqAttachId : ""
+                  refDoc === "Direct Contracting" ? reqAttachId : "",
+                  "draft",
+                  contractTitle,
+                  contractSenderParty,
+                  contractReceiverParty
                 );
                 setOpenCreateContract(false);
               }
@@ -2374,7 +2388,10 @@ const RequestDetails = ({
                   contractEndDate,
                   signatories,
                   refDoc === "Direct Contracting" ? reqAttachId : "",
-                  "legal-review"
+                  "legal-review",
+                  contractTitle,
+                  contractSenderParty,
+                  contractReceiverParty
                 );
                 setOpenCreateContract(false);
               }
@@ -2392,8 +2409,20 @@ const RequestDetails = ({
       >
         <div className="space-y-10 px-20 py-5">
           {contextHolder}
-          <Typography.Title level={4}>
-            CONTRACT: {vendor?.companyName}
+          <Typography.Title
+            level={4}
+            className="flex flex-row"
+            editable={{
+              text: contractTitle,
+              onChange: (e) => {
+                // let _signatories = [...signatories];
+                // _signatories[index].title = e;
+                // setSignatories(_signatories);
+                setContractTitle(e);
+              },
+            }}
+          >
+            {contractTitle}
           </Typography.Title>
           <div className="grid grid-cols-2 w-1/2">
             <div>
@@ -2408,11 +2437,21 @@ const RequestDetails = ({
           </div>
           <div className="grid grid-cols-2 gap-5">
             <div className="flex flex-col ring-1 ring-gray-300 rounded p-5 space-y-3">
-              <div className="flex flex-col">
+              <div className="flex flex-col space-y-1">
                 <Typography.Text type="secondary">
                   <div className="text-xs">Company Name</div>
                 </Typography.Text>
-                <Typography.Text strong>Irembo ltd</Typography.Text>
+                <Typography.Text
+                  strong
+                  // editable={{
+                  //   text: contractSender,
+                  //   onChange: (e) => {
+                  //     setContractSender(e);
+                  //   },
+                  // }}
+                >
+                  Irembo Ltd
+                </Typography.Text>
               </div>
 
               <div className="flex flex-col">
@@ -2431,11 +2470,21 @@ const RequestDetails = ({
                 <Typography.Text strong>102911562</Typography.Text>
               </div>
 
-              <div className="flex flex-col">
+              <div className="flex flex-col space-y-1">
                 <Typography.Text type="secondary">
                   <div className="text-xs">Hereinafter refferd to as</div>
                 </Typography.Text>
-                <Typography.Text strong>Sender</Typography.Text>
+                <Typography.Text
+                  strong
+                  editable={{
+                    text: contractSenderParty,
+                    onChange: (e) => {
+                      setContractSenderParty(e);
+                    },
+                  }}
+                >
+                  {contractSenderParty}
+                </Typography.Text>
               </div>
             </div>
 
@@ -2444,7 +2493,17 @@ const RequestDetails = ({
                 <Typography.Text type="secondary">
                   <div className="text-xs">Company Name</div>
                 </Typography.Text>
-                <Typography.Text strong>{vendor?.companyName}</Typography.Text>
+                <Typography.Text
+                  strong
+                  // editable={{
+                  //   text: contractReceiver,
+                  //   onChange: (e) => {
+                  //     setContractReceiver(e);
+                  //   },
+                  // }}
+                >
+                  {vendor?.companyName}
+                </Typography.Text>
               </div>
 
               <div className="flex flex-col">
@@ -2461,11 +2520,21 @@ const RequestDetails = ({
                 </Typography.Text>
                 <Typography.Text strong>{vendor?.tin}</Typography.Text>
               </div>
-              <div className="flex flex-col">
+              <div className="flex flex-col space-y-1">
                 <Typography.Text type="secondary">
                   <div className="text-xs">Hereinafter refferd to as</div>
                 </Typography.Text>
-                <Typography.Text strong>Receiver</Typography.Text>
+                <Typography.Text
+                  strong
+                  editable={{
+                    text: contractReceiverParty,
+                    onChange: (e) => {
+                      setContractReceiverParty(e);
+                    },
+                  }}
+                >
+                  {contractReceiverParty}
+                </Typography.Text>
               </div>
             </div>
           </div>

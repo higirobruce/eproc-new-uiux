@@ -122,7 +122,7 @@ const TenderDetails = ({
   user,
   handleSendEvalApproval,
   handleEditSubmission,
-  handleSetEdit
+  handleSetEdit,
 }) => {
   const [form] = Form.useForm();
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
@@ -183,7 +183,7 @@ const TenderDetails = ({
   const [tab, setTab] = useState(0);
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
-  const [tenderActivityData, setTenderActivityData] = useState()
+  const [tenderActivityData, setTenderActivityData] = useState();
   const contentHeight = useRef();
 
   const itemColumns =
@@ -399,7 +399,7 @@ const TenderDetails = ({
     setCurrentCode(1);
     setItems(data?.purchaseRequest?.items);
     getUsers();
-    tenderActivity(data?._id)
+    tenderActivity(data?._id);
 
     if (data) checkSubmission();
     updateBidList();
@@ -459,17 +459,16 @@ const TenderDetails = ({
         "Content-Type": "application/json",
       },
     })
-    .then((res) => res.json())
-    .then((res) => {
-      setTenderActivityData(res);
-    })
-    .catch((err) => {
-      messageApi.open({
-        type: "error",
-        content: "Something happened! Please try again.",
+      .then((res) => res.json())
+      .then((res) => {
+        setTenderActivityData(res);
+      })
+      .catch((err) => {
+        messageApi.open({
+          type: "error",
+          content: "Something happened! Please try again.",
+        });
       });
-    });
-
   }
 
   async function updateProposalFiles(editBid) {
@@ -747,9 +746,9 @@ const TenderDetails = ({
 
   function editSubmission(submissionData) {
     handleEditSubmission(submissionData, editBid?._id);
-    setEditingBid(false)
-    setTab(3)
-    setSaving(false)
+    setEditingBid(false);
+    setTab(3);
+    setSaving(false);
   }
 
   const handleUpload = () => {
@@ -3132,7 +3131,7 @@ const TenderDetails = ({
           <div className="flex flex-row justify-between items-center">
             <Typography.Title level={4} className="flex flex-row items-center">
               <div>
-                CONTRACT: {contract?.vendor?.companyName}{" "}
+                CONTRACT: {contract?.title || contract?.vendor?.companyName}{" "}
                 <div>
                   <Popover
                     placement="topLeft"
@@ -3193,7 +3192,9 @@ const TenderDetails = ({
                 <Typography.Text type="secondary">
                   <div className="text-xs">Hereinafter refferd to as</div>
                 </Typography.Text>
-                <Typography.Text strong>Sender</Typography.Text>
+                <Typography.Text strong>
+                  {contract?.senderPartyLabel || "Sender"}
+                </Typography.Text>
               </div>
             </div>
 
@@ -3227,7 +3228,9 @@ const TenderDetails = ({
                 <Typography.Text type="secondary">
                   <div className="text-xs">Hereinafter refferd to as</div>
                 </Typography.Text>
-                <Typography.Text strong>Receiver</Typography.Text>
+                <Typography.Text strong>
+                  {contract?.receiverPartyLable || "Receiver"}
+                </Typography.Text>
               </div>
             </div>
           </div>
@@ -4138,15 +4141,15 @@ const TenderDetails = ({
                             Related Docs
                           </button>
                           <button
-                              className={`bg-transparent py-3 my-3 ${
-                                referenceTab == 1
-                                  ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 border-solid text-[#263238] px-4`
-                                  : `border-none text-[#8392AB]`
-                              } text-[14px] cursor-pointer`}
-                              onClick={() => setReferenceTab(1)}
-                            >
-                              Audit Tracking
-                            </button>
+                            className={`bg-transparent py-3 my-3 ${
+                              referenceTab == 1
+                                ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 border-solid text-[#263238] px-4`
+                                : `border-none text-[#8392AB]`
+                            } text-[14px] cursor-pointer`}
+                            onClick={() => setReferenceTab(1)}
+                          >
+                            Audit Tracking
+                          </button>
                         </div>
                       </div>
                       {referenceTab == 0 ? (
@@ -4201,68 +4204,68 @@ const TenderDetails = ({
                         </>
                       ) : (
                         <div className="bg-white rounded-lg pb-4 px-5">
-                            {contextHolder}
-                            <Timeline
-                              className="mt-8"
-                              // mode="alternate"
-                              items={
-                                tenderActivityData.length > 0 ? (
-                                  tenderActivityData
-                                    .filter((item) => item?.meta?.moduleMessage)
-                                    .map((item, k) => ({
-                                      children: (
-                                        <div className="flex flex-col mb-1">
-                                          <div className="flex gap-x-3 items-center">
-                                            <Link
-                                              className="text-blue-600"
-                                              href={
-                                                `/system/payment-requests` +
-                                                `/${item?.meta?.referenceId}`
-                                              }
-                                            >
-                                              Document
-                                            </Link>
-                                            <span className="text-[13px] text-[#80878b]">
-                                              {" "}
-                                              {item?.meta?.moduleMessage}
-                                            </span>
-                                            <Link
-                                              className="text-blue-600"
-                                              href={
-                                                activityUser[item?.meta?.module]
-                                                  ?.path +
-                                                `/${item?.meta?.doneBy?._id}`
-                                              }
-                                            >
-                                              {item?.meta?.doneBy?.lastName +
-                                                " " +
-                                                item?.meta?.doneBy?.firstName}
-                                            </Link>
-                                          </div>
-                                          <Tooltip
-                                            title={moment(item?.doneAt).format(
-                                              "MMMM Do YYYY, h:mm:ss a"
-                                            )}
+                          {contextHolder}
+                          <Timeline
+                            className="mt-8"
+                            // mode="alternate"
+                            items={
+                              tenderActivityData.length > 0 ? (
+                                tenderActivityData
+                                  .filter((item) => item?.meta?.moduleMessage)
+                                  .map((item, k) => ({
+                                    children: (
+                                      <div className="flex flex-col mb-1">
+                                        <div className="flex gap-x-3 items-center">
+                                          <Link
+                                            className="text-blue-600"
+                                            href={
+                                              `/system/payment-requests` +
+                                              `/${item?.meta?.referenceId}`
+                                            }
                                           >
-                                            <small className="text-[#80878b]">
-                                              {moment(item?.doneAt)
-                                                .endOf()
-                                                .fromNow()}
-                                            </small>
-                                          </Tooltip>
+                                            Document
+                                          </Link>
+                                          <span className="text-[13px] text-[#80878b]">
+                                            {" "}
+                                            {item?.meta?.moduleMessage}
+                                          </span>
+                                          <Link
+                                            className="text-blue-600"
+                                            href={
+                                              activityUser[item?.meta?.module]
+                                                ?.path +
+                                              `/${item?.meta?.doneBy?._id}`
+                                            }
+                                          >
+                                            {item?.meta?.doneBy?.lastName +
+                                              " " +
+                                              item?.meta?.doneBy?.firstName}
+                                          </Link>
                                         </div>
-                                      ),
-                                      color: "blue",
-                                      dot: activityUser[item?.module]?.icon,
-                                    }))
-                                ) : (
-                                  <p className="my-10 text-center text-black">
-                                    No Data
-                                  </p>
-                                )
-                              }
-                            />
-                          </div>
+                                        <Tooltip
+                                          title={moment(item?.doneAt).format(
+                                            "MMMM Do YYYY, h:mm:ss a"
+                                          )}
+                                        >
+                                          <small className="text-[#80878b]">
+                                            {moment(item?.doneAt)
+                                              .endOf()
+                                              .fromNow()}
+                                          </small>
+                                        </Tooltip>
+                                      </div>
+                                    ),
+                                    color: "blue",
+                                    dot: activityUser[item?.module]?.icon,
+                                  }))
+                              ) : (
+                                <p className="my-10 text-center text-black">
+                                  No Data
+                                </p>
+                              )
+                            }
+                          />
+                        </div>
                       )}
                       <div />
                     </div>
@@ -4450,7 +4453,6 @@ const TenderDetails = ({
                               >
                                 {editingBid
                                   ? "Save changes"
-
                                   : "Submit Proposal"}
                               </button>
                               {/* <Form.Item>

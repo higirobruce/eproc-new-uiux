@@ -1443,26 +1443,41 @@ export default function Contracts() {
         bodyStyle={{ maxHeight: "700px", overflow: "scroll" }}
       >
         <div className="space-y-10 px-20 py-5 overflow-x-scroll">
-          <PrintPDF content={content} file={'Contract'} />
+          <PrintPDF content={content} file={"Contract"} />
           {/* Header */}
           <div className="flex flex-row justify-between items-center">
-            <Typography.Title level={4} className="flex flex-row items-center">
+            <div>
+              <Typography.Title
+                level={4}
+                className="flex flex-row items-center"
+                editable={
+                  editContract &&
+                  (contract?.status === "draft" ||
+                    contract?.status === "legal-review") && {
+                    text: contract?.title,
+                    onChange: (e) => {
+                      let c = { ...contract };
+                      c.title = e;
+                      setContract(c);
+                    },
+                  }
+                }
+              >
+                <div>{contract?.title}</div>
+              </Typography.Title>
               <div>
-                CONTRACT #{contract?.number}{" "}
-                <div>
-                  <Popover
-                    placement="topLeft"
-                    content={`${moment(contract?.startDate).format(
-                      "YYYY-MMM-DD"
-                    )} - ${moment(contract?.endDate).format("YYYY-MMM-DD")}`}
-                  >
-                    <div className="text-xs font-thin text-gray-500">
-                      Expires in {moment(contract?.endDate).fromNow()}
-                    </div>
-                  </Popover>
-                </div>
+                <Popover
+                  placement="topLeft"
+                  content={`${moment(contract?.startDate).format(
+                    "YYYY-MMM-DD"
+                  )} - ${moment(contract?.endDate).format("YYYY-MMM-DD")}`}
+                >
+                  <div className="text-xs font-thin text-gray-500">
+                    Expires in {moment(contract?.endDate).fromNow()}
+                  </div>
+                </Popover>
               </div>
-            </Typography.Title>
+            </div>
             {/* {contract?.status !== "draft" && (
               <Button icon={<PrinterOutlined />}>Print</Button>
             )} */}
@@ -1508,7 +1523,23 @@ export default function Contracts() {
                 <Typography.Text type="secondary">
                   <div className="text-xs">Hereinafter refferd to as</div>
                 </Typography.Text>
-                <Typography.Text strong>Sender</Typography.Text>
+                <Typography.Text
+                  strong
+                  editable={
+                    editContract &&
+                    (contract?.status === "draft" ||
+                      contract?.status === "legal-review") && {
+                      text: contract?.senderPartyLabel || "Sender",
+                      onChange: (e) => {
+                        let c = { ...contract };
+                        c.senderPartyLabel = e;
+                        setContract(c);
+                      },
+                    }
+                  }
+                >
+                  {contract?.senderPartyLabel || "Sender"}
+                </Typography.Text>
               </div>
             </div>
 
@@ -1542,7 +1573,23 @@ export default function Contracts() {
                 <Typography.Text type="secondary">
                   <div className="text-xs">Hereinafter refferd to as</div>
                 </Typography.Text>
-                <Typography.Text strong>Receiver</Typography.Text>
+                <Typography.Text
+                  strong
+                  editable={
+                    editContract &&
+                    (contract?.status === "draft" ||
+                      contract?.status === "legal-review") && {
+                      text: contract?.receiverPartyLabel || "Receiver",
+                      onChange: (e) => {
+                        let c = { ...contract };
+                        c.receiverPartyLabel = e;
+                        setContract(c);
+                      },
+                    }
+                  }
+                >
+                  {contract?.receiverPartyLabel || "Receiver"}
+                </Typography.Text>
               </div>
             </div>
           </div>
