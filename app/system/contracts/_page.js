@@ -456,7 +456,7 @@ export default function Contracts() {
                   <div className="text-xs">Company Address</div>
                 </Typography.Text>
                 <Typography.Text strong>
-                  Irembo Campass Nyarutarama KG 9 Ave
+                  KG 9 Avenue, Nyarutarama Kigali Rwanda
                 </Typography.Text>
               </div>
 
@@ -884,7 +884,7 @@ export default function Contracts() {
             <Typography.Title level={4} className="flex flex-row items-center">
               <div>
                 CONTRACTOR #{contract?.number}{" "}
-                <div>
+                {/* <div>
                   <Popover
                     placement="topLeft"
                     content={`${moment(contract?.startDate).format(
@@ -895,7 +895,7 @@ export default function Contracts() {
                       Expires in {moment(contract?.endDate).fromNow()}
                     </div>
                   </Popover>
-                </div>
+                </div> */}
               </div>
             </Typography.Title>
             {/* {contract?.status !== "draft" && (
@@ -927,7 +927,7 @@ export default function Contracts() {
                   <div className="text-xs">Company Address</div>
                 </Typography.Text>
                 <Typography.Text strong>
-                  Irembo Campass Nyarutarama KG 9 Ave
+                  KG 9 Avenue, Nyarutarama Kigali Rwanda
                 </Typography.Text>
               </div>
 
