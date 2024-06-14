@@ -1966,7 +1966,7 @@ const TenderDetails = ({
         <div className="space-y-10 px-20 py-5">
           {contextHolder}
           <Typography.Title level={4}>
-            CONTRACT: {vendor?.companyName}
+            {contract?.title || vendor?.companyName}
           </Typography.Title>
           <div className="grid grid-cols-2 w-1/2">
             <div>
@@ -3131,7 +3131,7 @@ const TenderDetails = ({
           <div className="flex flex-row justify-between items-center">
             <Typography.Title level={4} className="flex flex-row items-center">
               <div>
-                CONTRACT: {contract?.title || contract?.vendor?.companyName}{" "}
+                {contract?.title || contract?.vendor?.companyName}{" "}
                 <div>
                   <Popover
                     placement="topLeft"

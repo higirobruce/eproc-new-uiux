@@ -1463,7 +1463,7 @@ export default function Contracts() {
                   }
                 }
               >
-                <div>{contract?.title}</div>
+                <div>{contract?.title || contract?.vendor?.companyName}</div>
               </Typography.Title>
               <div>
                 <Popover
