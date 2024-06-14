@@ -140,8 +140,10 @@ const DepartmentsTable = ({
   const [count, setCount] = useState(dataSource?.length + 1);
   // const [rowForm] = Form.useForm();
   const [openCreateDepartment, setOpenCreateDepartment] = useState(false);
+  const [openConfirmModal, setOpenConfirmModal] = useState(false);
   let [form] = Form.useForm();
 
+  let [editRow, setEditRow] = useState(false);
   const onFinish = (values) => {};
   const formItemLayout = {
     // labelCol: {
@@ -240,7 +242,8 @@ const DepartmentsTable = ({
     setCount(c + 1);
   };
 
-  const handleSave = (row) => {
+
+  const handleConfirm = (row) => {
     const newData = [...dataSource];
     const index = newData.findIndex((item) => row.key === item.key);
     const item = newData[index];
@@ -250,6 +253,11 @@ const DepartmentsTable = ({
     });
     handleUpdateRow(row, "department");
     setDataSource(newData);
+  };
+
+  const handleSave = (row) => {
+    setEditRow(row);
+    setOpenConfirmModal(true);
   };
 
   const handleHide = (row) => {
@@ -343,9 +351,32 @@ const DepartmentsTable = ({
     );
   }
 
+  function buildCofirmModal() {
+    return (
+      <Modal
+        centered
+        open={openConfirmModal}
+        onOk={() => {
+          handleConfirm(editRow);
+          // setOpenCreateServiceCategory(false);
+        }}
+        title="Editing a Department"
+        okText={"Yes"}
+        onCancel={() => setOpenConfirmModal(false)}
+        width={"30%"}
+        bodyStyle={{ maxHeight: "700px", overflow: "hidden" }}
+      >
+        <div className="p-10">
+          This will override the old information. Do you want to continue?
+        </div>
+      </Modal>
+    );
+  }
+
   return (
     <>
       {buildNewDepartmentModel()}
+      {buildCofirmModal()}
       <div className="flex flex-col gap-2 request-empty">
         <div className="flex items-center justify-between w-full">
           <div className="flex justify-between items-center">

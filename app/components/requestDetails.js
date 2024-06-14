@@ -89,6 +89,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import UploadOtherFiles from "./uploadOtherFiles";
 import { Dialog, Transition } from "@headlessui/react";
+import { activityUser } from "../utils/helpers";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -442,6 +443,7 @@ const RequestDetails = ({
   const [creatingPO, setCreatingPO] = useState(false);
   const [comment, setComment] = useState("");
   const [rate, setRate] = useState(0);
+  const [prActivityData, setprActivityData] = useState([]);
 
   const [assetOptions, setAssetOptions] = useState([]);
 
@@ -461,6 +463,12 @@ const RequestDetails = ({
   const [tab, setTab] = useState(0);
   const contentHeight = useRef();
   const scrollRef = useRef();
+  const [contractTitle, setContractTitle] = useState("Contract title");
+  const [contractSender, setContractSender] = useState("Irembo Ltd");
+  const [contractReceiver, setContractReceiver] = useState("");
+  const [contractSenderParty, setContractSenderParty] = useState("Sender");
+  const [contractReceiverParty, setContractReceiverParty] =
+    useState("Receiver");
 
   const showPopconfirm = () => {
     setOpen(true);
@@ -569,6 +577,10 @@ const RequestDetails = ({
   let [budgetLines, setBudgetLines] = useState([]);
 
   useEffect(() => {
+    setContractReceiver(vendor?.companyName);
+  }, [vendor]);
+
+  useEffect(() => {
     refresh();
     let _openConfirmDeliv = [...openConfirmDeliv];
     let _deliveredQties = [...deliveredQties];
@@ -609,7 +621,7 @@ const RequestDetails = ({
 
     // console.log('Seeeeet Files', _p)
 
-    fetch(`${url}/serviceCategories`, {
+    fetch(`${url}/serviceCategories/?visible=1`, {
       method: "GET",
       headers: {
         Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
@@ -755,6 +767,7 @@ const RequestDetails = ({
     checkDirectPOExists(data);
     setReqAttachId(v4());
     getFixedAssets();
+    getPrActivity(data?._id);
     if (data) {
       checkContractExists();
       checkTenderExists(data);
@@ -788,6 +801,26 @@ const RequestDetails = ({
     if (po?.deliveryProgress >= 100) setCurrentStep(3);
   }, [tender, po]);
 
+  function getPrActivity(id) {
+    fetch(`${url}/requests/logs/${id}`, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setprActivityData(res);
+      })
+      .catch((err) => {
+        messageApi.open({
+          type: "error",
+          content: "Something happened! Please try again.",
+        });
+      });
+  }
   function getRequestStatus(code) {
     // if (code === 0) return "verified";
     if (code === 0) return "pending";
@@ -1600,7 +1633,7 @@ const RequestDetails = ({
             .filter((i) => i.itemType === "asset")
             .map((i, index) => {
               assetsNeeded = true;
-              i.currency = poCurrency
+              i.currency = poCurrency;
               i?.assetCodes?.map((a) => {
                 assetItems?.push({
                   ItemCode: a,
@@ -1615,7 +1648,7 @@ const RequestDetails = ({
           items
             .filter((i) => i.itemType === "non-asset" || !i.itemType)
             .map((i, index) => {
-              i.currency = poCurrency
+              i.currency = poCurrency;
               nonAssetItems?.push({
                 ItemDescription: i.title,
                 Quantity: i.quantity,
@@ -2289,7 +2322,11 @@ const RequestDetails = ({
                   contractStartDate,
                   contractEndDate,
                   signatories,
-                  refDoc === "Direct Contracting" ? reqAttachId : ""
+                  refDoc === "Direct Contracting" ? reqAttachId : "",
+                  "draft",
+                  contractTitle,
+                  contractSenderParty,
+                  contractReceiverParty
                 );
                 setOpenCreateContract(false);
               }
@@ -2351,7 +2388,10 @@ const RequestDetails = ({
                   contractEndDate,
                   signatories,
                   refDoc === "Direct Contracting" ? reqAttachId : "",
-                  "legal-review"
+                  "legal-review",
+                  contractTitle,
+                  contractSenderParty,
+                  contractReceiverParty
                 );
                 setOpenCreateContract(false);
               }
@@ -2369,8 +2409,20 @@ const RequestDetails = ({
       >
         <div className="space-y-10 px-20 py-5">
           {contextHolder}
-          <Typography.Title level={4}>
-            CONTRACT: {vendor?.companyName}
+          <Typography.Title
+            level={4}
+            className="flex flex-row"
+            editable={{
+              text: contractTitle,
+              onChange: (e) => {
+                // let _signatories = [...signatories];
+                // _signatories[index].title = e;
+                // setSignatories(_signatories);
+                setContractTitle(e);
+              },
+            }}
+          >
+            {contractTitle}
           </Typography.Title>
           <div className="grid grid-cols-2 w-1/2">
             <div>
@@ -2385,11 +2437,21 @@ const RequestDetails = ({
           </div>
           <div className="grid grid-cols-2 gap-5">
             <div className="flex flex-col ring-1 ring-gray-300 rounded p-5 space-y-3">
-              <div className="flex flex-col">
+              <div className="flex flex-col space-y-1">
                 <Typography.Text type="secondary">
                   <div className="text-xs">Company Name</div>
                 </Typography.Text>
-                <Typography.Text strong>Irembo ltd</Typography.Text>
+                <Typography.Text
+                  strong
+                  // editable={{
+                  //   text: contractSender,
+                  //   onChange: (e) => {
+                  //     setContractSender(e);
+                  //   },
+                  // }}
+                >
+                  Irembo Ltd
+                </Typography.Text>
               </div>
 
               <div className="flex flex-col">
@@ -2408,11 +2470,21 @@ const RequestDetails = ({
                 <Typography.Text strong>102911562</Typography.Text>
               </div>
 
-              <div className="flex flex-col">
+              <div className="flex flex-col space-y-1">
                 <Typography.Text type="secondary">
                   <div className="text-xs">Hereinafter refferd to as</div>
                 </Typography.Text>
-                <Typography.Text strong>Sender</Typography.Text>
+                <Typography.Text
+                  strong
+                  editable={{
+                    text: contractSenderParty,
+                    onChange: (e) => {
+                      setContractSenderParty(e);
+                    },
+                  }}
+                >
+                  {contractSenderParty}
+                </Typography.Text>
               </div>
             </div>
 
@@ -2421,7 +2493,17 @@ const RequestDetails = ({
                 <Typography.Text type="secondary">
                   <div className="text-xs">Company Name</div>
                 </Typography.Text>
-                <Typography.Text strong>{vendor?.companyName}</Typography.Text>
+                <Typography.Text
+                  strong
+                  // editable={{
+                  //   text: contractReceiver,
+                  //   onChange: (e) => {
+                  //     setContractReceiver(e);
+                  //   },
+                  // }}
+                >
+                  {vendor?.companyName}
+                </Typography.Text>
               </div>
 
               <div className="flex flex-col">
@@ -2438,11 +2520,21 @@ const RequestDetails = ({
                 </Typography.Text>
                 <Typography.Text strong>{vendor?.tin}</Typography.Text>
               </div>
-              <div className="flex flex-col">
+              <div className="flex flex-col space-y-1">
                 <Typography.Text type="secondary">
                   <div className="text-xs">Hereinafter refferd to as</div>
                 </Typography.Text>
-                <Typography.Text strong>Receiver</Typography.Text>
+                <Typography.Text
+                  strong
+                  editable={{
+                    text: contractReceiverParty,
+                    onChange: (e) => {
+                      setContractReceiverParty(e);
+                    },
+                  }}
+                >
+                  {contractReceiverParty}
+                </Typography.Text>
               </div>
             </div>
           </div>
@@ -3263,6 +3355,7 @@ const RequestDetails = ({
                         value={data?.budgetLine?._id}
                         disabled={disable}
                         onChange={(value, option) => {
+                          alert(value);
                           let r = { ...data };
                           r.budgetLine = value;
                           handleUpdateRequest(r);
@@ -3279,18 +3372,22 @@ const RequestDetails = ({
                             .toLowerCase()
                             .includes(inputValue.toLowerCase());
                         }}
-                        options={budgetLines.map((s) => {
-                          return {
-                            label: s.description.toUpperCase(),
-                            options: s.budgetlines.map((sub) => {
-                              return {
-                                label: sub.description,
-                                value: sub._id,
-                                title: sub.description,
-                              };
-                            }),
-                          };
-                        })}
+                        options={budgetLines
+                          .filter((s) => s.visible == true)
+                          .map((s) => {
+                            return {
+                              label: s.description.toUpperCase(),
+                              options: s.budgetlines
+                                .filter((s) => s.visible == true)
+                                .map((sub) => {
+                                  return {
+                                    label: sub.description,
+                                    value: sub._id,
+                                    title: sub.description,
+                                  };
+                                }),
+                            };
+                          })}
                       ></Select>
                     </div>
                   </div>
@@ -4030,7 +4127,79 @@ const RequestDetails = ({
                               )}
                           </div>
                         ) : (
-                          <div />
+                          <div className="bg-white rounded-lg pb-4 px-5">
+                            {contextHolder}
+                            {}
+                            <Timeline
+                              className="mt-8"
+                              // mode="alternate"
+                              items={
+                                prActivityData.length > 0 ? (
+                                  prActivityData
+                                    .filter((item) => item?.meta?.moduleMessage)
+                                    .map((item, k) => ({
+                                      children: (
+                                        <div className="flex flex-col mb-1">
+                                          {
+                                            <>
+                                              <div className="flex gap-x-3 items-center">
+                                                <Link
+                                                  className="text-blue-600"
+                                                  href={
+                                                    `/system/requests` +
+                                                    `/${item?.meta?.referenceId}`
+                                                  }
+                                                >
+                                                  Document
+                                                </Link>
+                                                <span className="text-[13px] text-[#80878b]">
+                                                  {" "}
+                                                  {item?.meta?.moduleMessage}
+                                                </span>
+                                                <Link
+                                                  className="text-blue-600"
+                                                  href={
+                                                    activityUser[
+                                                      item?.meta?.module
+                                                    ]?.path +
+                                                    `/${item?.meta?.doneBy?._id}`
+                                                  }
+                                                >
+                                                  {item?.meta?.doneBy
+                                                    ?.lastName +
+                                                    " " +
+                                                    item?.meta?.doneBy
+                                                      ?.firstName}
+                                                </Link>
+                                              </div>
+                                              <Tooltip
+                                                title={moment(
+                                                  item?.doneAt
+                                                ).format(
+                                                  "MMMM Do YYYY, h:mm:ss a"
+                                                )}
+                                              >
+                                                <small className="text-[#80878b]">
+                                                  {moment(item?.doneAt)
+                                                    .endOf()
+                                                    .fromNow()}
+                                                </small>
+                                              </Tooltip>
+                                            </>
+                                          }
+                                        </div>
+                                      ),
+                                      color: "blue",
+                                      dot: activityUser[item?.module]?.icon,
+                                    }))
+                                ) : (
+                                  <p className="my-10 text-center text-black">
+                                    No Data
+                                  </p>
+                                )
+                              }
+                            />
+                          </div>
                         )}
                       </div>
                     </Dialog.Panel>

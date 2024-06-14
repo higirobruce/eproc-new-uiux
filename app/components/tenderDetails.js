@@ -32,6 +32,7 @@ import {
   Popconfirm,
   Switch,
   Tooltip,
+  Timeline,
 } from "antd";
 import {
   CloseCircleOutlined,
@@ -72,6 +73,7 @@ import { LuHash, LuUser } from "react-icons/lu";
 import { Dialog, Transition } from "@headlessui/react";
 import { TiInfoLarge } from "react-icons/ti";
 import UploadOtherFiles from "./uploadOtherFiles";
+import { activityUser } from "../utils/helpers";
 
 const PrintPDF = dynamic(() => import("@/app/components/printPDF"), {
   srr: false,
@@ -120,7 +122,7 @@ const TenderDetails = ({
   user,
   handleSendEvalApproval,
   handleEditSubmission,
-  handleSetEdit
+  handleSetEdit,
 }) => {
   const [form] = Form.useForm();
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
@@ -181,6 +183,7 @@ const TenderDetails = ({
   const [tab, setTab] = useState(0);
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [tenderActivityData, setTenderActivityData] = useState();
   const contentHeight = useRef();
 
   const itemColumns =
@@ -396,6 +399,8 @@ const TenderDetails = ({
     setCurrentCode(1);
     setItems(data?.purchaseRequest?.items);
     getUsers();
+    tenderActivity(data?._id);
+
     if (data) checkSubmission();
     updateBidList();
     setProposalDocId(v4());
@@ -444,6 +449,27 @@ const TenderDetails = ({
   // useEffect(() => {
   //   if (editingBid) updateProposalFiles();
   // }, [editingBid]);
+
+  function tenderActivity(id) {
+    fetch(`${url}/tenders/logs/${id}`, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + window.btoa(`${apiUsername}:${apiPassword}`),
+        token: token,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setTenderActivityData(res);
+      })
+      .catch((err) => {
+        messageApi.open({
+          type: "error",
+          content: "Something happened! Please try again.",
+        });
+      });
+  }
 
   async function updateProposalFiles(editBid) {
     let uid = `rc-upload-${moment().milliseconds()}-1`;
@@ -720,9 +746,9 @@ const TenderDetails = ({
 
   function editSubmission(submissionData) {
     handleEditSubmission(submissionData, editBid?._id);
-    setEditingBid(false)
-    setTab(3)
-    setSaving(false)
+    setEditingBid(false);
+    setTab(3);
+    setSaving(false);
   }
 
   const handleUpload = () => {
@@ -3105,7 +3131,7 @@ const TenderDetails = ({
           <div className="flex flex-row justify-between items-center">
             <Typography.Title level={4} className="flex flex-row items-center">
               <div>
-                CONTRACT: {contract?.vendor?.companyName}{" "}
+                CONTRACT: {contract?.title || contract?.vendor?.companyName}{" "}
                 <div>
                   <Popover
                     placement="topLeft"
@@ -3166,7 +3192,9 @@ const TenderDetails = ({
                 <Typography.Text type="secondary">
                   <div className="text-xs">Hereinafter refferd to as</div>
                 </Typography.Text>
-                <Typography.Text strong>Sender</Typography.Text>
+                <Typography.Text strong>
+                  {contract?.senderPartyLabel || "Sender"}
+                </Typography.Text>
               </div>
             </div>
 
@@ -3200,7 +3228,9 @@ const TenderDetails = ({
                 <Typography.Text type="secondary">
                   <div className="text-xs">Hereinafter refferd to as</div>
                 </Typography.Text>
-                <Typography.Text strong>Receiver</Typography.Text>
+                <Typography.Text strong>
+                  {contract?.receiverPartyLable || "Receiver"}
+                </Typography.Text>
               </div>
             </div>
           </div>
@@ -3697,7 +3727,7 @@ const TenderDetails = ({
                 </div>
               )}
             </div>
-            <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1">
+            <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1">
               <div className="flex flex-col items-start">
                 <div className="text-[14px] font-medium m-3 text-[#344767]">
                   Tender Number
@@ -3716,14 +3746,14 @@ const TenderDetails = ({
                 </div>
               </div>
 
-              <div className="flex flex-col items-start">
+              {/* <div className="flex flex-col items-start">
                 <div className="text-[14px] font-medium m-3 text-[#344767]">
                   Due date
                 </div>
                 <div className="text-[13px] mt-2 font-medium ml-3 text-[#87A1AA]">
                   {moment(data?.dueDate).format("YYYY-MMM-DD")}
                 </div>
-              </div>
+              </div> */}
 
               <div className="flex flex-col space-y-3">
                 <div className="text-[14px] font-medium mt-3 text-[#344767]">
@@ -4110,54 +4140,132 @@ const TenderDetails = ({
                           >
                             Related Docs
                           </button>
+                          <button
+                            className={`bg-transparent py-3 my-3 ${
+                              referenceTab == 1
+                                ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 border-solid text-[#263238] px-4`
+                                : `border-none text-[#8392AB]`
+                            } text-[14px] cursor-pointer`}
+                            onClick={() => setReferenceTab(1)}
+                          >
+                            Audit Tracking
+                          </button>
                         </div>
                       </div>
-                      {contract && (
+                      {referenceTab == 0 ? (
                         <>
-                          <h4 className="mb-2 mt-4 font-semibold ml-6">
-                            Contract Reference
-                          </h4>
-                          <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
-                            <Link
-                              href={`/system/contracts/${contract?._id}`}
-                              className="font-bold text-[16px] no-underline text-blue-600"
-                            >
-                              {contract?.number}
-                            </Link>
-                          </div>
+                          {contract && (
+                            <>
+                              <h4 className="mb-2 mt-4 font-semibold ml-6">
+                                Contract Reference
+                              </h4>
+                              <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                                <Link
+                                  href={`/system/contracts/${contract?._id}`}
+                                  className="font-bold text-[16px] no-underline text-blue-600"
+                                >
+                                  {contract?.number}
+                                </Link>
+                              </div>
+                            </>
+                          )}
+                          {po && (
+                            <>
+                              <h4 className="mb-2 mt-4 font-semibold ml-6">
+                                PO Reference
+                              </h4>
+                              <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                                <Link
+                                  href={`/system/purchase-orders/${po?._id}`}
+                                  className="font-bold text-[16px] no-underline text-blue-600"
+                                >
+                                  {po?.number}
+                                </Link>
+                              </div>
+                            </>
+                          )}
+                          {data?.purchaseRequest && (
+                            <>
+                              <h4 className="mb-2 mt-4 font-semibold ml-6">
+                                Requests Reference
+                              </h4>
+                              <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
+                                <Link
+                                  href={`/system/requests/${
+                                    data?.purchaseRequest?._id
+                                  }/?page=${1}&filter=${"all"}`}
+                                  className="font-bold text-[16px] no-underline text-blue-600"
+                                >
+                                  {data?.purchaseRequest?.number}
+                                </Link>
+                              </div>
+                            </>
+                          )}
                         </>
-                      )}
-                      {po && (
-                        <>
-                          <h4 className="mb-2 mt-4 font-semibold ml-6">
-                            PO Reference
-                          </h4>
-                          <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
-                            <Link
-                              href={`/system/purchase-orders/${po?._id}`}
-                              className="font-bold text-[16px] no-underline text-blue-600"
-                            >
-                              {po?.number}
-                            </Link>
-                          </div>
-                        </>
-                      )}
-                      {data?.purchaseRequest && (
-                        <>
-                          <h4 className="mb-2 mt-4 font-semibold ml-6">
-                            Requests Reference
-                          </h4>
-                          <div className="flex flex-col gap-y-1 ml-5 bg-[#F8F9FA] p-3 my-1">
-                            <Link
-                              href={`/system/requests/${
-                                data?.purchaseRequest?._id
-                              }/?page=${1}&filter=${"all"}`}
-                              className="font-bold text-[16px] no-underline text-blue-600"
-                            >
-                              {data?.purchaseRequest?.number}
-                            </Link>
-                          </div>
-                        </>
+                      ) : (
+                        <div className="bg-white rounded-lg pb-4 px-5">
+                          {contextHolder}
+                          <Timeline
+                            className="mt-8"
+                            // mode="alternate"
+                            items={
+                              tenderActivityData.length > 0 ? (
+                                tenderActivityData
+                                  .filter((item) => item?.meta?.moduleMessage)
+                                  .map((item, k) => ({
+                                    children: (
+                                      <div className="flex flex-col mb-1">
+                                        <div className="flex gap-x-3 items-center">
+                                          <Link
+                                            className="text-blue-600"
+                                            href={
+                                              `/system/payment-requests` +
+                                              `/${item?.meta?.referenceId}`
+                                            }
+                                          >
+                                            Document
+                                          </Link>
+                                          <span className="text-[13px] text-[#80878b]">
+                                            {" "}
+                                            {item?.meta?.moduleMessage}
+                                          </span>
+                                          <Link
+                                            className="text-blue-600"
+                                            href={
+                                              activityUser[item?.meta?.module]
+                                                ?.path +
+                                              `/${item?.meta?.doneBy?._id}`
+                                            }
+                                          >
+                                            {item?.meta?.doneBy?.lastName +
+                                              " " +
+                                              item?.meta?.doneBy?.firstName}
+                                          </Link>
+                                        </div>
+                                        <Tooltip
+                                          title={moment(item?.doneAt).format(
+                                            "MMMM Do YYYY, h:mm:ss a"
+                                          )}
+                                        >
+                                          <small className="text-[#80878b]">
+                                            {moment(item?.doneAt)
+                                              .endOf()
+                                              .fromNow()}
+                                          </small>
+                                        </Tooltip>
+                                      </div>
+                                    ),
+                                    color: "blue",
+                                    dot: activityUser[item?.module]?.icon,
+                                  }))
+                              ) : (
+                                <p className="my-10 text-center text-black">
+                                  No Data
+                                </p>
+                              )
+                            }
+                          />
+                        </div>
                       )}
                       <div />
                     </div>
@@ -4345,7 +4453,6 @@ const TenderDetails = ({
                               >
                                 {editingBid
                                   ? "Save changes"
-
                                   : "Submit Proposal"}
                               </button>
                               {/* <Form.Item>

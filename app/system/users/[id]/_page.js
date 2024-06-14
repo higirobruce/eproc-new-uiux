@@ -49,7 +49,7 @@ async function getUserDetails(id, router) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       router.push("/auth");
-    } 
+    }
     // This will activate the closest `error.js` Error Boundary
     // console.log(id);
     return null;
@@ -62,7 +62,7 @@ async function getUserDetails(id, router) {
 export default function page({ params }) {
   const { user, login, logout } = useUser();
   // let user = JSON.parse(localStorage.getItem("user"));
-  let token = localStorage.getItem('token');
+  let token = localStorage.getItem("token");
   let router = useRouter();
   const [dataLoaded, setDataLoaded] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
@@ -103,7 +103,6 @@ export default function page({ params }) {
       .then((res) => res.json())
       .then((res) => {
         setDpts(res);
-        
       })
       .catch((err) => {
         messageApi.open({
@@ -341,7 +340,8 @@ export default function page({ params }) {
     let viewPermissionLable = "canView" + module;
 
     newUser.permissions[permissionLable] = canCreate;
-    if(module!=='PaymentRequests') newUser.permissions[editPermissionLable] = canCreate;
+    if (module !== "PaymentRequests")
+      newUser.permissions[editPermissionLable] = canCreate;
     newUser.permissions[viewPermissionLable] = canCreate;
 
     fetch(`${url}/users/${row?._id}`, {
@@ -668,13 +668,15 @@ export default function page({ params }) {
                         setRow(r);
                       }}
                     >
-                      {dpts?.map((dpt) => {
-                        return (
-                          <Select.Option key={dpt._id} value={dpt._id}>
-                            {dpt.description}
-                          </Select.Option>
-                        );
-                      })}
+                      {dpts
+                        ?.filter((s) => s.visible == true)
+                        .map((dpt) => {
+                          return (
+                            <Select.Option key={dpt._id} value={dpt._id}>
+                              {dpt.description}
+                            </Select.Option>
+                          );
+                        })}
                     </Select>
                   )}
                 </div>
@@ -741,10 +743,18 @@ export default function page({ params }) {
                     canCreateRequests={row?.permissions?.canCreateRequests}
                     canEditRequests={row?.permissions?.canEditRequests}
                     canViewRequests={row?.permissions?.canViewRequests}
-                    canApprovePaymentRequests={row?.permissions?.canApprovePaymentRequests}
-                    canCreatePaymentRequests={row?.permissions?.canCreatePaymentRequests}
-                    canEditPaymentRequests={row?.permissions?.canEditPaymentRequests}
-                    canViewPaymentRequests={row?.permissions?.canViewPaymentRequests}
+                    canApprovePaymentRequests={
+                      row?.permissions?.canApprovePaymentRequests
+                    }
+                    canCreatePaymentRequests={
+                      row?.permissions?.canCreatePaymentRequests
+                    }
+                    canEditPaymentRequests={
+                      row?.permissions?.canEditPaymentRequests
+                    }
+                    canViewPaymentRequests={
+                      row?.permissions?.canViewPaymentRequests
+                    }
                     canApproveTenders={row?.permissions?.canApproveTenders}
                     canCreateTenders={row?.permissions?.canCreateTenders}
                     canEditTenders={row?.permissions?.canEditTenders}

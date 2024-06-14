@@ -38,6 +38,7 @@ const PaymentRequestsTable = ({
   const antIcon = <LoadingOutlined style={{ fontSize: 9 }} spin />;
   const {page, setPage, filter, userPendingRequest, userRequest} = usePaymentContext()
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
+  let fendUrl = process.env.NEXT_PUBLIC_FTEND_URL;
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME;
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD;
 
@@ -331,34 +332,35 @@ const PaymentRequestsTable = ({
       ),
     },
 
-    // {
-    //   title: "Invoice (s) ",
-    //   key: "docs",
-    //   sorter: (a, b) => a?.status > b?.status,
-    //   render: (_, record) => (
-    //     <div className="flex flex-col text-xs">
-    //       {record?.docIds?.map((doc, index) => {
-    //         const truncatedFileName =
-    //           doc?.length >= 11
-    //             ? `${doc?.slice(0, 7)}... ${doc?.slice(doc?.lastIndexOf("."))}`
-    //             : doc;
-    //         return (
-    //           <Tooltip title={doc}>
-    //             <Typography.Text ellipsis>
-    //               <Link
-    //                 href={`${url}/file/paymentRequests/${doc}`}
-    //                 target="_blank"
-    //                 className="capitalize text-[12px] text-[#8392AB]"
-    //               >
-    //                 {truncatedFileName}
-    //               </Link>
-    //             </Typography.Text>
-    //           </Tooltip>
-    //         );
-    //       })}
-    //     </div>
-    //   ),
-    // },
+    {
+      title: "Supporting docs",
+      key: "docs",
+      // sorter: (a, b) => a?.status > b?.status,
+      render: (_, record) => (
+        <div className="flex flex-col text-xs">
+          {record?.docIds?.map((doc, index) => {
+            const truncatedFileName =
+              doc?.length >= 11
+                ? `${doc?.slice(0, 7)}... ${doc?.slice(doc?.lastIndexOf("."))}`
+                : doc;
+            return (
+              <Tooltip title={doc}>
+                <Typography.Text ellipsis>
+                  <Link
+                    // href={`${url}/file/paymentRequests/${doc}`}
+                    href={`${fendUrl}/api/?folder=paymentRequests&name=${doc}`}
+                    target="_blank"
+                    className="capitalize text-[12px] text-[#8392AB]"
+                  >
+                    {truncatedFileName}
+                  </Link>
+                </Typography.Text>
+              </Tooltip>
+            );
+          })}
+        </div>
+      ),
+    },
 
     // {
     //   title: "Action",

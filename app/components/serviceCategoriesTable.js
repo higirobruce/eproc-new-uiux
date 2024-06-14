@@ -48,6 +48,7 @@ const EditableCell = ({
   record,
   handleSave,
   disable,
+  // handleAskConfirm,
   ...restProps
 }) => {
   const [editing, setEditing] = useState(false);
@@ -97,9 +98,11 @@ const EditableCell = ({
           <InputNumber
             className="w-full"
             ref={inputRef}
-            onPressEnter={save}
+            // onPressEnter={save}
+            onPressEnter={() => save()}
             // placeholder={dataIndex === "title" ? "enter title" : "eg. 1000000"}
-            onBlur={save}
+            // onBlur={save}
+            onBlur={() => save()}
             size="small"
             disabled={disable}
           />
@@ -107,9 +110,10 @@ const EditableCell = ({
           <Input
             className="w-full"
             ref={inputRef}
-            onPressEnter={save}
+            onPressEnter={() => save()}
             // placeholder={dataIndex === "title" ? "enter title" : "eg. 1000000"}
-            onBlur={save}
+            // onBlur={save}
+            onBlur={() => save()}
             size="small"
             disabled={disable}
           />
@@ -135,15 +139,17 @@ const ServiceCategoriesTable = ({
   dataSource,
   disable,
   handleUpdateRow,
-  handleRefresh
+  handleRefresh,
 }) => {
   const [count, setCount] = useState(dataSource?.length + 1);
   let token = typeof window !== "undefined" && localStorage.getItem("token");
   const [rowForm] = Form.useForm();
   const [openCreateServiceCategory, setOpenCreateServiceCategory] =
     useState(false);
+  const [openConfirmModal, setOpenConfirmModal] = useState(false);
   let [form] = Form.useForm();
 
+  let [editRow, setEditRow] = useState(false);
   const handleDelete = (key) => {
     const newData = dataSource.filter((item) => item.key !== key && item.key);
     setCount(count - 1);
@@ -242,7 +248,7 @@ const ServiceCategoriesTable = ({
     setCount(c + 1);
   };
 
-  const handleSave = (row) => {
+  const handleConfirm = (row) => {
     const newData = [...dataSource];
     const index = newData.findIndex((item) => row.key === item.key);
     const item = newData[index];
@@ -252,6 +258,11 @@ const ServiceCategoriesTable = ({
     });
     handleUpdateRow(row, "serviceCategory");
     setDataSource(newData);
+  };
+
+  const handleSave = (row) => {
+    setEditRow(row);
+    setOpenConfirmModal(true);
   };
 
   const handleHide = (row) => {
@@ -285,6 +296,7 @@ const ServiceCategoriesTable = ({
         dataIndex: col.dataIndex,
         number: col.number,
         handleSave,
+        // handleAskConfirm,
       }),
     };
   });
@@ -344,9 +356,33 @@ const ServiceCategoriesTable = ({
       </Modal>
     );
   }
+
+  function buildCofirmModal() {
+    return (
+      <Modal
+        centered
+        open={openConfirmModal}
+        onOk={() => {
+          handleConfirm(editRow);
+          // setOpenCreateServiceCategory(false);
+        }}
+        title="Editing a Service category"
+        okText={"Yes"}
+        onCancel={() => setOpenConfirmModal(false)}
+        width={"30%"}
+        bodyStyle={{ maxHeight: "700px", overflow: "hidden" }}
+      >
+        <div className="p-10">
+          This will override the old information. Do you want to continue?
+        </div>
+      </Modal>
+    );
+  }
+  
   return (
     <>
       {buildNewServiceCategoryModel()}
+      {buildCofirmModal()}
       <div className="flex flex-col gap-2 request-empty">
         <div className="flex items-center justify-between w-full">
           <div className="flex justify-between items-center">

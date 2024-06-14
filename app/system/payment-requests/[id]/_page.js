@@ -313,7 +313,7 @@ export default function PaymentRequest({ params }) {
           setTotalPaid(res?.totalPaymentVal);
         });
 
-      setAmount(res?.amount)
+      setAmount(res?.amount);
       let statusCode = getRequestStatusCode(res?.status);
       setCurrentCode(statusCode);
       setBudgeted(res?.budgeted);
@@ -378,8 +378,7 @@ export default function PaymentRequest({ params }) {
       });
   }, [po]);
 
-  useEffect(() => {
-  }, [files]);
+  useEffect(() => {}, [files]);
 
   function getPoTotalVal() {
     let t = 0;
@@ -749,7 +748,7 @@ export default function PaymentRequest({ params }) {
           setFiles(_files);
         });
       });
-      setAmount(res?.amount)
+      setAmount(res?.amount);
       setPo(res?.purchaseOrder);
       let statusCode = getRequestStatusCode(res?.status);
       setCurrentCode(statusCode);
@@ -1307,18 +1306,22 @@ export default function PaymentRequest({ params }) {
                             .toLowerCase()
                             .includes(inputValue.toLowerCase());
                         }}
-                        options={budgetLines.map((s) => {
-                          return {
-                            label: s.description.toUpperCase(),
-                            options: s.budgetlines.map((sub) => {
-                              return {
-                                label: sub.description,
-                                value: sub._id,
-                                title: sub.description,
-                              };
-                            }),
-                          };
-                        })}
+                        options={budgetLines
+                          .filter((s) => s.visible == true)
+                          .map((s) => {
+                            return {
+                              label: s.description.toUpperCase(),
+                              options: s.budgetlines
+                                .filter((s) => s.visible == true)
+                                .map((sub) => {
+                                  return {
+                                    label: sub.description,
+                                    value: sub._id,
+                                    title: sub.description,
+                                  };
+                                }),
+                            };
+                          })}
                       ></Select>
                     </Form.Item>
                   )}
@@ -1388,14 +1391,20 @@ export default function PaymentRequest({ params }) {
                       className={`font-semibold
                   
                       ${
-                        amount > getPoTotalVal().grossTotal - totalPaymentVal + paymentRequest?.amount &&
-                        "text-red-500"
+                        amount >
+                          getPoTotalVal().grossTotal -
+                            totalPaymentVal +
+                            paymentRequest?.amount && "text-red-500"
                       }
                   `}
                     >
                       {po?.items[0]?.currency +
                         " " +
-                        (totalPaymentVal + amount - paymentRequest?.amount)?.toLocaleString()}
+                        (
+                          totalPaymentVal +
+                          amount -
+                          paymentRequest?.amount
+                        )?.toLocaleString()}
                     </div>
                   </div>
                 </Typography.Text>

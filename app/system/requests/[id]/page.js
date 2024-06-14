@@ -89,33 +89,31 @@ export default function page({ params }) {
     loadData();
   }, []);
 
-
   function loadData() {
     geRequestDetails(params?.id, router, messageApi).then(async (res) => {
       let paths = await res?.supportingDocs?.map(async (path, i) => {
-            let uid = `rc-upload-${moment().milliseconds()}-${i}`;
-            let _url = `${url}/file/termsOfReference/${path}`;
-            let exists = await fileExists(
-              `${url}/check/file/termsOfReference/${path}`
-            );
-            let status = "done";
-            let name = `${path}`;
+        let uid = `rc-upload-${moment().milliseconds()}-${i}`;
+        let _url = `${url}/file/termsOfReference/${path}`;
+        let exists = await fileExists(
+          `${url}/check/file/termsOfReference/${path}`
+        );
+        let status = "done";
+        let name = `${path}`;
 
-            let reader = new FileReader();
-            const r = await fetch(_url);
-            const blob = await r.blob();
-            let p = new File([blob], name, { uid });
-            p.uid = uid;
-            p.exists = exists;
-            p.url = _url;
-            return p;
-          });
+        let reader = new FileReader();
+        const r = await fetch(_url);
+        const blob = await r.blob();
+        let p = new File([blob], name, { uid });
+        p.uid = uid;
+        p.exists = exists;
+        p.url = _url;
+        return p;
+      });
       let ps = paths
         ? await Promise.all(paths).then((values) => {
             return values;
           })
         : null;
-
 
       // request?.supportingDocs?.map(async (doc, i) => {
       //   let uid = `rc-upload-${moment().milliseconds()}-${i}`;
@@ -372,7 +370,10 @@ export default function page({ params }) {
     contractEndDate,
     signatories,
     reqAttachmentDocId,
-    status
+    status,
+    contractTitle,
+    contractSenderParty,
+    contractReceiverParty
   ) {
     fetch(`${url}/contracts/`, {
       method: "POST",
@@ -392,6 +393,9 @@ export default function page({ params }) {
         reqAttachmentDocId,
         request: rowData?._id,
         status,
+        title: contractTitle,
+        senderPartyLabel: contractSenderParty,
+        receiverPartyLabel: contractReceiverParty,
       }),
     })
       .then((res) => getResultFromServer(res))
@@ -638,7 +642,10 @@ export default function page({ params }) {
           >
             Return to List
           </Button>
-          <button onClick={() => setShow(true)} className="cursor-pointer bg-transparent px-1.5 py-1 rounded-full border-solid border-2 border-[#FFF]">
+          <button
+            onClick={() => setShow(true)}
+            className="cursor-pointer bg-transparent px-1.5 py-1 rounded-full border-solid border-2 border-[#FFF]"
+          >
             <TiInfoLarge className="text-[#FFF]" />
           </button>
         </div>
