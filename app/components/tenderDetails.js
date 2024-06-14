@@ -1464,7 +1464,7 @@ const TenderDetails = ({
                   <div className="text-xs">Company Address</div>
                 </Typography.Text>
                 <Typography.Text strong>
-                  Irembo Campass Nyarutarama KG 9 Ave
+                  KG 9 Avenue, Nyarutarama Kigali Rwanda
                 </Typography.Text>
               </div>
 
@@ -1993,7 +1993,7 @@ const TenderDetails = ({
                   <div className="text-xs">Company Address</div>
                 </Typography.Text>
                 <Typography.Text strong>
-                  Irembo Campass Nyarutarama KG 9 Ave
+                  KG 9 Avenue, Nyarutarama Kigali Rwanda
                 </Typography.Text>
               </div>
 
@@ -2326,7 +2326,7 @@ const TenderDetails = ({
                 <div className="text-xs">Company Address</div>
               </Typography.Text>
               <Typography.Text strong>
-                Irembo Campass Nyarutarama KG 9 Ave
+                KG 9 Avenue, Nyarutarama Kigali Rwanda
               </Typography.Text>
             </div>
 
@@ -2827,7 +2827,7 @@ const TenderDetails = ({
                   <div className="text-xs">Company Address</div>
                 </Typography.Text>
                 <Typography.Text strong>
-                  Irembo Campass Nyarutarama KG 9 Ave
+                  KG 9 Avenue, Nyarutarama Kigali Rwanda
                 </Typography.Text>
               </div>
 
@@ -3132,7 +3132,7 @@ const TenderDetails = ({
             <Typography.Title level={4} className="flex flex-row items-center">
               <div>
                 {contract?.title || contract?.vendor?.companyName}{" "}
-                <div>
+                {/* <div>
                   <Popover
                     placement="topLeft"
                     content={`${moment(contract?.startDate).format(
@@ -3143,7 +3143,7 @@ const TenderDetails = ({
                       Expires in {moment(contract?.endDate).fromNow()}
                     </div>
                   </Popover>
-                </div>
+                </div> */}
               </div>
             </Typography.Title>
             {/* {contract?.status !== "draft" && (
@@ -3177,7 +3177,7 @@ const TenderDetails = ({
                   <div className="text-xs">Company Address</div>
                 </Typography.Text>
                 <Typography.Text strong>
-                  Irembo Campass Nyarutarama KG 9 Ave
+                  KG 9 Avenue, Nyarutarama Kigali Rwanda
                 </Typography.Text>
               </div>
 

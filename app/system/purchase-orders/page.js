@@ -503,7 +503,7 @@ export default function PurchaseOrders() {
                   <div className="text-xs">Company Address</div>
                 </Typography.Text>
                 <Typography.Text strong>
-                  Irembo Campass Nyarutarama KG 9 Ave
+                  KG 9 Avenue, Nyarutarama Kigali Rwanda
                 </Typography.Text>
               </div>
 
@@ -995,7 +995,7 @@ export default function PurchaseOrders() {
                 <div className="text-xs">Company Address</div>
               </Typography.Text>
               <Typography.Text strong>
-                Irembo Campass Nyarutarama KG 9 Ave
+                KG 9 Avenue, Nyarutarama Kigali Rwanda
               </Typography.Text>
             </div>
 
