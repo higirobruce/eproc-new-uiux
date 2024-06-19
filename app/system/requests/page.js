@@ -908,9 +908,8 @@ export default function UserRequests() {
     let _data = data?.map((d) => {
       let totalAmount = 0;
       d?.items?.map((i) => {
-        totalAmount += i?.estimatedUnitCost;
+        totalAmount += i?.estimatedUnitCost * i?.quantity;
       });
-
       return {
         id: d?._id,
         "Request Number": d?.number,
