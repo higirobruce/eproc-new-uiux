@@ -106,7 +106,7 @@ export default function UserRequests() {
   let [searchStatus, setSearchStatus] = useState(
     statusFilter ? statusFilter : "all"
   );
-  let [searchText, setSearchText] = useState("offi");
+  let [searchText, setSearchText] = useState("");
   const [form] = Form.useForm();
   const [onlyMine, setOnlyMine] = useState(
     !user?.permissions?.canApproveAsHof &&
@@ -1132,6 +1132,8 @@ export default function UserRequests() {
                   <Input
                     placeholder="Search by request #, Initiator"
                     className="border-0 text-[#8392AB] bg-transparent text-[15px] hover:bg-transparent hover:border-none hover:outline-none"
+                    value={searchText}
+                    autoFocus={true}
                     onChange={(e) => {
                       setSearchText(e?.target?.value);
                     }}

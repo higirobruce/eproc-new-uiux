@@ -36,8 +36,8 @@ import NotificationComponent from "@/app/hooks/useMobile";
 export default function Tenders() {
   const { user, login, logout } = useUser();
   // let user = JSON.parse(typeof window !== 'undefined' && localStorage.getItem("user"));
-  let router = useRouter()
-  let token = typeof window !== 'undefined' && localStorage.getItem("token");
+  let router = useRouter();
+  let token = typeof window !== "undefined" && localStorage.getItem("token");
   const [dataLoaded, setDataLoaded] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   let url = process.env.NEXT_PUBLIC_BKEND_URL;
@@ -276,7 +276,7 @@ export default function Tenders() {
       return res.json();
     }
   }
-  
+
   return (
     <>
       {isMobile && <NotificationComponent />}
@@ -327,21 +327,21 @@ export default function Tenders() {
             <div />
             <div className="flex items-center gap-5">
               <Select
-                  // mode="tags"
-                  className="text-[9px] w-32 rounded-sm"
-                  placeholder="Select status"
-                  onChange={(value) => setSearchStatus(value)}
-                  value={searchStatus}
-                  options={[
-                    // { value: "mine", label: "My requests" },
-                    { value: "all", label: "All" },
-                    { value: "open", label: "Open" },
-                    {
-                      value: "closed",
-                      label: "Closed",
-                    },
-                  ]}
-                />
+                // mode="tags"
+                className="text-[9px] w-32 rounded-sm"
+                placeholder="Select status"
+                onChange={(value) => setSearchStatus(value)}
+                value={searchStatus}
+                options={[
+                  // { value: "mine", label: "My requests" },
+                  { value: "all", label: "All" },
+                  { value: "open", label: "Open" },
+                  {
+                    value: "closed",
+                    label: "Closed",
+                  },
+                ]}
+              />
               <Button
                 type="text"
                 className="bg-white h-8 text-[#0063CF]"
@@ -359,13 +359,15 @@ export default function Tenders() {
                   onChange={(e) => {
                     setSearchText(e?.target?.value);
                   }}
+                  value={searchText}
+                  autoFocus={true}
                   placeholder="Search by tender#, request#"
                   className="border-0 text-[#8392AB] bg-transparent text-[15px] hover:border-none hover:outline-none"
                 />
                 <div></div>
               </div>
             </div>
-          
+
             <TendersTable
               handleSetRow={handleSetRow}
               dataSet={tempDataset}
