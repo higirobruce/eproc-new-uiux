@@ -209,7 +209,7 @@ export default function PurchaseOrders() {
   }, [po]);
 
   function refresh(userInitiated) {
-    userInitiated && setDataLoaded(false);
+    setDataLoaded(false);
     if (user?.userType === "VENDOR") {
       fetch(
         `${url}/purchaseOrders/byVendorId/${user?._id}?status=${searchStatus}`,
@@ -1347,6 +1347,8 @@ export default function PurchaseOrders() {
                     onChange={(e) => {
                       setSearchText(e?.target?.value);
                     }}
+                    autoFocus={true}
+                    value={searchText}
                     placeholder="Search by po#, vendor name"
                   />
                   {/* <Input.Search
