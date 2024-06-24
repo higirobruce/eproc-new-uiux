@@ -57,10 +57,19 @@ export default function UserRequests() {
   const search = searchParams.get("search");
   const statusFilter = searchParams.get("filter");
   const ownPendingRequest = searchParams.get("myApproval");
-  const ownRequest = searchParams.get('myRequest')
+  const ownRequest = searchParams.get("myRequest");
 
   // Routing Context
-  const { setPage, setFilter, filter, page, userPendingRequest, setUserPendingRequest, userRequest, setUserRequest } = usePaymentContext();
+  const {
+    setPage,
+    setFilter,
+    filter,
+    page,
+    userPendingRequest,
+    setUserPendingRequest,
+    userRequest,
+    setUserRequest,
+  } = usePaymentContext();
 
   const [dataLoaded, setDataLoaded] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
@@ -98,7 +107,7 @@ export default function UserRequests() {
     setPage(pagination ? pagination : 1);
     setFilter(statusFilter ? statusFilter : "all");
     setUserPendingRequest(ownPendingRequest ? ownPendingRequest : false);
-    setUserRequest(ownRequest ? ownRequest : onlyMine)
+    setUserRequest(ownRequest ? ownRequest : onlyMine);
   }, [pagination, statusFilter, ownPendingRequest, ownRequest]);
 
   useEffect(() => {
@@ -128,7 +137,7 @@ export default function UserRequests() {
   useEffect(() => {
     setDataLoaded(false);
     let requestUrl =
-      (userRequest || onlyMine || user?.userType === "VENDOR")
+      userRequest || onlyMine || user?.userType === "VENDOR"
         ? `${url}/paymentRequests/byStatus/${filter ? filter : searchStatus}/${
             user?._id
           }`
@@ -148,7 +157,7 @@ export default function UserRequests() {
         setDataLoaded(true);
         setDataset(res);
         setTempDataset(res);
-        getMyPendingRequest(userPendingRequest, res)
+        getMyPendingRequest(userPendingRequest, res);
       })
       .catch((err) => {
         messageApi.open({
@@ -157,7 +166,6 @@ export default function UserRequests() {
         });
       });
   }, [searchStatus, onlyMine, search, filter]);
-
 
   useEffect(() => {
     fetch(`${url}/users/${user?._id}`, {
@@ -199,13 +207,14 @@ export default function UserRequests() {
 
   async function loadRequests() {
     // setDataLoaded(false);
-    let requestUrl = (onlyMine || userRequest)
-      ? `${url}/paymentRequests/byStatus/${filter ? filter : searchStatus}/${
-          user?._id
-        }`
-      : `${url}/paymentRequests/byStatus/${
-          filter ? filter : searchStatus
-        }/${null}`;
+    let requestUrl =
+      onlyMine || userRequest
+        ? `${url}/paymentRequests/byStatus/${filter ? filter : searchStatus}/${
+            user?._id
+          }`
+        : `${url}/paymentRequests/byStatus/${
+            filter ? filter : searchStatus
+          }/${null}`;
     // let requestUrl =
     //   searchStatus === "mine"
     //     ? `${url}/requests/${user?._id}`
@@ -225,7 +234,7 @@ export default function UserRequests() {
     let filterData = tempDataset;
     setMyPendingRequest(value);
     setUserPendingRequest(value);
-    
+
     let filtered = [];
     if (value) {
       const forHod = filterData.filter(
@@ -518,7 +527,7 @@ export default function UserRequests() {
                       <Checkbox
                         checked={onlyMine || userRequest}
                         onChange={(e) => {
-                          setUserRequest(e.target.checked)
+                          setUserRequest(e.target.checked);
                           setOnlyMine(e.target.checked);
                         }}
                       />
@@ -534,6 +543,8 @@ export default function UserRequests() {
                     onChange={(e) => {
                       setSearchText(e?.target?.value);
                     }}
+                    value={searchText}
+                    autoFocus={true}
                     placeholder="Search by request#, po#, initiator"
                     className="border-0 text-[#8392AB] bg-transparent text-[15px] hover:border-none hover:outline-none"
                   />

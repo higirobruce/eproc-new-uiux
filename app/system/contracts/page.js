@@ -189,29 +189,29 @@ export default function Contracts() {
 
   useEffect(() => {
     getContracts();
-  }, [currentPage, pageSize, searchStatus]);
+  }, [currentPage, pageSize, searchStatus, searchText]);
 
-  useEffect(() => {
-    if (searchText === "") {
-      getContracts();
-    } else {
-      let _dataSet = [...contracts];
-      let filtered = _dataSet.filter((d) => {
-        return (
-          d?.number
-            ?.toString()
-            .toLowerCase()
-            .indexOf(searchText.toLowerCase()) > -1 ||
-          d?.vendor?.companyName
-            ?.toString()
-            .toLowerCase()
-            .indexOf(searchText.toLowerCase()) > -1
-        );
-      });
-      setTempContracts(filtered);
-      // else setTempDataset(dataset)
-    }
-  }, [searchText]);
+  // useEffect(() => {
+  //   if (searchText === "") {
+  //     getContracts();
+  //   } else {
+  //     let _dataSet = [...contracts];
+  //     let filtered = _dataSet.filter((d) => {
+  //       return (
+  //         d?.number
+  //           ?.toString()
+  //           .toLowerCase()
+  //           .indexOf(searchText.toLowerCase()) > -1 ||
+  //         d?.vendor?.companyName
+  //           ?.toString()
+  //           .toLowerCase()
+  //           .indexOf(searchText.toLowerCase()) > -1
+  //       );
+  //     });
+  //     setTempContracts(filtered);
+  //     // else setTempDataset(dataset)
+  //   }
+  // }, [searchText]);
 
   useEffect(() => {
     if (openViewContract) {
@@ -948,7 +948,7 @@ export default function Contracts() {
         });
     } else {
       fetch(
-        `${url}/contracts/byStatus/${searchStatus}?pagesize=${pageSize}&page=${currentPage}`,
+        `${url}/contracts/byStatus/${searchStatus}?search=${searchText}&pagesize=${pageSize}&page=${currentPage}`,
         {
           method: "GET",
           headers: {
@@ -2727,6 +2727,8 @@ export default function Contracts() {
                     onChange={(e) => {
                       setSearchText(e?.target?.value);
                     }}
+                    value={searchText}
+                    autoFocus={true}
                     placeholder="Search by contract#, vendor name"
                   />
                   <div></div>

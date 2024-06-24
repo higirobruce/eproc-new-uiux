@@ -766,6 +766,8 @@ export default function Users() {
                   onChange={(e) => {
                     setSearchText(e?.target?.value);
                   }}
+                  value={searchText}
+                  autoFocus={true}
                   placeholder="Search Email, Names"
                   className="border-0 text-[#8392AB] bg-transparent text-[15px] hover:border-none hover:outline-none"
                 />
@@ -1304,7 +1306,7 @@ export default function Users() {
                         // mode="multiple"
                         // allowClear
                         // style={{width:'100%'}}
-                        
+
                         size="large"
                         placeholder="Please select"
                       >

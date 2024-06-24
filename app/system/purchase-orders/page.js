@@ -181,29 +181,16 @@ export default function PurchaseOrders() {
   const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
-    refresh();
+    refresh(false);
   }, [currentPage, pageSize]);
 
   useEffect(() => {
-    refresh();
+    refresh(false);
   }, [searchStatus]);
 
   useEffect(() => {
-    if (searchText === "") {
-      refresh();
-    } else {
-      let _dataSet = [...pOs];
-      let filtered = _dataSet.filter((d) => {
-        return (
-          d?.number?.toString().indexOf(searchText.toLowerCase()) > -1 ||
-          d?.vendor?.companyName
-            ?.toString()
-            .toLowerCase()
-            .indexOf(searchText.toLowerCase()) > -1
-        );
-      });
-      setTempPOs(filtered);
-      // else setTempDataset(dataset)
+    if (searchText === "" || searchText?.length >= 3) {
+      refresh(false);
     }
   }, [searchText]);
 
@@ -220,7 +207,8 @@ export default function PurchaseOrders() {
       });
     }
   }, [po]);
-  function refresh() {
+
+  function refresh(userInitiated) {
     setDataLoaded(false);
     if (user?.userType === "VENDOR") {
       fetch(
@@ -248,7 +236,7 @@ export default function PurchaseOrders() {
         });
     } else {
       fetch(
-        `${url}/purchaseOrders?pagesize=${pageSize}&page=${currentPage}&status=${searchStatus}`,
+        `${url}/purchaseOrders?pagesize=${pageSize}&page=${currentPage}&status=${searchStatus}&search=${searchText}`,
         {
           method: "GET",
           headers: {
@@ -815,7 +803,7 @@ export default function PurchaseOrders() {
         setOpenViewPO(false);
         setOpenWithdrawWarning(false);
         setWithdrawing(false);
-        refresh();
+        refresh(false);
       });
     //call API to sign
   }
@@ -846,7 +834,7 @@ export default function PurchaseOrders() {
         setOpenViewPO(false);
         setOpenTerminatingWarning(false);
         setWithdrawing(false);
-        refresh();
+        refresh(false);
       });
     //call API to sign
   }
@@ -1341,7 +1329,7 @@ export default function PurchaseOrders() {
                 type="text"
                 className="bg-white h-8 text-[#0063CF]"
                 icon={<ReloadOutlined />}
-                onClick={() => refresh()}
+                onClick={() => refresh(true)}
               ></Button>
             </div>
           </div>
@@ -1359,6 +1347,8 @@ export default function PurchaseOrders() {
                     onChange={(e) => {
                       setSearchText(e?.target?.value);
                     }}
+                    autoFocus={true}
+                    value={searchText}
                     placeholder="Search by po#, vendor name"
                   />
                   {/* <Input.Search

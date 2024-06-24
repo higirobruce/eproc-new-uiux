@@ -22,6 +22,7 @@ export default function page() {
   const [contracts, setContracts] = useState([]);
   const [payments, setPayments] = useState([]);
   const [year, setYear] = useState(new Date().getFullYear());
+  const [currency, setCurrency] = useState("RWF");
   const [internalUsers, setInternalUsers] = useState([]);
   const [purchaseOrders, setPurchaseOrders] = useState([]);
   const [vendors, setVendors] = useState([]);
@@ -227,6 +228,7 @@ export default function page() {
       loadSpendTrackingOverview()
         .then((res) => getResultFromServer(res))
         .then((res) => {
+          console.log("Spend------------", res);
           setSpendOverview(res);
         })
         .catch((err) => {
@@ -253,7 +255,7 @@ export default function page() {
         content: "Something happened! Please try again.",
       });
     }
-  }, [year]);
+  }, [year, currency]);
 
   async function loadTenders() {
     return fetch(`${url}/tenders/`, {
@@ -377,29 +379,35 @@ export default function page() {
   }
 
   async function loadRequestOverview() {
-    return fetch(`${url}/requests/totalOverview?year=${year}`, {
-      method: "GET",
-      headers: {
-        Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
-        token: token,
-        "Content-Type": "application/json",
-      },
-    });
+    return fetch(
+      `${url}/requests/totalOverview?year=${year}&currency=${currency}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+          token: token,
+          "Content-Type": "application/json",
+        },
+      }
+    );
   }
 
   async function loadPaymentOverview() {
-    return fetch(`${url}/paymentRequests/totalOverview?year=${year}`, {
-      method: "GET",
-      headers: {
-        Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
-        token: token,
-        "Content-Type": "application/json",
-      },
-    });
+    return fetch(
+      `${url}/paymentRequests/totalOverview?year=${year}&currency=${currency}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+          token: token,
+          "Content-Type": "application/json",
+        },
+      }
+    );
   }
 
   async function loadDashboardOverview() {
-    return fetch(`${url}/dashboards?year=${year}`, {
+    return fetch(`${url}/dashboards?year=${year}&currency=${currency}`, {
       method: "GET",
       headers: {
         Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
@@ -410,25 +418,31 @@ export default function page() {
   }
 
   async function loadSpendTrackingOverview() {
-    return fetch(`${url}/paymentRequests/spendTracking?year=${year}`, {
-      method: "GET",
-      headers: {
-        Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
-        token: token,
-        "Content-Type": "application/json",
-      },
-    });
+    return fetch(
+      `${url}/paymentRequests/spendTracking?year=${year}&currency=${currency}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+          token: token,
+          "Content-Type": "application/json",
+        },
+      }
+    );
   }
 
   async function loadExpensePlanning() {
-    return fetch(`${url}/paymentRequests/expensePlanning?year=${year}`, {
-      method: "GET",
-      headers: {
-        Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
-        token: token,
-        "Content-Type": "application/json",
-      },
-    });
+    return fetch(
+      `${url}/paymentRequests/expensePlanning?year=${year}&currency=${currency}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
+          token: token,
+          "Content-Type": "application/json",
+        },
+      }
+    );
   }
 
   function getResultFromServer(res) {
@@ -642,7 +656,7 @@ export default function page() {
     return yearsArray;
   }
 
-  const dashboardOverviewData = transformData(dashboardOverview.data);
+  const dashboardOverviewData = transformData(dashboardOverview?.data);
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload?.length) {
@@ -662,7 +676,7 @@ export default function page() {
       {dataLoaded ? (
         <div className="payment-request lg:m-6  mb-10 p-5 h-screen overflow-x-auto">
           {/* Cards */}
-          <div className="lg:grid hidden xl:grid-cols-8 md:grid-cols-4 gap-3 my-4">
+          <div className="lg:grid hidden xl:grid-cols-9 md:grid-cols-4 gap-3 my-4">
             {[
               {
                 name: "Purchase request",
@@ -709,8 +723,9 @@ export default function page() {
                 </div>
               </div>
             ))}
+
             {/* Select Year */}
-            <div className="flex justify-end mb-4 mr-1">
+            <div className="flex mb-4 mr-1">
               <Select
                 defaultValue={year}
                 style={{ width: 120 }}
@@ -718,6 +733,23 @@ export default function page() {
                 className="border-0"
                 onChange={(value) => setYear(value)}
                 options={generateYearsArray()}
+              />
+            </div>
+
+            {/* Select Currency */}
+            <div className="flex justify-end mb-4 mr-1">
+              <Select
+                defaultValue={currency}
+                style={{ width: 120 }}
+                size="large"
+                className="border-0"
+                onChange={(value) => setCurrency(value)}
+                options={[
+                  { key: "RWF", value: "RWF", label: "RWF" },
+                  { key: "USD", value: "USD", label: "USD" },
+                  { key: "EUR", value: "EUR", label: "EUR" },
+                  { key: "GBP", value: "GBP", label: "GBP" },
+                ]}
               />
             </div>
           </div>
@@ -1027,31 +1059,31 @@ export default function page() {
                     {dashboardOverview?.statusData && (
                       <div className="bg-[#F9FAFD] p-5 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
                         <div>
-                            <Chart
-                              options={{
-                                title: {
-                                  text: "Tenders",
-                                },
-                                chart: {
-                                  id: "pie-approval",
-                                },
+                          <Chart
+                            options={{
+                              title: {
+                                text: "Tenders",
+                              },
+                              chart: {
+                                id: "pie-approval",
+                              },
 
-                                labels:
-                                  dashboardOverview?.statusData?.tenders?.map(
-                                    (s) => {
-                                      return s?._id;
-                                    }
-                                  ),
-                              }}
-                              series={dashboardOverview?.statusData?.tenders?.map(
-                                (s) => {
-                                  return s?.total;
-                                }
-                              )}
-                              type="pie"
-                              width="400"
-                            />
-                          </div>
+                              labels:
+                                dashboardOverview?.statusData?.tenders?.map(
+                                  (s) => {
+                                    return s?._id;
+                                  }
+                                ),
+                            }}
+                            series={dashboardOverview?.statusData?.tenders?.map(
+                              (s) => {
+                                return s?.total;
+                              }
+                            )}
+                            type="pie"
+                            width="400"
+                          />
+                        </div>
                       </div>
                     )}
                     {dashboardOverview?.statusData && (
@@ -1124,200 +1156,208 @@ export default function page() {
               </div>
             </div>
           ) : tab == 1 ? (
-            <div className="payment-request bg-white h-[calc(100vh-310px)] pb-10 rounded-lg mt-3 overflow-y-auto px-5 py-3">
-              <div className="grid xl:grid-cols-5 gap-x-8 bg-[#F9FAFD] p-4">
-                <div className="xl:col-span-4">
-                  <div className="bg-[#F9FAFD] xl:p-5 p-1 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
-                    <Chart
-                      options={{
-                        title: {
-                          text: "Amount Paid vs Requests over time",
-                        },
-                        chart: {
-                          id: "bar-paid-nrequest",
-                          type: "line",
-                          // stacked: true,
-                        },
-                        stroke: {
-                          width: [4, 4, 4],
-                          curve: "monotoneCubic",
-                        },
-                        dataLabels: {
-                          enabled: true,
-                          formatter: numberWithCommas,
-                        },
-                        labels: spendOverview?.data?.map((s) => {
-                          return s?.month;
-                        }),
-                        yaxis: [
-                          {
-                            title: {
-                              text: "Total Paid",
+            spendOverview && (
+              <div className="payment-request bg-white h-[calc(100vh-310px)] pb-10 rounded-lg mt-3 overflow-y-auto px-5 py-3">
+                <div className="grid xl:grid-cols-5 gap-x-8 bg-[#F9FAFD] p-4">
+                  <div className="xl:col-span-4">
+                    <div className="bg-[#F9FAFD] xl:p-5 p-1 border-x-0 border-b-0 border border-solid border-[#F1F3FF]">
+                      <Chart
+                        options={{
+                          title: {
+                            text: "Amount Paid vs Requests over time",
+                          },
+                          chart: {
+                            id: "bar-paid-nrequest",
+                            type: "line",
+                            // stacked: true,
+                          },
+                          stroke: {
+                            width: [4, 4, 4],
+                            curve: "monotoneCubic",
+                          },
+                          dataLabels: {
+                            enabled: true,
+                            formatter: numberWithCommas,
+                          },
+                          labels: spendOverview?.data?.map((s) => {
+                            return s?.month;
+                          }),
+                          yaxis: [
+                            {
+                              title: {
+                                text: "Total Paid",
+                              },
+                              labels: {
+                                formatter: numberWithCommas,
+                              },
                             },
+                            {
+                              opposite: true,
+                              title: {
+                                text: "Number of requests",
+                              },
+                              labels: {
+                                formatter: numberWithCommas,
+                              },
+                            },
+                          ],
+                        }}
+                        // type="bar"
+                        height="300"
+                        series={[
+                          {
+                            name: "paid",
+                            type: "bar",
+                            data: spendOverview?.data?.map((s) => {
+                              return s?.total_paid;
+                            }),
+                          },
+                          {
+                            name: "# of requests",
+                            type: "line",
+                            data: spendOverview?.data?.map((s) => {
+                              return s?.requests;
+                            }),
+                          },
+                        ]}
+                        // width="500"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-col space-y-3 sm:w-full">
+                    <div className="bg-white flex justify-between items-center py-1 px-4 ring-1 ring-[#EDF2F9] rounded-lg">
+                      <div>
+                        <h6 className="text-[#95AAC9] font-light text-[12px] mt-4 mb-6">
+                          Total Amount
+                        </h6>
+                        <h2 className="text-[#6C757D] text-[20px] font-semibold mt-0">
+                          $
+                          {formatAmount(spendOverview?.totals[0]?.total_amount)}
+                        </h2>
+                      </div>
+                      <PiCurrencyCircleDollarFill
+                        size={24}
+                        className="text-[#95AAC9]"
+                      />
+                    </div>
+                    <div className="bg-white flex justify-between items-center py-1 px-4 ring-1 ring-[#EDF2F9] rounded-lg">
+                      <div>
+                        <h6 className="text-[#95AAC9] font-light text-[12px] mt-4 mb-0">
+                          Total Requests
+                        </h6>
+                        <h2 className="text-[#6C757D] text-[20px] font-semibold mt-4">
+                          {spendOverview?.totals[0]?.total_requests}
+                        </h2>
+                      </div>
+                      <MdOutlinePendingActions
+                        size={22}
+                        className="text-[#95AAC9]"
+                      />
+                    </div>
+                    <div className="bg-white flex justify-between items-center py-1 px-4 ring-1 ring-[#EDF2F9] rounded-lg">
+                      <div>
+                        <h6 className="text-[#95AAC9] font-light text-[12px] mt-4 mb-0">
+                          Average
+                        </h6>
+                        <h2 className="text-[#6C757D] text-[20px] font-semibold mt-4">
+                          $
+                          {formatAmount(
+                            spendOverview?.totals[0]?.average_request
+                          )}{" "}
+                          / requests
+                        </h2>
+                      </div>
+                      <MdOutlinePayments size={24} className="text-[#95AAC9]" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid xl:grid-cols-3 mt-5 xl:gap-10">
+                  {dashboardOverview?.departmentExpanditure && (
+                    <div className=" xl:col-span-2 bg-[#F9FAFD] py-3 ">
+                      <Chart
+                        options={{
+                          title: {
+                            text: "Department Expenditures",
+                          },
+                          // stroke: {
+                          //   curve: "smooth",
+                          //   // width: 2,
+                          // },
+                          chart: {
+                            id: "basic-line",
+                            // type:'bar'
+                            stacked: true,
+                          },
+                          xaxis: {
+                            categories:
+                              dashboardOverview?.departmentExpanditure?.map(
+                                (d) => {
+                                  return d?.name;
+                                }
+                              ),
+                          },
+                          yaxis: {
                             labels: {
                               formatter: numberWithCommas,
                             },
                           },
-                          {
-                            opposite: true,
-                            title: {
-                              text: "Number of requests",
-                            },
-                            labels: {
-                              formatter: numberWithCommas,
-                            },
+                          dataLabels: {
+                            formatter: numberWithCommas,
                           },
-                        ],
-                      }}
-                      // type="bar"
-                      height="300"
-                      series={[
-                        {
-                          name: "paid",
-                          type: "bar",
-                          data: spendOverview?.data?.map((s) => {
-                            return s?.total_paid;
+                        }}
+                        series={[
+                          {
+                            name: "budgeted",
+                            data: dashboardOverview?.departmentExpanditure?.map(
+                              (d) => {
+                                return d?.budgeted;
+                              }
+                            ),
+                          },
+                          {
+                            name: "non-budgeted",
+                            data: dashboardOverview?.departmentExpanditure?.map(
+                              (d) => {
+                                return d?.nonBudgeted;
+                              }
+                            ),
+                          },
+                        ]}
+                        type="bar"
+                        height="300"
+                        // width="500"
+                      />
+                    </div>
+                  )}
+
+                  {spendOverview?.budgetData && (
+                    <div className="bg-[#F9FAFD] px-5 py-3 ">
+                      <Chart
+                        options={{
+                          title: {
+                            text: "Budget comparison",
+                          },
+
+                          chart: {
+                            id: "pie-budget-comparison",
+                          },
+
+                          labels: spendOverview?.budgetData?.map((s) => {
+                            return s?.name;
                           }),
-                        },
-                        {
-                          name: "# of requests",
-                          type: "line",
-                          data: spendOverview?.data?.map((s) => {
-                            return s?.requests;
-                          }),
-                        },
-                      ]}
-                      // width="500"
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-col space-y-3 sm:w-full">
-                  <div className="bg-white flex justify-between items-center py-1 px-4 ring-1 ring-[#EDF2F9] rounded-lg">
-                    <div>
-                      <h6 className="text-[#95AAC9] font-light text-[12px] mt-4 mb-6">
-                        Total Amount
-                      </h6>
-                      <h2 className="text-[#6C757D] text-[20px] font-semibold mt-0">
-                        ${formatAmount(spendOverview?.totals[0]?.total_amount)}
-                      </h2>
+                        }}
+                        series={spendOverview?.budgetData?.map((s) => {
+                          return s?.value;
+                        })}
+                        type="pie"
+                        width="400"
+                      />
                     </div>
-                    <PiCurrencyCircleDollarFill
-                      size={24}
-                      className="text-[#95AAC9]"
-                    />
-                  </div>
-                  <div className="bg-white flex justify-between items-center py-1 px-4 ring-1 ring-[#EDF2F9] rounded-lg">
-                    <div>
-                      <h6 className="text-[#95AAC9] font-light text-[12px] mt-4 mb-0">
-                        Total Requests
-                      </h6>
-                      <h2 className="text-[#6C757D] text-[20px] font-semibold mt-4">
-                        {spendOverview?.totals[0]?.total_requests}
-                      </h2>
-                    </div>
-                    <MdOutlinePendingActions
-                      size={22}
-                      className="text-[#95AAC9]"
-                    />
-                  </div>
-                  <div className="bg-white flex justify-between items-center py-1 px-4 ring-1 ring-[#EDF2F9] rounded-lg">
-                    <div>
-                      <h6 className="text-[#95AAC9] font-light text-[12px] mt-4 mb-0">
-                        Average
-                      </h6>
-                      <h2 className="text-[#6C757D] text-[20px] font-semibold mt-4">
-                        $
-                        {formatAmount(
-                          spendOverview?.totals[0]?.average_request
-                        )}{" "}
-                        / requests
-                      </h2>
-                    </div>
-                    <MdOutlinePayments size={24} className="text-[#95AAC9]" />
-                  </div>
+                  )}
                 </div>
               </div>
-
-              <div className="grid xl:grid-cols-3 mt-5 xl:gap-10">
-                <div className=" xl:col-span-2 bg-[#F9FAFD] py-3 ">
-                  <Chart
-                    options={{
-                      title: {
-                        text: "Department Expenditures",
-                      },
-                      // stroke: {
-                      //   curve: "smooth",
-                      //   // width: 2,
-                      // },
-                      chart: {
-                        id: "basic-line",
-                        // type:'bar'
-                        stacked: true,
-                      },
-                      xaxis: {
-                        categories:
-                          dashboardOverview?.departmentExpanditure?.map((d) => {
-                            return d?.name;
-                          }),
-                      },
-                      yaxis: {
-                        labels: {
-                          formatter: numberWithCommas,
-                        },
-                      },
-                      dataLabels: {
-                        formatter: numberWithCommas,
-                      },
-                    }}
-                    series={[
-                      {
-                        name: "budgeted",
-                        data: dashboardOverview?.departmentExpanditure?.map(
-                          (d) => {
-                            return d?.budgeted;
-                          }
-                        ),
-                      },
-                      {
-                        name: "non-budgeted",
-                        data: dashboardOverview?.departmentExpanditure?.map(
-                          (d) => {
-                            return d?.nonBudgeted;
-                          }
-                        ),
-                      },
-                    ]}
-                    type="bar"
-                    height="300"
-                    // width="500"
-                  />
-                </div>
-                <div className="bg-[#F9FAFD] px-5 py-3 ">
-                  <div>
-                    <Chart
-                      options={{
-                        title: {
-                          text: "Budget comparison",
-                        },
-
-                        chart: {
-                          id: "pie-budget-comparison",
-                        },
-
-                        labels: spendOverview?.budgetData?.map((s) => {
-                          return s?.name;
-                        }),
-                      }}
-                      series={spendOverview?.budgetData?.map((s) => {
-                        return s?.value;
-                      })}
-                      type="pie"
-                      width="400"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
+            )
           ) : (
             <div className="payment-request bg-white h-[calc(100vh-310px)] rounded-lg mt-3 overflow-y-auto px-5 py-3">
               <div className="grid xl:grid-cols-5 gap-x-8 bg-[#F9FAFD] py-4 px-3 my-4">
