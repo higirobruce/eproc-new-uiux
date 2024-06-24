@@ -723,70 +723,73 @@ export default function page() {
                 </div>
               </div>
             ))}
-
-            {/* Select Year */}
-            <div className="flex mb-4 mr-1">
-              <Select
-                defaultValue={year}
-                style={{ width: 120 }}
-                size="large"
-                className="border-0"
-                onChange={(value) => setYear(value)}
-                options={generateYearsArray()}
-              />
-            </div>
-
-            {/* Select Currency */}
-            <div className="flex justify-end mb-4 mr-1">
-              <Select
-                defaultValue={currency}
-                style={{ width: 120 }}
-                size="large"
-                className="border-0"
-                onChange={(value) => setCurrency(value)}
-                options={[
-                  { key: "RWF", value: "RWF", label: "RWF" },
-                  { key: "USD", value: "USD", label: "USD" },
-                  { key: "EUR", value: "EUR", label: "EUR" },
-                  { key: "GBP", value: "GBP", label: "GBP" },
-                ]}
-              />
-            </div>
           </div>
 
           {/* Tabs */}
           <div className="bg-white rounded-lg my-1 ">
-            <div className="flex items-center gap-x-14 px-5 py-1 bg-[#F5F5F5] rounded">
-              <button
-                className={`bg-transparent py-1 my-1 ${
-                  tab == 0
-                    ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238] px-4`
-                    : `border-none text-[#8392AB]`
-                } text-[14px] cursor-pointer`}
-                onClick={() => setTab(0)}
-              >
-                Overview
-              </button>
-              <button
-                className={`bg-transparent py-1 my-1 ${
-                  tab == 1
-                    ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238] px-4`
-                    : `border-none text-[#8392AB]`
-                } text-[14px] cursor-pointer`}
-                onClick={() => setTab(1)}
-              >
-                Spend Tracking
-              </button>
-              <button
-                className={`bg-transparent py-1 my-1 ${
-                  tab == 2
-                    ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238] px-4`
-                    : `border-none text-[#8392AB]`
-                } text-[14px] cursor-pointer`}
-                onClick={() => setTab(2)}
-              >
-                Expense Planning
-              </button>
+            <div className="flex items-center justify-between  bg-[#F5F5F5] rounded">
+              <div className="flex items-center gap-x-14 px-5 py-1">
+                <button
+                  className={`bg-transparent py-1 my-1 ${
+                    tab == 0
+                      ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238] px-4`
+                      : `border-none text-[#8392AB]`
+                  } text-[14px] cursor-pointer`}
+                  onClick={() => setTab(0)}
+                >
+                  Overview
+                </button>
+                <button
+                  className={`bg-transparent py-1 my-1 ${
+                    tab == 1
+                      ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238] px-4`
+                      : `border-none text-[#8392AB]`
+                  } text-[14px] cursor-pointer`}
+                  onClick={() => setTab(1)}
+                >
+                  Spend Tracking
+                </button>
+                <button
+                  className={`bg-transparent py-1 my-1 ${
+                    tab == 2
+                      ? `border-b-2 border-[#1677FF] border-x-0 border-t-0 text-[#263238] px-4`
+                      : `border-none text-[#8392AB]`
+                  } text-[14px] cursor-pointer`}
+                  onClick={() => setTab(2)}
+                >
+                  Expense Planning
+                </button>
+              </div>
+              <div className="justify-end flex">
+                {/* Select Year */}
+                <div className="flex mr-1">
+                  <Select
+                    defaultValue={year}
+                    style={{ width: 120 }}
+                    size="middle"
+                    className="border-0"
+                    onChange={(value) => setYear(value)}
+                    options={generateYearsArray()}
+                  />
+                </div>
+
+                {/* Select Currency */}
+                <div className="flex mr-1">
+                  <Select
+                    defaultValue={currency}
+                    style={{ width: 120 }}
+                    size="middle"
+                    className="border-0"
+                    onChange={(value) => setCurrency(value)}
+                    options={[
+                      { key: "RWF", value: "RWF", label: "RWF" },
+                      { key: "USD", value: "USD", label: "USD" },
+                      { key: "EUR", value: "EUR", label: "EUR" },
+                      { key: "GBP", value: "GBP", label: "GBP" },
+                    ]}
+                  />
+                </div>
+              </div>
             </div>
           </div>
           {tab == 0 ? (
@@ -1231,7 +1234,6 @@ export default function page() {
                           Total Amount
                         </h6>
                         <h2 className="text-[#6C757D] text-[20px] font-semibold mt-0">
-                          $
                           {formatAmount(spendOverview?.totals[0]?.total_amount)}
                         </h2>
                       </div>
@@ -1260,7 +1262,6 @@ export default function page() {
                           Average
                         </h6>
                         <h2 className="text-[#6C757D] text-[20px] font-semibold mt-4">
-                          $
                           {formatAmount(
                             spendOverview?.totals[0]?.average_request
                           )}{" "}
@@ -1346,6 +1347,12 @@ export default function page() {
                           labels: spendOverview?.budgetData?.map((s) => {
                             return s?.name;
                           }),
+
+                          tooltip: {
+                            y: {
+                              formatter: numberWithCommas,
+                            },
+                          },
                         }}
                         series={spendOverview?.budgetData?.map((s) => {
                           return s?.value;
@@ -1451,7 +1458,6 @@ export default function page() {
                         Total Requests Amount
                       </h6>
                       <h2 className="text-[#6C757D] text-[20px] font-semibold mt-0">
-                        $
                         {formatAmount(
                           expenseOverview?.totals[0]?.total_requests_amount
                         )}
@@ -1471,7 +1477,6 @@ export default function page() {
                         {/* <span className="text-[#95AAC9] font-light text-[12px] mt-0 mb-0"> (this week)</span> */}
                       </div>
                       <h2 className="text-[#6C757D] text-[20px] font-semibold mt-4">
-                        $
                         {formatAmount(
                           expenseOverview?.totals[0]?.total_pending_payments
                         )}
