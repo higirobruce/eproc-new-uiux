@@ -676,7 +676,7 @@ export default function page() {
       {dataLoaded ? (
         <div className="payment-request lg:m-6  mb-10 p-5 h-screen overflow-x-auto">
           {/* Cards */}
-          <div className="lg:grid hidden xl:grid-cols-9 md:grid-cols-4 gap-3 my-4">
+          <div className="lg:grid hidden xl:grid-cols-7 md:grid-cols-4 gap-3 my-4">
             {[
               {
                 name: "Purchase request",
