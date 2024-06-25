@@ -1311,7 +1311,28 @@ export default function page() {
                             },
                           },
                           dataLabels: {
-                            dropShadow: true,
+                            dropShadow: {
+                              enabled: false,
+                              top: 1,
+                              left: 1,
+                              blur: 1,
+                              opacity: 0.45,
+                            },
+                            style: {
+                              fontSize: '11px',
+                              fontFamily: 'Helvetica, Arial, sans-serif',
+                              fontWeight: 'bold',
+                              colors: ['#304758']
+                            },
+                            background: {
+                              enabled: true,
+                              foreColor: '#fff',
+                              borderRadius: 2,
+                              padding: 4,
+                              borderWidth: 1,
+                              borderColor: '#fff',
+                              opacity: 0.9,
+                            },
                             enabled: true,
                             formatter: numberWithCommas,
                           },
@@ -1438,6 +1459,29 @@ export default function page() {
                         },
                       },
                       dataLabels: {
+                        dropShadow: {
+                          enabled: false,
+                          top: 1,
+                          left: 1,
+                          blur: 1,
+                          opacity: 0.45,
+                        },
+                        style: {
+                          fontSize: '11px',
+                          fontFamily: 'Helvetica, Arial, sans-serif',
+                          fontWeight: 'bold',
+                          colors: ['#304758']
+                        },
+                        background: {
+                          enabled: true,
+                          foreColor: '#fff',
+                          borderRadius: 2,
+                          padding: 4,
+                          borderWidth: 1,
+                          borderColor: '#fff',
+                          opacity: 0.9,
+                        },
+                        enabled: true,
                         formatter: numberWithCommas,
                       },
                     }}
@@ -1543,6 +1587,29 @@ export default function page() {
                       },
                     },
                     dataLabels: {
+                      dropShadow: {
+                        enabled: false,
+                        top: 1,
+                        left: 1,
+                        blur: 1,
+                        opacity: 0.45,
+                      },
+                      style: {
+                        fontSize: '11px',
+                        fontFamily: 'Helvetica, Arial, sans-serif',
+                        fontWeight: 'bold',
+                        colors: ['#304758']
+                      },
+                      background: {
+                        enabled: true,
+                        foreColor: '#fff',
+                        borderRadius: 2,
+                        padding: 4,
+                        borderWidth: 1,
+                        borderColor: '#fff',
+                        opacity: 0.9,
+                      },
+                      enabled: true,
                       formatter: numberWithCommas,
                     },
                   }}
