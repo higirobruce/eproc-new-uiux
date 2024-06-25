@@ -25,6 +25,8 @@ export default function page() {
   const [currency, setCurrency] = useState("RWF");
   const [internalUsers, setInternalUsers] = useState([]);
   const [purchaseOrders, setPurchaseOrders] = useState([]);
+
+  const [purchaseOrdersLength, setPurchaseOrdersLength] = useState(0);
   const [vendors, setVendors] = useState([]);
   const [budgeted, setBudgeted] = useState(0);
   const [unbudgeted, setUnbudgeted] = useState(0);
@@ -132,7 +134,7 @@ export default function page() {
       loadPurchaseOrders()
         .then((res) => getResultFromServer(res))
         .then((res) => {
-          setPurchaseOrders(res?.data);
+          setPurchaseOrdersLength(res?.totalPages);
         })
         .catch((err) => {
           messageApi.open({
@@ -283,7 +285,7 @@ export default function page() {
   }
 
   async function loadContracts() {
-    return fetch(`${url}/contracts/`, {
+    return fetch(`${url}/contracts?status=all`, {
       method: "GET",
       headers: {
         Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
@@ -294,7 +296,7 @@ export default function page() {
   }
 
   async function loadPurchaseOrders() {
-    return fetch(`${url}/purchaseOrders/`, {
+    return fetch(`${url}/purchaseOrders?status=all`, {
       method: "GET",
       headers: {
         Authorization: "Basic " + encode(`${apiUsername}:${apiPassword}`),
@@ -650,7 +652,7 @@ export default function page() {
   function generateYearsArray() {
     const currentYear = new Date().getFullYear();
     const startYear = 2023;
-    const yearsArray = [];
+    const yearsArray = [{ value: "all", label: "All" }];
 
     for (let year = startYear; year <= currentYear; year++) {
       yearsArray.push({ value: year, label: `${year}` });
@@ -695,7 +697,7 @@ export default function page() {
               { name: "Contract", value: contracts?.length, color: "#679AF3" },
               {
                 name: "Purchase Orders",
-                value: purchaseOrders?.length,
+                value: purchaseOrdersLength,
                 color: "#E4C1A0",
               },
               { name: "Vendors", value: vendors?.length, color: "#6A76D7" },
@@ -1319,18 +1321,18 @@ export default function page() {
                               opacity: 0.45,
                             },
                             style: {
-                              fontSize: '11px',
-                              fontFamily: 'Helvetica, Arial, sans-serif',
-                              fontWeight: 'bold',
-                              colors: ['#304758']
+                              fontSize: "11px",
+                              fontFamily: "Helvetica, Arial, sans-serif",
+                              fontWeight: "bold",
+                              colors: ["#3e9ffc"],
                             },
                             background: {
                               enabled: true,
-                              foreColor: '#fff',
+                              foreColor: "#fff",
                               borderRadius: 2,
                               padding: 4,
                               borderWidth: 1,
-                              borderColor: '#fff',
+                              borderColor: "#fff",
                               opacity: 0.9,
                             },
                             enabled: true,
@@ -1467,18 +1469,18 @@ export default function page() {
                           opacity: 0.45,
                         },
                         style: {
-                          fontSize: '11px',
-                          fontFamily: 'Helvetica, Arial, sans-serif',
-                          fontWeight: 'bold',
-                          colors: ['#304758']
+                          fontSize: "11px",
+                          fontFamily: "Helvetica, Arial, sans-serif",
+                          fontWeight: "bold",
+                          colors: ["#3e9ffc"],
                         },
                         background: {
                           enabled: true,
-                          foreColor: '#fff',
+                          foreColor: "#fff",
                           borderRadius: 2,
                           padding: 4,
                           borderWidth: 1,
-                          borderColor: '#fff',
+                          borderColor: "#fff",
                           opacity: 0.9,
                         },
                         enabled: true,
@@ -1595,18 +1597,18 @@ export default function page() {
                         opacity: 0.45,
                       },
                       style: {
-                        fontSize: '11px',
-                        fontFamily: 'Helvetica, Arial, sans-serif',
-                        fontWeight: 'bold',
-                        colors: ['#304758']
+                        fontSize: "11px",
+                        fontFamily: "Helvetica, Arial, sans-serif",
+                        fontWeight: "bold",
+                        colors: ["#3e9ffc"],
                       },
                       background: {
                         enabled: true,
-                        foreColor: '#fff',
+                        foreColor: "#fff",
                         borderRadius: 2,
                         padding: 4,
                         borderWidth: 1,
-                        borderColor: '#fff',
+                        borderColor: "#fff",
                         opacity: 0.9,
                       },
                       enabled: true,
