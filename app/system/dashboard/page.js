@@ -50,7 +50,10 @@ export default function page() {
   const [messageApi, contextHolder] = message.useMessage();
 
   const numberWithCommas = (value) => {
-    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return parseFloat(value)
+      .toFixed(0)
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
   useEffect(() => {
@@ -1290,6 +1293,10 @@ export default function page() {
                             // type:'bar'
                             stacked: true,
                           },
+                          stroke: {
+                            width: [4, 4, 4],
+                            curve: "monotoneCubic",
+                          },
                           xaxis: {
                             categories:
                               dashboardOverview?.departmentExpanditure?.map(
@@ -1304,6 +1311,8 @@ export default function page() {
                             },
                           },
                           dataLabels: {
+                            dropShadow: true,
+                            enabled: true,
                             formatter: numberWithCommas,
                           },
                         }}
